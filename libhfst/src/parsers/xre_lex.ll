@@ -141,7 +141,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 
 "\\\\\\" { CR; return LEFT_QUOTIENT; }
 
-"^"({UINTEGER}|"0")","({UINTEGER}|"0") { 
+"^"{WSP}*({UINTEGER}|"0")","({UINTEGER}|"0") { 
     CR;
     yylval->values = hfst::xre::get_n_to_k(yytext);
     return CATENATE_N_TO_K;
@@ -153,19 +153,19 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     return CATENATE_N_TO_K;
 }
 
-"^>"({UINTEGER}|"0") { 
+"^>"{WSP}*({UINTEGER}|"0") { 
     CR;
     yylval->value = strtol(yytext + 2, 0, 10);
     return CATENATE_N_PLUS; 
 }
 
-"^<"({UINTEGER}|"0") { 
+"^<"{WSP}*({UINTEGER}|"0") { 
     CR;
     yylval->value = strtol(yytext + 2, 0, 10);
     return CATENATE_N_MINUS;
 }
 
-"^"({UINTEGER}|"0")                  { 
+"^"{WSP}*({UINTEGER}|"0")                  { 
     CR;
     yylval->value = strtol(yytext + 1, 0, 10);
     return CATENATE_N;
