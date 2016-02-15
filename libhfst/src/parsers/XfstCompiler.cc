@@ -4995,25 +4995,28 @@ namespace xfst {
 
   static std::string to_literal_regexp(const hfst::StringPairVector & path, bool input_side)
   {
-    std::string pathstr("[ ");
+    std::string pathstr("[");
     for (hfst::StringPairVector::const_iterator it = path.begin(); it != path.end(); it++)
       {
         std::string symbol = (input_side) ? it->first : it->second ;
-        pathstr.append("\"").append(symbol).append("\" ");
+        if (symbol != hfst::internal_epsilon)
+          pathstr.append("\"").append(symbol).append("\" ");
       }
     pathstr.append("]");
+    if (pathstr == "[]")
+      pathstr = "[0]";
     return pathstr;
   }
 
   static HfstTransducer * to_literal_transducer(const hfst::StringPairVector & path, hfst::xre::XreCompiler & xre_)
   {
-    std::string pathstr("[ ");
+    std::string pathstr("[");
     for (hfst::StringPairVector::const_iterator it = path.begin(); it != path.end(); it++)
       {
         std::string isymbol = it->first;
         if (isymbol == hfst::internal_epsilon)
           {
-            pathstr.append("0");
+            pathstr.append(" 0 ");
           }
         else
           {
@@ -5025,7 +5028,7 @@ namespace xfst {
         std::string osymbol = it->second;
         if (osymbol == hfst::internal_epsilon)
           {
-            pathstr.append("0 ");
+            pathstr.append(" 0 ");
           }
         else
           {
@@ -5033,6 +5036,8 @@ namespace xfst {
           }
       }
     pathstr.append("];");
+    if (pathstr == "[];")
+      pathstr = "[0];";
     // debug
     //std::cerr << "to_literal_transducer: compiling expression: " << pathstr << std::endl;
     char * p = strdup(pathstr.c_str());
@@ -5043,17 +5048,20 @@ namespace xfst {
 
   static std::string to_regexp(const hfst::StringPairVector & path, bool input_side)
   {
-    std::string pathstr("[ ");
+    std::string pathstr("[");
     for (hfst::StringPairVector::const_iterator it = path.begin(); it != path.end(); it++)
       {
         std::string symbol = (input_side) ? it->first : it->second ;
         // ignore "^[" and "^]"
         if (symbol != "^]" && symbol != "^[")
           {
-            pathstr.append(symbol).append(" ");
+            if (symbol != hfst::internal_epsilon)
+              pathstr.append(symbol); //.append(" ");
           }
       }
     pathstr.append("]");
+    if (pathstr == "[]")
+      pathstr = "[0]";
     return pathstr;
   }
 
@@ -5127,7 +5135,7 @@ namespace xfst {
                    if (replacement == NULL)
                      {
                        error() << "Could not compile regular expression in compile-replace: " << cpr << "." << std::endl;
-        flush(&error());
+                       flush(&error());
                        //fprintf(stderr, "Could not compile regular expression in compile-replace: %s.\n", cpr);
                        xfst_lesser_fail();
                        prompt();
