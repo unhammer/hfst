@@ -1033,9 +1033,12 @@ void warn_about_hfst_special_symbol(const char * symbol)
     return;
   if (!verbose_)
     return;
-  std::ostream * err = xreerrstr();
-  *err << "warning: '" << symbol << "' is not an ordinary symbol in hfst" << std::endl;
-  xreflush(err);
+  if (hfst::xre::verbose_)
+    {
+      std::ostream * err = xreerrstr();
+      *err << "warning: '" << symbol << "' is not an ordinary symbol in hfst" << std::endl;
+      xreflush(err);
+    }
 }
 
 void warn_about_special_symbols_in_replace(HfstTransducer * t)
