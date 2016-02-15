@@ -3939,10 +3939,18 @@
          {
            std::string istr = tr.get_input_symbol();
            std::string ostr = tr.get_output_symbol();
-           if ((input_side && is_special_symbol(istr)) || (!input_side && is_special_symbol(ostr)))
+
+           if (input_side && is_epsilon(istr))
+             {}
+           else if (!input_side && is_epsilon(ostr))
+             {}
+           else if ((input_side && is_special_symbol(istr)) || (!input_side && is_special_symbol(ostr)))
              {
                throw "error: special symbol detected in compile-replace regular expression";
              } 
+           else 
+             {}
+
            if ((input_side && ("^[" == istr)) || (!input_side && ("^[" == ostr)))
              {
                throw "error: ^[ detected inside compile-replace regular expression";
