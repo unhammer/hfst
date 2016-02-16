@@ -172,7 +172,7 @@ parse_options(int argc, char** argv)
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "I:Nx",
+                             HFST_GETOPT_UNARY_SHORT "I:NX",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -214,6 +214,29 @@ parse_options(int argc, char** argv)
               /*inputfilename*/);
       }
     return EXIT_CONTINUE;
+}
+
+std::string &replace_all_substr(const std::string &substr, 
+                                const std::string &repl,
+                                std::string &str)
+{
+  int pos = 0;
+  while ((pos = str.find(substr, pos)) != std::string::npos)
+    {
+      str.replace(pos, substr.size(), repl);
+    }
+  return str;
+}
+#define PTPP "PAIR_TEST_PERC_PERC"
+// perc_escaped is a string where special symols are escaped using
+// %. Transform it into a string where specail symbols are escaped
+// using \. 
+std::string backslash_escape(std::string perc_escaped)
+{
+  replace_all_substr("%%", PTPP, perc_escaped);
+  for (char &c : perc_escaped)
+    { c = (c == '%' ? '\\' : c); }
+  return replace_all_substr(PTPP, "%", perc_escaped);
 }
 
 HfstState get_target(const std::string &isymbol,
@@ -657,9 +680,23 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
             const std::string &input_case = positive_test_cases[i];
             const std::string &output_case = positive_test_cases[i + 1];
 
-            StringPairVector test_case = input_tokenizer.tokenize_string_pair
-              (input_case + ":" + output_case, false);
-            
+            StringPairVector test_case;
+            try 
+              {
+                // We need to convert the %-escaped input and output
+                // string to \-escpaed strings for input_toknizer.
+                test_case = input_tokenizer.tokenize_string_pair
+                  (backslash_escape(input_case) + ":" + 
+                   backslash_escape(output_case), false);
+              }
+            catch (const hfst::UnescapedColsFound &e)
+              {
+                error(EXIT_FAILURE, 0, 
+                      "The correspondence %s %s contains unescaped "
+                      "colon-symbols. Escape them using %%.",
+                      input_case.c_str(), output_case.c_str(), line);
+              }
+
             int new_exit_code = test(test_case,
                                      input_case + " : " + output_case,
                                      grammar,
@@ -677,9 +714,23 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
             const std::string &input_case = negative_test_cases[i];
             const std::string &output_case = negative_test_cases[i + 1];
 
-            StringPairVector test_case = input_tokenizer.tokenize_string_pair
-              (input_case + ":" + output_case, false);
-            
+            StringPairVector test_case;
+            try
+              {
+                // We need to convert the %-escaped input and output
+                // string to \-escpaed strings for input_toknizer.
+                test_case = input_tokenizer.tokenize_string_pair
+                  (backslash_escape(input_case) + ":" + 
+                   backslash_escape(output_case), false);
+              }
+            catch (const hfst::UnescapedColsFound &e)
+              {
+                error(EXIT_FAILURE, 0, 
+                      "The correspondence %s %s contains unquoted "
+                      "colon-symbols. Quote them using %%.",
+                      input_case.c_str(), output_case.c_str(), line);
+              }
+
             int new_exit_code = test(test_case,
                                      input_case + " : " + output_case,
                                      grammar,
