@@ -94,8 +94,12 @@ namespace hfst_ol {
         RtnNameMap rtn_names;
 // For each symbol, either NO_SYMBOL for "no corresponding list" or an index into symbol_lists
         SymbolNumberVector symbol2lists;
-// For each a symbol, either NO_SYMBOL for "this is not a list" or an index into symbol_lists_members
+// For each a symbol, either NO_SYMBOL for "this is not a list" or an index into symbol_list_members
         SymbolNumberVector list2symbols;
+        // For each entry referring to entries in the symbol table, indicate
+        // "this symbol is an exclusionary list", ie. symbols not in it
+        // will match
+        SymbolNumberVector exclusionary_lists;
         std::vector<SymbolNumberVector> symbol_lists;
         std::vector<SymbolNumberVector> symbol_list_members;
         std::vector<unsigned long int> counters;

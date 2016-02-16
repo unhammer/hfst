@@ -285,7 +285,24 @@ PmatchTransducerContainer * make_counter(std::string name)
 
 HfstTransducer * make_list(HfstTransducer * t)
 {
-    std::string arc = "@PMATCH_LIST_";
+    std::string arc = "@L.";
+    hfst::StringSet alphabet = t->get_alphabet();
+    for (hfst::StringSet::const_iterator it = alphabet.begin();
+         it != alphabet.end(); ++it) {
+        if (!hfst_ol::PmatchAlphabet::is_special(*it) &&
+            *it != hfst::internal_epsilon && *it != hfst::internal_unknown &&
+            *it != hfst::internal_identity && *it != hfst::internal_default) {
+            arc.append(*it);
+            arc.append("_");
+        }
+    }
+    arc.append("@");
+    return new HfstTransducer(arc, format);
+}
+
+HfstTransducer * make_exc_list(HfstTransducer * t)
+{
+    std::string arc = "@X.";
     hfst::StringSet alphabet = t->get_alphabet();
     for (hfst::StringSet::const_iterator it = alphabet.begin();
          it != alphabet.end(); ++it) {
@@ -1241,6 +1258,12 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
         } else if (op == MakeList) {
             if (!flatten) {
                 HfstTransducer * tmp = make_list(cache);
+                delete cache;
+                cache = tmp;
+            }
+        } else if (op == MakeExcList) {
+            if (!flatten) {
+                HfstTransducer * tmp = make_exc_list(cache);
                 delete cache;
                 cache = tmp;
             }

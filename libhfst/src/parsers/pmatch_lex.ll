@@ -81,6 +81,7 @@ UNICODE_ESCAPE ("\\u"{HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR})|("\\U00"{HEXCHAR}{HEX
 "AND(" { return AND_LEFT; }
 ".t(" { return TAG_LEFT; }
 "Lst(" { return LST_LEFT; }
+"Exc(" { return EXC_LEFT; }
 "Sigma(" { return SIGMA_LEFT; }
 "Counter(" { return COUNTER_LEFT; }
 "DownCase(" { return TOUPPER_LEFT; }

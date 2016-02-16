@@ -28,11 +28,20 @@ PmatchAlphabet::PmatchAlphabet(void):
 
 void PmatchAlphabet::add_symbol(const std::string & symbol)
 {
-    TransducerAlphabet::add_symbol(symbol);
     symbol2lists.push_back(NO_SYMBOL_NUMBER);
     list2symbols.push_back(NO_SYMBOL_NUMBER);
     rtns.push_back(NULL);
     printable_vector.push_back(true);
+    if (exclusionary_lists.size() != 0) {
+        // if there are exclusionary lists, they should all accept the new symbol
+        symbol2lists[symbol_table.size()] = symbol_lists.size();
+        symbol_lists.push_back(SymbolNumberVector(exclusionary_lists.begin(),
+                                                  exclusionary_lists.end()));
+        for(const auto & exc: exclusionary_lists) {
+            symbol_list_members[list2symbols[exc]].push_back(symbol_table.size());
+        }
+    }
+    TransducerAlphabet::add_symbol(symbol);
 }
 
 bool PmatchAlphabet::is_printable(SymbolNumber symbol)
@@ -89,7 +98,9 @@ void PmatchAlphabet::process_symbol_list(std::string str, SymbolNumber sym)
 {
     SymbolNumberVector list_symbols;
     StringSymbolMap ss = build_string_symbol_map();
-    size_t begin = strlen("@PMATCH_LIST_");
+    // regular list or exlusionary list?
+    bool polarity = str[1] == 'L';
+    size_t begin = strlen("@L.");
     size_t stop;
     std::vector<std::string> collected_symbols;
     while ((stop = str.find('_', begin)) != std::string::npos) {
@@ -104,8 +115,6 @@ void PmatchAlphabet::process_symbol_list(std::string str, SymbolNumber sym)
         }
         collected_symbols.push_back(symbol);
     }
-    // One at the end
-    collected_symbols.push_back(str.substr(begin, str.size() - begin - strlen("@")));
     // Process the symbols we found
     for (std::vector<std::string>::const_iterator it = collected_symbols.begin();
          it != collected_symbols.end(); ++it) {
@@ -119,15 +128,35 @@ void PmatchAlphabet::process_symbol_list(std::string str, SymbolNumber sym)
             str_sym = ss[*it];
         }
         list_symbols.push_back(str_sym);
-        if (symbol2lists[str_sym] == NO_SYMBOL_NUMBER) {
-            symbol2lists[str_sym] = symbol_lists.size();
-            symbol_lists.push_back(SymbolNumberVector(1, sym));
-        } else {
-            symbol_lists[symbol2lists[str_sym]].push_back(sym);
+        if (polarity == true) {
+            if (symbol2lists[str_sym] == NO_SYMBOL_NUMBER) {
+                symbol2lists[str_sym] = symbol_lists.size();
+                symbol_lists.push_back(SymbolNumberVector(1, sym));
+            } else {
+                symbol_lists[symbol2lists[str_sym]].push_back(sym);
+            }
         }
     }
     list2symbols[sym] = symbol_list_members.size();
-    symbol_list_members.push_back(list_symbols);
+    if (polarity == false) {
+        SymbolNumberVector excl_symbols;
+        exclusionary_lists.push_back(sym);
+        for (SymbolNumber sym = 1; sym < symbol_table.size(); ++sym) {
+            if (is_printable(sym) &&
+                find(list_symbols.begin(), list_symbols.end(), sym) == list_symbols.end()) {
+                excl_symbols.push_back(sym);
+                if (symbol2lists[sym] == NO_SYMBOL_NUMBER) {
+                    symbol2lists[sym] = symbol_lists.size();
+                    symbol_lists.push_back(SymbolNumberVector(1, sym));
+                } else {
+                    symbol_lists[symbol2lists[sym]].push_back(sym);
+                }
+            }
+        }
+        symbol_list_members.push_back(excl_symbols);
+    } else {
+        symbol_list_members.push_back(list_symbols);
+    }
 }
 
 SymbolNumberVector PmatchAlphabet::get_specials(void) const
@@ -299,7 +328,7 @@ bool PmatchAlphabet::is_counter(const std::string & symbol)
 
 bool PmatchAlphabet::is_list(const std::string & symbol)
 {
-    return symbol.find("@PMATCH_LIST_") == 0 && symbol.rfind("@") == symbol.size() - 1;
+    return (symbol.find("@L.") == 0 || symbol.find("@X.") == 0) && symbol.rfind("@") == symbol.size() - 1;
 }
 
 bool PmatchAlphabet::is_special(const std::string & symbol)
@@ -892,7 +921,15 @@ void PmatchTransducer::collect_first_transition(TransitionTableIndex i,
                     throw true;
                 }
                 if (alphabet.list2symbols[*it] != NO_SYMBOL_NUMBER) {
-// If this is a list, collect everything in the list
+                    // If this is a list, collect everything in the list
+                    // if it's an exclusionary list, give up
+                    if (std::find(alphabet.exclusionary_lists.begin(),
+                                  alphabet.exclusionary_lists.end(),
+                                  *it)
+                        != alphabet.exclusionary_lists.end()) {
+                        container->reset_recursion();
+                        throw true;
+                    }
                     for (SymbolNumberVector::const_iterator sym_it =
                             alphabet.symbol_list_members[alphabet.list2symbols[*it]].begin();
                         sym_it != alphabet.symbol_list_members[alphabet.list2symbols[*it]].end(); ++sym_it) {
@@ -1378,14 +1415,14 @@ void PmatchTransducer::get_analyses(unsigned int input_pos,
     }
     
     if (alphabet.symbol2lists[input] != NO_SYMBOL_NUMBER) {
-// At least one symbol list contains this symbol
+// At least one symbol list could allow this symbol
         for(SymbolNumberVector::const_iterator it =
                 alphabet.symbol_lists[alphabet.symbol2lists[input]].begin();
             it != alphabet.symbol_lists[alphabet.symbol2lists[input]].end(); ++it) {
             take_transitions(*it, input_pos, tape_pos, i+1);
         }
     }
-
+    // The "normal" case where we have a regular input symbol
     if (input < orig_symbol_count) {
         take_transitions(input, input_pos, tape_pos, i+1);
     } else {
@@ -1396,6 +1433,7 @@ void PmatchTransducer::get_analyses(unsigned int input_pos,
             take_transitions(alphabet.get_unknown_symbol(), input_pos, tape_pos, i+1);
         }
     }
+    
     container->unrecurse();
 }
 

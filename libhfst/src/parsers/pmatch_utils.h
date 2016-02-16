@@ -105,6 +105,7 @@ PmatchTransducerContainer * epsilon_to_symbol_container(std::string s);
 PmatchTransducerContainer * make_end_tag(std::string tag);
 PmatchTransducerContainer * make_counter(std::string name);
 HfstTransducer * make_list(HfstTransducer * t);
+HfstTransducer * make_exc_list(HfstTransducer * t);
 HfstTransducer * make_sigma(HfstTransducer * t);
 PmatchTransducerContainer * make_minimization_guard(void);
 PmatchTransducerContainer * make_passthrough(void);
@@ -396,7 +397,8 @@ enum PmatchUnaryOp {
     ToLower,
     ToUpper,
     MakeSigma,
-    MakeList
+    MakeList,
+    MakeExcList
 };
 
 enum PmatchBinaryOp {
