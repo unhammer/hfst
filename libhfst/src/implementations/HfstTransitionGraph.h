@@ -4000,6 +4000,7 @@
                      path.push_back(std::pair<std::string, std::string>(it->get_input_symbol(), it->get_output_symbol()));
                      full_paths.push_back
                        (HfstReplacement(it->get_target_state(), path));
+                     path.pop_back(); // remove closing bracket as we are not going to proceed to next state
                    }
                  // add transition to path and call function again for its target state
                  else
