@@ -100,7 +100,7 @@ void match_and_print(hfst_ol::PmatchContainer & container,
 #ifndef _MSC_VER
         outstream << container.match(input_text, time_cutoff);
 #else
-        hfst::hfst_fprintf(stdout, "%s", container.match(input_text, time_cutoff).c_str());
+        hfst::hfst_fprintf_console(stdout, "%s", container.match(input_text, time_cutoff).c_str());
 #endif
     } else {
         hfst_ol::LocationVectorVector locations = container.locate(input_text, time_cutoff);
