@@ -1418,6 +1418,8 @@ std::string hfst::two_level_paths_to_string(const HfstTwoLevelPaths &);
 
 %pythoncode %{
 
+from sys import stdout
+ 
 EPSILON='@_EPSILON_SYMBOL_@'
 UNKNOWN='@_UNKNOWN_SYMBOL_@'
 IDENTITY='@_IDENTITY_SYMBOL_@'
@@ -1543,7 +1545,7 @@ def start_xfst(**kvargs):
         retval = -1
         if idle:
             retval = _libhfst.hfst_compile_xfst_to_string_one(comp, expression)
-            print(_libhfst.get_hfst_xfst_string_one(), end='')
+            stdout.write(_libhfst.get_hfst_xfst_string_one())
         else:
             retval = comp.parse_line(expression + "\n")
         if retval != 0:
