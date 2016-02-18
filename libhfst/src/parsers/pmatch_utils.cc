@@ -1035,7 +1035,7 @@ HfstTransducer * PmatchUtilityTransducers::tolower(HfstTransducer & t)
     HfstTokenizer tok;
     HfstTransducer lowercase(*lowerfy);
     HfstTransducer any_but_upper(hfst::internal_identity, hfst::pmatch::format);
-    any_but_lower.subtract(*latin1_uppercase_acceptor);
+    any_but_upper.subtract(*latin1_uppercase_acceptor);
     lowercase.disjunct(any_but_upper);
     HfstTransducer * retval = new HfstTransducer(t);
     retval->compose(lowercase.repeat_star());
