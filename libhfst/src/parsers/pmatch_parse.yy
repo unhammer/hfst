@@ -394,8 +394,8 @@ NUM { $$ = new PmatchAcceptor(Numeral); } |
 PUNCT { $$ = new PmatchAcceptor(Punctuation); } |
 WHITESPACE { $$ = new PmatchAcceptor(Whitespace); } |
 OPTCAP_LEFT EXPRESSION2 RIGHT_PARENTHESIS { $$ = new PmatchUnaryOperation(OptCap, $2); } |
-TOLOWER_LEFT EXPRESSION2 RIGHT_PARENTHESIS { $$ = new PmatchUnaryOperation(ToUpper, $2); } |
-TOUPPER_LEFT EXPRESSION2 RIGHT_PARENTHESIS { $$ = new PmatchUnaryOperation(ToLower, $2); } |
+TOLOWER_LEFT EXPRESSION2 RIGHT_PARENTHESIS { $$ = new PmatchUnaryOperation(ToLower, $2); } |
+TOUPPER_LEFT EXPRESSION2 RIGHT_PARENTHESIS { $$ = new PmatchUnaryOperation(ToUpper, $2); } |
 DEFINE_LEFT EXPRESSION2 RIGHT_PARENTHESIS { $$ = new PmatchUnaryOperation(AddDelimiters, $2); } |
 READ_FROM { } |
 CHARACTER_RANGE { $$ = $1; } |

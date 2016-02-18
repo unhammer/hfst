@@ -1034,10 +1034,9 @@ HfstTransducer * PmatchUtilityTransducers::tolower(HfstTransducer & t)
 {
     HfstTokenizer tok;
     HfstTransducer lowercase(*lowerfy);
-    lowercase.disjunct(*latin1_numeral_acceptor);
-    lowercase.disjunct(*latin1_punct_acceptor);
-    lowercase.disjunct(*latin1_whitespace_acceptor);
-    lowercase.disjunct(*latin1_lowercase_acceptor);
+    HfstTransducer any_but_upper(hfst::internal_identity, hfst::pmatch::format);
+    any_but_lower.subtract(*latin1_uppercase_acceptor);
+    lowercase.disjunct(any_but_upper);
     HfstTransducer * retval = new HfstTransducer(t);
     retval->compose(lowercase.repeat_star());
     retval->output_project();
@@ -1049,10 +1048,9 @@ HfstTransducer * PmatchUtilityTransducers::toupper(HfstTransducer & t)
 {
     HfstTokenizer tok;
     HfstTransducer uppercase(*capify);
-    uppercase.disjunct(*latin1_numeral_acceptor);
-    uppercase.disjunct(*latin1_punct_acceptor);
-    uppercase.disjunct(*latin1_whitespace_acceptor);
-    uppercase.disjunct(*latin1_uppercase_acceptor);
+    HfstTransducer any_but_lower(hfst::internal_identity, hfst::pmatch::format);
+    any_but_lower.subtract(*latin1_lowercase_acceptor);
+    uppercase.disjunct(any_but_lower);
     HfstTransducer * retval = new HfstTransducer(t);
     retval->compose(uppercase.repeat_star());
     retval->output_project();
