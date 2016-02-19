@@ -228,14 +228,16 @@ std::string &replace_all_substr(const std::string &substr,
   return str;
 }
 #define PTPP "PAIR_TEST_PERC_PERC"
+#define PTPC "PAIR_TEST_PERC_COL"
 // perc_escaped is a string where special symols are escaped using
 // %. Transform it into a string where specail symbols are escaped
 // using \. 
 std::string backslash_escape(std::string perc_escaped)
 {
   replace_all_substr("%%", PTPP, perc_escaped);
-  for (char &c : perc_escaped)
-    { c = (c == '%' ? '\\' : c); }
+  replace_all_substr("%:", PTPC, perc_escaped);
+  replace_all_substr("%", "", perc_escaped);
+  replace_all_substr(PTPC, "\\:", perc_escaped);
   return replace_all_substr(PTPP, "%", perc_escaped);
 }
 
@@ -688,6 +690,13 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                 test_case = input_tokenizer.tokenize_string_pair
                   (backslash_escape(input_case) + ":" + 
                    backslash_escape(output_case), false);
+                test_case.insert
+                  (test_case.begin(),
+                   StringPair("@#@",hfst::internal_epsilon));
+                test_case.insert
+                  (test_case.end(),
+                   StringPair("@#@",hfst::internal_epsilon));
+
               }
             catch (const hfst::UnescapedColsFound &e)
               {
@@ -722,6 +731,12 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                 test_case = input_tokenizer.tokenize_string_pair
                   (backslash_escape(input_case) + ":" + 
                    backslash_escape(output_case), false);
+                test_case.insert
+                  (test_case.begin(),
+                   StringPair("@#@",hfst::internal_epsilon));
+                test_case.insert
+                  (test_case.end(),
+                   StringPair("@#@",hfst::internal_epsilon));
               }
             catch (const hfst::UnescapedColsFound &e)
               {
