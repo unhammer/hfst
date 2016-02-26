@@ -1,3 +1,554 @@
+2016-02-19 14:36  mpsilfve
+
+	* tools/src/hfst-pair-test.cc: Add word boundaries in xerox mode.
+
+2016-02-18 11:21  hardwick
+
+	* libhfst/src/parsers/pmatch_utils.cc: Fix copypasted typo
+
+2016-02-18 09:46  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc: Fix ToLower and ToUpper,
+	  which had transposed names and flawed implementations
+
+2016-02-17 15:12  eaxelson
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc: Use
+	  iterator instead of range-based loop on windows.
+
+2016-02-17 15:11  eaxelson
+
+	* tools/src/hfst-optimized-lookup.cc, tools/src/hfst-pmatch.cc: Fix
+	  a couple of typos inside 'ifdef _MSC_VER' detected when compiling
+	  on windows.
+
+2016-02-17 15:09  mpsilfve
+
+	* libhfst/COPYING, libhfst/Makefile.am,
+	  libhfst/src/FormatSpecifiers.h,
+	  libhfst/src/HarmonizeUnknownAndIdentitySymbols.cc,
+	  libhfst/src/HarmonizeUnknownAndIdentitySymbols.h,
+	  libhfst/src/HfstApply.cc, libhfst/src/HfstDataTypes.cc,
+	  libhfst/src/HfstDataTypes.h, libhfst/src/HfstEpsilonHandler.cc,
+	  libhfst/src/HfstEpsilonHandler.h,
+	  libhfst/src/HfstExceptionDefs.cc,
+	  libhfst/src/HfstExceptionDefs.h,
+	  libhfst/src/HfstExtractStrings.h,
+	  libhfst/src/HfstFlagDiacritics.cc,
+	  libhfst/src/HfstFlagDiacritics.h, libhfst/src/HfstInputStream.cc,
+	  libhfst/src/HfstInputStream.h,
+	  libhfst/src/HfstLookupFlagDiacritics.cc,
+	  libhfst/src/HfstLookupFlagDiacritics.h,
+	  libhfst/src/HfstOutputStream.cc, libhfst/src/HfstOutputStream.h,
+	  libhfst/src/HfstPrintDot.cc, libhfst/src/HfstPrintDot.h,
+	  libhfst/src/HfstPrintPCKimmo.cc, libhfst/src/HfstPrintPCKimmo.h,
+	  libhfst/src/HfstRules.cc,
+	  libhfst/src/HfstStrings2FstTokenizer.cc,
+	  libhfst/src/HfstStrings2FstTokenizer.h,
+	  libhfst/src/HfstSymbolDefs.cc, libhfst/src/HfstSymbolDefs.h,
+	  libhfst/src/HfstTokenizer.cc, libhfst/src/HfstTokenizer.h,
+	  libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRules.h,
+	  libhfst/src/HfstXeroxRulesTest.cc, libhfst/src/Makefile.am,
+	  libhfst/src/hfst.h, libhfst/src/hfst_apply_schemas.h,
+	  libhfst/src/hfstdll.h,
+	  libhfst/src/implementations/ConvertFomaTransducer.cc,
+	  libhfst/src/implementations/ConvertLogWeightTransducer.cc,
+	  libhfst/src/implementations/ConvertOlTransducer.cc,
+	  libhfst/src/implementations/ConvertSfstTransducer.cc,
+	  libhfst/src/implementations/ConvertTransducerFormat.cc,
+	  libhfst/src/implementations/ConvertTransducerFormat.h,
+	  libhfst/src/implementations/ConvertTropicalWeightTransducer.cc,
+	  libhfst/src/implementations/ConvertXfsmTransducer.cc,
+	  libhfst/src/implementations/FomaTransducer.cc,
+	  libhfst/src/implementations/FomaTransducer.h,
+	  libhfst/src/implementations/HfstOlTransducer.cc,
+	  libhfst/src/implementations/HfstOlTransducer.h,
+	  libhfst/src/implementations/HfstTransition.h,
+	  libhfst/src/implementations/HfstTransitionGraph.cc,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  libhfst/src/implementations/HfstTropicalTransducerTransitionData.cc,
+	  libhfst/src/implementations/HfstTropicalTransducerTransitionData.h,
+	  libhfst/src/implementations/LogWeightTransducer.cc,
+	  libhfst/src/implementations/LogWeightTransducer.h,
+	  libhfst/src/implementations/Makefile.am,
+	  libhfst/src/implementations/MyTransducerLibraryTransducer.cc,
+	  libhfst/src/implementations/MyTransducerLibraryTransducer.h,
+	  libhfst/src/implementations/SfstTransducer.cc,
+	  libhfst/src/implementations/SfstTransducer.h,
+	  libhfst/src/implementations/TropicalWeightTransducer.cc,
+	  libhfst/src/implementations/TropicalWeightTransducer.h,
+	  libhfst/src/implementations/XfsmTransducer.cc,
+	  libhfst/src/implementations/XfsmTransducer.h,
+	  libhfst/src/implementations/compose_intersect/ComposeIntersectFst.cc,
+	  libhfst/src/implementations/compose_intersect/ComposeIntersectFst.h,
+	  libhfst/src/implementations/compose_intersect/ComposeIntersectLexicon.cc,
+	  libhfst/src/implementations/compose_intersect/ComposeIntersectLexicon.h,
+	  libhfst/src/implementations/compose_intersect/ComposeIntersectRule.cc,
+	  libhfst/src/implementations/compose_intersect/ComposeIntersectRule.h,
+	  libhfst/src/implementations/compose_intersect/ComposeIntersectRulePair.cc,
+	  libhfst/src/implementations/compose_intersect/ComposeIntersectRulePair.h,
+	  libhfst/src/implementations/compose_intersect/ComposeIntersectUtilities.cc,
+	  libhfst/src/implementations/compose_intersect/ComposeIntersectUtilities.h,
+	  libhfst/src/implementations/optimized-lookup/convert.cc,
+	  libhfst/src/implementations/optimized-lookup/convert.h,
+	  libhfst/src/implementations/optimized-lookup/find_epsilon_loops.cc,
+	  libhfst/src/implementations/optimized-lookup/ospell.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h,
+	  libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h,
+	  libhfst/src/parsers/LexcCompiler.cc,
+	  libhfst/src/parsers/LexcCompiler.h,
+	  libhfst/src/parsers/Makefile.am,
+	  libhfst/src/parsers/PmatchCompiler.cc,
+	  libhfst/src/parsers/PmatchCompiler.h,
+	  libhfst/src/parsers/XfstCompiler.cc,
+	  libhfst/src/parsers/XfstCompiler.h,
+	  libhfst/src/parsers/XreCompiler.cc,
+	  libhfst/src/parsers/XreCompiler.h,
+	  libhfst/src/parsers/lexc-lexer.ll,
+	  libhfst/src/parsers/lexc-parser.yy,
+	  libhfst/src/parsers/lexc-utils.cc,
+	  libhfst/src/parsers/lexc-utils.h,
+	  libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h,
+	  libhfst/src/parsers/xfst-lexer.ll,
+	  libhfst/src/parsers/xfst-parser.yy,
+	  libhfst/src/parsers/xfst-utils.cc,
+	  libhfst/src/parsers/xfst-utils.h,
+	  libhfst/src/parsers/xfst_help_message.cc,
+	  libhfst/src/parsers/xfst_help_message.h,
+	  libhfst/src/parsers/xre_lex.ll, libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.cc,
+	  libhfst/src/parsers/xre_utils.h: License for the library code is
+	  now lgpl 3.
+
+2016-02-17 14:39  moshagen
+
+	* man, tools/src: Ignore generated files.
+
+2016-02-17 14:13  mpsilfve
+
+	* python/COPYING, python/Makefile.am, python/libhfst.i: LGPL
+	  license
+
+2016-02-17 13:41  mpsilfve
+
+	* python/libhfst.i: Compatibility with python2.
+
+2016-02-16 12:58  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h,
+	  libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h: Add exclusionary lists (eg.
+	  Exc(Whitespace) matches symbols not in Whitespace)
+
+2016-02-16 12:53  mpsilfve
+
+	* tools/src/hfst-pair-test.cc: -X option fixed in hfst-pair-test.
+	  Additionally, the user gets an error message if unescaped
+	  :-symbols were found.
+
+2016-02-16 12:18  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  libhfst/src/parsers/XfstCompiler.cc: Fix a bug in
+	  HfstTransitionGraph::find_replacements. Implement compile-replace
+	  without composition in XfstCompiler to avoid alignment issues in
+	  result.
+
+2016-02-15 15:39  eaxelson
+
+	* libhfst/src/parsers/XfstCompiler.cc: Fix epsilon handling in
+	  compile-replace expressions.
+
+2016-02-15 15:37  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h: Allow epsilons
+	  inside compile-replace expressions as xfst does.
+
+2016-02-15 15:36  eaxelson
+
+	* libhfst/src/parsers/xre_utils.cc: Warn about '@_EPSILON_SYMBOL_@'
+	  not being an ordinary symbol in hfst only in verbose mode.
+
+2016-02-15 15:33  eaxelson
+
+	* libhfst/src/parsers/xre_lex.ll: Allow space after operator '^' in
+	  regular expressions.
+
+2016-02-04 20:21  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Fix binding precedence of :
+
+2016-01-28 13:21  jezral
+
+	* libhfst/src/parsers/pmatch_utils.cc: Add throw to appease rpmlint
+	  no-return-in-nonvoid-function
+
+2016-01-27 09:36  eaxelson
+
+	* python/libhfst.i, python/test/foobar2.hfst: Fix a bug in function
+	  'fst'.
+
+2016-01-26 13:42  hardwick
+
+	* tools/src/hfst-optimized-lookup.cc: Print a blank line even if
+	  there were no results or if tokenization failed
+
+2016-01-26 08:33  jezral
+
+	* tools/src/Makefile.am: One && too many
+
+2016-01-25 13:34  hardwick
+
+	* configure.ac, man/Makefile.am, man/hfst-proc2.1,
+	  man/hfst-tokenize.1, tools/src/Makefile.am,
+	  tools/src/hfst-proc2.cc, tools/src/hfst-tokenize.cc: Rename
+	  hfst-proc2 to hfst-tokenize, with hfst-proc2 and hfst-tokenise as
+	  aliases
+
+2016-01-22 12:57  eaxelson
+
+	* python/test/README, python/test/foo_att_prolog,
+	  python/test/foo_basic, python/test/foobar2.hfst,
+	  python/test/foofile, python/test/test.py, python/test/test.sh,
+	  python/test/test2.py, python/test/test3.py, python/test/test4.py,
+	  python/test/test5.py, python/test/test7.py, python/test/test8.py,
+	  python/test/test9.py, python/test/test_streams_1.py,
+	  python/test/test_streams_2.py, python/test/test_streams_3.py,
+	  python/test/testfile, python/test/testfile1.att,
+	  python/test/testfile1.hfst, python/test/testfile2.att,
+	  python/test/testfile3.att: Add tests for python bindings.
+
+2016-01-22 12:18  hardwick
+
+	* libhfst/src/HfstXeroxRules.h,
+	  libhfst/src/parsers/PmatchCompiler.cc,
+	  libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h, test/tools/pmatch-tests.sh,
+	  tools/src/hfst-pmatch2fst.cc: Complete rewrite of pmatch
+	  compilation
+	  This is a cleanup and rewrite of pmatch compilation, hopefully
+	  allowing
+	  easier extensibility and maintainability in the future. While
+	  this has
+	  been reasonably well tested, it is likely that there are some
+	  regressions;
+	  please report any. Various additional features are pending.
+
+2016-01-22 10:47  eaxelson
+
+	* scripts/README_eight_tools_mac.txt,
+	  scripts/README_eight_tools_win.txt, scripts/README_xfst_mac.txt,
+	  scripts/README_xfst_win.txt, scripts/inttypes.h,
+	  scripts/multiple_targets.sh, scripts/package-static-binaries.sh,
+	  scripts/readmes, scripts/readmes/README_eight_tools_mac.txt,
+	  scripts/readmes/README_eight_tools_win.txt,
+	  scripts/readmes/README_xfst_mac.txt,
+	  scripts/readmes/README_xfst_win.txt, scripts/stdint.h,
+	  scripts/windows/inttypes.h, scripts/windows/multiple_targets.sh,
+	  scripts/windows/stdint.h: Move scripts under subdirectories and
+	  remove scripts that are not needed.
+
+2016-01-22 10:41  eaxelson
+
+	* scripts/copy-for-windows.sh,
+	  scripts/generate-python-bindings.bat, scripts/libhfst_win.i,
+	  scripts/make-foma.bat, scripts/make-hfst-lexc.bat,
+	  scripts/make-hfst-proc.bat, scripts/make-hfst-tool.bat,
+	  scripts/make-hfst-tools.bat, scripts/make-hfst-xfst.bat,
+	  scripts/make-htwolcpre1.bat, scripts/make-htwolcpre2.bat,
+	  scripts/make-htwolcpre3.bat, scripts/make-implementations.bat,
+	  scripts/make-libhfst.bat, scripts/make-openfstwin.bat,
+	  scripts/make-parsers.bat, scripts/make-python-bindings.bat,
+	  scripts/test-hfst-tools.bat, scripts/test_libhfst_win.py,
+	  scripts/windows, scripts/windows/generate-python-bindings.bat,
+	  scripts/windows/make-foma.bat,
+	  scripts/windows/make-hfst-lexc.bat,
+	  scripts/windows/make-hfst-proc.bat,
+	  scripts/windows/make-hfst-tool.bat,
+	  scripts/windows/make-hfst-tools.bat,
+	  scripts/windows/make-hfst-xfst.bat,
+	  scripts/windows/make-htwolcpre1.bat,
+	  scripts/windows/make-htwolcpre2.bat,
+	  scripts/windows/make-htwolcpre3.bat,
+	  scripts/windows/make-implementations.bat,
+	  scripts/windows/make-libhfst.bat,
+	  scripts/windows/make-openfstwin.bat,
+	  scripts/windows/make-parsers.bat,
+	  scripts/windows/make-python-bindings.bat,
+	  scripts/windows/test-hfst-tools.bat,
+	  scripts/windows/test_libhfst_win.py: Move windows scripts under
+	  scripts/windows. Get rid of libhfst_win.i.
+
+2016-01-22 09:43  eaxelson
+
+	* libhfst/src/Makefile.am, libhfst/src/implementations/Makefile.am:
+	  Remove HfstFastTransition.h also from dist.
+
+2016-01-21 13:30  eaxelson
+
+	* libhfst/src/HfstExceptions.cc, libhfst/src/HfstExceptions.h:
+	  Remove HfstException.cc and HfstException.h files,
+	  HfstExceptionDefs.cc and HfstExceptionDefs.h are used instead.
+
+2016-01-21 13:30  eaxelson
+
+	* libhfst/src/implementations/HfstFastTransitionData.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h: Remove class
+	  HfstFastTransitionData and the template HfstFastTransducer that
+	  uses it. HfstBasicTransducer is the template of
+	  HfstTransitionGraph that is used everywhere and it is fast
+	  enough.
+
+2016-01-21 13:23  eaxelson
+
+	* libhfst/src/parsers/XreCompiler.reentrant.cc,
+	  libhfst/src/parsers/XreCompiler.reentrant.h,
+	  libhfst/src/parsers/xre_lex.reentrant.ll,
+	  libhfst/src/parsers/xre_parse.reentrant.yy,
+	  libhfst/src/parsers/xre_utils.reentrant.cc,
+	  libhfst/src/parsers/xre_utils.reentrant.h: Remove tentative
+	  reentrant version of xre compiler. The normal xre compiler can
+	  handle expressions that the reentrant one was originally intended
+	  for.
+
+2016-01-21 13:15  eaxelson
+
+	* tools/src/FlagDiacritics, tools/src/PathPrettyPrinters: Remove
+	  empty directories that are not used.
+
+2016-01-20 13:12  eaxelson
+
+	* python/doc/libhfst.py: Update python API documentation.
+
+2016-01-20 13:10  eaxelson
+
+	* configure.ac: Remove old commented code. Add a warning about
+	  python bindings not being under autotools; advise users to see
+	  python/README.
+
+2016-01-19 15:19  eaxelson
+
+	* configure.ac: Set -std=c++0x unless a higher standard is required
+	  with the -std option.
+
+2016-01-19 09:45  eaxelson
+
+	* tools/src/Makefile.am, tools/src/hfst-scanner.ll: Do not generate
+	  hfst-scanner header file. Make hfst-scanner depend on
+	  hfst-compiler header file to make sure they are generated in the
+	  right order.
+
+2016-01-18 15:02  eaxelson
+
+	* configure.ac, libhfst/src/parsers/LexcCompiler.cc,
+	  libhfst/src/parsers/Makefile.am,
+	  libhfst/src/parsers/XfstCompiler.cc,
+	  libhfst/src/parsers/lexc-lexer.ll,
+	  libhfst/src/parsers/lexc-utils.cc,
+	  libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/xfst-lexer.ll,
+	  libhfst/src/parsers/xfst-utils.cc,
+	  libhfst/src/parsers/xre_lex.ll, tools/src/Makefile.am,
+	  tools/src/hfst-scanner.ll, tools/src/hfst-twolc/src/Makefile.am,
+	  tools/src/hfst-twolc/src/scanner1.ll,
+	  tools/src/hfst-twolc/src/scanner2.ll,
+	  tools/src/hfst-twolc/src/scanner3.ll: Check automake version in
+	  configure to determine whether header files generated by
+	  yacc/bison should use extension .h (automake < 1.12) or .hh
+	  (automake >= 1.12).
+
+2016-01-14 20:34  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc:
+	  call_counter is a member of the container, not the transducer
+
+2016-01-14 10:28  eaxelson
+
+	* tools/src/hfst-reweight.cc: Reweight arcs iff all conditions
+	  given with --input-symbol, --output-symbol and --symbol are met.
+
+2016-01-13 16:38  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc: Forgot to
+	  increment call counter
+
+2016-01-13 16:31  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h: Only call
+	  clock() every millionth time
+
+2016-01-13 16:13  hardwick
+
+	* tools/src/hfst-optimized-lookup.h: Add missing declarations
+
+2016-01-13 16:10  hardwick
+
+	* tools/src/hfst-optimized-lookup.cc: Only check clock() every
+	  million calls to get_analyses() to save time
+
+2016-01-13 14:14  hardwick
+
+	* tools/src/hfst-optimized-lookup.cc: Move start_clock setting to
+	  where the line is read to make the time limit per-analysis
+
+2016-01-13 14:06  hardwick
+
+	* tools/src/hfst-optimized-lookup.cc: Add short option for time
+	  cutoff (-t)
+
+2016-01-13 13:44  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h: In pmatch,
+	  make the time cutoff "soft" to ensure we at least return
+	  something
+	  (this was an issue for rulesets with RTNs only - all the time
+	  could be spent
+	  in one leaving nothing for anything else, causing needless
+	  failure)
+
+2016-01-13 11:09  hardwick
+
+	* tools/src/hfst-lookup.cc: Ignore previous commit, I had some old
+	  library code confusing me
+
+2016-01-13 10:52  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h,
+	  tools/src/hfst-pmatch.cc, tools/src/hfst-proc2.cc: Add time
+	  cutoff options
+
+2016-01-13 10:47  hardwick
+
+	* tools/src/hfst-lookup.cc: Fix what seems like a typo in
+	  hfst-lookup, &infinite_cutoff for infinite_cutoff
+	  It seems like the size_t and size_t* can substitute for each
+	  other, but the prototype
+	  is for size_t.
+
+2016-01-13 09:47  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h: Fix
+	  time cutoff check in ol library code
+
+2016-01-13 09:46  hardwick
+
+	* tools/src/hfst-lookup.cc: Omit infinitely ambiguous check when we
+	  have a time cutoff
+
+2016-01-13 09:28  hardwick
+
+	* tools/src/hfst-optimized-lookup.cc,
+	  tools/src/hfst-optimized-lookup.h: Fix time cutoff handling
+
+2016-01-13 08:09  moshagen
+
+	* tools/src/hfst-pair-test.cc: Switch from !€ / !$ to !!€ / !!$ as
+	  the test case prefixes, to bring it in line with the conventions
+	  in the rest of the Giella infrastructure (where this testing
+	  setup is used).
+
+2016-01-04 12:42  eaxelson
+
+	* tools/src/hfst-substitute.cc: Fix option --to-transducer of
+	  hfst-substitute.
+
+2015-12-21 08:29  eaxelson
+
+	* python/libhfst.i: Update HfstTransducer::priority_union
+	  declaration. It takes only one argument instead of three.
+
+2015-12-18 12:29  eaxelson
+
+	* tools/src/parsers/test/Makefile.am: Add new test files to dist.
+
+2015-12-18 12:05  sdrobac
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  tools/src/parsers/test/priority_union_1.att,
+	  tools/src/parsers/test/priority_union_1.xfst,
+	  tools/src/parsers/test/priority_union_2.att,
+	  tools/src/parsers/test/priority_union_2.xfst,
+	  tools/src/parsers/test/priority_union_3.att,
+	  tools/src/parsers/test/priority_union_3.xfst,
+	  tools/src/parsers/test/priority_union_4.att,
+	  tools/src/parsers/test/priority_union_4.xfst,
+	  tools/src/parsers/test/test.sh: Priority union bug solved.
+
+2015-12-17 13:54  eaxelson
+
+	* check_installation/morphology_tests/english-analyze.output,
+	  check_installation/morphology_tests/english-analyze.output.old,
+	  check_installation/morphology_tests/finnish-analyze.output:
+	  Update output of morphology tests.
+
+2015-12-17 13:53  eaxelson
+
+	* check_installation/check-ospell.sh,
+	  check_installation/dist-README, check_installation/make-dist.sh,
+	  check_installation/ospell_tests,
+	  check_installation/ospell_tests/ospell_input.txt,
+	  check_installation/ospell_tests/test.zhfst: Add a check for
+	  hfst-ospell.
+
+2015-12-17 13:46  eaxelson
+
+	* tools/src/parsers/test/Makefile.am: Add new replace markup tests
+	  to dist.
+
+2015-12-16 17:06  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRules.h,
+	  libhfst/src/HfstXeroxRulesTest.cc,
+	  tools/src/parsers/test/replace_markup_1.att,
+	  tools/src/parsers/test/replace_markup_1.xfst,
+	  tools/src/parsers/test/replace_markup_2.att,
+	  tools/src/parsers/test/replace_markup_2.xfst,
+	  tools/src/parsers/test/replace_markup_3.att,
+	  tools/src/parsers/test/replace_markup_3.xfst,
+	  tools/src/parsers/test/replace_markup_4.att,
+	  tools/src/parsers/test/replace_markup_4.xfst,
+	  tools/src/parsers/test/replace_markup_5.att,
+	  tools/src/parsers/test/replace_markup_5.xfst,
+	  tools/src/parsers/test/replace_markup_6.att,
+	  tools/src/parsers/test/replace_markup_6.xfst,
+	  tools/src/parsers/test/replace_markup_7.att,
+	  tools/src/parsers/test/replace_markup_7.xfst,
+	  tools/src/parsers/test/test.sh: Markup rules completely changed
+
+2015-12-15 15:54  eaxelson
+
+	* check_installation/check-python.sh,
+	  check_installation/check-swig.sh,
+	  check_installation/copy-python-tests.sh,
+	  check_installation/copy-swig-tests.sh,
+	  check_installation/copy-tool-tests.sh,
+	  check_installation/dist-README, check_installation/make-dist.sh:
+	  Update installation check.
+
+2015-12-15 08:51  eaxelson
+
+	* ChangeLog: Finally ready for release 3.9.0.
+
+2015-12-14 22:42  eaxelson
+
+	* test/tools/Makefile.am: Add missing files to dist.
+
 2015-12-14 20:46  unhammer
 
 	* test/tools/cat_cat.strings,
