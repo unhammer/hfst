@@ -71,7 +71,7 @@ mkdir $1/libhfst/src/parsers
 for file in \
 FormatSpecifiers.h HarmonizeUnknownAndIdentitySymbols.h \
 HfstDataTypes.h HfstEpsilonHandler.h HfstExceptionDefs.h \
-HfstExceptions.h HfstExtractStrings.h HfstFlagDiacritics.h \
+HfstExtractStrings.h HfstFlagDiacritics.h \
 HfstInputStream.h HfstLookupFlagDiacritics.h HfstOutputStream.h \
 HfstSymbolDefs.h HfstTokenizer.h HfstTransducer.h HfstXeroxRules.h \
 HfstStrings2FstTokenizer.h hfst.h hfst.hpp.in hfst_apply_schemas.h hfstdll.h \
@@ -82,7 +82,7 @@ done
 
 for file in \
 HarmonizeUnknownAndIdentitySymbols HfstApply HfstDataTypes \
-HfstEpsilonHandler HfstExceptionDefs HfstExceptions HfstFlagDiacritics \
+HfstEpsilonHandler HfstExceptionDefs HfstFlagDiacritics \
 HfstInputStream HfstLookupFlagDiacritics HfstOutputStream HfstRules \
 HfstSymbolDefs HfstTokenizer HfstTransducer HfstXeroxRules \
 HfstStrings2FstTokenizer HfstXeroxRulesTest HfstPrintDot HfstPrintPCKimmo;
@@ -92,7 +92,7 @@ done
 
 # libhfst/src/implementations without subdirectories
 for file in \
-ConvertTransducerFormat.h FomaTransducer.h HfstFastTransitionData.h \
+ConvertTransducerFormat.h FomaTransducer.h \
 HfstOlTransducer.h HfstTransition.h HfstTransitionGraph.h \
 HfstTropicalTransducerTransitionData.h LogWeightTransducer.h \
 TropicalWeightTransducer.h;
@@ -157,26 +157,26 @@ lexc-parser pmatch_parse xre_parse xfst-parser;
 do
     cp libhfst/src/parsers/$file.cc \
         $1/libhfst/src/parsers/$file.cpp
-    cp libhfst/src/parsers/$file.h \
-        $1/libhfst/src/parsers/$file.h
+    cp libhfst/src/parsers/$file.hh \
+        $1/libhfst/src/parsers/$file.hh
 done
 sed -i 's/#include <unistd.h>/#include <io.h>/' $1/libhfst/src/parsers/xfst-lexer.cpp
 sed -i 's/hxfstwrap( )/hxfstwrap(void)/' $1/libhfst/src/parsers/xfst-lexer.cpp
 
 
-cp scripts/make-python-bindings.bat $1/libhfst/src/
+cp scripts/windows/make-python-bindings.bat $1/libhfst/src/
 cp python/test/test_hfst.py $1/libhfst/src/
 cp python/test/examples.py $1/libhfst/src/
 cp python/test/foobar.hfst $1/libhfst/src/
 cp python/libhfst.i $1/libhfst/src/
-cp scripts/make-hfst-xfst.bat $1/libhfst/src/
-cp scripts/make-hfst-proc.bat $1/libhfst/src/
-cp scripts/make-hfst-lexc.bat $1/libhfst/src/
-cp scripts/make-hfst-tool.bat $1/libhfst/src/
-cp scripts/make-hfst-tools.bat $1/libhfst/src/
-cp scripts/make-htwolcpre1.bat $1/libhfst/src/
-cp scripts/make-htwolcpre2.bat $1/libhfst/src/
-cp scripts/make-htwolcpre3.bat $1/libhfst/src/
+cp scripts/windows/make-hfst-xfst.bat $1/libhfst/src/
+cp scripts/windows/make-hfst-proc.bat $1/libhfst/src/
+cp scripts/windows/make-hfst-lexc.bat $1/libhfst/src/
+cp scripts/windows/make-hfst-tool.bat $1/libhfst/src/
+cp scripts/windows/make-hfst-tools.bat $1/libhfst/src/
+cp scripts/windows/make-htwolcpre1.bat $1/libhfst/src/
+cp scripts/windows/make-htwolcpre2.bat $1/libhfst/src/
+cp scripts/windows/make-htwolcpre3.bat $1/libhfst/src/
 
 for file in test.lexc test.pmatch test.twolc test.xfst \
 test_xfst_result.txt test_twolc_result.txt test_pmatch_result.txt test_lexc_result.txt;
@@ -184,13 +184,13 @@ do
     cp scripts/windows_tests/$file $1/libhfst/src/
 done
 
-cp scripts/test-hfst-tools.bat $1/libhfst/src/
-cp scripts/README_xfst_win.txt $1/libhfst/src/
-cp scripts/README_eight_tools_win.txt $1/libhfst/src/
+cp scripts/windows/test-hfst-tools.bat $1/libhfst/src/
+cp scripts/readmes/README_xfst_win.txt $1/libhfst/src/
+cp scripts/readmes/README_eight_tools_win.txt $1/libhfst/src/
 
 # copy missing headers and change some headers included
-cp scripts/stdint.h $1/back-ends/foma/
-cp scripts/inttypes.h $1/back-ends/foma/
+cp scripts/windows/stdint.h $1/back-ends/foma/
+cp scripts/windows/inttypes.h $1/back-ends/foma/
 # unistd.h is included in some generated files
 for file in \
 $1/libhfst/src/parsers/pmatch_lex.cpp \
@@ -278,7 +278,7 @@ TWOLC_DIR=tools/src/hfst-twolc/src
 
 for file in \
 HfstTwolcDefs.h common_globals.h grammar_defs.h hfst-twolc.bat \
-htwolcpre1.h htwolcpre2.h htwolcpre3.h;
+htwolcpre1.hh htwolcpre2.hh htwolcpre3.hh;
 do
     cp $TWOLC_DIR/$file $1/$TWOLC_DIR/
 done
