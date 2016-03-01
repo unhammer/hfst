@@ -791,9 +791,19 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
             tr_it->second->minimize();
         }
     } else {
-        hfst::HfstTransducer * tmp = definitions["TOP"]->evaluate();
-        tmp->minimize();
-        retval.insert(std::pair<std::string, hfst::HfstTransducer*>("TOP", tmp));
+        if (definitions.size() == 0) {
+            std::cerr << "warning: pmatch compilation had an empty result\n";
+                retval.insert(std::pair<std::string, hfst::HfstTransducer*>("TOP", new HfstTransducer(format)));
+        } else if (definitions.count("TOP") == 0) {
+            std::cerr << "Pmatch compilation warning: regex or TOP was undefined, using ";
+            std::cerr << definitions.begin()->first << " as root\n";
+            hfst::HfstTransducer * tmp = definitions.begin()->second->evaluate();
+            retval.insert(std::pair<std::string, hfst::HfstTransducer*>("TOP", tmp));
+        } else {
+            hfst::HfstTransducer * tmp = definitions["TOP"]->evaluate();
+            tmp->minimize();
+            retval.insert(std::pair<std::string, hfst::HfstTransducer*>("TOP", tmp));
+        }
     }
     if (hfst::pmatch::verbose) {
         double duration = (clock() - hfst::pmatch::timer) /
