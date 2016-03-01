@@ -45,7 +45,7 @@ using std::set_difference;
 //#include "../../../tools/src/HfstStrings2FstTokenizer.h"
 
 #ifdef WINDOWS
-#include "../../../tools/src/hfst-string-conversions.h"
+#include "hfst-string-conversions.h"
 using hfst::hfst_fprintf_console;
 #endif // WINDOWS
 

@@ -16,7 +16,7 @@
 #include "HfstTransducer.h"
 
 #ifdef WINDOWS
-#include "../../../tools/src/hfst-string-conversions.h"
+#include "hfst-string-conversions.h"
 #endif 
 
 #ifndef UNIT_TEST

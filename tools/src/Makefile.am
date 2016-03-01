@@ -198,7 +198,6 @@ noinst_HEADERS= \
 	inc/getopt-cases-unary.h  inc/globals-binary.h      \
 	inc/globals-common.h      inc/globals-unary.h \
 	hfst-file-to-mem.h \
-	hfst-string-conversions.h \
 	hfst-tool-metadata.h hfst-optimized-lookup.h \
 	guessify_fst.h generate_model_forms.h hfst-compiler.$(HEADER)
 # parsers/XreCompiler.h parsers/xre_utils.h
@@ -271,8 +270,7 @@ hfst_lexc_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC)
 #					  parsers/xre_lex.ll parsers/xre_utils.cc \
 #					  parsers/LexcCompiler.h parsers/lexc-utils.h
 #hfst_lexc2fst_BUILT=parsers/lexc-parser.h parsers/xre_parse.h
-hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC) \
-hfst-string-conversions.cc
+hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC)
 hfst_pair_test_SOURCES=hfst-pair-test.cc $(HFST_COMMON_SRC) 
 hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
 hfst_name_SOURCES=hfst-name.cc $(HFST_COMMON_SRC)

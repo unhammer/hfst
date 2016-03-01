@@ -22,7 +22,6 @@ cl /EHsc /Zc:wchar_t /Fehtwolcpre2.exe ^
 /I..\..\back-ends /I..\..\back-ends\openfstwin\src\include /I..\..\tools\src ^
 /I..\..\tools\src\hfst-twolc\src /I..\..\tools\src\hfst-twolc\src\commandline_src /I..\..\tools\src\hfst-twolc\src\io_src ^
 ..\..\tools\src\hfst-program-options.cpp ^
-..\..\tools\src\hfst-string-conversions.cpp ^
 ..\..\tools\src\hfst-tool-metadata.cpp ^
 ..\..\tools\src\hfst-getopt.cpp ^
 ..\..\tools\src\hfst-twolc\src\htwolcpre2.cpp ^
@@ -46,6 +45,7 @@ HfstEpsilonHandler.cpp ^
 HfstStrings2FstTokenizer.cpp ^
 HfstPrintDot.cpp ^
 HfstPrintPCKimmo.cpp ^
+hfst-string-conversions.cpp ^
 implementations\HfstTransitionGraph.cpp ^
 implementations\ConvertTransducerFormat.cpp ^
 implementations\HfstTropicalTransducerTransitionData.cpp ^

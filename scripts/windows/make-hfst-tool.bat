@@ -23,7 +23,6 @@ cl /EHsc /Zc:wchar_t /Fe%1.exe ^
 ..\..\tools\src\hfst-commandline.cpp ^
 ..\..\tools\src\hfst-file-to-mem.cpp ^
 ..\..\tools\src\hfst-program-options.cpp ^
-..\..\tools\src\hfst-string-conversions.cpp ^
 ..\..\tools\src\hfst-tool-metadata.cpp ^
 ..\..\tools\src\hfst-getopt.cpp ^
 ..\..\tools\src\%1.cpp ^
@@ -44,6 +43,7 @@ HfstEpsilonHandler.cpp ^
 HfstStrings2FstTokenizer.cpp ^
 HfstPrintDot.cpp ^
 HfstPrintPCKimmo.cpp ^
+hfst-string-conversions.cpp ^
 implementations\HfstTransitionGraph.cpp ^
 implementations\ConvertTransducerFormat.cpp ^
 implementations\HfstTropicalTransducerTransitionData.cpp ^

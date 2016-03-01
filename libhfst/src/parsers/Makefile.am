@@ -24,7 +24,7 @@ LEXC_HDRS=LexcCompiler.h lexc-utils.h
 LEXC_BUILT=lexc-parser.cc lexc-lexer.cc
 
 # TODO: hfst-string-conversions.cc
-XFST_SRCS=xfst-lexer.ll xfst-parser.yy xfst-utils.cc XfstCompiler.cc xfst_help_message.cc ../../../tools/src/hfst-string-conversions.cc
+XFST_SRCS=xfst-lexer.ll xfst-parser.yy xfst-utils.cc XfstCompiler.cc xfst_help_message.cc
 XFST_HDRS=XfstCompiler.h xfst-utils.h xfst_help_message.h
 XFST_BUILT=xfst-parser.cc xfst-lexer.cc
 

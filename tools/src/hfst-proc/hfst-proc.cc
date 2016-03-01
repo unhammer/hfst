@@ -12,7 +12,7 @@
 
 #ifdef _MSC_VER
 #  include "hfst-getopt.h"
-#  include "../hfst-string-conversions.h"
+#  include "hfst-string-conversions.h"
 #else
 #  include <getopt.h>
 #endif

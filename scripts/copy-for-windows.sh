@@ -75,7 +75,7 @@ HfstExtractStrings.h HfstFlagDiacritics.h \
 HfstInputStream.h HfstLookupFlagDiacritics.h HfstOutputStream.h \
 HfstSymbolDefs.h HfstTokenizer.h HfstTransducer.h HfstXeroxRules.h \
 HfstStrings2FstTokenizer.h hfst.h hfst.hpp.in hfst_apply_schemas.h hfstdll.h \
-HfstPrintDot.h HfstPrintPCKimmo.h;
+hfst-string-conversions.h HfstPrintDot.h HfstPrintPCKimmo.h;
 do
     cp libhfst/src/$file $1/libhfst/src/
 done
@@ -85,6 +85,7 @@ HarmonizeUnknownAndIdentitySymbols HfstApply HfstDataTypes \
 HfstEpsilonHandler HfstExceptionDefs HfstFlagDiacritics \
 HfstInputStream HfstLookupFlagDiacritics HfstOutputStream HfstRules \
 HfstSymbolDefs HfstTokenizer HfstTransducer HfstXeroxRules \
+hfst-string-conversions \
 HfstStrings2FstTokenizer HfstXeroxRulesTest HfstPrintDot HfstPrintPCKimmo;
 do
     cp libhfst/src/$file.cc $1/libhfst/src/$file.cpp
@@ -234,7 +235,7 @@ done
 # compare, strings2fst and txt2fst are needed for testing hfst-xfst
 for file in \
 hfst-program-options hfst-commandline hfst-tool-metadata \
-hfst-file-to-mem hfst-string-conversions hfst-getopt \
+hfst-file-to-mem hfst-getopt \
 hfst-lexc-compiler hfst-compare hfst-strings2fst hfst-txt2fst hfst-pmatch hfst-pmatch2fst \
 hfst-lookup hfst-optimized-lookup;
 do
@@ -257,7 +258,6 @@ done
 
 for file in \
 hfst-commandline.h hfst-program-options.h hfst-tool-metadata.h \
-hfst-string-conversions.h \
 hfst-file-to-mem.h hfst-getopt.h hfst-optimized-lookup.h;
 do
     cp tools/src/$file $1/tools/src/

@@ -25,7 +25,7 @@
   #include <windows.h>
 #endif
 
-#include "../hfst-string-conversions.h"
+#include "hfst-string-conversions.h"
 
 #ifdef HAVE_READLINE
   #include <readline/readline.h>

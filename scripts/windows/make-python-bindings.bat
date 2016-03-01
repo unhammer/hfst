@@ -50,6 +50,7 @@ HfstEpsilonHandler.cpp ^
 HfstStrings2FstTokenizer.cpp ^
 HfstPrintDot.cpp ^
 HfstPrintPCKimmo.cpp ^
+hfst-string-conversions.cpp ^
 implementations\HfstTransitionGraph.cpp ^
 implementations\ConvertTransducerFormat.cpp ^
 implementations\HfstTropicalTransducerTransitionData.cpp ^
@@ -88,7 +89,6 @@ parsers\pmatch_utils.cpp ^
 parsers\xre_utils.cpp ^
 parsers\xfst-utils.cpp ^
 parsers\xfst_help_message.cpp ^
-..\..\tools\src\hfst-string-conversions.cpp ^
 ..\..\back-ends\openfstwin\src\lib\compat.cpp ^
 ..\..\back-ends\openfstwin\src\lib\flags.cpp ^
 ..\..\back-ends\openfstwin\src\lib\fst.cpp ^
