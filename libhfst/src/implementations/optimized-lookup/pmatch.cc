@@ -104,6 +104,7 @@ void PmatchAlphabet::add_special_symbol(const std::string & str,
     } else if (is_counter(str)) {
         process_counter(str, symbol_number);
     } else {
+        // it's a regular symbol
         printable_vector[symbol_number] = true;
     }
 }
@@ -156,7 +157,7 @@ void PmatchAlphabet::process_symbol_list(std::string str, SymbolNumber sym)
         SymbolNumberVector excl_symbols;
         exclusionary_lists.push_back(sym);
         for (SymbolNumber sym = 1; sym < symbol_table.size(); ++sym) {
-            if (is_printable(sym) &&
+            if (is_printable(symbol_table[sym]) &&
                 find(list_symbols.begin(), list_symbols.end(), sym) == list_symbols.end()) {
                 excl_symbols.push_back(sym);
                 if (symbol2lists[sym] == NO_SYMBOL_NUMBER) {
@@ -356,6 +357,14 @@ bool PmatchAlphabet::is_special(const std::string & symbol)
     } else {
         return symbol.find("@PMATCH") == 0 && symbol.at(symbol.size() - 1) == '@';
     }
+}
+
+bool PmatchAlphabet::is_printable(const std::string & symbol)
+{
+    if (symbol.size() < 3) {
+        return true;
+    }
+    return symbol.find("@") != 0 || symbol.at(symbol.size() - 1) != '@';
 }
 
 bool PmatchAlphabet::is_guard(const SymbolNumber symbol) const
