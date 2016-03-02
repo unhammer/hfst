@@ -129,6 +129,11 @@ bool symbol_in_local_context(std::string & sym)
     return call_stack[call_stack.size() - 1].count(sym) != 0;
 }
 
+bool should_use_cache(void)
+{
+    return call_stack.size() == 0;
+}
+
 PmatchObject * symbol_from_global_context(std::string & sym)
 {
     if (symbol_in_global_context(sym)) {
@@ -1079,10 +1084,19 @@ PmatchObject::PmatchObject(void)
 HfstTransducer * PmatchObject::evaluate(std::vector<PmatchObject *> args)
 {
     if (args.size() == 0) {
-        if (cache == NULL) {
-            cache = evaluate();
+        if (should_use_cache()) {
+            if (cache == NULL) {
+                start_timing();
+                cache = evaluate();
+                report_time();
+            }
+            return new HfstTransducer(*cache);
+        } else {
+            start_timing();
+            HfstTransducer * retval = evaluate();
+            report_time();
+            return new HfstTransducer(*retval);
         }
-        return new HfstTransducer(*cache);
     } else {
         std::stringstream errstring;
         errstring << "Object " << name << " on line " << pmatchlineno << " has no argument handling";
@@ -1116,18 +1130,23 @@ HfstTransducer * PmatchSymbol::evaluate(PmatchEvalType eval_type)
 }
 
 HfstTransducer * PmatchString::evaluate(PmatchEvalType eval_type) {
-    if (cache == NULL) {
-        start_timing();
-        if(multichar) {
-            HfstTokenizer tok;
-            cache = new HfstTransducer(string, tok, format);
-        } else {
-            cache = new HfstTransducer(string, format);
-        }
-        cache->set_final_weights(weight, true);
-        report_time();
+    if (cache != NULL && should_use_cache()) {
+        return new HfstTransducer(*cache);
     }
-    return new HfstTransducer(*cache);
+    start_timing();
+    HfstTransducer * tmp;
+    if(multichar) {
+        HfstTokenizer tok;
+        tmp = new HfstTransducer(string, tok, format);
+    } else {
+        tmp = new HfstTransducer(string, format);
+    }
+    tmp->set_final_weights(weight, true);
+    if (cache == NULL && should_use_cache()) {
+        cache = tmp;
+    }
+    report_time();
+    return new HfstTransducer(*tmp);
 }
 
 HfstTransducer * PmatchFunction::evaluate(std::vector<PmatchObject *> funargs)
@@ -1164,211 +1183,226 @@ HfstTransducer * PmatchFunction::evaluate(PmatchEvalType eval_type)
 
 HfstTransducer * PmatchNumericOperation::evaluate(PmatchEvalType eval_type)
 {
-    if (cache == NULL) {
-        start_timing();
-        cache = root->evaluate();
-        if (op == RepeatN) {
-            cache->repeat_n(values[0]);
-        } else if (op == RepeatNPlus) {
-            cache->repeat_n_plus(values[0]);
-        } else if (op == RepeatNMinus) {
-            cache->repeat_n_minus(values[0]);
-        } else if (op == RepeatNToK) {
-            cache->repeat_n_to_k(values[0], values[1]);
-        }
-        cache->set_final_weights(weight, true);
-        report_time();
+    if (cache != NULL && should_use_cache()) {
+        return new HfstTransducer(*cache);
     }
-    return new HfstTransducer(*cache);
+    HfstTransducer * tmp;
+    start_timing();
+    tmp = root->evaluate();
+    if (op == RepeatN) {
+        tmp->repeat_n(values[0]);
+    } else if (op == RepeatNPlus) {
+        tmp->repeat_n_plus(values[0]);
+    } else if (op == RepeatNMinus) {
+        tmp->repeat_n_minus(values[0]);
+    } else if (op == RepeatNToK) {
+        tmp->repeat_n_to_k(values[0], values[1]);
+    }
+    tmp->set_final_weights(weight, true);
+    report_time();
+    if (cache == NULL && should_use_cache()) {
+        cache = tmp;
+    }
+    return new HfstTransducer(*tmp);
 }
 
 HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
 {
-    if (cache == NULL) {
-        start_timing();
-        cache = root->evaluate();
-        if (op == AddDelimiters) {
-            cache = add_pmatch_delimiters(cache);
-        } else if (op == Optionalize) {
-            cache->optionalize();
-        } else if (op == RepeatStar) {
-            cache->repeat_star();
-        } else if (op == RepeatPlus) {
-            cache->repeat_plus();
-        } else if (op == Reverse) {
-            cache->reverse();
-        } else if (op == Invert) {
-            cache->invert();
-        } else if (op == InputProject) {
-            cache->input_project();
-        } else if (op == OutputProject) {
-            cache->output_project();
-        } else if (op == Complement) {
-            // Defined here only for automata, so can project to input
-            HfstTransducer * complement =
-                new HfstTransducer(hfst::internal_identity, hfst::pmatch::format);
-            complement->repeat_star();
-            complement->subtract(*cache);
-            delete cache;
-            cache = complement;
-        } else if (op == Containment) {
-            HfstTransducer* left = new HfstTransducer(hfst::internal_identity,
-                                                      hfst::pmatch::format);
-            HfstTransducer* right = new HfstTransducer(hfst::internal_identity,
-                                                       hfst::pmatch::format);
-            right->repeat_star();
-            left->repeat_star();
-            cache->repeat_star();
-            left->concatenate(*cache);
-            left->concatenate(*right);
-            delete cache; delete right;
-            cache = left;
-        } else if (op == ContainmentOnce) {
-            HfstTransducer* left = new HfstTransducer(hfst::internal_identity,
-                                                      hfst::pmatch::format);
-            HfstTransducer* right = new HfstTransducer(hfst::internal_identity,
-                                                       hfst::pmatch::format);
-            left->subtract(*cache);
-            right->subtract(*cache);
-            right->repeat_star();
-            left->repeat_star();
-            left->concatenate(*cache);
-            left->concatenate(*right);
-            delete cache; delete right;
-            cache = left;
-        } else if (op == ContainmentOptional) {
-            HfstTransducer* left = new HfstTransducer(hfst::internal_identity,
-                                                      hfst::pmatch::format);
-            HfstTransducer* right = new HfstTransducer(hfst::internal_identity,
-                                                       hfst::pmatch::format);
-            left->subtract(*cache);
-            right->subtract(*cache);
-            right->repeat_star();
-            left->repeat_star();
-            cache->optionalize();
-            left->concatenate(*cache);
-            left->concatenate(*right);
-            delete cache; delete right;
-            cache = left;
-        } else if (op == TermComplement) {
-            HfstTransducer* any = new HfstTransducer(hfst::internal_identity,
-                                                     hfst::pmatch::format);
-            any->subtract(*cache);
-            delete cache;
-            cache = any;
-        } else if (op == OptCap) {
-            HfstTransducer * tmp = get_utils()->optcap(*cache);
-            delete cache;
-            cache = tmp;
-        } else if (op == ToLower) {
-            HfstTransducer * tmp = get_utils()->tolower(*cache);
-            delete cache;
-            cache = tmp;
-        } else if (op == ToUpper) {
-            HfstTransducer * tmp = get_utils()->toupper(*cache);
-            delete cache;
-            cache = tmp;
-        } else if (op == MakeSigma) {
-            HfstTransducer * tmp = make_sigma(cache);
-            delete cache;
-            cache = tmp;
-        } else if (op == MakeList) {
-            if (!flatten) {
-                HfstTransducer * tmp = make_list(cache);
-                delete cache;
-                cache = tmp;
-            }
-        } else if (op == MakeExcList) {
-            if (!flatten) {
-                HfstTransducer * tmp = make_exc_list(cache);
-                delete cache;
-                cache = tmp;
-            }
-        }
-        cache->set_final_weights(weight, true);
-        report_time();
+    if (cache != NULL && should_use_cache()) {
+        return new HfstTransducer(*cache);
     }
-    return new HfstTransducer(*cache);
+    HfstTransducer * retval;
+    start_timing();
+    retval = root->evaluate();
+    if (op == AddDelimiters) {
+        retval = add_pmatch_delimiters(retval);
+    } else if (op == Optionalize) {
+        retval->optionalize();
+    } else if (op == RepeatStar) {
+        retval->repeat_star();
+    } else if (op == RepeatPlus) {
+        retval->repeat_plus();
+    } else if (op == Reverse) {
+        retval->reverse();
+    } else if (op == Invert) {
+        retval->invert();
+    } else if (op == InputProject) {
+        retval->input_project();
+    } else if (op == OutputProject) {
+        retval->output_project();
+    } else if (op == Complement) {
+        // Defined here only for automata, so can project to input
+        HfstTransducer * complement =
+            new HfstTransducer(hfst::internal_identity, hfst::pmatch::format);
+        complement->repeat_star();
+        complement->subtract(*retval);
+        delete retval;
+        retval = complement;
+    } else if (op == Containment) {
+        HfstTransducer* left = new HfstTransducer(hfst::internal_identity,
+                                                  hfst::pmatch::format);
+        HfstTransducer* right = new HfstTransducer(hfst::internal_identity,
+                                                   hfst::pmatch::format);
+        right->repeat_star();
+        left->repeat_star();
+        retval->repeat_star();
+        left->concatenate(*retval);
+        left->concatenate(*right);
+        delete retval; delete right;
+        retval = left;
+    } else if (op == ContainmentOnce) {
+        HfstTransducer* left = new HfstTransducer(hfst::internal_identity,
+                                                  hfst::pmatch::format);
+        HfstTransducer* right = new HfstTransducer(hfst::internal_identity,
+                                                   hfst::pmatch::format);
+        left->subtract(*retval);
+        right->subtract(*retval);
+        right->repeat_star();
+        left->repeat_star();
+        left->concatenate(*retval);
+        left->concatenate(*right);
+        delete retval; delete right;
+        retval = left;
+    } else if (op == ContainmentOptional) {
+        HfstTransducer* left = new HfstTransducer(hfst::internal_identity,
+                                                  hfst::pmatch::format);
+        HfstTransducer* right = new HfstTransducer(hfst::internal_identity,
+                                                   hfst::pmatch::format);
+        left->subtract(*retval);
+        right->subtract(*retval);
+        right->repeat_star();
+        left->repeat_star();
+        retval->optionalize();
+        left->concatenate(*retval);
+        left->concatenate(*right);
+        delete retval; delete right;
+        retval = left;
+    } else if (op == TermComplement) {
+        HfstTransducer* any = new HfstTransducer(hfst::internal_identity,
+                                                 hfst::pmatch::format);
+        any->subtract(*retval);
+        delete retval;
+        retval = any;
+    } else if (op == OptCap) {
+        HfstTransducer * tmp = get_utils()->optcap(*retval);
+        delete retval;
+        retval = tmp;
+    } else if (op == ToLower) {
+        HfstTransducer * tmp = get_utils()->tolower(*retval);
+        delete retval;
+        retval = tmp;
+    } else if (op == ToUpper) {
+        HfstTransducer * tmp = get_utils()->toupper(*retval);
+        delete retval;
+        retval = tmp;
+    } else if (op == MakeSigma) {
+        HfstTransducer * tmp = make_sigma(retval);
+        delete retval;
+        retval = tmp;
+    } else if (op == MakeList) {
+        if (!flatten) {
+            HfstTransducer * tmp = make_list(retval);
+            delete retval;
+            retval = tmp;
+        }
+    } else if (op == MakeExcList) {
+        if (!flatten) {
+            HfstTransducer * tmp = make_exc_list(retval);
+            delete retval;
+            retval = tmp;
+        }
+    }
+    retval->set_final_weights(weight, true);
+    report_time();
+    if (cache == NULL && should_use_cache()) {
+        cache = retval;
+    }
+    return new HfstTransducer(*retval);
 }
 
 HfstTransducer * PmatchBinaryOperation::evaluate(PmatchEvalType eval_type)
 {
-    if (cache == NULL) {
-        start_timing();
-        HfstTransducer * lhs = left->evaluate();
-        HfstTransducer * rhs = right->evaluate();
-        if (op == Concatenate) {
-            lhs->concatenate(*rhs);
-        } else if (op == Compose) {
-            lhs->compose(*rhs);
-        } else if (op == CrossProduct) {
-            lhs->cross_product(*rhs);
-        } else if (op == LenientCompose) {
-            lhs->lenient_composition(*rhs);
-        } else if (op == Disjunct) {
-            lhs->disjunct(*rhs);
-        } else if (op == Intersect) {
-            lhs->intersect(*rhs);
-        } else if (op == Subtract) {
-            lhs->subtract(*rhs);
-        } else if (op == UpperSubtract) {
-            pmatcherror("Upper subtraction not implemented.");
-            return lhs;
-        } else if (op == LowerSubtract) {
-            pmatcherror("Lower subtraction not implemented.");
-            return lhs;
-        } else if (op == UpperPriorityUnion) {
-            lhs->priority_union(*rhs);
-        } else if (op == LowerPriorityUnion) {
-            lhs->invert();
-            rhs->invert();
-            lhs->priority_union(*rhs);
-            lhs->invert();
-        } else if (op == Shuffle) {
-            try {
-                lhs->shuffle(*rhs);
-            } catch (const TransducersAreNotAutomataException & e) {
-                pmatchwarning("tried to shuffle with non-automaton transducers,\n"
-                              "    shuffling with their input projection instead.");
-                lhs->input_project();
-                rhs->input_project();
-                lhs->shuffle(*rhs);
-            }
-        } else if (op == Before) {
-            HfstTransducer * tmp = new HfstTransducer(hfst::xeroxRules::before(*lhs, *rhs));
-            delete lhs;
-            lhs = tmp;
-        } else if (op == After) {
-            HfstTransducer * tmp = new HfstTransducer(hfst::xeroxRules::after(*lhs, *rhs));
-            delete lhs;
-            lhs = tmp;
-        } else if (op == InsertFreely) {
-            lhs->insert_freely(*rhs, false);
-        } else if (op == IgnoreInternally) {
-            HfstTransducer * right_part = new HfstTransducer(*lhs);
-            HfstTransducer * middle_part = new HfstTransducer(*lhs);
-            middle_part->disjunct(*rhs);
-            middle_part->repeat_star();
-            lhs->concatenate(*middle_part);
-            lhs->concatenate(*right_part);
-            delete middle_part;
-            delete right_part;
-        } else if (op == Merge) {
-            HfstTransducer * tmp;
-            try {
-                tmp = hfst::xre::merge_first_to_second(lhs, rhs);
-            }
-            catch (const TransducersAreNotAutomataException & e) {
-                pmatcherror("Error: transducers must be automata in merge operation.");
-            }
-            delete lhs; lhs = tmp;
-        }
-        delete rhs;
-        lhs->set_final_weights(weight, true);
-        report_time();
-        cache = lhs;
+    if (cache != NULL && should_use_cache()) {
+        return new HfstTransducer(*cache);
     }
-    return new HfstTransducer(*cache);
+    start_timing();
+    HfstTransducer * retval;
+    HfstTransducer * lhs = left->evaluate();
+    HfstTransducer * rhs = right->evaluate();
+    if (op == Concatenate) {
+        lhs->concatenate(*rhs);
+    } else if (op == Compose) {
+        lhs->compose(*rhs);
+    } else if (op == CrossProduct) {
+        lhs->cross_product(*rhs);
+    } else if (op == LenientCompose) {
+        lhs->lenient_composition(*rhs);
+    } else if (op == Disjunct) {
+        lhs->disjunct(*rhs);
+    } else if (op == Intersect) {
+        lhs->intersect(*rhs);
+    } else if (op == Subtract) {
+        lhs->subtract(*rhs);
+    } else if (op == UpperSubtract) {
+        pmatcherror("Upper subtraction not implemented.");
+        return lhs;
+    } else if (op == LowerSubtract) {
+        pmatcherror("Lower subtraction not implemented.");
+        return lhs;
+    } else if (op == UpperPriorityUnion) {
+        lhs->priority_union(*rhs);
+    } else if (op == LowerPriorityUnion) {
+        lhs->invert();
+        rhs->invert();
+        lhs->priority_union(*rhs);
+        lhs->invert();
+    } else if (op == Shuffle) {
+        try {
+            lhs->shuffle(*rhs);
+        } catch (const TransducersAreNotAutomataException & e) {
+            pmatchwarning("tried to shuffle with non-automaton transducers,\n"
+                          "    shuffling with their input projection instead.");
+            lhs->input_project();
+            rhs->input_project();
+            lhs->shuffle(*rhs);
+        }
+    } else if (op == Before) {
+        HfstTransducer * tmp = new HfstTransducer(hfst::xeroxRules::before(*lhs, *rhs));
+        delete lhs;
+        lhs = tmp;
+    } else if (op == After) {
+        HfstTransducer * tmp = new HfstTransducer(hfst::xeroxRules::after(*lhs, *rhs));
+        delete lhs;
+        lhs = tmp;
+    } else if (op == InsertFreely) {
+        lhs->insert_freely(*rhs, false);
+    } else if (op == IgnoreInternally) {
+        HfstTransducer * right_part = new HfstTransducer(*lhs);
+        HfstTransducer * middle_part = new HfstTransducer(*lhs);
+        middle_part->disjunct(*rhs);
+        middle_part->repeat_star();
+        lhs->concatenate(*middle_part);
+        lhs->concatenate(*right_part);
+        delete middle_part;
+        delete right_part;
+    } else if (op == Merge) {
+        HfstTransducer * tmp;
+        try {
+            tmp = hfst::xre::merge_first_to_second(lhs, rhs);
+        }
+        catch (const TransducersAreNotAutomataException & e) {
+            pmatcherror("Error: transducers must be automata in merge operation.");
+        }
+        delete lhs; lhs = tmp;
+    }
+    delete rhs;
+    lhs->set_final_weights(weight, true);
+    report_time();
+    retval = lhs;
+    if (cache == NULL && should_use_cache()) {
+        cache = retval;
+    }
+    return new HfstTransducer(*retval);
 }
 
 StringPair PmatchBinaryOperation::as_string_pair(void)
@@ -1383,24 +1417,29 @@ StringPair PmatchBinaryOperation::as_string_pair(void)
 
 HfstTransducer * PmatchTernaryOperation::evaluate(PmatchEvalType eval_type)
 {
-    if (cache == NULL) {
-        start_timing();
-        if (op == Substitute) {
-            cache = left->evaluate();
-            StringPair middle_pair = middle->as_string_pair();
-            StringPair right_pair = right->as_string_pair();
-            if (right_pair.first != "" || right_pair.second != "") {
-                cache->substitute(middle_pair, right_pair);
-            } else {
-                HfstTransducer * tmp = right->evaluate();
-                cache->substitute(middle_pair, *tmp);
-                delete tmp;
-            }
-        }
-        cache->set_final_weights(weight, true);
-        report_time();
+    if (cache != NULL && should_use_cache()) {
+        return new HfstTransducer(*cache);
     }
-    return new HfstTransducer(*cache);
+    start_timing();
+    HfstTransducer * retval;
+    if (op == Substitute) {
+        retval = left->evaluate();
+        StringPair middle_pair = middle->as_string_pair();
+        StringPair right_pair = right->as_string_pair();
+        if (right_pair.first != "" || right_pair.second != "") {
+            retval->substitute(middle_pair, right_pair);
+        } else {
+            HfstTransducer * tmp = right->evaluate();
+            retval->substitute(middle_pair, *tmp);
+            delete tmp;
+        }
+    }
+    retval->set_final_weights(weight, true);
+    report_time();
+    if (cache == NULL && should_use_cache()) {
+        cache = retval;
+    }
+    return new HfstTransducer(*retval);
 }
 
 HfstTransducer * PmatchAcceptor::evaluate(PmatchEvalType eval_type)
@@ -1433,42 +1472,47 @@ HfstTransducer * PmatchAcceptor::evaluate(PmatchEvalType eval_type)
 
 HfstTransducer * PmatchParallelRulesContainer::evaluate(PmatchEvalType eval_type)
 {
-    if (cache == NULL) {
-        start_timing();
-        switch (arrow) {
-        case hfst::xeroxRules::E_REPLACE_RIGHT:
-            cache = new HfstTransducer(replace(make_mappings(), false));
-            break;
-        case hfst::xeroxRules::E_OPTIONAL_REPLACE_RIGHT:
-            cache = new HfstTransducer(replace(make_mappings(), true));
-            break;
-        case hfst::xeroxRules::E_REPLACE_LEFT:
-            cache = new HfstTransducer(replace_left(make_mappings(), false));
-            break;
-        case hfst::xeroxRules::E_OPTIONAL_REPLACE_LEFT:
-            cache = new HfstTransducer(replace_left(make_mappings(), true));
-            break;
-        case hfst::xeroxRules::E_RTL_LONGEST_MATCH:
-            cache = new HfstTransducer(replace_rightmost_longest_match(make_mappings()));
-            break;
-        case hfst::xeroxRules::E_RTL_SHORTEST_MATCH:
-            cache = new HfstTransducer(replace_rightmost_shortest_match(make_mappings()));
-            break;
-        case hfst::xeroxRules::E_LTR_LONGEST_MATCH:
-            cache = new HfstTransducer(replace_leftmost_longest_match(make_mappings()));
-            break;
-        case hfst::xeroxRules::E_LTR_SHORTEST_MATCH:
-            cache = new HfstTransducer(replace_leftmost_shortest_match(make_mappings()));
-            break;
-        case hfst::xeroxRules::E_REPLACE_RIGHT_MARKUP:
-        default:
-            pmatcherror("Unrecognized arrow type");
-            return (HfstTransducer *) NULL;
-        }
-        cache->set_final_weights(weight, true);
-        report_time();
+    if (cache != NULL && should_use_cache()) {
+        return new HfstTransducer(*cache);
     }
-    return new HfstTransducer(*cache);
+    start_timing();
+    HfstTransducer * retval;
+    switch (arrow) {
+    case hfst::xeroxRules::E_REPLACE_RIGHT:
+        retval = new HfstTransducer(replace(make_mappings(), false));
+        break;
+    case hfst::xeroxRules::E_OPTIONAL_REPLACE_RIGHT:
+        retval = new HfstTransducer(replace(make_mappings(), true));
+        break;
+    case hfst::xeroxRules::E_REPLACE_LEFT:
+        retval = new HfstTransducer(replace_left(make_mappings(), false));
+        break;
+    case hfst::xeroxRules::E_OPTIONAL_REPLACE_LEFT:
+        retval = new HfstTransducer(replace_left(make_mappings(), true));
+        break;
+    case hfst::xeroxRules::E_RTL_LONGEST_MATCH:
+        retval = new HfstTransducer(replace_rightmost_longest_match(make_mappings()));
+        break;
+    case hfst::xeroxRules::E_RTL_SHORTEST_MATCH:
+        retval = new HfstTransducer(replace_rightmost_shortest_match(make_mappings()));
+        break;
+    case hfst::xeroxRules::E_LTR_LONGEST_MATCH:
+        retval = new HfstTransducer(replace_leftmost_longest_match(make_mappings()));
+        break;
+    case hfst::xeroxRules::E_LTR_SHORTEST_MATCH:
+        retval = new HfstTransducer(replace_leftmost_shortest_match(make_mappings()));
+        break;
+    case hfst::xeroxRules::E_REPLACE_RIGHT_MARKUP:
+    default:
+        pmatcherror("Unrecognized arrow type");
+        return (HfstTransducer *) NULL;
+    }
+    retval->set_final_weights(weight, true);
+    report_time();
+    if (cache == NULL && should_use_cache()) {
+        cache = retval;
+    }
+    return new HfstTransducer(*retval);
 }
 
 std::vector<hfst::xeroxRules::Rule> PmatchParallelRulesContainer::make_mappings(void)
@@ -1484,42 +1528,47 @@ std::vector<hfst::xeroxRules::Rule> PmatchParallelRulesContainer::make_mappings(
 
 HfstTransducer * PmatchReplaceRuleContainer::evaluate(PmatchEvalType eval_type)
 {
-    if (cache == NULL) {
-        start_timing();
-        switch (arrow) {
-        case hfst::xeroxRules::E_REPLACE_RIGHT:
-            cache = new HfstTransducer(replace(make_mapping(), false));
-            break;
-        case hfst::xeroxRules::E_OPTIONAL_REPLACE_RIGHT:
-            cache = new HfstTransducer(replace(make_mapping(), true));
-            break;
-        case hfst::xeroxRules::E_REPLACE_LEFT:
-            cache = new HfstTransducer(replace_left(make_mapping(), false));
-            break;
-        case hfst::xeroxRules::E_OPTIONAL_REPLACE_LEFT:
-            cache = new HfstTransducer(replace_left(make_mapping(), true));
-            break;
-        case hfst::xeroxRules::E_RTL_LONGEST_MATCH:
-            cache = new HfstTransducer(replace_rightmost_longest_match(make_mapping()));
-            break;
-        case hfst::xeroxRules::E_RTL_SHORTEST_MATCH:
-            cache = new HfstTransducer(replace_rightmost_shortest_match(make_mapping()));
-            break;
-        case hfst::xeroxRules::E_LTR_LONGEST_MATCH:
-            cache = new HfstTransducer(replace_leftmost_longest_match(make_mapping()));
-            break;
-        case hfst::xeroxRules::E_LTR_SHORTEST_MATCH:
-            cache = new HfstTransducer(replace_leftmost_shortest_match(make_mapping()));
-            break;
-        case hfst::xeroxRules::E_REPLACE_RIGHT_MARKUP:
-        default:
-            pmatcherror("Unrecognized arrow");
-            return (HfstTransducer *) NULL;
-        }
-        cache->set_final_weights(weight, true);
-        report_time();
+    if (cache != NULL && should_use_cache()) {
+        return new HfstTransducer(*cache);
     }
-    return new HfstTransducer(*cache);
+    start_timing();
+    HfstTransducer * retval;
+    switch (arrow) {
+    case hfst::xeroxRules::E_REPLACE_RIGHT:
+        retval = new HfstTransducer(replace(make_mapping(), false));
+        break;
+    case hfst::xeroxRules::E_OPTIONAL_REPLACE_RIGHT:
+        retval = new HfstTransducer(replace(make_mapping(), true));
+        break;
+    case hfst::xeroxRules::E_REPLACE_LEFT:
+        retval = new HfstTransducer(replace_left(make_mapping(), false));
+        break;
+    case hfst::xeroxRules::E_OPTIONAL_REPLACE_LEFT:
+        retval = new HfstTransducer(replace_left(make_mapping(), true));
+        break;
+    case hfst::xeroxRules::E_RTL_LONGEST_MATCH:
+        retval = new HfstTransducer(replace_rightmost_longest_match(make_mapping()));
+        break;
+    case hfst::xeroxRules::E_RTL_SHORTEST_MATCH:
+        retval = new HfstTransducer(replace_rightmost_shortest_match(make_mapping()));
+        break;
+    case hfst::xeroxRules::E_LTR_LONGEST_MATCH:
+        retval = new HfstTransducer(replace_leftmost_longest_match(make_mapping()));
+        break;
+    case hfst::xeroxRules::E_LTR_SHORTEST_MATCH:
+        retval = new HfstTransducer(replace_leftmost_shortest_match(make_mapping()));
+        break;
+    case hfst::xeroxRules::E_REPLACE_RIGHT_MARKUP:
+    default:
+        pmatcherror("Unrecognized arrow");
+        return (HfstTransducer *) NULL;
+    }
+    retval->set_final_weights(weight, true);
+    report_time();
+    if (cache == NULL && should_use_cache()) {
+        cache = retval;
+    }
+    return new HfstTransducer(*retval);
 }
 
 hfst::xeroxRules::Rule PmatchReplaceRuleContainer::make_mapping(void)
@@ -1564,24 +1613,29 @@ HfstTransducer * PmatchQuestionMark::evaluate(PmatchEvalType eval_type)
 
 HfstTransducer * PmatchRestrictionContainer::evaluate(PmatchEvalType eval_type)
 {
-    if (cache == NULL) {
-        start_timing();
-        HfstTransducerPairVector pair_vector;
-        for (MappingPairVector::iterator it = contexts->begin();
-             it != contexts->end(); ++it) {
-            HfstTransducer * lside = it->first->evaluate();
-            HfstTransducer * rside = it->second->evaluate();
-            pair_vector.push_back(HfstTransducerPair(HfstTransducer(*lside),
-                                                     HfstTransducer(*rside)));
-            delete lside; delete rside;
-        }
-        HfstTransducer * l = left->evaluate();
-        cache = new HfstTransducer(hfst::xeroxRules::restriction(*l, pair_vector));
-        delete l;
-        cache->set_final_weights(weight, true);
-        report_time();
+    if (cache != NULL && should_use_cache()) {
+        return new HfstTransducer(*cache);
     }
-    return new HfstTransducer(*cache);
+    start_timing();
+    HfstTransducer * retval;
+    HfstTransducerPairVector pair_vector;
+    for (MappingPairVector::iterator it = contexts->begin();
+         it != contexts->end(); ++it) {
+        HfstTransducer * lside = it->first->evaluate();
+        HfstTransducer * rside = it->second->evaluate();
+        pair_vector.push_back(HfstTransducerPair(HfstTransducer(*lside),
+                                                 HfstTransducer(*rside)));
+        delete lside; delete rside;
+    }
+    HfstTransducer * l = left->evaluate();
+    retval = new HfstTransducer(hfst::xeroxRules::restriction(*l, pair_vector));
+    delete l;
+    retval->set_final_weights(weight, true);
+    report_time();
+    if (cache == NULL && should_use_cache()) {
+        cache = retval;
+    }
+    return new HfstTransducer(*retval);
 }
 
 HfstTransducer * PmatchMarkupContainer::evaluate(PmatchEvalType eval_type) { pmatcherror("Should never happen\n"); throw 1; }

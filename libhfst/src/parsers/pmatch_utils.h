@@ -72,6 +72,7 @@ PmatchUtilityTransducers* get_utils();
 void zero_minimization_guard(void);
 bool symbol_in_global_context(std::string & sym);
 bool symbol_in_local_context(std::string & sym);
+bool should_use_cache(void);
 PmatchObject * symbol_from_global_context(std::string & sym);
 PmatchObject * symbol_from_local_context(std::string & sym);
 
