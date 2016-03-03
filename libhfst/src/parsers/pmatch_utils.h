@@ -451,6 +451,10 @@ enum PmatchPredefined {
     Whitespace
 };
 
+enum PmatchBuiltin {
+    Interpolate
+};
+
 struct PmatchNumericOperation: public PmatchObject{
     PmatchNumericOp op;
     PmatchObject * root;
@@ -525,6 +529,15 @@ struct PmatchFuncall: public PmatchObject {
             return fun->evaluate(*args);
         }
                                                    
+};
+
+struct PmatchBuiltinFunction: public PmatchObject {
+    std::vector<PmatchObject *>* args;
+    PmatchBuiltin type;
+    PmatchBuiltinFunction(PmatchBuiltin _type,
+                          std::vector<PmatchObject*>* argument_vector):
+        type(_type), args(argument_vector) {}
+    HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
 };
 
 using hfst::xeroxRules::ReplaceArrow;

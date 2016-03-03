@@ -1181,6 +1181,33 @@ HfstTransducer * PmatchFunction::evaluate(PmatchEvalType eval_type)
     return evaluate(funargs);
 }
 
+HfstTransducer * PmatchBuiltinFunction::evaluate(PmatchEvalType eval_type)
+{
+    start_timing();
+    HfstTransducer * retval;
+    if (type == Interpolate) {
+        if (args->size() < 3) {
+            std::stringstream errstring;
+            errstring << "Builtin function Interpolate called with " << args->size() << " arguments, but it expects at least 3." << std::endl;
+            throw std::invalid_argument(errstring.str());
+        }
+        // arguments are in reverse order after parsing
+        retval = (*(args->rbegin() + 1))->evaluate();
+        HfstTransducer * interpolator = (*(args->rbegin()))->evaluate();
+        for(std::vector<PmatchObject*>::reverse_iterator it = args->rbegin() + 2;
+            it != args->rend(); ++it) {
+            HfstTransducer * tmp = (*it)->evaluate();
+            retval->concatenate(*interpolator);
+            retval->concatenate(*tmp);
+            delete tmp;
+        }
+        delete interpolator;
+    }
+    retval->set_final_weights(weight, true);
+    report_time();
+    return retval;
+}
+
 HfstTransducer * PmatchNumericOperation::evaluate(PmatchEvalType eval_type)
 {
     if (cache != NULL && should_use_cache()) {
