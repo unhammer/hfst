@@ -31,7 +31,7 @@ LIBHFST_MINOR=9
 LIBHFST_EXTENSION=1
 LIBHFST_VERSION=$LIBHFST_MAJOR.$LIBHFST_MINOR.$LIBHFST_EXTENSION
 
-AC_INIT([hfst], [3.9.1], [hfst-bugs@helsinki.fi], [hfst])
+AC_INIT([hfst], [3.9.2], [hfst-bugs@helsinki.fi], [hfst])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall std-options foreign check-news])
 
@@ -44,8 +44,8 @@ AC_CONFIG_HEADERS([config.h libhfst/src/hfst.hpp])
 
 AC_SUBST([LIBHFST_MAJOR],     [3])
 AC_SUBST([LIBHFST_MINOR],     [9])
-AC_SUBST([LIBHFST_EXTENSION], [1])
-AC_SUBST([LIBHFST_VERSION],   [3.9.1])
+AC_SUBST([LIBHFST_EXTENSION], [2])
+AC_SUBST([LIBHFST_VERSION],   [3.9.2])
 AC_SUBST([LIBHFST_NAME],      [hfst])
 
 # long version = version vector cast in base 10000, for automatic comparisons
@@ -56,7 +56,7 @@ AC_SUBST([LIBHFST_NAME],      [hfst])
 # $LIBHFST_MINOR * 10000 + $LIBHFST_EXTENSION + "L"
 # NB! It turned out to be not portable, and can't be used!
 
-AC_DEFINE([HFST_LONGVERSION], [300090001L],
+AC_DEFINE([HFST_LONGVERSION], [300090002L],
           [Define to hfst version vector as long in base 10000])
 AC_DEFINE([HFST_REVISION], ["$Revision$"],
           [Automatically substitute to configure.ac revision])
