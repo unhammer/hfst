@@ -76,17 +76,17 @@ print_usage()
             "\n", program_name);
     print_common_program_options(message_out);
     fprintf(message_out,
-            "  -n  --newline          Newline as input separator (default is blank line)\n"
-            "  -a  --print-all        Print nonmatching text\n"
-            "  -w  --print-weight     Print weights\n"
-            "  --tokenize-multichar   Tokenize multicharacter symbols\n"
-            "                         (by default only one utf-8 character is tokenized at a time\n"
-            "                         regardless of what is present in the alphabet)\n"
-            "  -t, --time-cutoff=S    Limit search after having used S seconds per input\n"
-            "  --segment              Segmenting / tokenization mode (default)\n"
-            "  --xerox                Xerox output\n"
-            "  --cg                   cg output\n"
-            "  --finnpos              FinnPos output\n");
+            "  -n, --newline            Newline as input separator (default is blank line)\n"
+            "  -a, --print-all          Print nonmatching text\n"
+            "  -w, --print-weight       Print weights\n"
+            "  -m, --tokenize-multichar Tokenize multicharacter symbols\n"
+            "                           (by default only one utf-8 character is tokenized at a time\n"
+            "                           regardless of what is present in the alphabet)\n"
+            "  -t, --time-cutoff=S      Limit search after having used S seconds per input\n"
+            "  -z, --segment            Segmenting / tokenization mode (default)\n"
+            "  -x, --xerox              Xerox output\n"
+            "  -c, --cg                 cg output\n"
+            "  -f, --finnpos            FinnPos output\n");
     fprintf(message_out, 
             "Use standard streams for input and output (for now).\n"
             "\n"
@@ -292,7 +292,7 @@ int parse_options(int argc, char** argv)
                 {0,0,0,0}
             };
         int option_index = 0;
-        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nawt:zxcf",
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nawmt:zxcf",
                              long_options, &option_index);
         if (-1 == c)
         {
