@@ -114,6 +114,7 @@ namespace hfst_ol {
         SymbolNumberVector guards;
         std::vector<bool> printable_vector;
         bool is_end_tag(const SymbolNumber symbol) const;
+        bool is_input_mark(const SymbolNumber symbol) const;
         bool is_guard(const SymbolNumber symbol) const;
         bool is_counter(const SymbolNumber symbol) const;
         std::string end_tag(const SymbolNumber symbol);
@@ -243,6 +244,7 @@ namespace hfst_ol {
         std::string output;
         std::string tag;
         Weight weight;
+        std::vector<std::string> input_parts;
 
         bool operator<(Location rhs) const
             { return this->weight < rhs.weight; }

@@ -383,6 +383,12 @@ bool PmatchAlphabet::is_counter(const SymbolNumber symbol) const
     return (symbol < counters.size() && counters[symbol] != NO_COUNTER);
 }
 
+bool PmatchAlphabet::is_input_mark(const SymbolNumber symbol) const
+{
+    // TODO: Special tag in symbol table or such; not printable
+    return string_from_symbol(symbol) == "¤";
+}
+
 std::string PmatchAlphabet::name_from_insertion(const std::string & symbol)
 {
     return symbol.substr(sizeof("@I.") - 1, symbol.size() - (sizeof("@I.@") - 1));
@@ -731,10 +737,10 @@ Location PmatchAlphabet::locatefy(unsigned int input_offset,
     Location retval;
     retval.start = input_offset;
     retval.weight = str.weight;
+    size_t part_offset = 0;
 
     // We rebuild the original input without special
     // symbols but with IDENTITIES etc. replaced
-    SymbolNumberVector orig_input;
     for (DoubleTape::const_iterator it = str.begin();
          it != str.end(); ++it) {
         SymbolNumber input = it->input;
@@ -747,15 +753,18 @@ Location PmatchAlphabet::locatefy(unsigned int input_offset,
             retval.output.append(string_from_symbol(output));
         }
         if (is_printable(input)) {
-            orig_input.push_back(input);
+            retval.input.append(string_from_symbol(input));
             ++input_offset;
         }
+        if (is_input_mark(output)) {
+            retval.input_parts.push_back(retval.input.substr(part_offset));
+            part_offset = retval.input.size();
+        }
+    }
+    if (part_offset > 0) {
+        retval.input_parts.push_back(retval.input.substr(part_offset));
     }
     retval.length = input_offset - retval.start;
-    for(SymbolNumberVector::const_iterator input_it = orig_input.begin();
-        input_it != orig_input.end(); ++input_it) {
-        retval.input.append(string_from_symbol(*input_it));
-    }
     return retval;
 }
 
