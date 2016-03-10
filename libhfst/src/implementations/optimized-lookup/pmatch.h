@@ -43,7 +43,9 @@ namespace hfst_ol {
                        NRC_entry,
                        NRC_exit,
                        Pmatch_passthrough,
-                       boundary};
+                       boundary,
+                       Pmatch_input_mark,
+                       SPECIALSYMBOL_NR_ITEMS};
 
     struct SymbolPair
     {
@@ -244,7 +246,8 @@ namespace hfst_ol {
         std::string output;
         std::string tag;
         Weight weight;
-        std::vector<std::string> input_parts;
+        std::vector<size_t> input_parts;
+        std::vector<size_t> output_parts;
 
         bool operator<(Location rhs) const
             { return this->weight < rhs.weight; }
