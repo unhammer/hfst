@@ -998,91 +998,87 @@ namespace hfst
     bytes_to_skip(0), filename(std::string(filename)), has_hfst_header(false),
     hfst_version_2_weighted_transducer(false)
   {
-    try { 
-      if (strcmp("",filename.c_str()) != 0) {
-        std::ifstream ifs(filename.c_str());
-        if (ifs.fail())
-          HFST_THROW_MESSAGE(NotTransducerStreamException, 
-                             "file could not be opened");
-        input_stream = &ifs;
-        if (stream_eof())
-          HFST_THROW(EndOfStreamException);
-        type = stream_fst_type();
-      }
-      else {
-        input_stream = &std::cin;
-        if (stream_eof())
-          HFST_THROW(EndOfStreamException);
-        type = stream_fst_type();
-      }
+    if (strcmp("",filename.c_str()) != 0) {
+      std::ifstream ifs(filename.c_str());
+      if (ifs.fail())
+        HFST_THROW_MESSAGE(NotTransducerStreamException, 
+                           "file could not be opened");
+      input_stream = &ifs;
+      if (stream_eof())
+        HFST_THROW(EndOfStreamException);
+      type = stream_fst_type();
     }
-
-    catch( const HfstException e)
-      { throw e; }
+    else {
+      input_stream = &std::cin;
+      if (stream_eof())
+        HFST_THROW(EndOfStreamException);
+      type = stream_fst_type();
+    }
+    
     if ( ! HfstTransducer::is_implementation_type_available(type)) {
       HFST_THROW(ImplementationTypeNotAvailableException);
     }
-
+    
     switch (type)
-    {
+      {
 #if HAVE_SFST
-    case SFST_TYPE:
-      implementation.sfst 
-        = new hfst::implementations::SfstInputStream(filename);
-      break;
+      case SFST_TYPE:
+        implementation.sfst 
+          = new hfst::implementations::SfstInputStream(filename);
+        break;
 #endif
 #if HAVE_OPENFST
-    case TROPICAL_OPENFST_TYPE:
-      if (strcmp(filename.c_str(),"") == 0) {  
-        // FIXME: this should be done in TropicalWeight layer
-        implementation.tropical_ofst = 
-          new hfst::implementations::TropicalWeightInputStream();
-      }
-      else
-        implementation.tropical_ofst = 
-          new hfst::implementations::TropicalWeightInputStream(filename);
-      break;
+      case TROPICAL_OPENFST_TYPE:
+        if (strcmp(filename.c_str(),"") == 0) {  
+          // FIXME: this should be done in TropicalWeight layer
+          implementation.tropical_ofst = 
+            new hfst::implementations::TropicalWeightInputStream();
+        }
+        else
+          implementation.tropical_ofst = 
+            new hfst::implementations::TropicalWeightInputStream(filename);
+        break;
 #if HAVE_OPENFST_LOG
-    case LOG_OPENFST_TYPE:
-      implementation.log_ofst = 
-        new hfst::implementations::LogWeightInputStream(filename);
-      break;
+      case LOG_OPENFST_TYPE:
+        implementation.log_ofst = 
+          new hfst::implementations::LogWeightInputStream(filename);
+        break;
 #endif
 #endif
 #if HAVE_FOMA
-    case FOMA_TYPE:
-      implementation.foma 
-        = new hfst::implementations::FomaInputStream(filename);
-      break;
+      case FOMA_TYPE:
+        implementation.foma 
+          = new hfst::implementations::FomaInputStream(filename);
+        break;
 #endif
 #if HAVE_XFSM
-    case XFSM_TYPE:
-      implementation.xfsm 
-        = new hfst::implementations::XfsmInputStream(filename);
-      break;
+      case XFSM_TYPE:
+        implementation.xfsm 
+          = new hfst::implementations::XfsmInputStream(filename);
+        break;
 #endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
-    case MY_TRANSDUCER_LIBRARY_TYPE:
-      implementation.my_transducer_library 
-        = new hfst::implementations::MyTransducerLibraryInputStream(filename);
-      break;
+      case MY_TRANSDUCER_LIBRARY_TYPE:
+        implementation.my_transducer_library 
+          = new hfst::implementations::MyTransducerLibraryInputStream(filename);
+        break;
 #endif
-    case HFST_OL_TYPE:
-      implementation.hfst_ol 
-        = new hfst::implementations::HfstOlInputStream(filename, false);
-      break;
-    case HFST_OLW_TYPE:
-      implementation.hfst_ol 
-        = new hfst::implementations::HfstOlInputStream(filename, true);
-      break;
-    default:
-      debug_error("#10");
-
-      HFST_THROW_MESSAGE(NotTransducerStreamException,
-                         "transducer type not recognised");
-    }
+      case HFST_OL_TYPE:
+        implementation.hfst_ol 
+          = new hfst::implementations::HfstOlInputStream(filename, false);
+        break;
+      case HFST_OLW_TYPE:
+        implementation.hfst_ol 
+          = new hfst::implementations::HfstOlInputStream(filename, true);
+        break;
+      default:
+        debug_error("#10");
+        
+        HFST_THROW_MESSAGE(NotTransducerStreamException,
+                           "transducer type not recognised");
+      }
   }
-
+  
   HfstInputStream::~HfstInputStream(void)
   { 
     switch (type)
