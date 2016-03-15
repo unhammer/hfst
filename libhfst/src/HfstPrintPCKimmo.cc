@@ -7,12 +7,6 @@
 // See the file COPYING included with this distribution for more      
 // information.
 
-//! @file hfst-fst2txt.cc
-//!
-//! @brief Transducer array printing command line tool
-//!
-//! @author HFST Team
-
 #include "HfstTransducer.h"
 using hfst::HfstTransducer;
 using hfst::HfstBasicTransducer;

@@ -1592,8 +1592,8 @@ namespace hfst { namespace implementations
   
   LogFst * LogWeightTransducer::substitute
   (LogFst * t,
-   pair<unsigned int, unsigned int> old_key_pair,
-   pair<unsigned int, unsigned int> new_key_pair)
+   NumberPair old_key_pair,
+   NumberPair new_key_pair)
   {
     EncodeMapper<LogArc> encode_mapper(0x0001,ENCODE);
     EncodeFst<LogArc> enc(*t,&encode_mapper);

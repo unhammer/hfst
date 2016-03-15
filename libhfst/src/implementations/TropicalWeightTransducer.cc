@@ -1964,8 +1964,8 @@ namespace hfst {
 
   StdVectorFst * TropicalWeightTransducer::substitute
   (StdVectorFst * t,
-   pair<unsigned int, unsigned int> old_key_pair,
-   pair<unsigned int, unsigned int> new_key_pair)
+   NumberPair old_key_pair,
+   NumberPair new_key_pair)
   {
     EncodeMapper<StdArc> encode_mapper(0x0001,ENCODE);
     EncodeFst<StdArc> enc(*t,&encode_mapper);

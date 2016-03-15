@@ -209,8 +209,8 @@ namespace implementations
       static StdVectorFst * disjunct
         (StdVectorFst * t, const NumberPairVector &npv);
 
-      static StdVectorFst * disjunct_as_tries(StdVectorFst * t1,
-                                              const StdVectorFst * t2);
+      static fst::StdVectorFst * disjunct_as_tries(fst::StdVectorFst * t1,
+                                              const fst::StdVectorFst * t2);
 
       static StdVectorFst * intersect(StdVectorFst * t1,
                                       StdVectorFst * t2);
@@ -331,9 +331,9 @@ namespace implementations
                   StdArc::StateId sourcestate,                          
                   StdArc::Label ilabel, 
                   StdArc::Label olabel);
-      static void disjunct_as_tries(StdVectorFst &t1,
+      static void disjunct_as_tries(fst::StdVectorFst &t1,
                              StateId t1_state,
-                             const StdVectorFst * t2,
+                                    const fst::StdVectorFst * t2,
                              StateId t2_state);
       static void add_sub_trie(StdVectorFst &t1,
                         StateId t1_state,

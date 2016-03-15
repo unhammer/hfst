@@ -7,8 +7,7 @@
 // See the file COPYING included with this distribution for more      
 // information.
 
-/** @file hfst_apply_schemas.h
-    \brief declarations for HFST functions that take two or more parameters */
+/** \brief declarations for HFST functions that take two or more parameters */
 
 HfstTransducer &apply(
 #if HAVE_SFST

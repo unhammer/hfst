@@ -1081,6 +1081,7 @@ ccc : ddd
     //! @param limit  (Currently ignored.) Number of strings to look up. 
     //!               -1 tries to look up all and may get stuck 
     //!               if infinitely ambiguous.
+    //! @param time_cutoff Number of seconds that can pass before lookup is stopped.
     //! \return{A pointer to a HfstOneLevelPaths container allocated by callee}
     //! 
     //! @see HfstTokenizer::tokenize_one_level
@@ -1106,6 +1107,7 @@ ccc : ddd
     //! @param limit  (Currently ignored.) Number of strings to look up. 
     //!               -1 tries to look up all and may get stuck 
     //!               if infinitely ambiguous.
+    //! @param time_cutoff Number of seconds that can pass before lookup is stopped.
     //! \return{A pointer to a HfstOneLevelPaths container allocated by callee}
     //!
     //!
@@ -1119,7 +1121,7 @@ ccc : ddd
     //!
     //!
     //! This function is the same as 
-    //! #lookup(const StringVector&, ssize_t) const
+    //! #lookup(const StringVector&, ssize_t, double) const
     //! but lookup is not done using a string and a tokenizer instead of
     //! a StringVector.
       HFSTDLL HfstOneLevelPaths * lookup(const HfstTokenizer& tok,
@@ -1132,7 +1134,7 @@ ccc : ddd
     //! \a tok defines how s is tokenized.
     //!
     //! The same as 
-    //! #lookup_fd(const StringVector&, ssize_t) const 
+    //! #lookup_fd(const StringVector&, ssize_t, double) const 
     //! but uses a tokenizer and a string instead of a StringVector.
     //!
     HFSTDLL HfstOneLevelPaths * lookup_fd(

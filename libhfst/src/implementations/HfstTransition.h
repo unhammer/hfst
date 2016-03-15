@@ -145,12 +145,7 @@ namespace hfst {
     typedef HfstTransition<HfstTropicalTransducerTransitionData> 
       HfstBasicTransition;
 
-    /** @brief An HfstTransition with transition data of type
-        HfstFastTransitionData. 
-
-        This implementation is compatible with #HfstFastTransducer.
-
-        @see HfstFastTransitionData HfstFastTransducer */
+    // TODO: remove?
     typedef HfstTransition<HfstFastTransitionData> HfstFastTransition;
 
   }

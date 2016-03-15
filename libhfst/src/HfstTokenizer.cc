@@ -109,7 +109,7 @@ const
 { return (s == "") || (skip_symbol_set.find(s) != skip_symbol_set.end()); }
 
 void
-HfstTokenizer::add_multichar_symbol(const string& symbol)
+HfstTokenizer::add_multichar_symbol(const std::string& symbol)
 {  if (symbol == "")
     { return; }
   multi_char_symbols.add(symbol.c_str()); }
@@ -122,7 +122,7 @@ HfstTokenizer::add_skip_symbol(const std::string &symbol)
   skip_symbol_set.insert(symbol.c_str()); }
 
 StringPairVector HfstTokenizer::tokenize
-(const string& input_string) const
+(const std::string& input_string) const
 {
   check_utf8_correctness(input_string);
   StringPairVector spv;
@@ -140,7 +140,7 @@ StringPairVector HfstTokenizer::tokenize
 }
 
 StringVector HfstTokenizer::tokenize_one_level
-(const string& input_string) const
+(const std::string& input_string) const
 {
   check_utf8_correctness(input_string);
 
@@ -197,7 +197,7 @@ StringPairVector HfstTokenizer::tokenize_space_separated(const std::string & str
 }
 
 StringPairVector HfstTokenizer::tokenize
-(const string& input_string,const string& output_string) const
+(const std::string& input_string,const std::string& output_string) const
 {
   check_utf8_correctness(input_string);
   check_utf8_correctness(output_string);
@@ -235,7 +235,7 @@ StringPairVector HfstTokenizer::tokenize
 }
 
 StringPairVector HfstTokenizer::tokenize
-(const string& input_string,const string& output_string,
+(const std::string& input_string,const std::string& output_string,
  void (*warn_about_pair)(const std::pair<std::string, std::string> &symbol_pair)) const
 {
   check_utf8_correctness(input_string);
@@ -281,7 +281,7 @@ StringPairVector HfstTokenizer::tokenize
 }
 
 StringPairVector HfstTokenizer::tokenize_and_align_flag_diacritics
-(const string& input_string,const string& output_string,
+(const std::string& input_string,const std::string& output_string,
  void (*warn_about_pair)(const std::pair<std::string, std::string> &symbol_pair)) const
 {
   check_utf8_correctness(input_string);
