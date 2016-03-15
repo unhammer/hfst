@@ -1,10 +1,7 @@
 ## @package libhfst 
-# HFST API for Python3.
+# HFST API for Python
 
 ## @mainpage
-#
-# <p><b> <font color="red"> THIS PAGE IS FOR TESTING PURPOSES </font> </b>
-# We are moving from Sourceforge to <a href="http://www.github.com/hfst">Github</a> in January 2016.</p> 
 #
 # HFST - The Helsinki Finite-State Transducer technology is intended for creating and manipulating weighted or unweighted synchronic transducers implementing regular relations.
 # UTF-8 is chosen as the character encoding used in HFST software. Currently, HFST has been implemented using the
@@ -2453,7 +2450,7 @@ def deep_restriction_and_coercion(contexts, mapping, alphabet):
 # 
 # \section using_hfst Using HFST in your own code
 # 
-# After <a href="InstallHfst.html">installing</a> HFST on your computer, start python3 and execute <code>import libhfst</code>.
+# After <a href="InstallHfst.html">installing</a> HFST on your computer, start python and execute <code>import libhfst</code>.
 # 
 # For example, the following simple program 
 #
@@ -2602,7 +2599,7 @@ def deep_restriction_and_coercion(contexts, mapping, alphabet):
 #
 # run on command line (fstprint is native OpenFst tool):
 # \verbatim
-# python3 test.py > ab.fst
+# python test.py > ab.fst
 # fstprint ab.fst
 # \endverbatim
 #
@@ -2642,7 +2639,7 @@ def deep_restriction_and_coercion(contexts, mapping, alphabet):
 # the commands
 #
 # \verbatim
-# cat ab.txt | fstcompile --isymbols=symbols.txt --osymbols=symbols.txt --keep_isymbols --keep_osymbols | python3 test.py
+# cat ab.txt | fstcompile --isymbols=symbols.txt --osymbols=symbols.txt --keep_isymbols --keep_osymbols | python test.py
 # \endverbatim
 #
 # will compile a native OpenFst transducer (fstcompile is a native OpenFst tool), read it with HFST tools and print it to standard output in AT&T text format:
