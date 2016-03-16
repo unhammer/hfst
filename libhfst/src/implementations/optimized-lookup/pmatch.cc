@@ -14,7 +14,7 @@ namespace hfst_ol {
 PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
                                SymbolNumber symbol_count):
     TransducerAlphabet(inputstream, symbol_count, false),
-    special_symbols(12, NO_SYMBOL_NUMBER) // SpecialSymbols enum
+    special_symbols(SPECIALSYMBOL_NR_ITEMS, NO_SYMBOL_NUMBER) // SpecialSymbols enum
 {
     symbol2lists = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
     list2symbols = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
@@ -88,6 +88,8 @@ void PmatchAlphabet::add_special_symbol(const std::string & str,
         special_symbols[NRC_exit] = symbol_number;
     } else if (str == "@PMATCH_PASSTHROUGH@") {
         special_symbols[Pmatch_passthrough] = symbol_number;
+    } else if (str == "@PMATCH_INPUT_MARK@") {
+        special_symbols[Pmatch_input_mark] = symbol_number;
     } else if (str == "@BOUNDARY@") {
         special_symbols[boundary] = symbol_number;
     } else if (is_end_tag(str)) {
@@ -381,6 +383,11 @@ bool PmatchAlphabet::is_guard(const SymbolNumber symbol) const
 bool PmatchAlphabet::is_counter(const SymbolNumber symbol) const
 {
     return (symbol < counters.size() && counters[symbol] != NO_COUNTER);
+}
+
+bool PmatchAlphabet::is_input_mark(const SymbolNumber symbol) const
+{
+    return get_special(Pmatch_input_mark) == symbol;
 }
 
 std::string PmatchAlphabet::name_from_insertion(const std::string & symbol)
@@ -731,10 +738,11 @@ Location PmatchAlphabet::locatefy(unsigned int input_offset,
     Location retval;
     retval.start = input_offset;
     retval.weight = str.weight;
+    size_t input_mark = 0;
+    size_t output_mark = 0;
 
     // We rebuild the original input without special
     // symbols but with IDENTITIES etc. replaced
-    SymbolNumberVector orig_input;
     for (DoubleTape::const_iterator it = str.begin();
          it != str.end(); ++it) {
         SymbolNumber input = it->input;
@@ -747,15 +755,23 @@ Location PmatchAlphabet::locatefy(unsigned int input_offset,
             retval.output.append(string_from_symbol(output));
         }
         if (is_printable(input)) {
-            orig_input.push_back(input);
+            retval.input.append(string_from_symbol(input));
             ++input_offset;
         }
+        if (is_input_mark(output)) {
+            retval.output_parts.push_back(output_mark);
+            retval.input_parts.push_back(input_mark);
+            output_mark = retval.output.size();
+            input_mark = retval.input.size();
+        }
+    }
+    if (output_mark > 0) {
+        retval.output_parts.push_back(output_mark);
+    }
+    if (input_mark > 0) {
+        retval.input_parts.push_back(input_mark);
     }
     retval.length = input_offset - retval.start;
-    for(SymbolNumberVector::const_iterator input_it = orig_input.begin();
-        input_it != orig_input.end(); ++input_it) {
-        retval.input.append(string_from_symbol(*input_it));
-    }
     return retval;
 }
 

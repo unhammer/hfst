@@ -43,7 +43,9 @@ namespace hfst_ol {
                        NRC_entry,
                        NRC_exit,
                        Pmatch_passthrough,
-                       boundary};
+                       boundary,
+                       Pmatch_input_mark,
+                       SPECIALSYMBOL_NR_ITEMS};
 
     struct SymbolPair
     {
@@ -114,6 +116,7 @@ namespace hfst_ol {
         SymbolNumberVector guards;
         std::vector<bool> printable_vector;
         bool is_end_tag(const SymbolNumber symbol) const;
+        bool is_input_mark(const SymbolNumber symbol) const;
         bool is_guard(const SymbolNumber symbol) const;
         bool is_counter(const SymbolNumber symbol) const;
         std::string end_tag(const SymbolNumber symbol);
@@ -243,6 +246,8 @@ namespace hfst_ol {
         std::string output;
         std::string tag;
         Weight weight;
+        std::vector<size_t> input_parts;
+        std::vector<size_t> output_parts;
 
         bool operator<(Location rhs) const
             { return this->weight < rhs.weight; }
