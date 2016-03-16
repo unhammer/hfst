@@ -8,5 +8,5 @@
 # information.
 
 SUBDIRS = test
-EXTRA_DIST = libhfst.i README setup.py test.py
+EXTRA_DIST = libhfst.i README setup.py
 AUTOMAKE_OPTIONS = subdir-objects
