@@ -7,6 +7,17 @@
 
 TESTDIR=python_tests
 
+PYTHON=python3
+PYTHON_DIR=""
+
+if [ "$1" = "--python" ]; then
+    PYTHON=$2
+fi
+
+if [ "$3" = "--python" ]; then
+    PYTHON_DIR=$4
+fi
+
 if [ ! -d "$TESTDIR" ]; then
     echo "ERROR: directory" $TESTDIR "does not exist, try running ./copy-python-tests.sh first."
     exit 1;
@@ -21,13 +32,32 @@ echo "Moving to directory" `pwd`"/"$TESTDIR"..."
 echo ""
 cd $TESTDIR
 
-# ./test.sh --python python3
-if ! (python3 test_hfst.py > /dev/null 2> /dev/null && python3 examples.py > /dev/null 2> /dev/null); then
-    echo "FAIL: Python tests did not pass"
+touch tmp.py
+echo "import sys" >> tmp.py
+echo "sys.path.insert(1, '"$PYTHON_DIR"')" >> tmp.py
+echo "import test_hfst.py" >> tmp.py
+
+if ! ( $PYTHON tmp.py > /dev/null 2> /dev/null ); then
+    echo "FAIL: test_hfst.py failed"
     echo ""
     echo "Exiting directory" `pwd`"..."
     echo ""
+    cd ..
+    exit 1
+fi
 
+rm -f tmp.py
+
+touch tmp.py
+echo "import sys" >> tmp.py
+echo "sys.path.insert(1, '"$PYTHON_DIR"')" >> tmp.py
+echo "import examples.py" >> tmp.py
+
+if ! ( $PYTHON tmp.py > /dev/null 2> /dev/null ); then
+    echo "FAIL: examples.py failed"
+    echo ""
+    echo "Exiting directory" `pwd`"..."
+    echo ""
     cd ..
     exit 1
 fi

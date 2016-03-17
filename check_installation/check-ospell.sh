@@ -31,7 +31,7 @@ echo "Moving to directory" `pwd`"/"$TESTDIR"..."
 echo ""
 cd $TESTDIR
 
-if ! ($PREFIX/hfst-ospell --help > /dev/null 2> /dev/null); then
+if ! (${PREFIX}hfst-ospell --help > /dev/null 2> /dev/null); then
     echo "FAIL: hfst-ospell tests did not pass: hfst-ospell was not found"
     echo ""
     echo "Exiting directory" `pwd`"..."
@@ -51,8 +51,8 @@ if ! (ls test.zhfst > /dev/null 2> /dev/null); then
     exit 1
 fi
 
-if ! (cat ospell_input.txt | $PREFIX/hfst-ospell test.zhfst --suggest --time-cutoff=1.0 > /dev/null 2> /dev/null); then
-    echo "FAIL: hfst-ospell tests did not pass:"
+if ! (cat ospell_input.txt | ${PREFIX}hfst-ospell test.zhfst --suggest --time-cutoff=1.0 > /dev/null 2> /dev/null); then
+    echo "FAIL: hfst-ospell tests did not pass"
     echo ""
     echo "Exiting directory" `pwd`"..."
     echo ""
@@ -61,8 +61,8 @@ if ! (cat ospell_input.txt | $PREFIX/hfst-ospell test.zhfst --suggest --time-cut
     exit 1
 fi
 
-if ! (cat ospell_input.txt | $PREFIX/hfst-ospell test.zhfst --suggest > /dev/null 2> /dev/null); then
-    echo "FAIL: hfst-ospell tests did not pass:"
+if ! (cat ospell_input.txt | ${PREFIX}hfst-ospell test.zhfst --suggest > /dev/null 2> /dev/null); then
+    echo "FAIL: hfst-ospell tests did not pass"
     echo ""
     echo "Exiting directory" `pwd`"..."
     echo ""
@@ -71,8 +71,8 @@ if ! (cat ospell_input.txt | $PREFIX/hfst-ospell test.zhfst --suggest > /dev/nul
     exit 1
 fi
 
-if ! (cat ospell_input.txt | $PREFIX/hfst-ospell test.zhfst > /dev/null 2> /dev/null); then
-    echo "FAIL: hfst-ospell tests did not pass:"
+if ! (cat ospell_input.txt | ${PREFIX}hfst-ospell test.zhfst > /dev/null 2> /dev/null); then
+    echo "FAIL: hfst-ospell tests did not pass"
     echo ""
     echo "Exiting directory" `pwd`"..."
     echo ""
