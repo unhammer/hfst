@@ -8,15 +8,24 @@
 TESTDIR=python_tests
 
 PYTHON=python3
-PYTHON_DIR=""
+PYTHONPATH=""
 
 if [ "$1" = "--python" ]; then
     PYTHON=$2
 fi
 
-if [ "$3" = "--python" ]; then
-    PYTHON_DIR=$4
+if [ "$1" = "--pythonpath" ]; then
+    PYTHONPATH=$2
 fi
+
+if [ "$3" = "--python" ]; then
+    PYTHON=$4
+fi
+
+if [ "$3" = "--pythonpath" ]; then
+    PYTHONPATH=$4
+fi
+
 
 if [ ! -d "$TESTDIR" ]; then
     echo "ERROR: directory" $TESTDIR "does not exist, try running ./copy-python-tests.sh first."
@@ -32,10 +41,13 @@ echo "Moving to directory" `pwd`"/"$TESTDIR"..."
 echo ""
 cd $TESTDIR
 
+rm -f tmp.py
 touch tmp.py
-echo "import sys" >> tmp.py
-echo "sys.path.insert(1, '"$PYTHON_DIR"')" >> tmp.py
-echo "import test_hfst.py" >> tmp.py
+if ! [ "$PYTHONPATH" = "" ]; then
+    echo "import sys" >> tmp.py
+    echo "sys.path.insert(1, '"$PYTHONPATH"')" >> tmp.py
+fi
+cat test_hfst.py >> tmp.py
 
 if ! ( $PYTHON tmp.py > /dev/null 2> /dev/null ); then
     echo "FAIL: test_hfst.py failed"
@@ -47,11 +59,12 @@ if ! ( $PYTHON tmp.py > /dev/null 2> /dev/null ); then
 fi
 
 rm -f tmp.py
-
 touch tmp.py
-echo "import sys" >> tmp.py
-echo "sys.path.insert(1, '"$PYTHON_DIR"')" >> tmp.py
-echo "import examples.py" >> tmp.py
+if ! [ "$PYTHONPATH" = "" ]; then
+    echo "import sys" >> tmp.py
+    echo "sys.path.insert(1, '"$PYTHONPATH"')" >> tmp.py
+fi
+cat examples.py >> tmp.py
 
 if ! ( $PYTHON tmp.py > /dev/null 2> /dev/null ); then
     echo "FAIL: examples.py failed"

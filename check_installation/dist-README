@@ -11,19 +11,18 @@ The tool check-tools.sh accepts the option '--prefix PREFIX' which tells
 where the HFST tools to be tested are found. 
 
 The tool check-python.sh accepts the option '--python PYTHON' which defines
-the python program to be used (e.g. python2, python3).
-
-By default, the python program and HFST command line tools are searched
-in the locations defined the environment variable PATH.
+the python program to be used (e.g. python2, python3) and the option
+'--pythonpath PATH' which tells where the swig-generated libhfst.py file
+can be found.
 
 If you use check-python.sh before installation, you need to add
-'/path/to/hfst-top-dir/python/' to PYTHONPATH and 
-'/path/to/hfst-top-dir/libhfst/src/.libs/' to LD_LIBRARY_PATH. If this is
-not enough, you have to add the following lines before 'import libhst' to
-files 'test_hfst.py' and 'examples.py' in directory 'python_tests'
+'/path/to/hfst/installation/lib/' (or '/path/to/hfst-top-dir/libhfst/src/.libs/'
+if you haven't yet installed hfst) to LD_LIBRARY_PATH.
 
-  import sys
-  sys.path.insert(1, '/path/to/hfst-top-dir/python/')
+The tool check-morphologies.sh accepts the option '--script-prefix PREFIX'
+which tells where the morphology scripts can be found and the option
+'--hfst-tool-prefix PREFIX' which tells where the hfst tools (hfst-proc,
+hfst-optimized-lookup) used in the morphology scripts can be found.
 
 The tool check-ospell.sh accepts the option '--prefix PREFIX' which tells
 where hfst-ospell tool is found.
