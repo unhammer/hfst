@@ -268,6 +268,8 @@ For documentation on the HFST binary transducer format, see
     transducer that has a different type than the previous ones. */
     HFSTDLL ImplementationType get_type(void) const;
 
+    HFSTDLL bool is_hfst_header_included(void) const;
+
     friend class HfstTransducer;
   };
 

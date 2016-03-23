@@ -179,12 +179,22 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 {
   //instream.open();
   //    outstream.open();
+
+  if (instream.get_type() == hfst::FOMA_TYPE && ! instream.is_hfst_header_included())
+    {
+      if (!silent)
+        {
+          fprintf(message_out, "warning: converting native foma transducer: "
+                  "inversion may be needed for lookup to work as expected\n");
+        }
+    }
     
     size_t transducer_n = 0;
     while(instream.is_good())
     {
         transducer_n++;
         HfstTransducer orig(instream);
+
         char* inputname = hfst_get_name(orig, inputfilename);
         if (transducer_n == 1)
         {
