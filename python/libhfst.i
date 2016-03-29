@@ -36,6 +36,7 @@
 #include "parsers/PmatchCompiler.h"
 #include "parsers/XfstCompiler.h"
 #include "implementations/HfstTransitionGraph.h"
+#include "implementations/optimized-lookup/pmatch.h"
 
 // todo instead: #include "hfst_extensions.h"
 
@@ -205,6 +206,7 @@ hfst::HfstTransducer * hfst_compile_lexc(hfst::lexc::LexcCompiler & comp, const 
         }        
 }
 
+
 /* Wrapper variables for an IOString output. */
 std::string hfst_xfst_string_one("");
 char * get_hfst_xfst_string_one() { return strdup(hfst::hfst_xfst_string_one.c_str()); }
@@ -270,6 +272,16 @@ int hfst_compile_xfst(hfst::xfst::XfstCompiler & comp, std::string input, const 
 }
 
 
+
+hfst_ol::PmatchContainer * create_pmatch_container(const std::string & filename)
+{
+    std::ifstream instream(filename.c_str(),
+                           std::ifstream::binary);
+    if (!instream.good()) {
+        return NULL;
+    }
+    return new hfst_ol::PmatchContainer(instream);
+}
 
 hfst::HfstOutputStream * create_hfst_output_stream(const std::string & filename, hfst::ImplementationType type, bool hfst_format)
 {
@@ -417,6 +429,7 @@ typedef std::pair<float, std::vector<std::pair<std::string, std::string > > > Hf
 typedef std::set<std::pair<float, std::vector<std::pair<std::string, std::string> > > > HfstTwoLevelPaths;
 typedef std::map<std::string, std::string> HfstSymbolSubstitutions;
 typedef std::map<std::pair<std::string, std::string>, std::pair<std::string, std::string> > HfstSymbolPairSubstitutions;
+typedef std::vector<hfst::HfstTransducer> HfstTransducerVector;
 
 enum ImplementationType
 {
@@ -545,7 +558,7 @@ HfstTransducer & intersect(const HfstTransducer&, bool harmonize=true) throw(Tra
 HfstTransducer & compose(const HfstTransducer&, bool harmonize=true) throw(TransducerTypeMismatchException);
 
 /* More binary operations */
-HfstTransducer & compose_intersect(const hfst::HfstTransducerVector &v, bool invert=false, bool harmonize=true);
+HfstTransducer & compose_intersect(const HfstTransducerVector &v, bool invert=false, bool harmonize=true);
 HfstTransducer & priority_union(const HfstTransducer &another);
 HfstTransducer & lenient_composition(const HfstTransducer &another, bool harmonize=true);
 HfstTransducer & cross_product(const HfstTransducer &another, bool harmonize=true) throw(TransducersAreNotAutomataException);
@@ -974,6 +987,7 @@ HfstOutputStream &flush();
 //HfstOutputStream& redirect (HfstTransducer &transducer);
 void close(void);
 
+
 %extend {
 
 HfstOutputStream & write(hfst::HfstTransducer & transducer) throw(StreamIsClosedException)
@@ -1283,7 +1297,6 @@ class HfstBasicTransition {
 
 }
 
-
 namespace pmatch {
   class PmatchCompiler
   {
@@ -1423,7 +1436,38 @@ hfst::HfstTransducer * hfst::read_prolog(hfst::HfstFile & f) throw(EndOfStreamEx
 std::string hfst::one_level_paths_to_string(const HfstOneLevelPaths &);
 std::string hfst::two_level_paths_to_string(const HfstTwoLevelPaths &);
 
+
+hfst_ol::PmatchContainer * create_pmatch_container(const std::string & filename);
+
+} // namespace hfst
+
+namespace hfst_ol {
+    class PmatchContainer
+    {
+    public:
+        //PmatchContainer(std::istream & is);
+        PmatchContainer(void);
+        ~PmatchContainer(void);
+        std::string match(std::string & input, double time_cutoff = 0.0);
+        std::string get_profiling_info(void);
+        void set_verbose(bool b);
+        void set_extract_tags_mode(bool b);
+        void set_profile(bool b);
+
+%extend {
+
+%pythoncode %{
+
+def __init__(self, filename):
+    self.this = _libhfst.create_pmatch_container(filename)
+
+%}
+
 }
+
+    };
+}
+
 
 %pythoncode %{
 
