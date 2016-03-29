@@ -1448,7 +1448,7 @@ namespace hfst_ol {
         //PmatchContainer(std::istream & is);
         PmatchContainer(void);
         ~PmatchContainer(void);
-        std::string match(std::string & input, double time_cutoff = 0.0);
+        std::string match(const std::string & input, double time_cutoff = 0.0);
         std::string get_profiling_info(void);
         void set_verbose(bool b);
         void set_extract_tags_mode(bool b);
