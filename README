@@ -23,24 +23,26 @@ versions, development and non-supported operating systems and versions you
 will have to perform `installation from the sources`_.
 
 Installation packages for Debian and Ubuntu 
---------------------------------------------
+-------------------------------------------
 
-HFST and related software can be downloaded from `HFST download directory 
-<https://sourceforge.net/projects/hfst/files/hfst/>`_. This folder contains
-sources and debian packages for HFST API library and tool packages.
+Debian packages for HFST are distributed via `Apertium project 
+<http://apertium.projectjj.com/apt/nightly/pool/main/h/hfst/>`_. This folder 
+contains debian packages for HFST API library and tool packages.
 The debian packages are experimental; the requirements of debian or ubuntu
 installations are same as main packages. SFST is excluded from the packages
 as it has portability issues with hash_maps and hash_sets. The python packages
 contain binaries for swig-generated Python bindings for HFST. 
 
-Installation packages for Windows
----------------------------------
+Binaries for Windows
+--------------------
 
-`HFST download directory <https://sourceforge.net/projects/hfst/files/hfst/>`_
-contains an experimental installer for Windows, HfstInstaller.exe. It has 
-ready-compiled HFST library, tools and Python bindings. Performing 
+Binaries for Windows are distributed via `Apertium project 
+<http://apertium.projectjj.com/win32/nightly/>`_. This folder contains
+ready-compiled HFST library and command line tools. Performing 
 `installation from the sources`_ is also possible on Windows with MinGW 
-and Cygwin.
+and Cygwin. Python bindings for Windows are currently available only for 64-bit
+Python versions 3.3 and 3.4 on our `download page
+<https://hfst.github.io/downloads/index.html>`_.
 
 Installation for MacPorts
 -------------------------
@@ -63,7 +65,7 @@ Now you can install hfst and related software using port commands::
   sudo port install hfst
 
 Installation for Gentoo Linux
------------------------------
+/-----------------------------
 
 HFST software is available in *science* overlay. For portage, use::
 
@@ -78,14 +80,14 @@ use Paludis, just try to ``cave resolve sci-misc/hfst`` to get the current
 instructions.
 
 Installation for other systems
-------------------------------
+/------------------------------
 
 For rest of the systems, HFST needs to be installed from the source, the
 traditional GNU/linux way. To begin your installation, you need to start by
 gathering the dependencies, as adviced in the following chapter.
 
 Dependencies
-============
+/============
 
 Please note that the dependencies for the library can be set during the compile
 time. Settings that determine dependencies relate to features the resulting
@@ -96,7 +98,7 @@ The command ``./configure --help`` lists all features that can be controlled
 with configure switches and whether they are enabled or disabled by default.
 
 Compilation requirements
-------------------------
+/------------------------
 
 - To use the OpenFST_ backend (default):
 
@@ -107,7 +109,7 @@ Compilation requirements
     GCC version and pthread and m libraries
 
   - to disable OpenFST support, configure switch ``--without-openfst`` may
-    be used
+    be used (however, this seriously limits the use of HFST)
 
 - To use the SFST_ backend (default):
 
@@ -131,7 +133,7 @@ Compilation requirements
 
   - to disable foma backend, configure switch ``--without-foma`` may be used
 
-  - the *hfst-xfst* frontend currently does not require foma binary or foma library
+  - the *hfst-xfst* frontend does not require foma binary or foma library
 
 - For proper Unicode support in corpus tools:
 
@@ -143,7 +145,7 @@ Compilation requirements
     operations such as *case-folding* properly (default)
 
   - To compile corpus processing tool ``hfst-proc``, you need to use the
-    ``configure`` switch ``--enable-proc`` ??
+    ``configure`` switch ``--enable-proc`` (or ``--enable-all-tools``)
 
 Note that if you did install dependent libraries, such as libxml or glib
 to your home directory instead of using your system's package manager 
@@ -210,12 +212,11 @@ When running HFST software or using HFST libraries from HFST-enabled software:
   --with-sfst) in order to compile SFST-PL scripts to HFST automata.
 
 Installation from the sources
------------------------------
+/-----------------------------
 
 INSTALL describes the GNU build system in detail, but for most users the usual::
 
     ./configure
-    ./scripts/generate-cc-files.sh
     make
     (as root) make install
 
@@ -223,9 +224,7 @@ should result in a local installation and::
 
     (as root) make uninstall
 
-in its uninstallation. The script *generate-cc-files.sh* compiles all 
-flex/bison-generated files and makes sure that the generated header 
-files have the right extension, i.e. hh and not h.
+in its uninstallation.
 
 If you aren't going to be linking to the library after
 building it and don't need to be able to send debugging information, you can
@@ -261,15 +260,14 @@ If you are compiling HFST from source on Windows with *MinGW*, use the switch
 Warning: Using this option with *Cygwin* will cause compilation errors.
 
 Troubleshooting
-===============
+/===============
 
 In this section we list the errors that pop up commonly on `our support channel
-<irc://FreeNode/#hfst>`_, in `our bug tracker
-<https://sourceforge.net/tracker/?group_id=224521&atid=1061990>`_ or `on our
-development mailing list <hfst-development@lists.sf.net>`_.
+<irc://FreeNode/#hfst>`_ or in `our issue tracker
+<https://github.com/hfst/hfst/issues>`_,
 
 \::malloc has not been declared
--------------------------------
+/-------------------------------
 
 **During the compilation** errors of form::
 
@@ -319,7 +317,7 @@ See also:
 the gory details.
 
 Error while loading shared libraries: libhfst.so.0: cannot open shared object file: No such file or directory
--------------------------------------------------------------------------------------------------------------
+/-------------------------------------------------------------------------------------------------------------
 
 **After installing HFST and running programs**, the installed programs should
 on most systems be able to find and use the shared libraries that just got
@@ -341,7 +339,7 @@ applies for libraries installed to e.g. home directory.
 See also the previous error description.
 
 chmod: cannot access 'scripts/hfst-foma-wrapper.sh': No such file or directory
-------------------------------------------------------------------------------
+/------------------------------------------------------------------------------
 
 **During the configuration phase.** This is a case of autoconf being silly; the
 commands for creating a script and making it executable from autoconf are ran
@@ -350,7 +348,7 @@ of the files it creates. The script for doing this is copied to configure.ac
 from autoconf manual so it supposably will always work correctly...
 
 fatal error: htwolcpre1.h: No such file or directory
-----------------------------------------------------
+/----------------------------------------------------
 
 **During the compilation phase**, an error message including things like::
 
@@ -365,7 +363,7 @@ flex/yacc-generated header file of the form `foo.hh` as `foo.h`. You probably
 have to do this iteratively after each error message of this type.
 
 ....libs/lt-hfst-strings2fst: Incorrect utf-8 coding
-----------------------------------------------------
+/----------------------------------------------------
 
 **During the make check phase**. This indicates that a test that tests for
 expected failure fails expectedly, which is also indicated by a green word
@@ -388,7 +386,7 @@ bug tracker in sf.net infrastructure
 <https://sourceforge.net/tracker/?atid=1061990&group_id=224521&func=browse>`_.
 
 cat: hvVqf:o:l:u:: No such file or directory
---------------------------------------------
+/--------------------------------------------
 **During use of bash-based scripts**, an error message including things like::
 
 
@@ -410,7 +408,7 @@ must be last parameters on commandline with it, so its use is strongly
 discouraged.
 
 libc++-abi.dylib: terminate called throwing an exception
---------------------------------------------------------
+/--------------------------------------------------------
 
 **During program execution** *(Mac OS X only)*, errors of form::
 
@@ -432,19 +430,19 @@ in configure, empty file, reading error, writing error...
 
 
 Further information
-===================
+/===================
 
 The `Hfst wiki site
 <https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome>`_ contains further
 details of the HFST system.
 
 Reporting bugs
-==============
+/==============
 
 Bugs can be reported via email to `HFST team bug mail address
 <hfst-bugs@helsinki.fi>`_, or preferably to `HFST's bug tracking system
-at sourceforge
-<https://sourceforge.net/tracker/?atid=1061990&group_id=224521&func=browse>`_
+at Github
+<https://github.com/hfst/hfst/issues>`_
 When reporting, please include at least following:
 
 * version of software used, if command-line tool (hfst-toolname --version)
