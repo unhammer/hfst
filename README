@@ -147,6 +147,13 @@ Compilation requirements
   - To compile corpus processing tool ``hfst-proc``, you need to use the
     ``configure`` switch ``--enable-proc`` (or ``--enable-all-tools``)
 
+- To use the Python interface:
+
+  - Compiling the bindings requires swig (tested with versions 2.0.4 and 3.0.0)
+
+  - *NOTE:* the Python API is not under autotools, you must compile it yourself;
+    for more information, see file ``python/README``
+
 Note that if you did install dependent libraries, such as libxml or glib
 to your home directory instead of using your system's package manager 
 (or supported default location):
