@@ -1340,10 +1340,30 @@ public:
     ImplementationType get_type(void) const throw(TransducerTypeMismatchException);
 
 %extend {
+
 hfst::HfstTransducer * read() throw (EndOfStreamException)
 {
   return new hfst::HfstTransducer(*($self));
 }
+
+%pythoncode %{
+
+def __iter__(self):
+    return self
+
+# Python 2
+def next(self):
+    if self.is_eof():
+        raise StopIteration
+    else:
+        return self.read();
+
+# Python 3
+def __next__(self):
+    return self.next()
+
+%}
+
 }
 
 };
