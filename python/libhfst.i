@@ -398,6 +398,21 @@ std::string one_level_paths_to_string(const hfst::HfstOneLevelPaths & paths)
     return oss.str();
 }
 
+hfst::HfstOneLevelPaths extract_output_side(const hfst::HfstTwoLevelPaths & paths)
+{
+    hfst::HfstOneLevelPaths result;
+    for(hfst::HfstTwoLevelPaths::const_iterator it = paths.begin(); it != paths.end(); it++)
+    {  
+      hfst::StringVector sv; 
+      for (hfst::StringPairVector::const_iterator svit = it->second.begin(); svit != it->second.end(); svit++)
+      {
+        sv.push_back(svit->second);
+      }
+      result.insert(std::pair<float, hfst::StringVector>(it->first, sv));
+    }
+    return result;
+}
+
 std::string two_level_paths_to_string(const hfst::HfstTwoLevelPaths & paths)
 {
     std::ostringstream oss;
@@ -1027,13 +1042,57 @@ int longest_path_size(bool obey_flags=true) const;
 // Wrappers for lookup functions
 
 HfstOneLevelPaths lookup_fd_vector(const StringVector& s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
-{ return *($self->lookup_fd(s, limit, time_cutoff)); }
+{ 
+  if ($self->get_type() == hfst::HFST_OL_TYPE || $self->get_type() == hfst::HFST_OLW_TYPE)
+    { return *($self->lookup_fd(s, limit, time_cutoff)); }
+  hfst::HfstTransducer input(s, $self->get_type());
+  input.compose(*($self));
+  input.minimize();
+  hfst::HfstTwoLevelPaths result;
+  input.extract_paths_fd(result, limit, -1);
+  return hfst::extract_output_side(result);
+}
 HfstOneLevelPaths lookup_fd_string(const std::string& s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
-{ return *($self->lookup_fd(s, limit, time_cutoff)); }
+{ 
+  if ($self->get_type() == hfst::HFST_OL_TYPE || $self->get_type() == hfst::HFST_OLW_TYPE)
+    { return *($self->lookup_fd(s, limit, time_cutoff)); }
+  hfst::StringSet alpha = $self->get_alphabet();
+  hfst::HfstTokenizer tok;
+  for (hfst::StringSet::const_iterator it = alpha.begin(); it != alpha.end(); it++)
+    { tok.add_multichar_symbol(*it); }
+  hfst::HfstTransducer input(s, tok, $self->get_type());
+  input.compose(*($self));
+  input.minimize();
+  hfst::HfstTwoLevelPaths result;
+  input.extract_paths_fd(result, limit, -1);
+  return hfst::extract_output_side(result);
+}
 HfstOneLevelPaths lookup_vector(const StringVector& s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
-{ return *($self->lookup(s, limit, time_cutoff)); }
+{ 
+  if ($self->get_type() == hfst::HFST_OL_TYPE || $self->get_type() == hfst::HFST_OLW_TYPE)
+    { return *($self->lookup(s, limit, time_cutoff)); }
+  hfst::HfstTransducer input(s, $self->get_type());
+  input.compose(*($self));
+  input.minimize();
+  hfst::HfstTwoLevelPaths result;
+  input.extract_paths(result, limit, -1);
+  return hfst::extract_output_side(result);
+}
 HfstOneLevelPaths lookup_string(const std::string & s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
-{ return *($self->lookup(s, limit, time_cutoff)); }
+{ 
+  if ($self->get_type() == hfst::HFST_OL_TYPE || $self->get_type() == hfst::HFST_OLW_TYPE)
+    { return *($self->lookup(s, limit, time_cutoff)); }
+  hfst::StringSet alpha = $self->get_alphabet();
+  hfst::HfstTokenizer tok;
+  for (hfst::StringSet::const_iterator it = alpha.begin(); it != alpha.end(); it++)
+    { tok.add_multichar_symbol(*it); }
+  hfst::HfstTransducer input(s, tok, $self->get_type());
+  input.compose(*($self));
+  input.minimize();
+  hfst::HfstTwoLevelPaths result;
+  input.extract_paths(result, limit, -1);
+  return hfst::extract_output_side(result);
+}
 
 
 %pythoncode %{
