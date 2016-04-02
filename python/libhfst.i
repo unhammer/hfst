@@ -973,7 +973,7 @@ int longest_path_size(bool obey_flags=true) const;
         {
             return;
         }
-        delete *($self);
+        delete $self;
     }
 
     char *__str__() {
@@ -1084,7 +1084,13 @@ HfstOneLevelPaths lookup_string(const std::string & s, int limit = -1, double ti
          else:
             retval=self.lookup_string(input, max_number, time_cutoff)
       else:
-         raise RuntimeError('Input argument must be string or tuple.')
+         try:
+            if obey_flags:
+                retval=self.lookup_fd_string(str(input), max_number, time_cutoff)
+            else:
+                retval=self.lookup_string(str(input), max_number, time_cutoff)         
+         except:
+            raise RuntimeError('Input argument must be string or tuple.')
 
       if output == 'text':
          return one_level_paths_to_string(retval)
