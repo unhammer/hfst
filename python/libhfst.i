@@ -801,7 +801,7 @@ HfstTransducer();
 // Redefined with %extend:
 //HfstTransducer(const hfst::HfstTransducer &);
 //HfstTransducer(const hfst::implementations::HfstBasicTransducer &, hfst::ImplementationType);
-~HfstTransducer();
+//~HfstTransducer();
 
 void set_name(const std::string &name);
 std::string get_name() const;
@@ -966,6 +966,14 @@ int longest_path_size(bool obey_flags=true) const;
     HfstTransducer(const hfst::implementations::HfstBasicTransducer & t, hfst::ImplementationType impl)
     {
         return hfst::copy_hfst_transducer_from_basic_transducer(t, impl);
+    }
+    ~HfstTransducer()
+    {
+        if ($self->get_type() == hfst::UNSPECIFIED_TYPE || $self->get_type() == hfst::ERROR_TYPE)
+        {
+            return;
+        }
+        delete *($self);
     }
 
     char *__str__() {
@@ -1471,6 +1479,8 @@ class HfstBasicTransducer {
     void insert_freely(const StringPair &symbol_pair, float weight) { self->insert_freely(symbol_pair, weight); }
     void insert_freely(const HfstBasicTransducer &tr) { self->insert_freely(tr); }
     void sort_arcs() { self->sort_arcs(); }
+    void disjunct(const StringPairVector &spv, float weight) { self->disjunct(spv, weight); }
+    void harmonize(HfstBasicTransducer &another) { self->harmonize(another); }
 
   HfstTwoLevelPaths lookup_fd_(const StringVector &lookup_path, size_t * infinite_cutoff, float * max_weight)
   {
