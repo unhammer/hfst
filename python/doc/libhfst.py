@@ -1110,6 +1110,15 @@ class HfstTransducer:
 
     ## Create a deep copy of HfstTransducer \a another or a transducer equivalent to HfstBasicTransducer \a another.
     # @param another An HfstTransducer or HfstBasicTransducer.
+    #
+    # An example:
+    #
+    # \verbatim
+    # tr1 = libhfst.regex('foo bar foo')
+    # tr2 = libhfst.HfstTransducer(tr1)
+    # tr2.substitute('foo','FOO')
+    # tr1.concatenate(tr2)
+    # \endverbatim
     def __init__(self, another):
         pass
 
