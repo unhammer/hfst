@@ -685,8 +685,8 @@ class XfstCompiler
   XfstCompiler& print_transducer_info();
   XfstCompiler& add_prop_line(char* line);
 
-  XfstCompiler& lookup(char* line, const HfstTransducer * t, size_t cutoff);
-  XfstCompiler& lookup(char* line, HfstBasicTransducer * t);
+  XfstCompiler& apply_line(char* line, const HfstTransducer * t, size_t cutoff);
+  XfstCompiler& apply_line(char* line, HfstBasicTransducer * t);
 
   XfstCompiler& apply_up_line(char* line);
   XfstCompiler& apply_down_line(char* line);

@@ -1,11 +1,11 @@
 regex [ {foo}:{baz} | {bar}:{baz} ];
-apply up
+apply down
 baz
 foo
 bar
 <ctrl-d>
 set print-space ON
-apply up
+apply down
 baz
 foo
 bar

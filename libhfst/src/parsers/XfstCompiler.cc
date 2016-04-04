@@ -651,7 +651,7 @@ namespace xfst {
   }
 
     XfstCompiler&
-    XfstCompiler::lookup(char* line, HfstBasicTransducer * t)
+    XfstCompiler::apply_line(char* line, HfstBasicTransducer * t)
       {
         char* token = strstrip(line);
         StringSet alpha = t->get_alphabet();
@@ -713,7 +713,7 @@ namespace xfst {
 
 
     XfstCompiler&
-    XfstCompiler::lookup(char* line, const HfstTransducer * t, size_t cutoff)
+    XfstCompiler::apply_line(char* line, const HfstTransducer * t, size_t cutoff)
       {
         char* token = strstrip(line);
         HfstOneLevelPaths * paths = NULL;
@@ -854,7 +854,7 @@ namespace xfst {
 
 
     XfstCompiler&
-    XfstCompiler::apply_down_line(char* line) // apply_up_line -> apply_down_line
+    XfstCompiler::apply_up_line(char* line)
       {
         if (stack_.size() < 1)
           {
@@ -868,7 +868,7 @@ namespace xfst {
           {
             //hfst_fprintf(warnstream_, "lookup might be slow, consider 'convert net'\n");
             HfstBasicTransducer fsm(*t);
-            return this->lookup(line, &fsm);
+            return this->apply_line(line, &fsm);
           }
 
         size_t ol_cutoff = string_to_size_t(variables_["lookup-cycle-cutoff"]); // -1; fix this
@@ -885,24 +885,30 @@ namespace xfst {
               }
           }
         
-        return this->lookup(line, t, ol_cutoff);
+        return this->apply_line(line, t, ol_cutoff);
       }
 
     XfstCompiler&
-    XfstCompiler::apply_up_line(char* line) // apply_down_line -> apply_up_line
+    XfstCompiler::apply_down_line(char* line)
       {
         GET_TOP(t);
         // lookdown not yet implemented in HFST
         if (verbose_)
           {
-            error() << "warning: apply up not implemented, inverting transducer and performing apply down" << std::endl
-                    << "for faster performance, invert and minimize top network and do apply down instead" << std::endl << std::endl;
+            error() << "warning: lookdown not implemented, inverting transducer and performing lookup" << std::endl
+                    << "for faster performance, invert and minimize top network and do lookup instead" << std::endl << std::endl;
             flush(&error());
+        //hfst_fprintf(warnstream_, 
+        //                 "warning: lookdown not implemented, inverting transducer and performing lookup\n"
+        //                 "for faster performance, invert and minimize top network and do lookup instead\n\n");
           }
         t = new HfstTransducer(*(stack_.top()));
         t->invert().minimize();
+
+        //hfst_fprintf(warnstream_, "lookup might be slow, consider 'convert net'\n");
+
         HfstBasicTransducer fsm(*t);
-        this->lookup(line, &fsm);
+        this->apply_line(line, &fsm);
         delete t;
         return *this;
       }
@@ -1027,6 +1033,7 @@ namespace xfst {
     return this->quit_requested_;
   }
 
+  // HERE
   XfstCompiler&
   XfstCompiler::apply(FILE* infile, ApplyDirection direction)
       {
@@ -1043,13 +1050,15 @@ namespace xfst {
 
         HfstBasicTransducer * fsm = NULL;
 
-        if (direction == APPLY_UP_DIRECTION)
+        if (direction == APPLY_DOWN_DIRECTION)
           {
             if (t->get_type() == hfst::HFST_OL_TYPE ||
                 t->get_type() == hfst::HFST_OLW_TYPE)
               {
                 error() << "Operation not supported for optimized lookup format. Consider 'remove-optimization' to convert into ordinary format." << std::endl; 
                 flush(&error());
+                //hfst_fprintf(stderr, "Operation not supported for optimized lookup format. "
+                //             "Consider 'remove-optimization' to convert into ordinary format.\n");
                 prompt();
                 return *this;
               }
@@ -1057,9 +1066,12 @@ namespace xfst {
             // lookdown not yet implemented in HFST
             if (verbose_)
               {
-                error() << "warning: apply up not implemented, inverting transducer and performing apply down" << std::endl
-                        << "for faster performance, invert and minimize top network and do apply down instead" << std::endl << std::endl;
+                error() << "warning: lookdown not implemented, inverting transducer and performing lookup" << std::endl
+                        << "for faster performance, invert and minimize top network and do lookup instead" << std::endl << std::endl;
                 flush(&error());
+                //hfst_fprintf(warnstream_, 
+                //             "warning: lookdown not implemented, inverting transducer and performing lookup\n"
+                //             "for faster performance, invert and minimize top network and do lookup instead\n\n");
               }
             t = new HfstTransducer(*(stack_.top()));
             t->invert().minimize();
@@ -1079,6 +1091,8 @@ namespace xfst {
                   {
                     error() << "warning: transducer is infinitely ambiguous, limiting number of cycles to " << ol_cutoff << std::endl;
                     flush(&error());
+                //hfst_fprintf(warnstream_, 
+                //                 "warning: transducer is infinitely ambiguous, limiting number of cycles to " SIZE_T_SPECIFIER "\n", ol_cutoff);
                   }
               }
           }
@@ -1113,16 +1127,16 @@ namespace xfst {
 
             // perform lookup/lookdown
             if (fsm != NULL)
-              lookup(line, fsm);
+              apply_line(line, fsm);
             else
-              lookup(line, t, ol_cutoff);
+              apply_line(line, t, ol_cutoff);
             free(line);
           }
 
         // ignore all readline history given to the apply command
         ignore_history_after_index(ind);
 
-        if (direction == APPLY_UP_DIRECTION)
+        if (direction == APPLY_DOWN_DIRECTION)
           delete t;
         if (fsm != NULL)
           delete fsm;

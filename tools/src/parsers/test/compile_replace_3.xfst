@@ -1,16 +1,5 @@
 regex "^[" a "+" "^]" ;
 compile-replace upper
-apply down a
-apply down aa
-apply down aaa
-apply down aaaaaaaaa
-apply down b
-apply down ab
-apply down ba
-apply down abba
-echo --
-regex "^[" a "+" "^]" ;
-compile-replace lower
 apply up a
 apply up aa
 apply up aaa
@@ -19,3 +8,14 @@ apply up b
 apply up ab
 apply up ba
 apply up abba
+echo --
+regex "^[" a "+" "^]" ;
+compile-replace lower
+apply down a
+apply down aa
+apply down aaa
+apply down aaaaaaaaa
+apply down b
+apply down ab
+apply down ba
+apply down abba
