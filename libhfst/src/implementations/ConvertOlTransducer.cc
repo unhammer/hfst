@@ -460,8 +460,14 @@ HfstTransducer * ConversionFunctions::hfst_ol_to_hfst_transducer(
     return retval;
 }
 
-
-
+hfst_ol::Transducer * ConversionFunctions::hfst_transducer_to_hfst_ol(
+    HfstTransducer * t)
+{
+    if (t->type != HFST_OL_TYPE && t->type != HFST_OLW_TYPE) {
+        t->convert(HFST_OLW_TYPE);
+    }
+    return t->implementation.hfst_ol;
+}
 
 }}
 #else // MAIN_TEST was defined

@@ -297,7 +297,7 @@ PmatchTransducerContainer * make_end_tag(std::string tag)
 PmatchTransducerContainer * make_counter(std::string name)
 { return epsilon_to_symbol_container("@PMATCH_COUNTER_" + name + "@"); }
 
-HfstTransducer * make_list(HfstTransducer * t)
+HfstTransducer * make_list(HfstTransducer * t, ImplementationType f)
 {
     std::string arc = "@L.";
     hfst::StringSet alphabet = t->get_alphabet();
@@ -311,10 +311,10 @@ HfstTransducer * make_list(HfstTransducer * t)
         }
     }
     arc.append("@");
-    return new HfstTransducer(arc, format);
+    return new HfstTransducer(arc, f);
 }
 
-HfstTransducer * make_exc_list(HfstTransducer * t)
+HfstTransducer * make_exc_list(HfstTransducer * t, ImplementationType f)
 {
     std::string arc = "@X.";
     hfst::StringSet alphabet = t->get_alphabet();
@@ -328,7 +328,7 @@ HfstTransducer * make_exc_list(HfstTransducer * t)
         }
     }
     arc.append("@");
-    return new HfstTransducer(arc, format);
+    return new HfstTransducer(arc, f);
 }
 
 HfstTransducer * make_sigma(HfstTransducer * t)

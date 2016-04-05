@@ -220,15 +220,19 @@ void HfstTransducer::insert_to_alphabet(const std::string &symbol)
     if (symbol == "")
       HFST_THROW_MESSAGE(EmptyStringException, "insert_to_alphabet");
 
+#if HAVE_HFSTOL
+    if (this->type == HFST_OL_TYPE || this->type == HFST_OLW_TYPE) {
+        this->implementation.hfst_ol->include_symbol_in_alphabet(symbol);
+        return;
+    }
+#endif
     if (this->type != XFSM_TYPE)
       {
         hfst::implementations::HfstBasicTransducer * net 
           = convert_to_basic_transducer();
         net->add_symbol_to_alphabet(symbol);
         convert_to_hfst_transducer(net);
-      }
-    else
-      {
+      } else {
 #if HAVE_XFSM
         this->xfsm_interface.add_symbol_to_alphabet(this->implementation.xfsm, symbol);
 #else

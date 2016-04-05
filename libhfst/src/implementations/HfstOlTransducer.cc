@@ -437,7 +437,8 @@ StringSet HfstOlTransducer::get_alphabet(hfst_ol::Transducer * t)
     return StringSet(symbol_table.begin(), symbol_table.end());
 }
 
-} }
+}
+}
 
 #else // MAIN_TEST was defined
 #include <cstdlib>

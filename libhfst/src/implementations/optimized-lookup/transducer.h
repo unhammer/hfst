@@ -655,6 +655,8 @@ public:
             return (i < TRANSITION_TARGET_TABLE_START) ? 
                 table[i] : table[i-TRANSITION_TARGET_TABLE_START];
         }
+
+    std::vector<T> get_vector(void) const { return std::vector<T>(table); } ;
   
     void display(bool transition_table) const
         {
@@ -743,7 +745,6 @@ public:
         { return index_table[i].final(); }
     Weight get_final_weight(TransitionTableIndex i) const
         { return index_table[i].final_weight(); }
-
   
     void display() const
         {
@@ -922,11 +923,11 @@ public:
     const SymbolTable& get_symbol_table() const
         { return alphabet->get_symbol_table(); }
 
-
     const TransitionIndex& get_index(TransitionTableIndex i) const
         { return tables->get_index(i); }
     const Transition& get_transition(TransitionTableIndex i) const
         { return tables->get_transition(i); }
+    
     bool final_index(TransitionTableIndex i) const
         {
             if (indexes_transition_table(i)) {
@@ -947,7 +948,7 @@ public:
     TransducerTable<TransitionW> copy_transitionw_table();
     TransducerTable<TransitionIndex> copy_index_table();
     TransducerTable<Transition> copy_transition_table();
-
+    
     // state_index must be an index to a state which is defined as either:
     // (1) the start of a set of entries in the transition index table, or
     // (2) the boundary before a set of entries in the transition table, in
@@ -959,6 +960,7 @@ public:
 
 
     bool initialize_input(const char * input_str);
+    void include_symbol_in_alphabet(const std::string & sym);
     HfstOneLevelPaths * lookup_fd(const StringVector & s, ssize_t limit = -1,
         double time_cutoff = 0.0);
     /* Tokenize and lookup, accounting for flag diacritics, the surface string

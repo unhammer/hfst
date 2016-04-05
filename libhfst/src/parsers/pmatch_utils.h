@@ -114,8 +114,10 @@ HfstTransducer * add_pmatch_delimiters(HfstTransducer * regex);
 PmatchTransducerContainer * epsilon_to_symbol_container(std::string s);
 PmatchTransducerContainer * make_end_tag(std::string tag);
 PmatchTransducerContainer * make_counter(std::string name);
-HfstTransducer * make_list(HfstTransducer * t);
-HfstTransducer * make_exc_list(HfstTransducer * t);
+HfstTransducer * make_list(HfstTransducer * t,
+                           ImplementationType f = format);
+HfstTransducer * make_exc_list(HfstTransducer * t,
+                               ImplementationType f = format);
 HfstTransducer * make_sigma(HfstTransducer * t);
 PmatchTransducerContainer * make_minimization_guard(void);
 PmatchTransducerContainer * make_passthrough(void);
@@ -282,37 +284,37 @@ struct PmatchUtilityTransducers
     const HfstTransducer * capify;
     const HfstTransducer * lowerfy;
     
-    HfstTransducer * make_latin1_acceptor(
+    static HfstTransducer * make_latin1_acceptor(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
     
-    HfstTransducer * make_latin1_alpha_acceptor(
+    static HfstTransducer * make_latin1_alpha_acceptor(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
     
-    HfstTransducer * make_latin1_lowercase_acceptor(
+    static HfstTransducer * make_latin1_lowercase_acceptor(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
     
-    HfstTransducer * make_latin1_uppercase_acceptor(
+    static HfstTransducer * make_latin1_uppercase_acceptor(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
     
-    HfstTransducer * make_combining_accent_acceptor(
+    static HfstTransducer * make_combining_accent_acceptor(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
     
 /** @brief Return a transducer that accepts one arabic numeral character. 
  */
-    HfstTransducer * make_latin1_numeral_acceptor(
+    static HfstTransducer * make_latin1_numeral_acceptor(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
     
 /** @brief Return a transducer that accepts one utf-8 symbol that is also a
  *  latin-1 punctuation character.
  */
-    HfstTransducer * make_latin1_punct_acceptor(
+    static HfstTransducer * make_latin1_punct_acceptor(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
     
 /** @brief Return a transducer that accepts one utf-8 symbol that is also a
  *  latin-1 whitespace character.
  */
 
-    HfstTransducer * make_latin1_whitespace_acceptor(
+    static HfstTransducer * make_latin1_whitespace_acceptor(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
     
     HfstTransducer * make_lowerfy(

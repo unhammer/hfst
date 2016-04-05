@@ -199,6 +199,7 @@ namespace hfst_ol {
         void initialize_input(const char * input);
         bool has_unsatisfied_rtns(void) const;
         std::string get_unsatisfied_rtn_name(void) const;
+        void add_rtn(Transducer * rtn, const std::string & name);
         void process(const std::string & input);
         std::string match(const std::string & input,
                           double time_cutoff = 0.0);

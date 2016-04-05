@@ -44,7 +44,13 @@ using std::pair;
 #include "hfst-program-options.h"
 #include "hfst-tool-metadata.h"
 #include "implementations/optimized-lookup/pmatch.h"
+#include "parsers/pmatch_utils.h"
 #include "HfstExceptionDefs.h"
+#include "HfstDataTypes.h"
+#include "HfstInputStream.h"
+#include "implementations/ConvertTransducerFormat.h"
+
+using hfst::HfstTransducer;
 
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
@@ -55,6 +61,7 @@ static bool print_weights = false;
 static bool tokenize_multichar = false;
 static double time_cutoff = 0.0;
 std::string tokenizer_filename;
+static hfst::ImplementationType default_format = hfst::TROPICAL_OPENFST_TYPE;
 enum OutputFormat {
     tokenize,
     xerox,
@@ -124,6 +131,83 @@ void print_nonmatching_sequence(std::string const & str, std::ostream & outstrea
     }
 //    std::cerr << "from print_nonmatching_sequence\n";
     outstream << "\n";
+}
+
+hfst_ol::PmatchContainer make_naive_tokenizer(HfstTransducer & dictionary)
+{
+    HfstTransducer * word_boundary = hfst::pmatch::PmatchUtilityTransducers::
+        make_latin1_whitespace_acceptor(default_format);
+    HfstTransducer * punctuation = hfst::pmatch::PmatchUtilityTransducers::
+        make_latin1_punct_acceptor(default_format);
+    word_boundary->disjunct(*punctuation);
+    HfstTransducer * others = hfst::pmatch::make_exc_list(word_boundary,
+                                                          default_format);
+    others->repeat_plus();
+    // make the default token less likely than any dictionary token
+    others->set_final_weights(std::numeric_limits<float>::max());
+    HfstTransducer * word_boundary_list = hfst::pmatch::make_list(
+        word_boundary, default_format);
+    // @BOUNDARY@ is pmatch's special input boundary marker
+    word_boundary_list->disjunct(HfstTransducer("@BOUNDARY@", default_format));
+    delete word_boundary; delete punctuation;
+    HfstTransducer * left_context = new HfstTransducer(
+        hfst::internal_epsilon, hfst::pmatch::LC_ENTRY_SYMBOL, default_format);
+    HfstTransducer * right_context = new HfstTransducer(
+        hfst::internal_epsilon, hfst::pmatch::RC_ENTRY_SYMBOL, default_format);
+    left_context->concatenate(*word_boundary_list);
+    right_context->concatenate(*word_boundary_list);
+    delete word_boundary_list;
+    HfstTransducer * left_context_exit = new HfstTransducer(
+        hfst::internal_epsilon, hfst::pmatch::LC_EXIT_SYMBOL, default_format);
+    HfstTransducer * right_context_exit = new HfstTransducer(
+        hfst::internal_epsilon, hfst::pmatch::RC_EXIT_SYMBOL, default_format);
+    left_context->concatenate(*left_context_exit);
+    right_context->concatenate(*right_context_exit);
+    delete left_context_exit; delete right_context_exit;
+    std::string dict_name = dictionary.get_name();
+    if (dict_name == "") {
+        dict_name = "unknown_pmatch_tokenized_dict";
+        dictionary.set_name(dict_name);
+    }
+    HfstTransducer dict_ins_arc(hfst::pmatch::get_Ins_transition(dict_name.c_str()), default_format);
+    // We now make the center of the tokenizer
+    others->disjunct(dict_ins_arc);
+    // And combine it with the context conditions
+    left_context->concatenate(*others);
+    left_context->concatenate(*right_context);
+    delete others; delete right_context;
+    // Because there are context conditions we need delimiter markers
+    HfstTransducer * tokenizer = hfst::pmatch::add_pmatch_delimiters(left_context);
+    tokenizer->set_name("TOP");
+    tokenizer->minimize();
+    // Convert the dictionary to olw if it wasn't already
+    dictionary.convert(hfst::HFST_OLW_TYPE);
+    // Get the alphabets
+    std::set<std::string> dict_syms = dictionary.get_alphabet();
+    std::set<std::string> tokenizer_syms = tokenizer->get_alphabet();
+    std::vector<std::string> tokenizer_minus_dict;
+    // What to add to the dictionary
+    std::set_difference(tokenizer_syms.begin(), tokenizer_syms.end(),
+                        dict_syms.begin(), dict_syms.end(),
+                        std::inserter(tokenizer_minus_dict, tokenizer_minus_dict.begin()));
+    for (std::vector<std::string>::const_iterator it = tokenizer_minus_dict.begin();
+         it != tokenizer_minus_dict.end(); ++it) {
+        dictionary.insert_to_alphabet(*it);
+    }
+    hfst::HfstBasicTransducer * tokenizer_basic = hfst::implementations::ConversionFunctions::
+        hfst_transducer_to_hfst_basic_transducer(*tokenizer);
+    hfst_ol::Transducer * tokenizer_ol = hfst::implementations::ConversionFunctions::
+        hfst_basic_transducer_to_hfst_ol(tokenizer_basic,
+                                         true, // weighted
+                                         "", // no special options
+                                         &dictionary); // harmonize with the dictionary
+    delete tokenizer_basic;
+    hfst_ol::PmatchContainer retval(tokenizer_ol);
+    hfst_ol::Transducer * dict_backend = hfst::implementations::ConversionFunctions::
+        hfst_transducer_to_hfst_ol(&dictionary);
+    retval.add_rtn(dict_backend, dict_name);
+    delete tokenizer_ol;
+    return retval;
 }
 
 void print_location_vector(LocationVector const & locations, std::ostream & outstream)
@@ -373,6 +457,47 @@ int parse_options(int argc, char** argv)
     return EXIT_FAILURE;
 }
 
+bool first_transducer_is_called_TOP(std::istream & f)
+{
+    const char* header1 = "HFST";
+    unsigned int header_loc = 0;
+    int c;
+    while(header_loc < strlen(header1) + 1) {
+        c = f.get();
+        ++header_loc;
+        if(c != header1[header_loc]) {
+            return false;
+        }
+    }
+    if(header_loc == strlen(header1) + 1) {
+        unsigned short remaining_header_len;
+        f.read((char*) &remaining_header_len, sizeof(remaining_header_len));
+        if (f.get() != '\0') {
+            return false;
+        }
+        char * headervalue = new char[remaining_header_len];
+        f.read(headervalue, remaining_header_len);
+        if (headervalue[remaining_header_len - 1] != '\0') {
+            delete[] headervalue;
+            return false;
+        }
+        int i = 0;
+        while (i < remaining_header_len) {
+            if (strcmp(headervalue + i, "name") == 0) {
+                bool retval = strcmp(headervalue + i + strlen("name") + 1, "TOP") == 0;
+                delete[] headervalue;
+                return retval;
+            }
+            while (headervalue[i] != '\0') {
+                ++i;
+            }
+            ++i;
+        }
+        delete[] headervalue;
+    }
+    return false;
+}
+
 int main(int argc, char ** argv)
 {
     hfst_set_program_name(argv[0], "0.1", "HfstTokenize");
@@ -388,15 +513,28 @@ int main(int argc, char ** argv)
         return EXIT_FAILURE;
     }
     try {
-        hfst_ol::PmatchContainer container(instream);
-        container.set_verbose(verbose);
-        container.set_single_codepoint_tokenization(!tokenize_multichar);
-        return process_input(container, std::cout);
+        if (first_transducer_is_called_TOP(instream)) {
+            instream.seekg(0);
+            instream.clear();
+            hfst_ol::PmatchContainer container(instream);
+            container.set_verbose(verbose);
+            container.set_single_codepoint_tokenization(!tokenize_multichar);
+            return process_input(container, std::cout);
+        } else {
+            instream.close();
+            hfst::HfstInputStream is(tokenizer_filename);
+            HfstTransducer dictionary(is);
+            hfst_ol::PmatchContainer container = make_naive_tokenizer(dictionary);
+            container.set_verbose(verbose);
+            container.set_single_codepoint_tokenization(!tokenize_multichar);
+            return process_input(container, std::cout);
+        }
     } catch(HfstException & e) {
         std::cerr << "The archive in " << tokenizer_filename << " doesn't look right."
             "\nDid you make it with hfst-pmatch2fst or make sure it's in weighted optimized-lookup format?\n";
         return 1;
     }
+        
 //     if (outfile != stdout) {
 //         std::filebuf fb;
 // fb.open(outfilename, std::ios::out);

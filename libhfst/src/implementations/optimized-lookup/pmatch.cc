@@ -410,6 +410,22 @@ PmatchContainer::PmatchContainer(Transducer * t):
     }
 }
 
+void PmatchContainer::add_rtn(Transducer * rtn, const std::string & name)
+{
+    TransducerTable<TransitionW> transitions = rtn->copy_transitionw_table();
+    TransducerTable<TransitionWIndex> indices = rtn->copy_windex_table();
+    PmatchTransducer * pmatch_rtn = new hfst_ol::PmatchTransducer(
+        transitions.get_vector(),
+        indices.get_vector(),
+        alphabet,
+        this);
+    if (!alphabet.has_rtn(name)) {
+        alphabet.add_rtn(pmatch_rtn, name);
+    } else {
+        delete rtn;
+    }
+}
+
 PmatchContainer::PmatchContainer(void)
 {
     // Not used, but apparently needed by swig to construct these

@@ -280,6 +280,20 @@ bool Transducer::initialize_input(const char * input)
     return true;
 }
 
+void Transducer::include_symbol_in_alphabet(const std::string & sym)
+{
+    SymbolNumber key = alphabet->symbol_from_string(sym);
+    if (key != NO_SYMBOL_NUMBER) {
+        return;
+    }
+    key = alphabet->get_symbol_table().size();
+    alphabet->add_symbol(sym);
+    char * cstr_for_encoder = new char[sym.size() + 1];
+    std::strcpy(cstr_for_encoder, sym.c_str());
+    encoder->read_input_symbol(cstr_for_encoder, key);
+    delete[] cstr_for_encoder;
+}
+
 HfstOneLevelPaths * Transducer::lookup_fd(const StringVector & s, ssize_t limit,
                                           double time_cutoff)
 {
