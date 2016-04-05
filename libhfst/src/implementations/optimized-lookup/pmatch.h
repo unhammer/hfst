@@ -125,6 +125,7 @@ namespace hfst_ol {
 
     public:
         PmatchAlphabet(std::istream& is, SymbolNumber symbol_count);
+        PmatchAlphabet(TransducerAlphabet const & a);
         PmatchAlphabet(void);
         ~PmatchAlphabet(void);
         virtual void add_symbol(const std::string & symbol);
@@ -189,6 +190,7 @@ namespace hfst_ol {
     public:
 
         PmatchContainer(std::istream & is);
+        PmatchContainer(Transducer * toplevel);
         PmatchContainer(void);
         ~PmatchContainer(void);
 
@@ -388,6 +390,11 @@ namespace hfst_ol {
         PmatchTransducer(std::istream& is,
                          TransitionTableIndex index_table_size,
                          TransitionTableIndex transition_table_size,
+                         PmatchAlphabet & alphabet,
+                         PmatchContainer * container);
+
+        PmatchTransducer(std::vector<TransitionW> transition_vector,
+                         std::vector<TransitionWIndex> index_vector,
                          PmatchAlphabet & alphabet,
                          PmatchContainer * container);
 
