@@ -10,7 +10,8 @@ TESTDIR=./tool_tests/
 
 # Copy hfst3/test/tools/
 cd ../test/tools
-files_to_copy=`svn list`
+#files_to_copy=`svn list`
+files_to_copy=`git ls-files`
 cd ../../check_installation
 
 if [ -d "$TESTDIR" ]; then
@@ -41,8 +42,6 @@ done
 # this file uses 'tooldir' instead of 'TOOLDIR'
 # sed -i 's/$\tooldir\//$1/g' pmatch-tester.sh
 
-
-
 # These tests are rewritten in directory check_installation
 rm empty-input.sh
 cp ../test-empty-input.sh .
@@ -56,6 +55,9 @@ rm incompatible-formats.sh
 rm latin-1-strings.sh
 rm lexc-compiler-functionality.sh
 rm lexc-compiler-flags-functionality.sh
+rm test.sh
+rm xfst-att-to-hfst-att.sh
+rm xfst-prolog-to-hfst-att.sh
 
 # These tests are not included in basic check
 cp ../test-hfst-xfst.sh .

@@ -532,6 +532,8 @@ An example:
        by \a type. */
     HFSTDLL HfstTransducer(const StringPairVector & spv, ImplementationType type);
 
+    HFSTDLL HfstTransducer(const StringVector & sv, ImplementationType type);
+
     /* \brief Create a transducer that recognizes the concatenation of the 
        unions of string pairs in string pair sets in \a spsv. The type of
        the transducer is defined by \a type. */

@@ -39,27 +39,27 @@ do
     if ! (echo $txt_file | grep 'pmatch_' > /dev/null 2> /dev/null); then
         echo "generating binary transducers from file "$txt_file"..."
         file=`echo $txt_file | sed 's/\.txt//'`
-        $PREFIX/hfst-txt2fst -e '@0@' $file.txt > $file.hfst
-        if ($PREFIX/hfst-format --list-formats | grep 'sfst' > /dev/null); then
-	    $PREFIX/hfst-txt2fst -f sfst -e '@0@' $file.txt > $file.sfst
+        ${PREFIX}hfst-txt2fst -e '@0@' $file.txt > $file.hfst
+        if (${PREFIX}hfst-format --list-formats | grep 'sfst' > /dev/null); then
+	    ${PREFIX}hfst-txt2fst -f sfst -e '@0@' $file.txt > $file.sfst
         else
 	    echo "warning: sfst back-end not available, assumed skipped off and continuing"
         fi
-        $PREFIX/hfst-txt2fst -f openfst-tropical -e '@0@' $file.txt > $file.ofst
-        if ($PREFIX/hfst-format --list-formats | grep 'foma' > /dev/null); then
-	    $PREFIX/hfst-txt2fst -f foma -e '@0@' $file.txt > $file.foma
+        ${PREFIX}hfst-txt2fst -f openfst-tropical -e '@0@' $file.txt > $file.ofst
+        if (${PREFIX}hfst-format --list-formats | grep 'foma' > /dev/null); then
+	    ${PREFIX}hfst-txt2fst -f foma -e '@0@' $file.txt > $file.foma
         else
 	    echo "warning: foma back-end not available, assumed skipped off and continuing"
         fi
-        $PREFIX/hfst-txt2fst -e '@0@' -i $file.txt | $PREFIX/hfst-fst2fst -w -o $file.hfstol
-        $PREFIX/hfst-txt2fst -e '@0@' -i $file.txt | $PREFIX/hfst-invert | $PREFIX/hfst-fst2fst -w -o $file.genhfstol
+        ${PREFIX}hfst-txt2fst -e '@0@' -i $file.txt | ${PREFIX}hfst-fst2fst -w -o $file.hfstol
+        ${PREFIX}hfst-txt2fst -e '@0@' -i $file.txt | ${PREFIX}hfst-invert | ${PREFIX}hfst-fst2fst -w -o $file.genhfstol
     else
         echo "generating pmatch transducer from file "$txt_file"..."
-        if ! [ -x $PREFIX/hfst-pmatch2fst ]; then
+        if ! [ -x ${PREFIX}hfst-pmatch2fst ]; then
             echo "tool hfst-pmatch2fst not found, assumed skipped off and continuing"
         else
             file=`echo $txt_file | sed 's/\.txt//'`
-            $PREFIX/hfst-pmatch2fst $file.txt > $file.pmatch
+            ${PREFIX}hfst-pmatch2fst $file.txt > $file.pmatch
         fi
     fi
 done

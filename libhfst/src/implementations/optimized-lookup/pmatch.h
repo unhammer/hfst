@@ -199,8 +199,8 @@ namespace hfst_ol {
         void initialize_input(const char * input);
         bool has_unsatisfied_rtns(void) const;
         std::string get_unsatisfied_rtn_name(void) const;
-        void process(std::string & input);
-        std::string match(std::string & input,
+        void process(const std::string & input);
+        std::string match(const std::string & input,
                           double time_cutoff = 0.0);
         LocationVectorVector locate(std::string & input,
                                     double time_cutoff = 0.0);

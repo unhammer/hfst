@@ -36,6 +36,7 @@
 #include "parsers/PmatchCompiler.h"
 #include "parsers/XfstCompiler.h"
 #include "implementations/HfstTransitionGraph.h"
+#include "implementations/optimized-lookup/pmatch.h"
 
 // todo instead: #include "hfst_extensions.h"
 
@@ -122,6 +123,89 @@ HfstTransducer * copy_hfst_transducer_from_basic_transducer(const hfst::implemen
         return new HfstTransducer(t, impl);
 }
 
+// Mostly copied from file 'tools/src/hfst-pmatch2fst.cc'.
+// TODO: HfstTransducer pointers in variable 'definitions' need to be deleted manually?
+std::vector<hfst::HfstTransducer> compile_pmatch_expression(const std::string & pmatch)
+{
+    std::vector<hfst::HfstTransducer> retval;
+    hfst::pmatch::PmatchCompiler comp(get_default_fst_type());
+    comp.set_verbose(false/*verbose*/);
+    comp.set_flatten(false/*flatten*/);
+    std::map<std::string, hfst::HfstTransducer*> definitions = comp.compile(pmatch);
+
+    // A dummy transducer with an alphabet with all the symbols
+    hfst::HfstTransducer harmonizer(get_default_fst_type());
+
+    // First we need to collect a unified alphabet from all the transducers.
+    hfst::StringSet symbols_seen;
+    for (std::map<std::string, hfst::HfstTransducer *>::const_iterator it =
+             definitions.begin(); it != definitions.end(); ++it) {
+        hfst::StringSet string_set = it->second->get_alphabet();
+        for (hfst::StringSet::const_iterator sym = string_set.begin();
+             sym != string_set.end(); ++sym) {
+            if (symbols_seen.count(*sym) == 0) {
+                harmonizer.disjunct(hfst::HfstTransducer(*sym, get_default_fst_type()));
+                symbols_seen.insert(*sym);
+            }
+        }
+    }
+    if (symbols_seen.size() == 0) {
+        // We don't recognise anything, go home early
+        std::cerr << "Empty ruleset, nothing to write\n";
+        throw HfstException(); // TODO
+    }
+
+    // Then we convert it...
+    harmonizer.convert(hfst::HFST_OLW_TYPE);
+    // Use these for naughty intermediate steps to make sure
+    // everything has the same alphabet
+    hfst::HfstBasicTransducer * intermediate_tmp;
+    hfst_ol::Transducer * harmonized_tmp;
+    hfst::HfstTransducer * output_tmp;
+
+    // When done compiling everything, look for TOP and output it first.
+    if (definitions.count("TOP") == 1) {
+        intermediate_tmp = hfst::implementations::ConversionFunctions::
+            hfst_transducer_to_hfst_basic_transducer(*definitions["TOP"]);
+        harmonized_tmp = hfst::implementations::ConversionFunctions::
+            hfst_basic_transducer_to_hfst_ol(intermediate_tmp,
+                                             true, // weighted
+                                             "", // no special options
+                                             &harmonizer); // harmonize with this
+        output_tmp = hfst::implementations::ConversionFunctions::
+            hfst_ol_to_hfst_transducer(harmonized_tmp);
+        output_tmp->set_name("TOP");
+        retval.push_back(*output_tmp);
+        delete definitions["TOP"];
+        definitions.erase("TOP");
+        delete intermediate_tmp;
+        delete output_tmp;
+
+        for (std::map<std::string, hfst::HfstTransducer *>::iterator it =
+                 definitions.begin(); it != definitions.end(); ++it) {
+            intermediate_tmp = hfst::implementations::ConversionFunctions::
+                hfst_transducer_to_hfst_basic_transducer(*(it->second));
+            harmonized_tmp = hfst::implementations::ConversionFunctions::
+                hfst_basic_transducer_to_hfst_ol(intermediate_tmp,
+                                                 true, // weighted
+                                                 "", // no special options
+                                                 &harmonizer); // harmonize with this
+            output_tmp = hfst::implementations::ConversionFunctions::
+                hfst_ol_to_hfst_transducer(harmonized_tmp);
+            output_tmp->set_name(it->first);
+            retval.push_back(*output_tmp);
+            delete it->second;
+            delete intermediate_tmp;
+            delete output_tmp;
+        }
+    } else {
+        std::cerr << "Empty ruleset, nothing to write\n";
+        throw HfstException(); // TODO
+    }
+    return retval;
+}
+
+
 /* Wrapper variables for an IOString output. */
 std::string hfst_regex_error_message("");
 std::string get_hfst_regex_error_message() { return hfst::hfst_regex_error_message; }
@@ -205,6 +289,7 @@ hfst::HfstTransducer * hfst_compile_lexc(hfst::lexc::LexcCompiler & comp, const 
         }        
 }
 
+
 /* Wrapper variables for an IOString output. */
 std::string hfst_xfst_string_one("");
 char * get_hfst_xfst_string_one() { return strdup(hfst::hfst_xfst_string_one.c_str()); }
@@ -271,6 +356,16 @@ int hfst_compile_xfst(hfst::xfst::XfstCompiler & comp, std::string input, const 
 
 
 
+hfst_ol::PmatchContainer * create_pmatch_container(const std::string & filename)
+{
+    std::ifstream instream(filename.c_str(),
+                           std::ifstream::binary);
+    if (!instream.good()) {
+        return NULL;
+    }
+    return new hfst_ol::PmatchContainer(instream);
+}
+
 hfst::HfstOutputStream * create_hfst_output_stream(const std::string & filename, hfst::ImplementationType type, bool hfst_format)
 {
         if (filename == "") { return new hfst::HfstOutputStream(type, hfst_format); }
@@ -303,6 +398,21 @@ std::string one_level_paths_to_string(const hfst::HfstOneLevelPaths & paths)
     return oss.str();
 }
 
+hfst::HfstOneLevelPaths extract_output_side(const hfst::HfstTwoLevelPaths & paths)
+{
+    hfst::HfstOneLevelPaths result;
+    for(hfst::HfstTwoLevelPaths::const_iterator it = paths.begin(); it != paths.end(); it++)
+    {  
+      hfst::StringVector sv; 
+      for (hfst::StringPairVector::const_iterator svit = it->second.begin(); svit != it->second.end(); svit++)
+      {
+        sv.push_back(svit->second);
+      }
+      result.insert(std::pair<float, hfst::StringVector>(it->first, sv));
+    }
+    return result;
+}
+
 std::string two_level_paths_to_string(const hfst::HfstTwoLevelPaths & paths)
 {
     std::ostringstream oss;
@@ -320,6 +430,175 @@ std::string two_level_paths_to_string(const hfst::HfstTwoLevelPaths & paths)
     return oss.str();
 }
 
+namespace hfst_rules {
+
+  HfstTransducer two_level_if(const HfstTransducerPair & context, const StringPairSet & mappings, const StringPairSet & alphabet) 
+  {
+    hfst::HfstTransducerPair context_(context);
+    StringPairSet mappings_(mappings);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::two_level_if(context_, mappings_, alphabet_);
+  }
+  HfstTransducer two_level_only_if(const HfstTransducerPair &context, const StringPairSet &mappings, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducerPair context_(context);
+    StringPairSet mappings_(mappings);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::two_level_only_if(context_, mappings_, alphabet_);
+  }
+  HfstTransducer two_level_if_and_only_if(const HfstTransducerPair &context, const StringPairSet &mappings, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducerPair context_(context);
+    StringPairSet mappings_(mappings);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::two_level_if_and_only_if(context_, mappings_, alphabet_);
+  }
+  HfstTransducer replace_down(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducerPair context_(context);
+    hfst::HfstTransducer mapping_(mapping);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::replace_down(context_, mapping_, optional, alphabet_);
+  }
+  HfstTransducer replace_down_karttunen(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducerPair context_(context);
+    hfst::HfstTransducer mapping_(mapping);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::replace_down_karttunen(context_, mapping_, optional, alphabet_);
+  }
+  HfstTransducer replace_right(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducerPair context_(context);
+    hfst::HfstTransducer mapping_(mapping);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::replace_right(context_, mapping_, optional, alphabet_);
+  }
+  HfstTransducer replace_left(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducerPair context_(context);
+    hfst::HfstTransducer mapping_(mapping);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::replace_left(context_, mapping_, optional, alphabet_);
+  }
+  HfstTransducer replace_up(const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducer mapping_(mapping);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::replace_up(mapping_, optional, alphabet_);
+  }
+  HfstTransducer replace_down(const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)  
+  {
+    hfst::HfstTransducer mapping_(mapping);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::replace_down(mapping_, optional, alphabet_);
+  }
+  HfstTransducer left_replace_up(const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducer mapping_(mapping);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::left_replace_up(mapping_, optional, alphabet_);
+  }
+  HfstTransducer left_replace_up(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducerPair context_(context);
+    hfst::HfstTransducer mapping_(mapping);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::left_replace_up(context_, mapping_, optional, alphabet_);
+  }
+  HfstTransducer left_replace_down(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducerPair context_(context);
+    hfst::HfstTransducer mapping_(mapping);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::left_replace_down(context_, mapping_, optional, alphabet_);
+  }
+  HfstTransducer left_replace_down_karttunen(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducerPair context_(context);
+    hfst::HfstTransducer mapping_(mapping);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::left_replace_down_karttunen(context_, mapping_, optional, alphabet_);
+  }
+  HfstTransducer left_replace_left(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducerPair context_(context);
+    hfst::HfstTransducer mapping_(mapping);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::left_replace_left(context_, mapping_, optional, alphabet_);
+  }
+  HfstTransducer left_replace_right(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducerPair context_(context);
+    hfst::HfstTransducer mapping_(mapping);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::left_replace_right(context_, mapping_, optional, alphabet_);
+  }
+  HfstTransducer restriction(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducerPairVector contexts_(contexts);
+    hfst::HfstTransducer mapping_(mapping);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::restriction(contexts_, mapping_, alphabet_);
+  }
+  HfstTransducer coercion(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducerPairVector contexts_(contexts);
+    hfst::HfstTransducer mapping_(mapping);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::coercion(contexts_, mapping_, alphabet_);
+  }
+  HfstTransducer restriction_and_coercion(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducerPairVector contexts_(contexts);
+    hfst::HfstTransducer mapping_(mapping);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::restriction_and_coercion(contexts_, mapping_, alphabet_);
+  }
+  HfstTransducer surface_restriction(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducerPairVector contexts_(contexts);
+    hfst::HfstTransducer mapping_(mapping);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::surface_restriction(contexts_, mapping_, alphabet_);
+  }
+  HfstTransducer surface_coercion(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducerPairVector contexts_(contexts);
+    hfst::HfstTransducer mapping_(mapping);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::surface_coercion(contexts_, mapping_, alphabet_);
+  }
+  HfstTransducer surface_restriction_and_coercion(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducerPairVector contexts_(contexts);
+    hfst::HfstTransducer mapping_(mapping);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::surface_restriction_and_coercion(contexts_, mapping_, alphabet_);
+  }
+  HfstTransducer deep_restriction(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducerPairVector contexts_(contexts);
+    hfst::HfstTransducer mapping_(mapping);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::deep_restriction(contexts_, mapping_, alphabet_);
+  }
+  HfstTransducer deep_coercion(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducerPairVector contexts_(contexts);
+    hfst::HfstTransducer mapping_(mapping);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::deep_coercion(contexts_, mapping_, alphabet_);
+  }
+  HfstTransducer deep_restriction_and_coercion(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet)
+  {
+    hfst::HfstTransducerPairVector contexts_(contexts);
+    hfst::HfstTransducer mapping_(mapping);
+    StringPairSet alphabet_(alphabet);
+    return hfst::rules::deep_restriction_and_coercion(contexts_, mapping_, alphabet_);
+  }
+
+}
 
 }
 
@@ -348,6 +627,8 @@ namespace std {
 %template(HfstOneLevelPaths) set<pair<float, vector<string> > >;
 %template(HfstTwoLevelPath) pair<float, vector<pair<string, string > > >;
 %template(HfstTwoLevelPaths) set<pair<float, vector<pair<string, string > > > >;
+%template(HfstTransducerPair) pair<hfst::HfstTransducer, hfst::HfstTransducer>;
+%template(HfstTransducerPairVector) vector<pair<hfst::HfstTransducer, hfst::HfstTransducer> >;
 }
 
 //%ignore hfst::HfstTransducer::lookup_fd(const std::string & s) const;
@@ -417,6 +698,9 @@ typedef std::pair<float, std::vector<std::pair<std::string, std::string > > > Hf
 typedef std::set<std::pair<float, std::vector<std::pair<std::string, std::string> > > > HfstTwoLevelPaths;
 typedef std::map<std::string, std::string> HfstSymbolSubstitutions;
 typedef std::map<std::pair<std::string, std::string>, std::pair<std::string, std::string> > HfstSymbolPairSubstitutions;
+typedef std::vector<hfst::HfstTransducer> HfstTransducerVector;
+typedef std::pair<hfst::HfstTransducer, hfst::HfstTransducer> HfstTransducerPair;
+typedef std::vector<std::pair<hfst::HfstTransducer, hfst::HfstTransducer> > HfstTransducerPairVector;
 
 enum ImplementationType
 {
@@ -522,13 +806,17 @@ bool is_diacritic(const std::string & symbol);
       return tuple(retval)
 %}
 
+// NOTE: all functions returning an HfstTransducer& are commented out and extended by replacing them with equivalent functions that return void.
+// This is done in order to avoid use of references that are not handled well by swig/python.
+
 class HfstTransducer 
 {
 public:
 HfstTransducer();
+// Redefined with %extend:
 //HfstTransducer(const hfst::HfstTransducer &);
 //HfstTransducer(const hfst::implementations::HfstBasicTransducer &, hfst::ImplementationType);
-~HfstTransducer();
+//~HfstTransducer();
 
 void set_name(const std::string &name);
 std::string get_name() const;
@@ -538,18 +826,18 @@ std::string get_property(const std::string& property) const;
 const std::map<std::string,std::string>& get_properties() const;
 
 /* Basic binary operations */
-HfstTransducer & concatenate(const HfstTransducer&, bool harmonize=true) throw(TransducerTypeMismatchException);
-HfstTransducer & disjunct(const HfstTransducer&, bool harmonize=true) throw(TransducerTypeMismatchException);
-HfstTransducer & subtract(const HfstTransducer&, bool harmonize=true) throw(TransducerTypeMismatchException);
-HfstTransducer & intersect(const HfstTransducer&, bool harmonize=true) throw(TransducerTypeMismatchException);
-HfstTransducer & compose(const HfstTransducer&, bool harmonize=true) throw(TransducerTypeMismatchException);
+//HfstTransducer & concatenate(const HfstTransducer&, bool harmonize=true) throw(TransducerTypeMismatchException);
+//HfstTransducer & disjunct(const HfstTransducer&, bool harmonize=true) throw(TransducerTypeMismatchException);
+//HfstTransducer & subtract(const HfstTransducer&, bool harmonize=true) throw(TransducerTypeMismatchException);
+//HfstTransducer & intersect(const HfstTransducer&, bool harmonize=true) throw(TransducerTypeMismatchException);
+//HfstTransducer & compose(const HfstTransducer&, bool harmonize=true) throw(TransducerTypeMismatchException);
 
 /* More binary operations */
-HfstTransducer & compose_intersect(const hfst::HfstTransducerVector &v, bool invert=false, bool harmonize=true);
-HfstTransducer & priority_union(const HfstTransducer &another);
-HfstTransducer & lenient_composition(const HfstTransducer &another, bool harmonize=true);
-HfstTransducer & cross_product(const HfstTransducer &another, bool harmonize=true) throw(TransducersAreNotAutomataException);
-HfstTransducer & shuffle(const HfstTransducer &another, bool harmonize=true);
+//HfstTransducer & compose_intersect(const HfstTransducerVector &v, bool invert=false, bool harmonize=true);
+//HfstTransducer & priority_union(const HfstTransducer &another);
+//HfstTransducer & lenient_composition(const HfstTransducer &another, bool harmonize=true);
+//HfstTransducer & cross_product(const HfstTransducer &another, bool harmonize=true) throw(TransducersAreNotAutomataException);
+//HfstTransducer & shuffle(const HfstTransducer &another, bool harmonize=true);
 
 /* Testing */
 bool compare(const HfstTransducer&, bool harmonize=true) const throw(TransducerTypeMismatchException);
@@ -568,55 +856,105 @@ void remove_from_alphabet(const std::string &);
 static bool is_implementation_type_available(hfst::ImplementationType type);
 
 /* Optimization */
-HfstTransducer & remove_epsilons();
-HfstTransducer & determinize();
-HfstTransducer & minimize();
-HfstTransducer & prune();
-HfstTransducer & eliminate_flags();
-HfstTransducer & eliminate_flag(const std::string&) throw(HfstException);
-HfstTransducer & n_best(unsigned int n);
-HfstTransducer & convert(ImplementationType impl);
+//HfstTransducer & remove_epsilons();
+//HfstTransducer & determinize();
+//HfstTransducer & minimize();
+//HfstTransducer & prune();
+//HfstTransducer & eliminate_flags();
+//HfstTransducer & eliminate_flag(const std::string&) throw(HfstException);
+//HfstTransducer & n_best(unsigned int n);
+//HfstTransducer & convert(ImplementationType impl);
 
 /* Repeat */
-HfstTransducer & repeat_star();
-HfstTransducer & repeat_plus();
-HfstTransducer & repeat_n(unsigned int);
-HfstTransducer & repeat_n_to_k(unsigned int, unsigned int);
-HfstTransducer & repeat_n_minus(unsigned int);
-HfstTransducer & repeat_n_plus(unsigned int);
+//HfstTransducer & repeat_star();
+//HfstTransducer & repeat_plus();
+//HfstTransducer & repeat_n(unsigned int);
+//HfstTransducer & repeat_n_to_k(unsigned int, unsigned int);
+//HfstTransducer & repeat_n_minus(unsigned int);
+//HfstTransducer & repeat_n_plus(unsigned int);
 
 /* Other basic operations */
-HfstTransducer & invert();
-HfstTransducer & reverse();
-HfstTransducer & input_project();
-HfstTransducer & output_project();
-HfstTransducer & optionalize();
+//HfstTransducer & invert();
+//HfstTransducer & reverse();
+//HfstTransducer & input_project();
+//HfstTransducer & output_project();
+//HfstTransducer & optionalize();
 
 /* Insert freely, substitute */
 
-HfstTransducer & insert_freely(const StringPair &symbol_pair, bool harmonize=true);
-HfstTransducer & insert_freely(const HfstTransducer &tr, bool harmonize=true);
+//HfstTransducer & insert_freely(const StringPair &symbol_pair, bool harmonize=true);
+//HfstTransducer & insert_freely(const HfstTransducer &tr, bool harmonize=true);
 
 //HfstTransducer & substitute(bool (*func)(const StringPair &sp, hfst::StringPairSet &sps));
 
-HfstTransducer & substitute_symbol(const std::string &old_symbol, const std::string &new_symbol, bool input_side=true, bool output_side=true);
-HfstTransducer & substitute_symbol_pair(const StringPair &old_symbol_pair, const StringPair &new_symbol_pair);
-HfstTransducer & substitute_symbol_pair_with_set(const StringPair &old_symbol_pair, const hfst::StringPairSet &new_symbol_pair_set);
-HfstTransducer & substitute_symbol_pair_with_transducer(const StringPair &symbol_pair, HfstTransducer &transducer, bool harmonize=true);
-HfstTransducer & substitute_symbols(const hfst::HfstSymbolSubstitutions &substitutions); // alias for the previous function which is shadowed
-HfstTransducer & substitute_symbol_pairs(const hfst::HfstSymbolPairSubstitutions &substitutions); // alias for the previous function which is shadowed
+//HfstTransducer & substitute_symbol(const std::string &old_symbol, const std::string &new_symbol, bool input_side=true, bool output_side=true);
+//HfstTransducer & substitute_symbol_pair(const StringPair &old_symbol_pair, const StringPair &new_symbol_pair);
+//HfstTransducer & substitute_symbol_pair_with_set(const StringPair &old_symbol_pair, const hfst::StringPairSet &new_symbol_pair_set);
+//HfstTransducer & substitute_symbol_pair_with_transducer(const StringPair &symbol_pair, HfstTransducer &transducer, bool harmonize=true);
+//HfstTransducer & substitute_symbols(const hfst::HfstSymbolSubstitutions &substitutions); // alias for the previous function which is shadowed
+//HfstTransducer & substitute_symbol_pairs(const hfst::HfstSymbolPairSubstitutions &substitutions); // alias for the previous function which is shadowed
 
 
 /* Weight handling */
-HfstTransducer & set_final_weights(float weight, bool increment=false);
+//HfstTransducer & set_final_weights(float weight, bool increment=false);
 // Can 'transform_weights' be wrapped?  It maybe needs to be rewritten in python.
-HfstTransducer & push_weights(hfst::PushType type);
+//HfstTransducer & push_weights(hfst::PushType type);
 
 //void extract_shortest_paths(HfstTwoLevelPaths &results) const;
 //bool extract_longest_paths(HfstTwoLevelPaths &results, bool obey_flags=true) const;
 int longest_path_size(bool obey_flags=true) const;
 
 %extend {
+
+  // First versions of all functions returning an HfstTransducer& that return void instead:
+
+  void concatenate(const HfstTransducer& tr, bool harmonize=true) throw(TransducerTypeMismatchException) { self->concatenate(tr, harmonize); }
+  void disjunct(const HfstTransducer& tr, bool harmonize=true) throw(TransducerTypeMismatchException) { self->disjunct(tr, harmonize); }
+  void subtract(const HfstTransducer& tr, bool harmonize=true) throw(TransducerTypeMismatchException) { self->subtract(tr, harmonize); }
+  void intersect(const HfstTransducer& tr, bool harmonize=true) throw(TransducerTypeMismatchException) { self->intersect(tr, harmonize); }
+  void compose(const HfstTransducer& tr, bool harmonize=true) throw(TransducerTypeMismatchException) { self->compose(tr, harmonize); }
+  void compose_intersect(const HfstTransducerVector &v, bool invert=false, bool harmonize=true) { self->compose_intersect(v, invert, harmonize); }
+  void priority_union(const HfstTransducer &another) { self->priority_union(another); }
+  void lenient_composition(const HfstTransducer &another, bool harmonize=true) { self->lenient_composition(another, harmonize); }
+  void cross_product(const HfstTransducer &another, bool harmonize=true) throw(TransducersAreNotAutomataException) { self->cross_product(another, harmonize); }
+  void shuffle(const HfstTransducer &another, bool harmonize=true) { self->shuffle(another, harmonize); }
+  void remove_epsilons() { self->remove_epsilons(); }
+  void determinize() { self->determinize(); }
+  void minimize() { self->minimize(); }
+  void prune() { self->prune(); }
+  void eliminate_flags() { self->eliminate_flags(); }
+  void eliminate_flag(const std::string& f) throw(HfstException) { self->eliminate_flag(f); }
+  void n_best(unsigned int n) { self->n_best(n); }
+  void convert(ImplementationType impl) { self->convert(impl); }
+  void repeat_star() { self->repeat_star(); }
+  void repeat_plus() { self->repeat_plus(); }
+  void repeat_n(unsigned int n) { self->repeat_n(n); }
+  void repeat_n_to_k(unsigned int n, unsigned int k) { self->repeat_n_to_k(n, k); }
+  void repeat_n_minus(unsigned int n) { self->repeat_n_minus(n); }
+  void repeat_n_plus(unsigned int n) { self->repeat_n_plus(n); }
+  void invert() { self->invert(); }
+  void reverse() { self->reverse(); }
+  void input_project() { self->input_project(); }
+  void output_project() { self->output_project(); }
+  void optionalize() { self->optionalize(); }
+  void insert_freely(const StringPair &symbol_pair, bool harmonize=true) { self->insert_freely(symbol_pair, harmonize); }
+  void insert_freely(const HfstTransducer &tr, bool harmonize=true) { self->insert_freely(tr, harmonize); }
+  void substitute_symbol(const std::string &old_symbol, const std::string &new_symbol, bool input_side=true, bool output_side=true) { self->substitute_symbol(old_symbol, new_symbol, input_side, output_side); }
+  void substitute_symbol_pair(const StringPair &old_symbol_pair, const StringPair &new_symbol_pair) { self->substitute_symbol_pair(old_symbol_pair, new_symbol_pair); }
+  void substitute_symbol_pair_with_set(const StringPair &old_symbol_pair, const hfst::StringPairSet &new_symbol_pair_set) { self->substitute_symbol_pair_with_set(old_symbol_pair, new_symbol_pair_set); }
+  void substitute_symbol_pair_with_transducer(const StringPair &symbol_pair, HfstTransducer &transducer, bool harmonize=true) { self->substitute_symbol_pair_with_transducer(symbol_pair, transducer, harmonize); }
+  void substitute_symbols(const hfst::HfstSymbolSubstitutions &substitutions) { self->substitute_symbols(substitutions); } // alias for the previous function which is shadowed
+  void substitute_symbol_pairs(const hfst::HfstSymbolPairSubstitutions &substitutions) { self->substitute_symbol_pairs(substitutions); } // alias for the previous function which is shadowed
+  void set_final_weights(float weight, bool increment=false) { self->set_final_weights(weight, increment); };
+  void push_weights(hfst::PushType type) { self->push_weights(type); };
+
+  // And some aliases:
+
+  // 'union' is a reserved word in python, so it cannot be used as an alias for function 'disjunct' 
+  void minus(const HfstTransducer& t, bool harmonize=true) { $self->subtract(t, harmonize); }
+  void conjunct(const HfstTransducer& t, bool harmonize=true) { $self->intersect(t, harmonize); }
+
+  // Then the actual extensions:
 
     hfst::HfstTwoLevelPaths extract_shortest_paths_()
     {
@@ -644,19 +982,24 @@ int longest_path_size(bool obey_flags=true) const;
     {
         return hfst::copy_hfst_transducer_from_basic_transducer(t, impl);
     }
+    ~HfstTransducer()
+    {
+        if ($self->get_type() == hfst::UNSPECIFIED_TYPE || $self->get_type() == hfst::ERROR_TYPE)
+        {
+            return;
+        }
+        delete $self;
+    }
 
     char *__str__() {
          static char tmp[1024];
          $self->write_in_att_format(tmp);
          return tmp;
     }
-    HfstTransducer & write(hfst::HfstOutputStream & os) {
+    void write(hfst::HfstOutputStream & os) {
          (void) os.redirect(*$self);
-         return *$self;
+         //return *$self;
     }
-    // 'union' is a reserved word in python, so it cannot be used as an alias for function 'disjunct' 
-    HfstTransducer & minus(const HfstTransducer& t, bool harmonize=true) { return $self->subtract(t, harmonize); }
-    HfstTransducer & conjunct(const HfstTransducer& t, bool harmonize=true) { return $self->intersect(t, harmonize); }
 
     void write_att(hfst::HfstFile & f, bool write_weights=true)
     {
@@ -699,13 +1042,57 @@ int longest_path_size(bool obey_flags=true) const;
 // Wrappers for lookup functions
 
 HfstOneLevelPaths lookup_fd_vector(const StringVector& s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
-{ return *($self->lookup_fd(s, limit, time_cutoff)); }
+{ 
+  if ($self->get_type() == hfst::HFST_OL_TYPE || $self->get_type() == hfst::HFST_OLW_TYPE)
+    { return *($self->lookup_fd(s, limit, time_cutoff)); }
+  hfst::HfstTransducer input(s, $self->get_type());
+  input.compose(*($self));
+  input.minimize();
+  hfst::HfstTwoLevelPaths result;
+  input.extract_paths_fd(result, limit, -1);
+  return hfst::extract_output_side(result);
+}
 HfstOneLevelPaths lookup_fd_string(const std::string& s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
-{ return *($self->lookup_fd(s, limit, time_cutoff)); }
+{ 
+  if ($self->get_type() == hfst::HFST_OL_TYPE || $self->get_type() == hfst::HFST_OLW_TYPE)
+    { return *($self->lookup_fd(s, limit, time_cutoff)); }
+  hfst::StringSet alpha = $self->get_alphabet();
+  hfst::HfstTokenizer tok;
+  for (hfst::StringSet::const_iterator it = alpha.begin(); it != alpha.end(); it++)
+    { tok.add_multichar_symbol(*it); }
+  hfst::HfstTransducer input(s, tok, $self->get_type());
+  input.compose(*($self));
+  input.minimize();
+  hfst::HfstTwoLevelPaths result;
+  input.extract_paths_fd(result, limit, -1);
+  return hfst::extract_output_side(result);
+}
 HfstOneLevelPaths lookup_vector(const StringVector& s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
-{ return *($self->lookup(s, limit, time_cutoff)); }
+{ 
+  if ($self->get_type() == hfst::HFST_OL_TYPE || $self->get_type() == hfst::HFST_OLW_TYPE)
+    { return *($self->lookup(s, limit, time_cutoff)); }
+  hfst::HfstTransducer input(s, $self->get_type());
+  input.compose(*($self));
+  input.minimize();
+  hfst::HfstTwoLevelPaths result;
+  input.extract_paths(result, limit, -1);
+  return hfst::extract_output_side(result);
+}
 HfstOneLevelPaths lookup_string(const std::string & s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
-{ return *($self->lookup(s, limit, time_cutoff)); }
+{ 
+  if ($self->get_type() == hfst::HFST_OL_TYPE || $self->get_type() == hfst::HFST_OLW_TYPE)
+    { return *($self->lookup(s, limit, time_cutoff)); }
+  hfst::StringSet alpha = $self->get_alphabet();
+  hfst::HfstTokenizer tok;
+  for (hfst::StringSet::const_iterator it = alpha.begin(); it != alpha.end(); it++)
+    { tok.add_multichar_symbol(*it); }
+  hfst::HfstTransducer input(s, tok, $self->get_type());
+  input.compose(*($self));
+  input.minimize();
+  hfst::HfstTwoLevelPaths result;
+  input.extract_paths(result, limit, -1);
+  return hfst::extract_output_side(result);
+}
 
 
 %pythoncode %{
@@ -756,7 +1143,13 @@ HfstOneLevelPaths lookup_string(const std::string & s, int limit = -1, double ti
          else:
             retval=self.lookup_string(input, max_number, time_cutoff)
       else:
-         raise RuntimeError('Input argument must be string or tuple.')
+         try:
+            if obey_flags:
+                retval=self.lookup_fd_string(str(input), max_number, time_cutoff)
+            else:
+                retval=self.lookup_string(str(input), max_number, time_cutoff)         
+         except:
+            raise RuntimeError('Input argument must be string or tuple.')
 
       if output == 'text':
          return one_level_paths_to_string(retval)
@@ -974,11 +1367,12 @@ HfstOutputStream &flush();
 //HfstOutputStream& redirect (HfstTransducer &transducer);
 void close(void);
 
+
 %extend {
 
-HfstOutputStream & write(hfst::HfstTransducer & transducer) throw(StreamIsClosedException)
+void write(hfst::HfstTransducer & transducer) throw(StreamIsClosedException)
 {
-  return $self->redirect(transducer);
+  $self->redirect(transducer);
 }
 
 HfstOutputStream() { return new hfst::HfstOutputStream(hfst::get_default_fst_type()); }
@@ -1019,10 +1413,30 @@ public:
     ImplementationType get_type(void) const throw(TransducerTypeMismatchException);
 
 %extend {
+
 hfst::HfstTransducer * read() throw (EndOfStreamException)
 {
   return new hfst::HfstTransducer(*($self));
 }
+
+%pythoncode %{
+
+def __iter__(self):
+    return self
+
+# Python 2
+def next(self):
+    if self.is_eof():
+        raise StopIteration
+    else:
+        return self.read();
+
+# Python 3
+def __next__(self):
+    return self.next()
+
+%}
+
 }
 
 };
@@ -1094,24 +1508,24 @@ class HfstBasicTransducer {
     bool is_final_state(HfstState s) const;
     float get_final_weight(HfstState s) const throw(StateIsNotFinalException, StateIndexOutOfBoundsException);
     void set_final_weight(HfstState s, const float & weight);
-    HfstBasicTransducer &sort_arcs(void);
+    //HfstBasicTransducer &sort_arcs(void);
     const std::vector<HfstBasicTransition> & transitions(HfstState s) const;
-    HfstBasicTransducer &disjunct(const StringPairVector &spv, float weight);
-    HfstBasicTransducer &harmonize(HfstBasicTransducer &another);
+    //HfstBasicTransducer &disjunct(const StringPairVector &spv, float weight);
+    //HfstBasicTransducer &harmonize(HfstBasicTransducer &another);
 
     bool is_infinitely_ambiguous();
     bool is_lookup_infinitely_ambiguous(const StringVector & s);
     int longest_path_size();
 
-    HfstBasicTransducer & substitute_symbol(const std::string &old_symbol, const std::string &new_symbol, bool input_side=true, bool output_side=true);
-    HfstBasicTransducer & substitute_symbol_pair(const StringPair &old_symbol_pair, const StringPair &new_symbol_pair);
-    HfstBasicTransducer & substitute_symbol_pair_with_set(const StringPair &old_symbol_pair, const hfst::StringPairSet &new_symbol_pair_set);
-    HfstBasicTransducer & substitute_symbol_pair_with_transducer(const StringPair &symbol_pair, HfstBasicTransducer &transducer);
-    HfstBasicTransducer & substitute_symbols(const hfst::HfstSymbolSubstitutions &substitutions); // alias for the previous function which is shadowed
-    HfstBasicTransducer & substitute_symbol_pairs(const hfst::HfstSymbolPairSubstitutions &substitutions); // alias for the previous function which is shadowed
+    //HfstBasicTransducer & substitute_symbol(const std::string &old_symbol, const std::string &new_symbol, bool input_side=true, bool output_side=true);
+    //HfstBasicTransducer & substitute_symbol_pair(const StringPair &old_symbol_pair, const StringPair &new_symbol_pair);
+    //HfstBasicTransducer & substitute_symbol_pair_with_set(const StringPair &old_symbol_pair, const hfst::StringPairSet &new_symbol_pair_set);
+    //HfstBasicTransducer & substitute_symbol_pair_with_transducer(const StringPair &symbol_pair, HfstBasicTransducer &transducer);
+    //HfstBasicTransducer & substitute_symbols(const hfst::HfstSymbolSubstitutions &substitutions); // alias for the previous function which is shadowed
+    //HfstBasicTransducer & substitute_symbol_pairs(const hfst::HfstSymbolPairSubstitutions &substitutions); // alias for the previous function which is shadowed
 
-    HfstBasicTransducer & insert_freely(const StringPair &symbol_pair, float weight);
-    HfstBasicTransducer & insert_freely(const HfstBasicTransducer &tr);
+    //HfstBasicTransducer & insert_freely(const StringPair &symbol_pair, float weight);
+    //HfstBasicTransducer & insert_freely(const HfstBasicTransducer &tr);
     
     // void lookup_fd(const StringVector &lookup_path, HfstTwoLevelPaths &results, size_t infinite_cutoff, float * max_weight = NULL)
 
@@ -1120,6 +1534,18 @@ class HfstBasicTransducer {
 
 
 %extend {
+
+    void substitute_symbol(const std::string &old_symbol, const std::string &new_symbol, bool input_side=true, bool output_side=true) { self->substitute_symbol(old_symbol, new_symbol, input_side, output_side); }
+    void substitute_symbol_pair(const StringPair &old_symbol_pair, const StringPair &new_symbol_pair) { self->substitute_symbol_pair(old_symbol_pair, new_symbol_pair); }
+    void substitute_symbol_pair_with_set(const StringPair &old_symbol_pair, const hfst::StringPairSet &new_symbol_pair_set) { self->substitute_symbol_pair_with_set(old_symbol_pair, new_symbol_pair_set); }
+    void substitute_symbol_pair_with_transducer(const StringPair &symbol_pair, HfstBasicTransducer &transducer) { self->substitute_symbol_pair_with_transducer(symbol_pair, transducer); }
+    void substitute_symbols(const hfst::HfstSymbolSubstitutions &substitutions) { self->substitute_symbols(substitutions); } // alias for the previous function which is shadowed
+    void substitute_symbol_pairs(const hfst::HfstSymbolPairSubstitutions &substitutions) { self->substitute_symbol_pairs(substitutions); } // alias for the previous function which is shadowed
+    void insert_freely(const StringPair &symbol_pair, float weight) { self->insert_freely(symbol_pair, weight); }
+    void insert_freely(const HfstBasicTransducer &tr) { self->insert_freely(tr); }
+    void sort_arcs() { self->sort_arcs(); }
+    void disjunct(const StringPairVector &spv, float weight) { self->disjunct(spv, weight); }
+    void harmonize(HfstBasicTransducer &another) { self->harmonize(another); }
 
   HfstTwoLevelPaths lookup_fd_(const StringVector &lookup_path, size_t * infinite_cutoff, float * max_weight)
   {
@@ -1283,7 +1709,6 @@ class HfstBasicTransition {
 
 }
 
-
 namespace pmatch {
   class PmatchCompiler
   {
@@ -1423,7 +1848,73 @@ hfst::HfstTransducer * hfst::read_prolog(hfst::HfstFile & f) throw(EndOfStreamEx
 std::string hfst::one_level_paths_to_string(const HfstOneLevelPaths &);
 std::string hfst::two_level_paths_to_string(const HfstTwoLevelPaths &);
 
+
+hfst_ol::PmatchContainer * create_pmatch_container(const std::string & filename);
+
+namespace rules {
+  enum ReplaceType {REPL_UP, REPL_DOWN, REPL_RIGHT, REPL_LEFT, REPL_DOWN_KARTTUNEN};
+  enum TwolType {twol_right, twol_left, twol_both};
 }
+
+namespace hfst_rules {
+
+  HfstTransducer two_level_if(const HfstTransducerPair & context, const StringPairSet & mappings, const StringPairSet & alphabet);
+  HfstTransducer two_level_only_if(const HfstTransducerPair &context, const StringPairSet &mappings, const StringPairSet &alphabet); 
+  HfstTransducer two_level_if_and_only_if(const HfstTransducerPair &context, const StringPairSet &mappings, const StringPairSet &alphabet); 
+  HfstTransducer replace_down(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet); 
+  HfstTransducer replace_down_karttunen(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet); 
+  HfstTransducer replace_right(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet); 
+  HfstTransducer replace_left(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet); 
+  HfstTransducer replace_up(const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet); 
+  HfstTransducer replace_down(const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet); 
+  HfstTransducer left_replace_up(const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet); 
+  HfstTransducer left_replace_up(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet); 
+  HfstTransducer left_replace_down(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet); 
+  HfstTransducer left_replace_down_karttunen(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet); 
+  HfstTransducer left_replace_left(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet); 
+  HfstTransducer left_replace_right(const HfstTransducerPair &context, const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet); 
+  HfstTransducer restriction(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet); 
+  HfstTransducer coercion(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet); 
+  HfstTransducer restriction_and_coercion(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet); 
+  HfstTransducer surface_restriction(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet); 
+  HfstTransducer surface_coercion(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet); 
+  HfstTransducer surface_restriction_and_coercion(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet); 
+  HfstTransducer deep_restriction(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet); 
+  HfstTransducer deep_coercion(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet); 
+  HfstTransducer deep_restriction_and_coercion(const HfstTransducerPairVector &contexts, const HfstTransducer &mapping, const StringPairSet &alphabet);
+
+} // namespace hfst_rules
+
+
+} // namespace hfst
+
+namespace hfst_ol {
+    class PmatchContainer
+    {
+    public:
+        //PmatchContainer(std::istream & is);
+        PmatchContainer(void);
+        ~PmatchContainer(void);
+        std::string match(const std::string & input, double time_cutoff = 0.0);
+        std::string get_profiling_info(void);
+        void set_verbose(bool b);
+        void set_extract_tags_mode(bool b);
+        void set_profile(bool b);
+
+%extend {
+
+%pythoncode %{
+
+def __init__(self, filename):
+    self.this = _libhfst.create_pmatch_container(filename)
+
+%}
+
+}
+
+    };
+}
+
 
 %pythoncode %{
 

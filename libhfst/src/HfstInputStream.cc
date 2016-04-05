@@ -1302,6 +1302,12 @@ namespace hfst
   {
     return type;
   }
+
+  bool HfstInputStream::is_hfst_header_included(void) const
+  {
+    return has_hfst_header;
+  }
+
 }
 
 #else // MAIN_TEST was defined

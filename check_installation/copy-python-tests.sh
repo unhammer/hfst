@@ -10,7 +10,8 @@ TESTDIR=./python_tests/
 
 # Copy hfst3/swig/test
 cd ../python/test
-files_to_copy=`svn list`
+#files_to_copy=`svn list`
+files_to_copy=`git ls-files`
 cd ../../check_installation
 
 if [ -d "$TESTDIR" ]; then

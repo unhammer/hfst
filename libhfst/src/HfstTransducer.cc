@@ -937,6 +937,18 @@ HfstTransducer::HfstTransducer(const std::string& utf8_str,
     }
 }
 
+HfstTransducer::HfstTransducer(const StringVector & sv,
+                               ImplementationType type):
+    type(type), anonymous(false), is_trie(false), name("")
+{
+  StringPairVector spv;
+  for (StringVector::const_iterator it = sv.begin(); it != sv.end(); it++)
+    {
+      spv.push_back(StringPair(*it, *it));
+    }
+  *this = HfstTransducer(spv, type);
+}
+
 HfstTransducer::HfstTransducer(const StringPairVector & spv, 
                    ImplementationType type):
     type(type), anonymous(false), is_trie(false), name("")

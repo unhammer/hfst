@@ -634,7 +634,7 @@ SymbolNumber PmatchAlphabet::get_special(SpecialSymbol special) const
     return special_symbols.at(special);
 }
 
-void PmatchContainer::process(std::string & input_str)
+void PmatchContainer::process(const std::string & input_str)
 {
     initialize_input(input_str.c_str());
     unsigned int input_pos = 0;
@@ -705,7 +705,7 @@ void PmatchContainer::process(std::string & input_str)
     }
 }
 
-std::string PmatchContainer::match(std::string & input,
+std::string PmatchContainer::match(const std::string & input,
                                    double time_cutoff)
 {
     max_time = time_cutoff;
