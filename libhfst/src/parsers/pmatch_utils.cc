@@ -1022,15 +1022,37 @@ HfstTransducer * PmatchUtilityTransducers::make_lowerfy(ImplementationType type)
     return retval;
 }
 
+HfstTransducer * PmatchUtilityTransducers::cap(HfstTransducer & t)
+{
+    HfstTokenizer tok;
+    HfstTransducer cap(*capify);
+    HfstTransducer anything(HfstTransducer::identity_pair(t.get_type()));
+    HfstTransducer anything_but_whitespace(anything);
+    anything_but_whitespace.subtract(*latin1_whitespace_acceptor);
+    HfstTransducer anything_but_lowercase(anything);
+    anything_but_lowercase.subtract(*latin1_lowercase_acceptor);
+    cap.disjunct(anything_but_lowercase);
+    HfstTransducer cap_one_word(cap);
+    cap_one_word.concatenate(anything_but_whitespace.repeat_star());
+    /* If we consider to cross the word boundary */ 
+    HfstTransducer more_words(*latin1_whitespace_acceptor);
+    more_words.concatenate(cap_one_word);
+    more_words.repeat_star();
+    HfstTransducer * retval = new HfstTransducer(t);
+    retval->compose(cap_one_word.concatenate(more_words));
+    retval->output_project();
+    retval->minimize();
+    return retval;
+}
+
 HfstTransducer * PmatchUtilityTransducers::optcap(HfstTransducer & t)
 {
     HfstTokenizer tok;
     HfstTransducer optcap(*capify);
-    optcap.disjunct(*lowerfy);
-    optcap.disjunct(*latin1_alpha_acceptor);
     HfstTransducer anything(HfstTransducer::identity_pair(t.get_type()));
-    HfstTransducer anything_but_whitespace(anything.subtract(
-                                               *latin1_whitespace_acceptor));
+    HfstTransducer anything_but_whitespace(anything);
+    anything_but_whitespace.subtract(*latin1_whitespace_acceptor);
+    optcap.disjunct(anything);
     HfstTransducer optcap_one_word(optcap);
     optcap_one_word.concatenate(anything_but_whitespace.repeat_star());
     /* If we consider to cross the word boundary */ 
@@ -1040,7 +1062,6 @@ HfstTransducer * PmatchUtilityTransducers::optcap(HfstTransducer & t)
     HfstTransducer * retval = new HfstTransducer(t);
     retval->compose(optcap_one_word.concatenate(more_words));
     retval->output_project();
-    retval->disjunct(t);
     retval->minimize();
     return retval;
 }
@@ -1310,6 +1331,10 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
         any->subtract(*retval);
         delete retval;
         retval = any;
+    } else if (op == Cap) {
+        HfstTransducer * tmp = get_utils()->cap(*retval);
+        delete retval;
+        retval = tmp;
     } else if (op == OptCap) {
         HfstTransducer * tmp = get_utils()->optcap(*retval);
         delete retval;

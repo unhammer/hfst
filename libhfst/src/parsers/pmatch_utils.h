@@ -323,6 +323,7 @@ struct PmatchUtilityTransducers
     HfstTransducer * make_capify(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
     
+    HfstTransducer * cap(HfstTransducer & t);
     HfstTransducer * optcap(HfstTransducer & t);
     HfstTransducer * tolower(HfstTransducer & t);
     HfstTransducer * toupper(HfstTransducer & t);
@@ -405,6 +406,7 @@ enum PmatchUnaryOp {
     ContainmentOnce,
     ContainmentOptional,
     TermComplement,
+    Cap,
     OptCap,
     ToLower,
     ToUpper,
