@@ -1094,6 +1094,32 @@ HfstTransducer * PmatchUtilityTransducers::toupper(HfstTransducer & t)
     return retval;
 }
 
+HfstTransducer * PmatchUtilityTransducers::opt_tolower(HfstTransducer & t)
+{
+    HfstTokenizer tok;
+    HfstTransducer lowercase(*lowerfy);
+    HfstTransducer anything(hfst::internal_identity, hfst::pmatch::format);
+    lowercase.disjunct(anything);
+    HfstTransducer * retval = new HfstTransducer(t);
+    retval->compose(lowercase.repeat_star());
+    retval->output_project();
+    retval->minimize();
+    return retval;
+}
+
+HfstTransducer * PmatchUtilityTransducers::opt_toupper(HfstTransducer & t)
+{
+    HfstTokenizer tok;
+    HfstTransducer uppercase(*capify);
+    HfstTransducer anything(hfst::internal_identity, hfst::pmatch::format);
+    uppercase.disjunct(anything);
+    HfstTransducer * retval = new HfstTransducer(t);
+    retval->compose(uppercase.repeat_star());
+    retval->output_project();
+    retval->minimize();
+    return retval;
+}
+
 PmatchObject::PmatchObject(void)
 {
     name = "";
@@ -1347,6 +1373,21 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
         HfstTransducer * tmp = get_utils()->toupper(*retval);
         delete retval;
         retval = tmp;
+    } else if (op == OptToLower) {
+        HfstTransducer * tmp = get_utils()->opt_tolower(*retval);
+        tmp->disjunct(*retval);
+        delete retval;
+        retval = tmp;
+    } else if (op == OptToUpper) {
+        HfstTransducer * tmp = get_utils()->opt_toupper(*retval);
+        delete retval;
+        retval = tmp;
+    } else if (op == AnyCase) {
+        HfstTransducer * toupper = get_utils()->opt_toupper(*retval);
+        HfstTransducer * tolower = get_utils()->opt_tolower(*retval);
+        retval->disjunct(*toupper);
+        retval->disjunct(*tolower);
+        delete toupper; delete tolower;
     } else if (op == MakeSigma) {
         HfstTransducer * tmp = make_sigma(retval);
         delete retval;

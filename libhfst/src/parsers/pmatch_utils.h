@@ -327,6 +327,8 @@ struct PmatchUtilityTransducers
     HfstTransducer * optcap(HfstTransducer & t);
     HfstTransducer * tolower(HfstTransducer & t);
     HfstTransducer * toupper(HfstTransducer & t);
+    HfstTransducer * opt_tolower(HfstTransducer & t);
+    HfstTransducer * opt_toupper(HfstTransducer & t);
 };
 
 struct PmatchObject;
@@ -410,6 +412,9 @@ enum PmatchUnaryOp {
     OptCap,
     ToLower,
     ToUpper,
+    OptToLower,
+    OptToUpper,
+    AnyCase,
     MakeSigma,
     MakeList,
     MakeExcList
