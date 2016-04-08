@@ -546,7 +546,7 @@ struct PmatchFuncall: public PmatchObject {
             for (std::vector<PmatchObject *>::iterator it =
                      evaluated_args.begin(); it != evaluated_args.end();
                  ++it) {
-                delete *it;
+                delete static_cast<PmatchTransducerContainer*>(*it);
             }
             return retval;
         }

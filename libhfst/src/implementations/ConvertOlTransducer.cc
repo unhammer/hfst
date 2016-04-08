@@ -456,6 +456,7 @@ HfstTransducer * ConversionFunctions::hfst_ol_to_hfst_transducer(
 {
     hfst::ImplementationType type = t->is_weighted() ? HFST_OLW_TYPE : HFST_OL_TYPE;
     HfstTransducer * retval = new HfstTransducer(type);
+    delete retval->implementation.hfst_ol;
     retval->implementation.hfst_ol = new hfst_ol::Transducer(*t);
     return retval;
 }
