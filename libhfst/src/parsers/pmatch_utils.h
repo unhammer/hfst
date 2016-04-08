@@ -44,6 +44,7 @@ extern std::map<std::string, PmatchObject*> def_insed_expressions;
 extern std::set<std::string> inserted_names;
 extern std::set<std::string> unsatisfied_insertions;
 extern std::set<std::string> used_definitions;
+extern std::set<std::string> function_names;
 extern ImplementationType format;
 extern bool verbose;
 extern bool flatten;

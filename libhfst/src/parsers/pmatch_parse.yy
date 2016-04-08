@@ -141,14 +141,10 @@ DEFINITION: DEFINE SYMBOL EXPRESSION1 {
      $2->name = "TOP";
  } |
  DEFINE SYMBOL_WITH_LEFT_PAREN ARGLIST RIGHT_PARENTHESIS EXPRESSION1 {
-     if ($3->size() == 0) {
-         $5->name = $2;
-         $$ = new std::pair<std::string, PmatchObject*>($2, $5);
-     } else {
-         PmatchFunction * fun = new PmatchFunction(*$3, $5);
-         fun->name = $2;
-         $$ = new std::pair<std::string, PmatchObject*>(std::string($2), fun);
-     }
+     PmatchFunction * fun = new PmatchFunction(*$3, $5);
+     fun->name = $2;
+     $$ = new std::pair<std::string, PmatchObject*>(std::string($2), fun);
+     function_names.insert($2);
      free($2);
  } |
  DEFINED_LIST SYMBOL EXPRESSION1 {
@@ -447,7 +443,7 @@ SYMBOL COMMA CONCATENATED_STRING_LIST
 FUNCALL: SYMBOL_WITH_LEFT_PAREN FUNCALL_ARGLIST RIGHT_PARENTHESIS
 {
     std::string sym($1);
-    if (!symbol_in_global_context(sym)) {
+    if (function_names.count($1) == 0) {
         std::stringstream ss;
         ss << "Function " << sym << " hasn't been defined\n";
         pmatcherror(ss.str().c_str());

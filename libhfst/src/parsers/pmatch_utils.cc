@@ -70,7 +70,7 @@ std::map<std::string, PmatchObject*> def_insed_expressions;
 std::set<std::string> inserted_names;
 std::set<std::string> unsatisfied_insertions;
 std::set<std::string> used_definitions;
-std::map<std::string, PmatchFunction> functions;
+std::set<std::string> function_names;
 char* startptr;
 hfst::ImplementationType format;
 size_t len;
@@ -714,7 +714,7 @@ void init_globals(void)
     inserted_names.clear();
     unsatisfied_insertions.clear();
     used_definitions.clear();
-    functions.clear();
+    function_names.clear();
     zero_minimization_guard();
     need_delimiters = false;
 }
