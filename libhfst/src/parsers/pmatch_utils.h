@@ -505,6 +505,7 @@ struct PmatchTransducerContainer: public PmatchObject{
     HfstTransducer * t;
     PmatchTransducerContainer(HfstTransducer * target):
         t(target) {}
+    ~PmatchTransducerContainer(void) { delete t; }
     HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer) {
         if (t->get_type() != format) {
             t->convert(format);
@@ -535,9 +536,20 @@ struct PmatchFuncall: public PmatchObject {
                                               fun(function) { }
     HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer)
         {
-            return fun->evaluate(*args);
+            std::vector<PmatchObject * > evaluated_args;
+            for (std::vector<PmatchObject *>::iterator it = args->begin();
+                 it != args->end(); ++it) {
+                evaluated_args.push_back(
+                    new PmatchTransducerContainer((*it)->evaluate()));
+            }
+            HfstTransducer * retval = fun->evaluate(evaluated_args);
+            for (std::vector<PmatchObject *>::iterator it =
+                     evaluated_args.begin(); it != evaluated_args.end();
+                 ++it) {
+                delete *it;
+            }
+            return retval;
         }
-                                                   
 };
 
 struct PmatchBuiltinFunction: public PmatchObject {

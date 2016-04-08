@@ -126,7 +126,7 @@ bool symbol_in_local_context(std::string & sym)
     if (call_stack.size() == 0) {
         return false;
     }
-    return call_stack[call_stack.size() - 1].count(sym) != 0;
+    return call_stack.back().count(sym) != 0;
 }
 
 bool should_use_cache(void)
@@ -146,7 +146,7 @@ PmatchObject * symbol_from_global_context(std::string & sym)
 PmatchObject * symbol_from_local_context(std::string & sym)
 {
     if (symbol_in_local_context(sym)) {
-        return call_stack[call_stack.size() - 1][sym];
+        return call_stack.back()[sym];
     } else {
         return (PmatchObject *) NULL;
     }
@@ -1207,6 +1207,9 @@ HfstTransducer * PmatchFunction::evaluate(std::vector<PmatchObject *> funargs)
         throw std::invalid_argument(errstring.str());
     }
     std::map<std::string, PmatchObject *> local_env;
+    if (call_stack.size() != 0) {
+        local_env = call_stack.back();
+    };
     for (int i = 0; i < args.size(); ++i) {
         local_env[args[i]] = funargs[i];
     }
