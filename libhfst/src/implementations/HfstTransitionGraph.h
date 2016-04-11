@@ -31,6 +31,7 @@
  #include "HfstTransition.h"
  #include "HfstTropicalTransducerTransitionData.h"
 //#include "HfstFastTransitionData.h"
+ #include "../string-utils.h"
 
  #include "../hfstdll.h"
 
@@ -788,22 +789,6 @@
            //  os << 0; 
            //else
            os << weight;
-         }
-
-         /* Replace all strings \a str1 in \a symbol with \a str2. */
-         static void replace_all(std::string & symbol, 
-                                 const std::string &str1,
-                                 const std::string &str2)
-         {
-           size_t pos = symbol.find(str1);
-           while (pos != std::string::npos) // while there are str1:s to replace
-             {
-               symbol.erase(pos, str1.size()); // erase str1
-               symbol.insert(pos, str2);       // insert str2 instead
-               pos = symbol.find               // find next str1
-                 (str1, pos+str2.size());      
-             }
-           return;
          }
 
          static void xfstize(std::string & symbol)

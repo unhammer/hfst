@@ -196,7 +196,9 @@ print_dot(FILE* out, HfstTransducer& t)
                       } // if old label empty
                   } // if weighted
               } // if id pair
-            target_labels[arc->get_target_state()] = l;
+            string sl(l);
+            replace_all(sl, "\"", "\\\"");
+            target_labels[arc->get_target_state()] = sl;
             free(l);
           } // each arc
         for (std::map<HfstState,std::string>::const_iterator tl = target_labels.begin();
@@ -392,7 +394,9 @@ print_dot(std::ostream & out, HfstTransducer& t)
                       } // if old label empty
                   } // if weighted
               } // if id pair
-            target_labels[arc->get_target_state()] = l;
+            string sl(l);
+            replace_all(sl, "\"", "\\\"");
+            target_labels[arc->get_target_state()] = sl;
             free(l);
           } // each arc
         for (std::map<HfstState,std::string>::const_iterator tl = target_labels.begin();

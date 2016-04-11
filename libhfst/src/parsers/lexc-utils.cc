@@ -29,6 +29,7 @@
 
 #include "LexcCompiler.h"
 #include "lexc-utils.h"
+#include "string-utils.h"
 
 #ifdef YACC_USE_PARSER_H_EXTENSION
   #include "lexc-parser.h"
@@ -47,21 +48,6 @@ extern YYLTYPE hlexclloc;
 namespace hfst { namespace lexc {
 
 extern hfst::lexc::LexcCompiler * lexc_;
-
-// string mangling
-static
-string&
-replace_all(string& haystack, const string& needle, const string& replacement)
-  {
-    size_t last_needle = haystack.find(needle);
-    size_t needle_len = needle.length();
-    while (last_needle != string::npos)
-      {
-        haystack.replace(last_needle, needle_len, replacement);
-        last_needle = haystack.find(needle);
-      }
-    return haystack;
-  }
 
 
 string&
