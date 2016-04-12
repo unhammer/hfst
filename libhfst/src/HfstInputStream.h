@@ -191,8 +191,9 @@ For documentation on the HFST binary transducer format, see
       OPENFST_LOG_,
       /* An SFST transducer. */ 
       SFST_, 
-      /* A foma transducer. */ 
-      FOMA_, 
+      /* A foma transducer in unzipped format. 
+         A zipped file is handled by throwing a FileIsInGZFormatException. */ 
+      FOMA_,
       /* An xfsm transducer. */
       XFSM_,
       /* Your transducer type */
