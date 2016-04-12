@@ -586,6 +586,22 @@ namespace hfst
       case '#':  // foma
         return FOMA_;
         break;
+      case (char)0x1f:  // native foma (gz magic number is 1F 8B 08)
+        {
+          char c0 = (char)stream_get();
+          if (stream_eof()) { HFST_THROW(EndOfStreamException); }
+          char c1 = (char)stream_get();
+          if (stream_eof()) { HFST_THROW(EndOfStreamException); }
+          char c2 = (char)stream_get();
+          if (stream_eof()) { HFST_THROW(EndOfStreamException); }
+          stream_unget(c2);
+          stream_unget(c1);
+          stream_unget(c0);
+          if (c0 == (char)0x1f && c1 == (char)0x8b && c2 == (char)0x08)
+            HFST_THROW(FileIsInGZFormatException);
+          else
+            HFST_THROW(NotTransducerStreamException);
+        }
       case 'a':  // SFST
         return SFST_;
         break;
@@ -927,15 +943,10 @@ namespace hfst
     bytes_to_skip(0), filename(std::string()), has_hfst_header(false),
     hfst_version_2_weighted_transducer(false)
   {
-    try { 
-      input_stream = &std::cin;
-      if (stream_eof())
-        HFST_THROW(EndOfStreamException);
-      type = stream_fst_type();
-    }
-
-    catch (const HfstException e)
-    { throw e; }
+    input_stream = &std::cin;
+    if (stream_eof())
+      HFST_THROW(EndOfStreamException);
+    type = stream_fst_type();
 
     if ( ! HfstTransducer::is_implementation_type_available(type)) {
       HFST_THROW(ImplementationTypeNotAvailableException);

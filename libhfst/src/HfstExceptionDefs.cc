@@ -49,6 +49,8 @@ HFST_EXCEPTION_CHILD_DEFINITION(HfstTransducerTypeMismatchException);
 
 HFST_EXCEPTION_CHILD_DEFINITION(ImplementationTypeNotAvailableException);
 
+HFST_EXCEPTION_CHILD_DEFINITION(FileIsInGZFormatException);
+
 HFST_EXCEPTION_CHILD_DEFINITION(FunctionNotImplementedException);
 
 HFST_EXCEPTION_CHILD_DEFINITION(StreamNotReadableException);
