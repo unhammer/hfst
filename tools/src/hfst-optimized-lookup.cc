@@ -48,6 +48,9 @@ bool print_usage(void)
     "\n" <<
     "Usage: " << PACKAGE_NAME << " [OPTIONS] TRANSDUCER\n" <<
     "Run a transducer on standard input (one word per line) and print analyses\n" <<
+    "NOTE: hfst-optimized-lookup does lookup from right to left as opposed to xfst\n" <<
+    "      and foma lookup which is carried out from left to right. In order to do\n" <<
+    "      lookup in a similar way as xfst and foma, invert the transducer first.\n" <<
     "\n" <<
     "  -h, --help                  Print this help message\n" <<
     "  -V, --version               Print version information\n" <<

@@ -100,6 +100,9 @@ static size_t linen = 0;
 static bool lookup_given = false;
 static size_t infinite_cutoff = 5;
 static float beam=-1;
+static bool invert = false;
+static bool force_ol = false; // accept also ol transducers when -R is not specified
+                              // inverting is slow then
 
 // symbols actually seen in (non-ol) transducers
 static std::vector<std::set<std::string> > cascade_symbols_seen;
@@ -229,10 +232,8 @@ print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
-           "perform transducer lookup (apply)\n"
-           "NOTE: hfst-lookup does lookup from right to left as opposed to xfst and foma\n"
-           "      lookup which is carried out from left to right. In order to do lookup\n"
-           "      in a similar way as xfst and foma, use 'hfst-flookup' instead.\n"
+           "Perform transducer lookup (apply). Lookup is done from right to left,\n"
+           "in the same way as in flookup of foma and lookup of xfst.\n"
         "\n", program_name);
 
     print_common_program_options(message_out);
@@ -243,6 +244,7 @@ print_usage()
         "  -p, --pipe-mode[=STREAM] Control input and output streams\n");
 
     fprintf(message_out, "Lookup options:\n"
+            "  -R, --invert                     Do lookdown instead of lookup\n"
             "  -I, --input-strings=SFILE        Read lookup strings from SFILE\n"
             "  -O, --output-format=OFORMAT      Use OFORMAT printing results sets\n"
             "  -e, --epsilon-format=EPS         Print epsilon as EPS\n"
@@ -254,7 +256,8 @@ print_usage()
             "                                   the best analysis\n"
             "  -t, --time-cutoff=S              Limit search after having used S seconds per input\n"
             "                                   (currently only works in optimized-lookup mode\n"
-            "  -P, --progress                   Show neat progress bar if possible\n");
+            "  -P, --progress                   Show neat progress bar if possible\n"
+            "  -f, --force-ol                   Force lookup of optimized lookup transducers (slow)\n");
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
     fprintf(message_out, 
@@ -284,16 +287,18 @@ print_usage()
 #endif
     fprintf(message_out, "\n");
 
-    fprintf(message_out, 
+/*    fprintf(message_out, 
             "Todo:\n"
             "  For optimized lookup format, only strings that pass "
             "flag diacritic checks\n"
             "  are printed and flag diacritic symbols are not printed.\n"
-            "  Support VARIABLE 'print-space' for optimized lookup format\n");
+            "  Support VARIABLE 'print-space' for optimized lookup format\n");*/
     fprintf(message_out,
-            "\n"
+            /*"\n"*/
             "Known bugs:\n"
-            "  'quote-special' quotes spaces that come from 'print-space'\n");
+            "  * 'quote-special' quotes spaces that come from 'print-space'\n"
+            "  * optimized lookup transducers are unidirectional and only support lookdown,\n"
+            "    --force-ol forces inversion but is slow\n");
 
     fprintf(message_out, "\n");
     print_report_bugs();
@@ -325,12 +330,14 @@ parse_options(int argc, char** argv)
             {"time-cutoff", required_argument, 0, 't'},
             {"pipe-mode", optional_argument, 0, 'p'},
             {"progress", no_argument, 0, 'P'},
+            {"invert", no_argument, 0, 'R'},
+            {"force-ol", no_argument, 0, 'f'},
             {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "I:O:F:xc:X:e:E:b:t:p::P",
+                             HFST_GETOPT_UNARY_SHORT "I:O:F:xc:X:e:E:b:t:p::PRf",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -342,6 +349,9 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-unary.h"
           // add tool-specific cases here
+        case 'R':
+            invert = true;
+            break;
         case 'I':
             lookup_file_name = hfst_strdup(optarg);
             lookup_file = hfst_fopen(lookup_file_name, "r");
@@ -463,6 +473,9 @@ parse_options(int argc, char** argv)
         case 'P':
             show_progress_bar = true;
             break;
+        case 'f':
+          force_ol = true;
+          break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -1115,6 +1128,7 @@ line_to_lookup_path(char** s, hfst::HfstStrings2FstTokenizer& tok,
     return rv;
 }
 
+// HERE
 HfstOneLevelPaths*
 lookup_simple(const HfstOneLevelPath& s, HfstTransducer& t, bool* infinity)
 {
@@ -1298,7 +1312,7 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
   results = filtered;
 }
 
-
+// HERE
 HfstOneLevelPaths*
 lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity)
 {
@@ -1527,6 +1541,20 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
           {
             only_optimized_lookup = false;
           }
+        else
+          {
+            if ((! invert))
+              {
+                if (! force_ol)
+                  {
+                    error(EXIT_FAILURE, 0, "lookup not supported for "
+                          "optimized lookup transducers: convert to openfst format,\n"
+                          "invert, and convert back to optimized lookup format "
+                          "or specify --force-ol\n");
+                  }
+              }
+          }
+
         char* inputname = strdup(trans.get_name().c_str());
         if (strlen(inputname) <= 0)
           {
@@ -1540,6 +1568,18 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
           {
             verbose_printf("Reading %s..." SIZE_T_SPECIFIER "\n", inputname,
                            transducer_n); 
+          }
+
+        if (! invert)
+          {
+            if (type != HFST_OL_TYPE && type != HFST_OLW_TYPE)
+              { trans.invert(); }
+            else
+              {
+                trans.convert(hfst::TROPICAL_OPENFST_TYPE);
+                trans.invert();
+                trans.convert(type);
+              }
           }
 
         // add multicharacter symbols to mc_symbols
@@ -1730,7 +1770,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
 
 int main( int argc, char **argv ) {
     hfst_setlocale();
-    hfst_set_program_name(argv[0], "0.6", "HfstLookup");
+    hfst_set_program_name(argv[0], "0.6", "HfstFlookup");
 
     int retval = parse_options(argc, argv);
     if (retval != EXIT_CONTINUE)

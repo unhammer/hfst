@@ -323,6 +323,12 @@ AC_ARG_ENABLE([lookup],
 			  [enable_lookup=$enableval],
 			  [if test x$enable_no_tools != xno; then enable_lookup=no; else enable_lookup=yes; fi])
 AM_CONDITIONAL([WANT_LOOKUP], [test x$enable_lookup != xno])
+AC_ARG_ENABLE([flookup],
+			  [AS_HELP_STRING([--enable-flookup],
+							  [build flookup tool @<:@default=yes@:>@])],
+			  [enable_flookup=$enableval],
+			  [if test x$enable_no_tools != xno; then enable_flookup=no; else enable_flookup=yes; fi])
+AM_CONDITIONAL([WANT_FLOOKUP], [test x$enable_flookup != xno])
 AC_ARG_ENABLE([pair-test],
 			  [AS_HELP_STRING([--enable-pair-test],
 							  [build pair-test tool @<:@default=yes@:>@])],
