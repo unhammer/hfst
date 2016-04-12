@@ -1,3 +1,7 @@
+import sys
+sys.path.insert(1, '/home/eaxelson/hfst-git/hfst/python/')
+
+
 # The examples given in doxygen documentation
 
 import libhfst
@@ -215,10 +219,15 @@ transducer1.reverse()
 transducer1.disjunct(transducer2)
 if not transducer2.compare(libhfst.regex('FOO:BAR BAZ')):
     raise RuntimeError('')
-transducer1.reverse().determinize().reverse().determinize()
+transducer1.reverse()
+transducer1.determinize()
+transducer1.reverse()
+transducer1.determinize()
 # implementation types
-tropical_transducer = libhfst.regex('foo').convert(libhfst.TROPICAL_OPENFST_TYPE)
-foma_transducer = libhfst.regex('foo').convert(libhfst.FOMA_TYPE)
+tropical_transducer = libhfst.regex('foo')
+tropical_transducer.convert(libhfst.TROPICAL_OPENFST_TYPE)
+foma_transducer = libhfst.regex('foo')
+foma_transducer.convert(libhfst.FOMA_TYPE)
 # TODO: segfaults
 try:
     tropical_transducer.compare(foma_transducer)
@@ -356,7 +365,8 @@ words.disjunct(t)
 rule = libhfst.regex('bar (->) baz || foo _ foo')
 
 # Apply the rule transducer to the lexicon.
-words.compose(rule).minimize()
+words.compose(rule)
+words.minimize()
 
 # Extract all string pairs from the result and print them to standard output.
 results = 0

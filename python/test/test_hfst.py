@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(1, '/home/eaxelson/hfst-git/hfst/python/')
+
 import libhfst
 import os.path
 from inspect import currentframe
@@ -82,8 +85,10 @@ for type in (libhfst.TROPICAL_OPENFST_TYPE, libhfst.FOMA_TYPE):
 
     # Read lexc
     tr = libhfst.compile_lexc_file('test.lexc')
-    tr.insert_freely(tr1).minimize()
-    tr.insert_freely(('A','B')).minimize()
+    tr.insert_freely(tr1)
+    tr.minimize()
+    tr.insert_freely(('A','B'))
+    tr.minimize()
 
     # Substitute
     tr = libhfst.regex('a a:b b;')
@@ -214,7 +219,9 @@ for type in (libhfst.TROPICAL_OPENFST_TYPE, libhfst.FOMA_TYPE):
     print(tr.extract_paths(obey_flags='True', filter_flags='False', max_number=3, output='dict'))
 
     def test_fst(input, result):
-        if not libhfst.fst(input).compare(libhfst.regex(result)):
+        tr1_ = libhfst.fst(input)
+        tr2_ = libhfst.regex(result)
+        if not tr1_.compare(tr2_):
             raise RuntimeError('test_fst failed with input: ' + input)
 
     # Create automaton:
@@ -415,8 +422,10 @@ if not (FSM.compare(FSM2)):
     raise RuntimeError(get_linenumber())
 
 for type in (libhfst.TROPICAL_OPENFST_TYPE, libhfst.FOMA_TYPE):
-    Fsm = libhfst.HfstBasicTransducer(FSM.convert(type))
-    Fsm2 = libhfst.HfstBasicTransducer(FSM2.convert(type))
+    FSM.convert(type)
+    Fsm = libhfst.HfstBasicTransducer(FSM)
+    FSM2.convert(type)
+    Fsm2 = libhfst.HfstBasicTransducer(FSM2)
 
 
 # Print basic transducer
