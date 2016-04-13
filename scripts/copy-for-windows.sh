@@ -237,7 +237,7 @@ for file in \
 hfst-program-options hfst-commandline hfst-tool-metadata \
 hfst-file-to-mem hfst-getopt \
 hfst-lexc-compiler hfst-compare hfst-strings2fst hfst-txt2fst hfst-pmatch hfst-pmatch2fst \
-hfst-lookup hfst-optimized-lookup;
+hfst-lookup hfst-optimized-lookup hfst-flookup;
 do
     cp tools/src/$file.cc $1/tools/src/$file.cpp
 done
