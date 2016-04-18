@@ -125,7 +125,9 @@ PMATCH: //empty
  };
 
 DEFINITION: DEFINE SYMBOL EXPRESSION1 {
-    $$ = new std::pair<std::string, PmatchObject*>($2, $3);
+    PmatchObject * tmp = new PmatchTransducerContainer($3->evaluate());
+    delete $3;
+    $$ = new std::pair<std::string, PmatchObject*>($2, tmp);
     $3->name = $2;
     free($2);
  } |
