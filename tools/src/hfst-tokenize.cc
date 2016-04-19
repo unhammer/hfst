@@ -457,45 +457,9 @@ int parse_options(int argc, char** argv)
     return EXIT_FAILURE;
 }
 
-bool first_transducer_is_called_TOP(std::istream & f)
+bool first_transducer_is_called_TOP(const HfstTransducer & dictionary)
 {
-    const char* header1 = "HFST";
-    unsigned int header_loc = 0;
-    int c;
-    while(header_loc < strlen(header1) + 1) {
-        c = f.get();
-        ++header_loc;
-        if(c != header1[header_loc]) {
-            return false;
-        }
-    }
-    if(header_loc == strlen(header1) + 1) {
-        unsigned short remaining_header_len;
-        f.read((char*) &remaining_header_len, sizeof(remaining_header_len));
-        if (f.get() != '\0') {
-            return false;
-        }
-        char * headervalue = new char[remaining_header_len];
-        f.read(headervalue, remaining_header_len);
-        if (headervalue[remaining_header_len - 1] != '\0') {
-            delete[] headervalue;
-            return false;
-        }
-        int i = 0;
-        while (i < remaining_header_len) {
-            if (strcmp(headervalue + i, "name") == 0) {
-                bool retval = strcmp(headervalue + i + strlen("name") + 1, "TOP") == 0;
-                delete[] headervalue;
-                return retval;
-            }
-            while (headervalue[i] != '\0') {
-                ++i;
-            }
-            ++i;
-        }
-        delete[] headervalue;
-    }
-    return false;
+    return dictionary.get_name() == "TOP";
 }
 
 int main(int argc, char ** argv)
@@ -513,7 +477,9 @@ int main(int argc, char ** argv)
         return EXIT_FAILURE;
     }
     try {
-        if (first_transducer_is_called_TOP(instream)) {
+        hfst::HfstInputStream is(tokenizer_filename);
+        HfstTransducer dictionary(is);
+        if (first_transducer_is_called_TOP(dictionary)) {
             instream.seekg(0);
             instream.clear();
             hfst_ol::PmatchContainer container(instream);
@@ -522,8 +488,6 @@ int main(int argc, char ** argv)
             return process_input(container, std::cout);
         } else {
             instream.close();
-            hfst::HfstInputStream is(tokenizer_filename);
-            HfstTransducer dictionary(is);
             hfst_ol::PmatchContainer container = make_naive_tokenizer(dictionary);
             container.set_verbose(verbose);
             container.set_single_codepoint_tokenization(!tokenize_multichar);
