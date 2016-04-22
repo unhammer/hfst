@@ -1003,7 +1003,8 @@ static size_t io_get_gz_file_size(char *filename) {
     /* The last four bytes in a .gz file shows the size of the uncompressed data */
     infile = fopen(filename, "r");
     fseek(infile, -4, SEEK_END);
-    fread(&bytes, 1, 4, infile);
+    if (fread(&bytes, 1, 4, infile) != 4) // value of fread was not checked in foma, this is an HFST addition
+      return -1;
     fclose(infile);
     for (i = 0 ; i < 4 ; i++) {
         ints[i] = bytes[i];
