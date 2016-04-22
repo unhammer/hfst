@@ -767,7 +767,7 @@ struct fsm *io_net_read(struct io_buf_handle *iobh, char **net_name) {
 #ifdef ORIGINAL
     sscanf(buf, "%i %i %i %i %i %lld %i %i %i %i %i %i %s", &net->arity, &net->arccount, &net->statecount, &net->linecount, &net->finalcount, &net->pathcount, &net->is_deterministic, &net->is_pruned, &net->is_minimized, &net->is_epsilon_free, &net->is_loop_free, &extras, buf);
 #else
-    sscanf(buf, "%i %i %i %i %i LONG_LONG_SPECIFIER %i %i %i %i %i %i %s", &net->arity, &net->arccount, &net->statecount, &net->linecount, &net->finalcount, &net->pathcount, &net->is_deterministic, &net->is_pruned, &net->is_minimized, &net->is_epsilon_free, &net->is_loop_free, &extras, buf);
+    sscanf(buf, "%i %i %i %i %i "LONG_LONG_SPECIFIER" %i %i %i %i %i %i %s", &net->arity, &net->arccount, &net->statecount, &net->linecount, &net->finalcount, &net->pathcount, &net->is_deterministic, &net->is_pruned, &net->is_minimized, &net->is_epsilon_free, &net->is_loop_free, &extras, buf);
 #endif
     strcpy(net->name, buf);
     *net_name = xxstrdup(buf);
@@ -917,7 +917,7 @@ int foma_net_print(struct fsm *net, gzFile outfile) {
 	     "%i %i %i %i %i %lld %i %i %i %i %i %i %s\n", net->arity, net->arccount, net->statecount, net->linecount, net->finalcount, net->pathcount, net->is_deterministic, net->is_pruned, net->is_minimized, net->is_epsilon_free, net->is_loop_free, extras, net->name);
 #else
     gzprintf(outfile, 
-	     "%i %i %i %i %i LONG_LONG_SPECIFIER %i %i %i %i %i %i %s\n", net->arity, net->arccount, net->statecount, net->linecount, net->finalcount, net->pathcount, net->is_deterministic, net->is_pruned, net->is_minimized, net->is_epsilon_free, net->is_loop_free, extras, net->name);
+	     "%i %i %i %i %i "LONG_LONG_SPECIFIER" %i %i %i %i %i %i %s\n", net->arity, net->arccount, net->statecount, net->linecount, net->finalcount, net->pathcount, net->is_deterministic, net->is_pruned, net->is_minimized, net->is_epsilon_free, net->is_loop_free, extras, net->name);
 #endif
     
     /* Sigma */
