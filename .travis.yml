@@ -27,5 +27,7 @@ before_install:
 script:
     - ./autogen.sh
     - ./configure --enable-xfst --enable-proc --without-foma --enable-lexc --enable-all-tools
-    - make -j
+    - if [[ $CXX = g++ ]]; then make -j2; else make -j; fi
     - make check
+
+# g++ with -j runs out of memory on travis, thus -j2
