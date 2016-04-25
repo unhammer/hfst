@@ -127,42 +127,42 @@ HFST_TWOLC_TESTS=string_manipulation InputReader Alphabet \
 check_PROGRAMS=$(HFST_TWOLC_TESTS)
 
 string_manipulation_SOURCES=$(STRING_SRC)/string_manipulation.cc
-string_manipulation_CXXFLAGS=-DSTRING_MANIPULATION_TEST
+string_manipulation_CXXFLAGS=-DSTRING_MANIPULATION_TEST -Wno-deprecated
 
 InputReader_SOURCES=$(IO_SRC)/InputReader.cc
-InputReader_CXXFLAGS=-DINPUT_READER_TEST
+InputReader_CXXFLAGS=-DINPUT_READER_TEST -Wno-deprecated
 
 Alphabet_SOURCES=$(ALPHABET_SRC)/Alphabet.cc \
                  $(RULE_SRC)/OtherSymbolTransducer.cc
-Alphabet_CXXFLAGS=-DTEST_ALPHABET
+Alphabet_CXXFLAGS=-DTEST_ALPHABET -Wno-deprecated
 
 OtherSymbolTransducer_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc
-OtherSymbolTransducer_CXXFLAGS=-DTEST_OTHER_SYMBOL_TRANSDUCER
+OtherSymbolTransducer_CXXFLAGS=-DTEST_OTHER_SYMBOL_TRANSDUCER -Wno-deprecated
 
 Rule_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc $(RULE_SRC)/Rule.cc \
              $(STRING_SRC)/string_manipulation.cc
-Rule_CXXFLAGS=-DTEST_RULE
+Rule_CXXFLAGS=-DTEST_RULE -Wno-deprecated
 
 LeftArrowRule_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
                       $(STRING_SRC)/string_manipulation.cc \
                       $(RULE_SRC)/Rule.cc $(RULE_SRC)/LeftArrowRule.cc	
-LeftArrowRule_CXXFLAGS=-DTEST_LEFT_ARROW_RULE
+LeftArrowRule_CXXFLAGS=-DTEST_LEFT_ARROW_RULE -Wno-deprecated
 
 LeftRestrictionArrowRule_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
                       $(STRING_SRC)/string_manipulation.cc \
                       $(RULE_SRC)/Rule.cc $(RULE_SRC)/LeftArrowRule.cc \
                       $(RULE_SRC)/LeftRestrictionArrowRule.cc
-LeftRestrictionArrowRule_CXXFLAGS=-DTEST_LEFT_RESTRICTION_ARROW_RULE
+LeftRestrictionArrowRule_CXXFLAGS=-DTEST_LEFT_RESTRICTION_ARROW_RULE -Wno-deprecated
 
 RightArrowRule_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
                        $(STRING_SRC)/string_manipulation.cc \
                        $(RULE_SRC)/Rule.cc $(RULE_SRC)/RightArrowRule.cc
-RightArrowRule_CXXFLAGS=-DTEST_RIGHT_ARROW_RULE
+RightArrowRule_CXXFLAGS=-DTEST_RIGHT_ARROW_RULE -Wno-deprecated
 
 RuleContainer_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
                       $(RULE_SRC)/Rule.cc $(RULE_SRC)/RuleContainer.cc \
                       $(STRING_SRC)/string_manipulation.cc
-RuleContainer_CXXFLAGS=-DTEST_RULE_CONTAINER
+RuleContainer_CXXFLAGS=-DTEST_RULE_CONTAINER -Wno-deprecated
 
 LeftArrowRuleContainer_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
                                $(RULE_SRC)/Rule.cc \
@@ -172,7 +172,7 @@ LeftArrowRuleContainer_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
                                $(RULE_SRC)/LeftArrowRuleContainer.cc \
                                $(RULE_SRC)/LeftArrowRule.cc
 
-LeftArrowRuleContainer_CXXFLAGS=-DTEST_LEFT_ARROW_RULE_CONTAINER
+LeftArrowRuleContainer_CXXFLAGS=-DTEST_LEFT_ARROW_RULE_CONTAINER -Wno-deprecated
 
 RightArrowRuleContainer_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
                                 $(RULE_SRC)/Rule.cc \
@@ -181,7 +181,7 @@ RightArrowRuleContainer_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
                                 $(RULE_SRC)/ConflictResolvingRightArrowRule.cc\
                                 $(RULE_SRC)/RightArrowRuleContainer.cc \
                                 $(RULE_SRC)/RightArrowRule.cc
-RightArrowRuleContainer_CXXFLAGS=-DTEST_RIGHT_ARROW_RULE_CONTAINER
+RightArrowRuleContainer_CXXFLAGS=-DTEST_RIGHT_ARROW_RULE_CONTAINER -Wno-deprecated
 
 ConflictResolvingLeftArrowRule_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
                                         $(RULE_SRC)/Rule.cc \
@@ -190,7 +190,7 @@ ConflictResolvingLeftArrowRule_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
                                 $(RULE_SRC)/ConflictResolvingLeftArrowRule.cc\
                                         $(RULE_SRC)/LeftArrowRule.cc
 ConflictResolvingLeftArrowRule_CXXFLAGS=\
--DTEST_CONFLICT_RESOLVING_LEFT_ARROW_RULE
+-DTEST_CONFLICT_RESOLVING_LEFT_ARROW_RULE -Wno-deprecated
 
 ConflictResolvingRightArrowRule_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
                                         $(RULE_SRC)/Rule.cc \
@@ -199,7 +199,7 @@ ConflictResolvingRightArrowRule_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
                                 $(RULE_SRC)/ConflictResolvingRightArrowRule.cc\
                                         $(RULE_SRC)/RightArrowRule.cc
 ConflictResolvingRightArrowRule_CXXFLAGS=\
--DTEST_CONFLICT_RESOLVING_RIGHT_ARROW_RULE
+-DTEST_CONFLICT_RESOLVING_RIGHT_ARROW_RULE -Wno-deprecated
 
 TwolCGrammar_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
                      $(RULE_SRC)/Rule.cc $(RULE_SRC)/RuleContainer.cc \
@@ -213,7 +213,7 @@ TwolCGrammar_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
                      $(RULE_SRC)/TwolCGrammar.cc \
                      $(RULE_SRC)/LeftRestrictionArrowRule.cc \
                      $(ALPHABET_SRC)/Alphabet.cc
-TwolCGrammar_CXXFLAGS=-DTEST_TWOL_C_GRAMMAR
+TwolCGrammar_CXXFLAGS=-DTEST_TWOL_C_GRAMMAR -Wno-deprecated
 
 TESTS=$(HFST_TWOLC_TESTS)
 
