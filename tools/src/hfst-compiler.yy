@@ -468,14 +468,21 @@ int main( int argc, char *argv[] )
   hfst::set_unknown_symbols_in_use(false);
   compiler = new HfstCompiler(output_format, Verbose);
 
+  char * strarg = NULL;
   try {
     yyparse();
     fclose(inputfile);
       try {
         if (strcmp(outfilename,"<stdout>") == 0)
-          compiler->write_to_file(Result, NULL, "");
+        {
+          strarg = strdup("");
+          compiler->write_to_file(Result, NULL, strarg);
+        }
 	else
-          compiler->write_to_file(Result, NULL, strdup(outfilename));
+        {
+          strarg = strdup(outfilename);
+          compiler->write_to_file(Result, NULL, strarg);
+        }
       } catch (HfstException e) {
           printf("\nAn error happened when writing to file \"%s\"\n", outfilename); }
     //printf("type is: %i\n", Result->get_type());
@@ -485,10 +492,12 @@ int main( int argc, char *argv[] )
   }
   catch(const char* p) {
       cerr << "\n" << p << "\n\n";
+      if (strarg != NULL) { free(strarg); }
       exit(1);
   }
   if (NULL != folder)
     free(folder);
 
+  if (strarg != NULL) { free(strarg); }
   exit(0);
 }

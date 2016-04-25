@@ -304,7 +304,8 @@ namespace SFST {
 
   {
     size_t n,m;
-    fread(&n, sizeof(n), 1, file);
+    if (fread(&n, sizeof(n), 1, file) != 1) // HFST addition: checking return value of fread
+      throw "read_probs: fread failed";
     if (fread(&m, sizeof(n), 1, file) != 1 ||
         n != node_count() || m != arc_count())
       {
@@ -313,7 +314,8 @@ namespace SFST {
       }
     final_logprob = new float[n];
     arc_logprob = new float[m];
-    fread(final_logprob, sizeof(float), n, file);
+    if (fread(final_logprob, sizeof(float), n, file) != n) // HFST addition: checking return value of fread
+      throw "read_probs: fread failed";
     if (fread(arc_logprob, sizeof(float), n, file) != n) {
       fprintf(stderr,"Error: in probability file!\n");
       exit(1);

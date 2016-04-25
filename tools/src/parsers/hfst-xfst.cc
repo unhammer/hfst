@@ -275,7 +275,7 @@ static int smatch;
 // By Mans Hulden
 char *my_generator(const char *text, int state) {
   static int list_index, list_index2, len, nummatches;
-  char *name;
+  const char *name;
   text = rl_line_buffer;
   if (!state) {
     list_index = 0;
@@ -554,7 +554,6 @@ int main(int argc, char** argv)
       return EXIT_FAILURE;
 #endif
     }
-
   return EXIT_SUCCESS;
 }
 
