@@ -31,8 +31,8 @@ TokenizationApplicator::process_token(const Token& t) const
     s << "Reserved char: '" << t.character << "'";
   else if(t.type == None)
     s << "None/EOF";
-  
-  s << " (to_symbol: " << token_stream.to_symbol(t) << ")" 
+
+  s << " (to_symbol: " << token_stream.to_symbol(t) << ")"
     << " (alphabetic: " << token_stream.is_alphabetic(t) << ")";
   if(t.type == Symbol)
   {
@@ -84,7 +84,7 @@ AnalysisApplicator::apply()
   size_t last_stream_location = 0;
   TokenVector surface_form;
   ProcResult analyzed_forms;
-  
+
   Token next_token;
   while((next_token = token_stream.get_token()).type != None)
   {
@@ -101,13 +101,13 @@ AnalysisApplicator::apply()
     }
     if(next_token.type == ReservedCharacter)
       stream_error(std::string("Found unexpected character ")+next_token.character+" unescaped in stream");
-    
+
         if(surface_form.size() > 0 && state.is_final())
         {
           LookupPathSet finals = state.get_finals_set();
       if (caps_mode == DictionaryCase || caps_mode == CaseSensitiveDictionaryCase)
         {
-              analyzed_forms = formatter.process_finals(finals, 
+              analyzed_forms = formatter.process_finals(finals,
                                                         Unknown);
         }
       else
@@ -116,16 +116,16 @@ AnalysisApplicator::apply()
                                                                                 token_stream.get_capitalization_state(surface_form));
         }
           last_stream_location = token_stream.get_pos()-1;
-          
+
           if(printDebuggingInformationFlag)
             std::cout << "Final paths (" << finals.size() << ") found and saved, stream location is " << last_stream_location << std::endl;
         }
-        
+
         state.step(token_stream.to_symbol(next_token), caps_mode);
-    
+
     if(printDebuggingInformationFlag)
       std::cout << "After stepping, there are " << state.num_active() << " active paths" << std::endl;
-    
+
     if(state.is_active())
     {
       surface_form.push_back(next_token);
@@ -137,7 +137,7 @@ AnalysisApplicator::apply()
         if(formatter.preserve_nonalphabetic())
           token_stream << next_token;
       }
-      else if(analyzed_forms.size() == 0 || 
+      else if(analyzed_forms.size() == 0 ||
               (token_stream.is_alphabetic(token_stream.at(last_stream_location)) &&
                token_stream.is_alphabetic(surface_form[surface_form.size()-1])))
       {
@@ -155,7 +155,7 @@ AnalysisApplicator::apply()
           // we overstepped the word by one token
           token_stream.move_back(1);
         }
-        
+
         if(!token_stream.is_alphabetic(surface_form[0]))
         {
           if(formatter.preserve_nonalphabetic())
@@ -167,14 +167,14 @@ AnalysisApplicator::apply()
           //size_t word_length = token_stream.first_nonalphabetic(surface_form);
           //if(word_length == string::npos)
           size_t word_length = surface_form.size();
-          
+
           int revert_count = surface_form.size()-word_length+
                          next_token_is_part_of_word ? 0 : 1;
-          
+
           if(printDebuggingInformationFlag)
-            std::cout << "word_length=" << word_length << ", surface_form.size()=" << surface_form.size() 
+            std::cout << "word_length=" << word_length << ", surface_form.size()=" << surface_form.size()
                       << ", moving back " << revert_count << " characters" << std::endl;
-          
+
           formatter.print_unknown_word(TokenVector(surface_form.begin(),
                                                 surface_form.begin()+word_length));
           token_stream.move_back(revert_count);
@@ -185,21 +185,21 @@ AnalysisApplicator::apply()
         // the number of symbols on the end of surface_form that aren't a part
         // of the transduction(s) found
         int revert_count = token_stream.diff_prev(last_stream_location+1);
-        formatter.print_word(TokenVector(surface_form.begin(), 
+        formatter.print_word(TokenVector(surface_form.begin(),
                                                 surface_form.end()-revert_count),
-                                   analyzed_forms); 
+                                   analyzed_forms);
         token_stream.move_back(revert_count+1);
       }
-      
+
       state.reset();
       surface_form.clear();
       analyzed_forms.clear();
     }
   }
-  
+
   if(verboseFlag)
     std::cout << std::endl << "Got None/EOF symbol; done." << std::endl;
-  
+
   // print any valid transductions stored
   if(analyzed_forms.size() != 0)// && token_stream.get_pos() == last_stream_location)
     formatter.print_word(surface_form, analyzed_forms);
@@ -237,16 +237,16 @@ GenerationApplicator::apply()
           else
             form.push_back(next_token);
         }
-        
+
         //Figure out how to output the word
-        
+
         if(prefix_char == '*' || prefix_char == '@') // the word is unanalyzed (*) or untranslated (@)
         {
           if(mode != gm_clean)
             token_stream.write_escaped(std::string(1,prefix_char));
-          
+
           std::string word = token_stream.read_delimited('$');
-          
+
           if(prefix_char == '*' || (prefix_char == '@' && mode != gm_all))
           {
             size_t loc = word.find('<');
@@ -262,7 +262,7 @@ GenerationApplicator::apply()
         else
         {
           // first try unsplit
-          
+
           if(!lookup(form, false))
             {
               std::vector<TokenVector> parts = split(form);
@@ -272,7 +272,7 @@ GenerationApplicator::apply()
                   lookup(*it, true);
                 }
             }
-          
+
           if(prefix_char == '#') // if there is an invariant part remaining
           {
             std::string invariant = token_stream.read_delimited('$');
@@ -307,7 +307,7 @@ GenerationApplicator::split(const TokenVector& tokens) const
   }
   if(start != tokens.end())
     res.push_back(TokenVector(start, tokens.end()));
-  
+
   return res;
 }
 
@@ -318,16 +318,21 @@ GenerationApplicator::lookup(const TokenVector& tokens, bool generate_on_fail)
   state.lookup(token_stream.to_symbols(tokens), caps_mode);
   if(state.is_final()) // generation succeeded
   {
-    CapitalizationState capitalization_state = 
-      caps_mode==DictionaryCase ?
-        Unknown :
-        token_stream.get_capitalization_state(TokenVector(tokens.begin(),tokens.size()>1?tokens.begin()+2:tokens.end()));
     LookupPathSet finals = state.get_finals_set();
-    
+    CapitalizationState caps_change = Unknown;
+    if(caps_mode!=DictionaryCase) {
+        CapitalizationState lm_caps_state = token_stream.get_capitalization_state((*finals.begin())->get_output_symbols());
+        CapitalizationState sf_caps_state = token_stream.get_capitalization_state(TokenVector(tokens.begin(),tokens.size()>1?tokens.begin()+2:tokens.end()));
+        if(sf_caps_state != lm_caps_state) {
+            // We *only* change capitalization if lm and sf caps state differs
+            caps_change = sf_caps_state;
+        }
+    }
+
     if(printDebuggingInformationFlag)
             std::cout << "Generated " << finals.size() << " forms" << std::endl;
-    
-    token_stream.put_symbols((*finals.begin())->get_output_symbols(),capitalization_state);
+
+    token_stream.put_symbols((*finals.begin())->get_output_symbols(),caps_change);
     if(finals.size() > 1)
     {
       LookupPathSet::const_iterator it=finals.begin();
@@ -335,7 +340,7 @@ GenerationApplicator::lookup(const TokenVector& tokens, bool generate_on_fail)
       for(;it!=finals.end();it++)
       {
         token_stream.ostream() << '/';
-        token_stream.put_symbols((*it)->get_output_symbols(),capitalization_state);
+        token_stream.put_symbols((*it)->get_output_symbols(),caps_change);
       }
     }
     return true;
@@ -366,4 +371,3 @@ GenerationApplicator::lookup(const TokenVector& tokens, bool generate_on_fail)
     }
   return false;
 }
-
