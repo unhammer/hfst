@@ -157,7 +157,7 @@ EXTRA_DIST=test.sh \
 	replace_test_51.xfst replace_test_51.output \
 	replace_test_52.xfst replace_test_52.output \
 	replace_test_53.xfst replace_test_53.output \
-	replace_test_flags_1.xfst replace_test_flags_1.output \
+	replace_test_flags_1.xfst replace_test_flags_1.att \
 	weighted_parallel_rules_1.xfst weighted_parallel_rules_1.output \
 	weighted_parallel_rules_2.xfst weighted_parallel_rules_2.output \
 	weighted_parallel_rules_3.xfst weighted_parallel_rules_3.output \
