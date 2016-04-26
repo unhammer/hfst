@@ -230,10 +230,23 @@ PmatchContainer::PmatchContainer(std::istream & inputstream):
     entry_stack()
 {
     std::string transducer_name;
-    transducer_name = parse_name_from_hfst3_header(inputstream);
-    // the first transducer should be called eg. "TOP", this could be tested
-    // for once more established
-
+    std::map<std::string, std::string> properties = parse_hfst3_header(inputstream);
+    if (properties.count("name") == 0) {
+        std::cerr << "pmatch: warning: TOP not defined in archive, using first as TOP\n";
+        transducer_name = "TOP";
+    } else {
+        transducer_name = properties["name"];
+        if (transducer_name != "TOP") {
+            std::cerr << "pmatch: warning: TOP not defined in archive, using first as TOP\n";
+        }
+    }
+    if (properties.count("type") == 0) {
+        std::cerr << "pmatch: warning: type information missing from archive\n";
+    } else {
+        if (properties["type"] != "HFST_OLW") {
+            std::cerr << "pmatch: warning: archive type isn't weighted optimized-lookup according to header\n";
+        }
+    }
     TransducerHeader header(inputstream);
     alphabet = PmatchAlphabet(inputstream, header.symbol_count());
     orig_symbol_count = symbol_count = alphabet.get_orig_symbol_count();
@@ -248,7 +261,8 @@ PmatchContainer::PmatchContainer(std::istream & inputstream):
         this);
     while (inputstream.good()) {
         try {
-            transducer_name = parse_name_from_hfst3_header(inputstream);
+            properties = parse_hfst3_header(inputstream);
+            transducer_name = properties["name"];
         } catch (TransducerHeaderException & e) {
             break;
         }
@@ -544,8 +558,9 @@ PmatchAlphabet::~PmatchAlphabet(void)
 
 }
 
-std::string PmatchContainer::parse_name_from_hfst3_header(std::istream & f)
+std::map<std::string, std::string> PmatchContainer::parse_hfst3_header(std::istream & f)
 {
+    std::map<std::string, std::string> properties;
     const char* header1 = "HFST";
     unsigned int header_loc = 0; // how much of the header has been found
     int c;
@@ -568,38 +583,18 @@ std::string PmatchContainer::parse_name_from_hfst3_header(std::istream & f)
         if (headervalue[remaining_header_len - 1] != '\0') {
             HFST_THROW(TransducerHeaderException);
         }
-        char * type = new char [remaining_header_len];
-        bool type_defined = false;
-        char * name = new char [remaining_header_len];
-        bool name_defined = false;
         int i = 0;
         while (i < remaining_header_len) {
-            if (!type_defined && strstr(headervalue + i, "type")) {
-                strcpy(type, headervalue + i + strlen("type") + 1);
-                type_defined = true;
-            } else if (!name_defined && strstr(headervalue + i, "name")) {
-                strcpy(name, headervalue + i + strlen("name") + 1);
-                name_defined = true;
-            }
-            while (i < remaining_header_len &&
-                   headervalue[i] != '\0') {
-                ++i;
-            }
+            int length = strlen(headervalue);
+            std::string property(headervalue + i, headervalue + i + length);
+            i += length + 1;
+            length = strlen(headervalue);
+            std::string value(headervalue + i, headervalue + i + length);
+            properties[property] = value;
             ++i;
         }
         delete[] headervalue;
-        if (strcmp(type, "HFST_OL") == 0) {
-            std::cerr << "\nThis version of pmatch uses weighted rulesets only, please recompile your rules\n\n";
-            HFST_THROW_MESSAGE(TransducerHeaderException,
-                               "This version of pmatch uses weighted rulesets only, please recompile your rules\n");
-        }
-        if (strcmp(type, "HFST_OLW") != 0) {
-            HFST_THROW(TransducerHeaderException);
-        }
-        std::string retval = std::string(name);
-        delete [] type;
-        delete [] name;
-        return retval;
+        return properties;
     } else // nope. put back what we've taken
     {
         f.unget(); // first the non-matching character

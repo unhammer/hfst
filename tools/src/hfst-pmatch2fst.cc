@@ -230,6 +230,7 @@ process_stream(HfstOutputStream& outstream)
         
     // When done compiling everything, look for TOP and output it first.
     if (definitions.count("TOP") == 1) {
+        std::map<std::string, std::string> properties = definitions["TOP"]->get_properties();
         intermediate_tmp = hfst::implementations::ConversionFunctions::
             hfst_transducer_to_hfst_basic_transducer(*definitions["TOP"]);
         harmonized_tmp = hfst::implementations::ConversionFunctions::
@@ -240,6 +241,10 @@ process_stream(HfstOutputStream& outstream)
         output_tmp = hfst::implementations::ConversionFunctions::
             hfst_ol_to_hfst_transducer(harmonized_tmp);
         output_tmp->set_name("TOP");
+        for(std::map<std::string, std::string>::iterator it = properties.begin();
+            it != properties.end(); ++it) {
+            output_tmp->set_property(it->first, it->second);
+        }
         outstream << *output_tmp;
         delete definitions["TOP"];
         definitions.erase("TOP");

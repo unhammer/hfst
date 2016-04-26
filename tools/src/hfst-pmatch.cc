@@ -57,8 +57,8 @@ using std::pair;
 #include "inc/globals-unary.h"
 
 static bool blankline_separated = true;
-static bool extract_tags = false;
-static bool locate_mode = false;
+static std::string extract_tags = "";
+static std::string locate_mode = "";
 static double time_cutoff = 0.0;
 static bool profile = false;
 std::string pmatch_filename;
@@ -96,7 +96,7 @@ void match_and_print(hfst_ol::PmatchContainer & container,
         // Remove final newline
         input_text.erase(input_text.size() -1, 1);
     }
-    if (!locate_mode) {
+    if (!container.is_in_locate_mode()) {
 #ifndef _MSC_VER
         outstream << container.match(input_text, time_cutoff);
 #else
@@ -195,10 +195,10 @@ int parse_options(int argc, char** argv)
             blankline_separated = false;
             break;
         case 'x':
-            extract_tags = true;
+            extract_tags = "yes";
             break;
         case 'l':
-            locate_mode = true;
+            locate_mode = "yes";
             break;
         case 't':
             time_cutoff = atof(optarg);
@@ -266,7 +266,10 @@ int main(int argc, char ** argv)
     try {
         hfst_ol::PmatchContainer container(instream);
         container.set_verbose(verbose);
-        container.set_extract_tags_mode(extract_tags);
+        if (extract_tags != "")
+            container.set_extract_tags_mode(extract_tags == "yes");
+        if (locate_mode != "")
+            container.set_locate_mode(locate_mode == "yes");
         container.set_profile(profile);
 #ifdef _MSC_VER
         //hfst::print_output_to_console(true);

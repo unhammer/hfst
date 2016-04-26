@@ -39,6 +39,7 @@ extern char* data;
 extern char* startptr;
 extern size_t len;
 extern std::map<std::string, PmatchObject*> definitions;
+extern std::map<std::string, std::string> variables;
 extern std::vector<std::map<std::string, PmatchObject*> > call_stack;
 extern std::map<std::string, PmatchObject*> def_insed_expressions;
 extern std::set<std::string> inserted_names;

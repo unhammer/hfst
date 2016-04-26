@@ -65,6 +65,7 @@ namespace pmatch
 
 char* data;
 std::map<std::string, hfst::pmatch::PmatchObject*> definitions;
+std::map<std::string, std::string> variables;
 std::vector<std::map<std::string, PmatchObject*> > call_stack;
 std::map<std::string, PmatchObject*> def_insed_expressions;
 std::set<std::string> inserted_names;
@@ -710,6 +711,15 @@ get_weight(const char *s)
 void init_globals(void)
 {
     definitions.clear();
+    variables.clear();
+    variables["count-patterns"] = "off";
+    variables["delete-patterns"] = "off";
+    variables["extract-patterns"] = "off";
+    variables["locate-patterns"] = "off";
+    variables["mark-patterns"] = "on";
+    variables["max-context-length"] = "254";
+    variables["max-recursion"] =  "5000";
+    variables["need-separators"] = "on";
     def_insed_expressions.clear();
     inserted_names.clear();
     unsatisfied_insertions.clear();
@@ -815,6 +825,10 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
             (double) CLOCKS_PER_SEC;
         hfst::pmatch::timer = clock();
         std::cerr << "compiled and harmonized in " << duration << " seconds\n";
+    }
+    for(std::map<std::string, std::string>::iterator it = variables.begin();
+        it != variables.end(); ++it) {
+        retval["TOP"]->set_property(it->first, it->second);
     }
     return retval;
 }

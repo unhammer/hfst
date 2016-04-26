@@ -72,6 +72,7 @@ UNICODE_ESCAPE ("\\u"{HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR})|("\\U00"{HEXCHAR}{HEX
 [Dd]"efine" { return DEFINE; }
 "DefFun" { return DEFINE; }
 "regex" { return REGEX; }
+"set" { return SET_VARIABLE; }
 "list" { return DEFINED_LIST; }
 "Lit(" { return LIT_LEFT; }
 "Ins(" { return INS_LEFT; }
@@ -97,7 +98,6 @@ UNICODE_ESCAPE ("\\u"{HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR})|("\\U00"{HEXCHAR}{HEX
 "Interpolate(" { return INTERPOLATE_LEFT; }
 "Sigma(" { return SIGMA_LEFT; }
 "Counter(" { return COUNTER_LEFT; }
-"DownCase(" { return TOUPPER_LEFT; }
 "Define(" { return DEFINE_LEFT; }
 "DefIns" { return DEFINS; }
 
@@ -107,6 +107,15 @@ UNICODE_ESCAPE ("\\u"{HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR})|("\\U00"{HEXCHAR}{HEX
 "Num" { return NUM; }
 "Punct" { return PUNCT; }
 "Whitespace" { return WHITESPACE; }
+
+"count-patterns" { return VAR_COUNT; }
+"delete-patterns" { return VAR_DELETE; }
+"extract-patterns" { return VAR_EXTRACT; }
+"locate-patterns"
+"mark-patterns"
+"max-context-length"
+"max-recursion"
+"need-separators"
 
 "~"   { return COMPLEMENT; }
 "\\"  { return TERM_COMPLEMENT; }

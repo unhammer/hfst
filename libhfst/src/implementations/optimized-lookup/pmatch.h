@@ -219,12 +219,14 @@ namespace hfst_ol {
         void copy_to_output(SymbolNumber input, SymbolNumber output);
         std::string stringify_output(void);
 //        LocationVector locatefy_output(void);
-        static std::string parse_name_from_hfst3_header(std::istream & f);
+        static std::map<std::string, std::string> parse_hfst3_header(std::istream & f);
         void set_verbose(bool b) { verbose = b; }
+        void set_locate_mode(bool b) { locate_mode = b; }
         void set_extract_tags_mode(bool b)
             { alphabet.extract_tags = b; }
         void set_single_codepoint_tokenization(bool b)
             { single_codepoint_tokenization = b; }
+        bool is_in_locate_mode(void) { return locate_mode; }
         void set_profile(bool b) { profile_mode = b; }
         bool try_recurse(void)
         {
