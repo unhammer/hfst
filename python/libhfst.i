@@ -84,40 +84,30 @@ namespace hfst {
 
 typedef std::vector<float> FloatVector;
 
+// Add Default implementation type
 hfst::ImplementationType type = hfst::TROPICAL_OPENFST_TYPE;
-
-void set_default_fst_type(hfst::ImplementationType t)
-{
-        type = t;
-}
-
-hfst::ImplementationType get_default_fst_type()
-{
-        return type;
-}
+void set_default_fst_type(hfst::ImplementationType t) { type = t; }
+hfst::ImplementationType get_default_fst_type() { return type; }
 
 std::string fst_type_to_string(hfst::ImplementationType t)
 {
         std::string retval = hfst::implementation_type_to_string(t);
         return retval;
 }
-
 bool is_diacritic(const std::string & symbol)
 {
         return hfst::FdOperation::is_diacritic(symbol);
 }
-        
 
+// Copy functions       
 HfstTransducer * copy_hfst_transducer(const hfst::HfstTransducer & t)
 {
         return new HfstTransducer(t);
 }
-
 HfstTransducer * copy_hfst_transducer_from_basic_transducer(const hfst::implementations::HfstBasicTransducer & t)
 {
         return new HfstTransducer(t, type);
 }
-
 HfstTransducer * copy_hfst_transducer_from_basic_transducer(const hfst::implementations::HfstBasicTransducer & t, hfst::ImplementationType impl)
 {
         return new HfstTransducer(t, impl);
@@ -429,6 +419,54 @@ std::string two_level_paths_to_string(const hfst::HfstTwoLevelPaths & paths)
     }
     return oss.str();
 }
+
+/** Wrappers for lookup functions **/
+
+HfstOneLevelPaths lookup_vector_(const hfst::HfstTransducer * tr, bool fd, const StringVector& s, int limit = -1, double time_cutoff = 0.0) throw(FunctionNotImplementedException)
+{
+  if (tr->get_type() == hfst::HFST_OL_TYPE || tr->get_type() == hfst::HFST_OLW_TYPE)
+    {
+      if (fd) 
+        { return *(tr->lookup_fd(s, limit, time_cutoff)); }
+      else
+        { return *(tr->lookup(s, limit, time_cutoff)); }
+    }
+  hfst::HfstTransducer input(s, tr->get_type());
+  input.compose(*(tr));
+  input.minimize();
+  hfst::HfstTwoLevelPaths result;
+  if (fd)
+    { input.extract_paths_fd(result, limit, -1); }
+  else
+    { input.extract_paths(result, limit, -1); }
+  return hfst::extract_output_side(result);
+}
+
+HfstOneLevelPaths lookup_string_(const hfst::HfstTransducer * tr, bool fd, const std::string& s, int limit = -1, double time_cutoff = 0.0) throw(FunctionNotImplementedException)
+{
+  if (tr->get_type() == hfst::HFST_OL_TYPE || tr->get_type() == hfst::HFST_OLW_TYPE)
+    {
+      if (fd) 
+        { return *(tr->lookup_fd(s, limit, time_cutoff)); }
+      else
+        { return *(tr->lookup(s, limit, time_cutoff)); }
+    }
+  hfst::StringSet alpha = tr->get_alphabet();
+  hfst::HfstTokenizer tok;
+  for (hfst::StringSet::const_iterator it = alpha.begin(); it != alpha.end(); it++)
+    { tok.add_multichar_symbol(*it); }
+  hfst::HfstTransducer input(s, tok, tr->get_type());
+  input.compose(*(tr));
+  input.minimize();
+  hfst::HfstTwoLevelPaths result;
+  if (fd)
+    { input.extract_paths_fd(result, limit, -1); }
+  else
+    { input.extract_paths(result, limit, -1); }
+  return hfst::extract_output_side(result);
+}
+
+/** Wrappers for rule functions. **/
 
 namespace hfst_rules {
 
@@ -1039,59 +1077,24 @@ int longest_path_size(bool obey_flags=true) const;
       return results;
     }
 
-// Wrappers for lookup functions
+HfstOneLevelPaths lookup_vector(const StringVector& s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
+{ 
+  return hfst::lookup_vector_($self, false /*fd*/, s, limit, time_cutoff);
+}
 
 HfstOneLevelPaths lookup_fd_vector(const StringVector& s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
 { 
-  if ($self->get_type() == hfst::HFST_OL_TYPE || $self->get_type() == hfst::HFST_OLW_TYPE)
-    { return *($self->lookup_fd(s, limit, time_cutoff)); }
-  hfst::HfstTransducer input(s, $self->get_type());
-  input.compose(*($self));
-  input.minimize();
-  hfst::HfstTwoLevelPaths result;
-  input.extract_paths_fd(result, limit, -1);
-  return hfst::extract_output_side(result);
+  return hfst::lookup_vector_($self, true /*fd*/, s, limit, time_cutoff);
 }
+
 HfstOneLevelPaths lookup_fd_string(const std::string& s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
 { 
-  if ($self->get_type() == hfst::HFST_OL_TYPE || $self->get_type() == hfst::HFST_OLW_TYPE)
-    { return *($self->lookup_fd(s, limit, time_cutoff)); }
-  hfst::StringSet alpha = $self->get_alphabet();
-  hfst::HfstTokenizer tok;
-  for (hfst::StringSet::const_iterator it = alpha.begin(); it != alpha.end(); it++)
-    { tok.add_multichar_symbol(*it); }
-  hfst::HfstTransducer input(s, tok, $self->get_type());
-  input.compose(*($self));
-  input.minimize();
-  hfst::HfstTwoLevelPaths result;
-  input.extract_paths_fd(result, limit, -1);
-  return hfst::extract_output_side(result);
+  return hfst::lookup_string_($self, true /*fd*/, s, limit, time_cutoff);
 }
-HfstOneLevelPaths lookup_vector(const StringVector& s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
-{ 
-  if ($self->get_type() == hfst::HFST_OL_TYPE || $self->get_type() == hfst::HFST_OLW_TYPE)
-    { return *($self->lookup(s, limit, time_cutoff)); }
-  hfst::HfstTransducer input(s, $self->get_type());
-  input.compose(*($self));
-  input.minimize();
-  hfst::HfstTwoLevelPaths result;
-  input.extract_paths(result, limit, -1);
-  return hfst::extract_output_side(result);
-}
+
 HfstOneLevelPaths lookup_string(const std::string & s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
 { 
-  if ($self->get_type() == hfst::HFST_OL_TYPE || $self->get_type() == hfst::HFST_OLW_TYPE)
-    { return *($self->lookup(s, limit, time_cutoff)); }
-  hfst::StringSet alpha = $self->get_alphabet();
-  hfst::HfstTokenizer tok;
-  for (hfst::StringSet::const_iterator it = alpha.begin(); it != alpha.end(); it++)
-    { tok.add_multichar_symbol(*it); }
-  hfst::HfstTransducer input(s, tok, $self->get_type());
-  input.compose(*($self));
-  input.minimize();
-  hfst::HfstTwoLevelPaths result;
-  input.extract_paths(result, limit, -1);
-  return hfst::extract_output_side(result);
+  return hfst::lookup_string_($self, false /*fd*/, s, limit, time_cutoff);
 }
 
 
@@ -2208,7 +2211,8 @@ def fst(arg):
               right = fsa(output)
            else:
               raise RuntimeError('Value not a string or tuple/list of strings.')
-           retval.disjunct(left.cross_product(right))
+           left.cross_product(right)
+           retval.disjunct(left)
        return retval
     return fsa(arg)
 

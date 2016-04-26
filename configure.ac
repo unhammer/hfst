@@ -18,8 +18,8 @@
 # Information on package
 HFST_NAME=hfst
 HFST_MAJOR=3
-HFST_MINOR=9
-HFST_EXTENSION=2
+HFST_MINOR=10
+HFST_EXTENSION=0
 HFST_VERSION=$HFST_MAJOR.$HFST_MINOR.$HFST_EXTENSION
 
 ### When the VERSION is INCREMENTED, REMEMBER to increment the LONGVERSION too.
@@ -27,11 +27,11 @@ HFST_VERSION=$HFST_MAJOR.$HFST_MINOR.$HFST_EXTENSION
 # for package-config pc file
 LIBHFST_NAME=hfst
 LIBHFST_MAJOR=3
-LIBHFST_MINOR=9
-LIBHFST_EXTENSION=2
+LIBHFST_MINOR=10
+LIBHFST_EXTENSION=0
 LIBHFST_VERSION=$LIBHFST_MAJOR.$LIBHFST_MINOR.$LIBHFST_EXTENSION
 
-AC_INIT([hfst], [3.9.2], [hfst-bugs@helsinki.fi], [hfst])
+AC_INIT([hfst], [3.10.0], [hfst-bugs@helsinki.fi], [hfst])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall std-options foreign check-news])
 
@@ -43,9 +43,9 @@ AC_CONFIG_SRCDIR([libhfst/src/HfstTransducer.h])
 AC_CONFIG_HEADERS([config.h libhfst/src/hfst.hpp])
 
 AC_SUBST([LIBHFST_MAJOR],     [3])
-AC_SUBST([LIBHFST_MINOR],     [9])
-AC_SUBST([LIBHFST_EXTENSION], [2])
-AC_SUBST([LIBHFST_VERSION],   [3.9.2])
+AC_SUBST([LIBHFST_MINOR],     [10])
+AC_SUBST([LIBHFST_EXTENSION], [0])
+AC_SUBST([LIBHFST_VERSION],   [3.10.0])
 AC_SUBST([LIBHFST_NAME],      [hfst])
 
 # long version = version vector cast in base 10000, for automatic comparisons
@@ -56,7 +56,7 @@ AC_SUBST([LIBHFST_NAME],      [hfst])
 # $LIBHFST_MINOR * 10000 + $LIBHFST_EXTENSION + "L"
 # NB! It turned out to be not portable, and can't be used!
 
-AC_DEFINE([HFST_LONGVERSION], [300090002L],
+AC_DEFINE([HFST_LONGVERSION], [300100000L],
           [Define to hfst version vector as long in base 10000])
 AC_DEFINE([HFST_REVISION], ["$Revision$"],
           [Automatically substitute to configure.ac revision])
@@ -323,6 +323,12 @@ AC_ARG_ENABLE([lookup],
 			  [enable_lookup=$enableval],
 			  [if test x$enable_no_tools != xno; then enable_lookup=no; else enable_lookup=yes; fi])
 AM_CONDITIONAL([WANT_LOOKUP], [test x$enable_lookup != xno])
+AC_ARG_ENABLE([flookup],
+			  [AS_HELP_STRING([--enable-flookup],
+							  [build flookup tool @<:@default=yes@:>@])],
+			  [enable_flookup=$enableval],
+			  [if test x$enable_no_tools != xno; then enable_flookup=no; else enable_flookup=yes; fi])
+AM_CONDITIONAL([WANT_FLOOKUP], [test x$enable_flookup != xno])
 AC_ARG_ENABLE([pair-test],
 			  [AS_HELP_STRING([--enable-pair-test],
 							  [build pair-test tool @<:@default=yes@:>@])],

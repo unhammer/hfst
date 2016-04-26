@@ -206,6 +206,8 @@ try {
 */
 HFST_EXCEPTION_CHILD_DECLARATION(NotTransducerStreamException);
 
+HFST_EXCEPTION_CHILD_DECLARATION(FileIsInGZFormatException);
+
 /** \brief The stream is not in valid AT&T format. 
 
     An example. The file "testfile.att" contains

@@ -230,6 +230,9 @@ print_usage()
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
            "perform transducer lookup (apply)\n"
+           "NOTE: hfst-lookup does lookup from left to right as opposed to xfst and foma\n"
+           "      lookup which is carried out from right to left. In order to do lookup\n"
+           "      in a similar way as xfst and foma, use 'hfst-flookup' instead.\n"
         "\n", program_name);
 
     print_common_program_options(message_out);

@@ -24,7 +24,8 @@ HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc HfstOutputStream.cc\
 		  HarmonizeUnknownAndIdentitySymbols.cc \
 		  HfstLookupFlagDiacritics.cc \
 		  HfstEpsilonHandler.cc HfstStrings2FstTokenizer.cc \
-		  HfstPrintDot.cc HfstPrintPCKimmo.cc hfst-string-conversions.cc
+		  HfstPrintDot.cc HfstPrintPCKimmo.cc hfst-string-conversions.cc \
+		  string-utils.cc
 
 # libtool takes over
 libhfst_la_SOURCES = $(HFST_SRCS)
@@ -93,6 +94,7 @@ HFST_HDRS = \
 	HfstStrings2FstTokenizer.h \
 	HfstPrintDot.h \
 	HfstPrintPCKimmo.h \
+	string-utils.h \
 	hfst-string-conversions.h \
 	parsers/LexcCompiler.h parsers/XreCompiler.h parsers/PmatchCompiler.h \
 	hfstdll.h
@@ -101,7 +103,7 @@ HFST_HDRS = \
 
 hfstinclude_HEADERS = $(HFST_HDRS)
 
-libhfst_la_LDFLAGS = -no-undefined -version-info 44:0:0
+libhfst_la_LDFLAGS = -no-undefined -version-info 45:0:0
 
 LIBHFST_TSTS=HfstApply HfstInputStream HfstTransducer \
 		HfstOutputStream HfstXeroxRules HfstRules HfstSymbolDefs \

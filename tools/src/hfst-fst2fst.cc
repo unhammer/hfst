@@ -177,15 +177,13 @@ parse_options(int argc, char** argv)
 int
 process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 {
-  //instream.open();
-  //    outstream.open();
-
   if (instream.get_type() == hfst::FOMA_TYPE && ! instream.is_hfst_header_included())
     {
       if (!silent)
         {
           fprintf(message_out, "warning: converting native foma transducer: "
-                  "inversion may be needed for lookup to work as expected\n");
+                  "inversion may be needed for hfst-lookup to work as expected "
+                  "(hfst-flookup works as foma's flookup)\n");
         }
     }
     
@@ -269,7 +267,14 @@ int main( int argc, char **argv ) {
     try {
       instream = (inputfile != stdin) ?
         new HfstInputStream(inputfilename) : new HfstInputStream();
-    } catch(const HfstException e)  {
+    } 
+    catch(const FileIsInGZFormatException e)
+      {
+        error(EXIT_FAILURE, 0, "%s seems to be a gzipped native foma file, you must first unzip it",
+              inputfilename);
+        return EXIT_FAILURE;
+      }
+    catch(const HfstException e)  {
         error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
 #if HAVE_XFSM

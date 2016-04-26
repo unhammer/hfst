@@ -104,6 +104,9 @@ endif
 if WANT_LOOKUP
 MAYBE_LOOKUP=hfst-lookup$(EXEEXT)
 endif
+if WANT_FLOOKUP
+MAYBE_FLOOKUP=hfst-flookup$(EXEEXT)
+endif
 if WANT_PAIR_TEST
 MAYBE_PAIR_TEST=hfst-pair-test$(EXEEXT)
 endif
@@ -217,7 +220,7 @@ bin_PROGRAMS= \
 			 $(MAYBE_FORMAT) $(MAYBE_FST2FST) $(MAYBE_FST2STRINGS)      \
 			 $(MAYBE_FST2TXT) $(MAYBE_GREP) $(MAYBE_HEAD)               \
 			 $(MAYBE_INVERT)                                            \
-			 $(MAYBE_LOOKUP) $(MAYBE_MINIMIZE) $(MAYBE_NAME)            \
+			 $(MAYBE_LOOKUP) $(MAYBE_FLOOKUP) $(MAYBE_MINIMIZE) $(MAYBE_NAME)            \
 			 $(MAYBE_OPTIMIZED_LOOKUP) $(MAYBE_PMATCH)                  \
 			 $(MAYBE_PMATCH2FST) $(MAYBE_TOKENIZE)                         \
 			 $(MAYBE_PROJECT) $(MAYBE_PRUNE_ALPHABET)                   \
@@ -271,6 +274,7 @@ hfst_lexc_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC)
 #					  parsers/LexcCompiler.h parsers/lexc-utils.h
 #hfst_lexc2fst_BUILT=parsers/lexc-parser.h parsers/xre_parse.h
 hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC)
+hfst_flookup_SOURCES=hfst-flookup.cc $(HFST_COMMON_SRC)
 hfst_pair_test_SOURCES=hfst-pair-test.cc $(HFST_COMMON_SRC) 
 hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
 hfst_name_SOURCES=hfst-name.cc $(HFST_COMMON_SRC)
