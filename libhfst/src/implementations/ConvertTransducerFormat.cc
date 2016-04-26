@@ -135,20 +135,35 @@ namespace hfst { namespace implementations
 #include <cstdlib>
 #include <cassert>
 
+#include "../HfstTransducer.h"
+
 using namespace hfst;
 using namespace hfst::implementations;
 
 int main(void)
   {
     std::cout << "Unit tests for " __FILE__ ":";
-    HfstBasicTransducer net;
-    net.add_transition(0, HfstBasicTransition(1, "c", "d", 1));
-    net.add_transition(1, HfstBasicTransition(2, "a", "o", 2));
-    net.add_transition(2, HfstBasicTransition(3, "t", "g", 3));
-    net.set_final_weight(3, 4);
-    std::cout << std::endl << "Conversions: ";
-    std::cout << "skipped everything " <<
-      "since they've disappeared into thin air" << std::endl;
-    return 77;
+
+    hfst::ImplementationType types [3] = {hfst::SFST_TYPE, hfst::FOMA_TYPE, hfst::TROPICAL_OPENFST_TYPE};
+
+    for (unsigned int i=0; i < 3; i++)
+      {
+        if (hfst::HfstTransducer::is_implementation_type_available(types[i]))
+          {
+            HfstTokenizer tok;
+            HfstTransducer fsm1("cat", "dog", tok, types[i]);
+            fsm1.set_final_weights(4);
+            
+            HfstBasicTransducer * fsm1_converted = 
+              ConversionFunctions::hfst_transducer_to_hfst_basic_transducer(fsm1);
+            
+            HfstTransducer fsm1_converted_twice(*fsm1_converted, types[i]);
+            
+            if (! fsm1.compare(fsm1_converted_twice))
+              return 1;
+          }
+      }
+    
+    return 0;
   }
 #endif // MAIN_TEST
