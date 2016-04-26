@@ -56,9 +56,13 @@ using hfst::HfstTransducer;
 #include "inc/globals-unary.h"
 
 static bool blankline_separated = true;
+static bool keep_newlines = false;
 static bool print_all = false;
 static bool print_weights = false;
 static bool tokenize_multichar = false;
+static string tag_separator = "+"; // + and # are hardcoded in cg-conv at least
+static string subreading_separator = "#";
+static string wtag = "W"; // TODO: cg-conv has an argument --wtag, allow changing here as well?
 static double time_cutoff = 0.0;
 std::string tokenizer_filename;
 static hfst::ImplementationType default_format = hfst::TROPICAL_OPENFST_TYPE;
@@ -66,7 +70,8 @@ enum OutputFormat {
     tokenize,
     xerox,
     cg,
-    finnpos
+    finnpos,
+    gtd
 };
 OutputFormat output_format = tokenize;
 
@@ -78,7 +83,7 @@ void
 print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
-    fprintf(message_out, "Usage: %s [--segment | --xerox | --cg] [OPTIONS...] RULESET\n"
+    fprintf(message_out, "Usage: %s [--segment | --xerox | --cg | --gtd] [OPTIONS...] RULESET\n"
             "perform matching/lookup on text streams\n"
             "\n", program_name);
     print_common_program_options(message_out);
@@ -92,13 +97,14 @@ print_usage()
             "  -t, --time-cutoff=S      Limit search after having used S seconds per input\n"
             "  -z, --segment            Segmenting / tokenization mode (default)\n"
             "  -x, --xerox              Xerox output\n"
-            "  -c, --cg                 cg output\n"
+            "  -c, --cg                 Constraint Grammar output\n"
+            "  -g, --gtd                Giellatekno/Divvun CG output\n"
             "  -f, --finnpos            FinnPos output\n");
-    fprintf(message_out, 
+    fprintf(message_out,
             "Use standard streams for input and output (for now).\n"
             "\n"
         );
-    
+
     print_report_bugs();
     fprintf(message_out, "\n");
     print_more_info();
@@ -111,11 +117,22 @@ void print_no_output(std::string const & input, std::ostream & outstream)
         outstream << input;
     } else if (output_format == xerox) {
         outstream << input << "\t" << input << "+?";
-    } else if (output_format == cg) {
+    } else if (output_format == cg || output_format == gtd) {
 	    outstream << "\"<" << input << ">\"" << std::endl << "\t\"" << input << "\" ?";
     }
 //    std::cerr << "from print_no_output\n";
     outstream << "\n\n";
+}
+
+void print_escaping_newlines(std::string const & str, std::ostream & outstream)
+{
+    // TODO: inline?
+    size_t i = 0, j = 0;
+    while((j = str.find("\n", i)) != std::string::npos) {
+        outstream << str.substr(i, j-i) << "\\n";
+        i = j+1;
+    }
+    outstream << str.substr(i, j-i);
 }
 
 void print_nonmatching_sequence(std::string const & str, std::ostream & outstream)
@@ -126,6 +143,9 @@ void print_nonmatching_sequence(std::string const & str, std::ostream & outstrea
         outstream << str << "\t" << str << "+?";
     } else if (output_format == cg) {
         outstream << "\"<" << str << ">\"" << std::endl << "\t\"" << str << "\" ?";
+    } else if (output_format == gtd) {
+        outstream << ":";
+        print_escaping_newlines(str, outstream);
     } else if (output_format == finnpos) {
         outstream << str << "\t_\t_\t_\t_";
     }
@@ -210,6 +230,100 @@ hfst_ol::PmatchContainer make_naive_tokenizer(HfstTransducer & dictionary)
     return retval;
 }
 
+
+void print_cg_subreading(std::string const & indent,
+                         std::string const & str,
+                         hfst_ol::Weight const & weight,
+                         std::string const & input,
+                         std::ostream & outstream)
+{
+    // Assume tags are +-separated, the first '+' marks the
+    // end of lemma, and there are no unescaped '+' symbols
+    // TODO: handle escaped '+'? (cg-conv doesn't)
+    size_t i = 0, j = 0;
+    outstream << indent << "\"";
+    if((j = str.find(tag_separator, i)) != std::string::npos) {
+        outstream << str.substr(i, j-i);
+        i = j+1;
+    }
+    outstream << "\"";
+    while((j = str.find(tag_separator, i)) != std::string::npos) {
+        outstream << " " << str.substr(i, j-i);
+        i = j+1;
+    }
+    if(!str.substr(i).empty()) {
+        outstream << " " << str.substr(i);
+    }
+    if (print_weights) {
+        outstream << " <" << wtag << ":" << weight << ">";
+    }
+    if (!input.empty()) {
+        outstream << " \"<" << input << ">\"";
+    }
+    outstream << std::endl;
+}
+
+void print_location_vector_gtd(LocationVector const & locations, std::ostream & outstream)
+{
+    outstream << "\"<" << locations.at(0).input << ">\"" << std::endl;
+    if(locations.size() == 1 && locations.at(0).output.empty()) {
+        // Treat empty analyses as unknown-but-tokenised:
+        outstream << "\t\"" << locations.at(0).input << "\" ?" << std::endl;
+    }
+    else {
+        for (LocationVector::const_iterator loc_it = locations.begin();
+             loc_it != locations.end(); ++loc_it) {
+            if(loc_it->output.empty()) {
+                continue;
+            }
+            std::string indent = "\t";
+            size_t out_beg = 0, out_end = loc_it->output.size();
+            size_t in_beg = 0, in_end = loc_it->input.size();
+            size_t part = loc_it->input_parts.size();
+            while(true) {
+                std::string inpart, outpart;
+                size_t sub_beg = loc_it->output.rfind(subreading_separator, out_end-1);
+                if(sub_beg == std::string::npos) {
+                    sub_beg = 0;
+                }
+                size_t part_beg = part > 0 ? loc_it->output_parts.at(part-1) : 0;
+                if(part_beg > sub_beg) {
+                    out_beg = part_beg;
+                    in_beg = loc_it->input_parts.at(part-1);
+                    inpart = loc_it->input.substr(in_beg, in_end - in_beg);
+                    in_end = in_beg;
+                    --part;
+                }
+                else if (sub_beg > 0) {
+                    out_beg = sub_beg + subreading_separator.size();
+                }
+                else {
+                    out_beg = 0;
+                    if(in_end != loc_it->input.size()) {
+                        inpart = loc_it->input.substr(0, in_end);
+                    }
+                }
+                outpart = loc_it->output.substr(out_beg, out_end - out_beg);
+                print_cg_subreading(indent,
+                                    outpart,
+                                    loc_it->weight,
+                                    inpart,
+                                    outstream);
+                if(out_beg == 0) {
+                    break;
+                }
+                else {
+                    indent += "\t";
+                    out_end = out_beg;
+                    if(sub_beg > part_beg) {
+                        out_end -= subreading_separator.size();
+                    }
+                }
+            }
+        }
+    }
+}
+
 void print_location_vector(LocationVector const & locations, std::ostream & outstream)
 {
     if (output_format == tokenize && locations.size() != 0) {
@@ -217,7 +331,7 @@ void print_location_vector(LocationVector const & locations, std::ostream & outs
         if (print_weights) {
             outstream << "\t" << locations.at(0).weight;
         }
-        outstream << std::endl;
+        outstream << std::endl << std::endl;
     } else if (output_format == cg && locations.size() != 0) {
         // Print the cg cohort header
         outstream << "\"<" << locations.at(0).input << ">\"" << std::endl;
@@ -238,6 +352,9 @@ void print_location_vector(LocationVector const & locations, std::ostream & outs
             }
             outstream << std::endl;
         }
+        outstream << std::endl;
+    } else if (output_format == gtd && locations.size() != 0) {
+        print_location_vector_gtd(locations, outstream);
     } else if (output_format == xerox) {
         for (LocationVector::const_iterator loc_it = locations.begin();
              loc_it != locations.end(); ++loc_it) {
@@ -247,6 +364,7 @@ void print_location_vector(LocationVector const & locations, std::ostream & outs
             }
             outstream << std::endl;
         }
+        outstream << std::endl;
     } else if (output_format == finnpos) {
         std::set<std::string> tags;
         std::set<std::string> lemmas;
@@ -292,10 +410,9 @@ void print_location_vector(LocationVector const & locations, std::ostream & outs
             }
             outstream << accumulator.substr(0, accumulator.size() - 1);
         }
-        outstream << "\t_";
+        outstream << "\t_" << std::endl;
     }
 //    std::cerr << "from print_location_vector\n";
-    outstream << std::endl;
 }
 
 void match_and_print(hfst_ol::PmatchContainer & container,
@@ -325,7 +442,7 @@ void match_and_print(hfst_ol::PmatchContainer & container,
         outstream << std::endl;
     }
 }
-        
+
 
 int process_input(hfst_ol::PmatchContainer & container,
                   std::ostream & outstream)
@@ -333,24 +450,34 @@ int process_input(hfst_ol::PmatchContainer & container,
     std::string input_text;
     char * line = NULL;
     size_t len = 0;
-    while (hfst_getline(&line, &len, inputfile) > 0) {
-        if (!blankline_separated) {
-            // newline separated
-            input_text = line;
-            match_and_print(container, outstream, input_text);
-        } else if (line[0] == '\n') {
-            match_and_print(container, outstream, input_text);
-            input_text.clear();
-        } else {
-            input_text.append(line);
+    if(blankline_separated) {
+        while (hfst_getline(&line, &len, inputfile) > 0) {
+            if (line[0] == '\n') {
+                match_and_print(container, outstream, input_text);
+                input_text.clear();
+            } else {
+                input_text.append(line);
+            }
+            free(line);
+            line = NULL;
         }
-        free(line);
-        line = NULL;
+        if (!input_text.empty()) {
+            match_and_print(container, outstream, input_text);
+        }
     }
-    
-    if (blankline_separated && !input_text.empty()) {
-        match_and_print(container, outstream, input_text);
+    else {
+        // newline or non-separated
+        while (hfst_getline(&line, &len, inputfile) > 0) {
+            input_text = line;
+            if(keep_newlines) {
+                input_text += "\n";
+            }
+            match_and_print(container, outstream, input_text);
+            free(line);
+            line = NULL;
+        }
     }
+
     return EXIT_SUCCESS;
 }
 
@@ -365,6 +492,7 @@ int parse_options(int argc, char** argv)
             {
                 HFST_GETOPT_COMMON_LONG,
                 {"newline", no_argument, 0, 'n'},
+                {"keep-newline", no_argument, 0, 'k'},
                 {"print-all", no_argument, 0, 'a'},
                 {"print-weights", no_argument, 0, 'w'},
                 {"tokenize-multichar", no_argument, 0, 'm'},
@@ -372,11 +500,12 @@ int parse_options(int argc, char** argv)
                 {"segment", no_argument, 0, 'z'},
                 {"xerox", no_argument, 0, 'x'},
                 {"cg", no_argument, 0, 'c'},
+                {"gtd", no_argument, 0, 'g'},
                 {"finnpos", no_argument, 0, 'f'},
                 {0,0,0,0}
             };
         int option_index = 0;
-        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nawmt:zxcf",
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nkawmt:zxcgf",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -387,6 +516,10 @@ int parse_options(int argc, char** argv)
         switch (c)
         {
 #include "inc/getopt-cases-common.h"
+        case 'k':
+            keep_newlines = true;
+            blankline_separated = false;
+            break;
         case 'n':
             blankline_separated = false;
             break;
@@ -416,14 +549,21 @@ int parse_options(int argc, char** argv)
         case 'c':
             output_format = cg;
             break;
+        case 'g':
+            output_format = gtd;
+            print_weights = true;
+            print_all = true;
+            keep_newlines = true;
+            blankline_separated = false;
+            break;
         case 'f':
             output_format = finnpos;
             break;
 #include "inc/getopt-cases-error.h"
         }
 
-        
-        
+
+
     }
 
 //            if (!inputNamed)
@@ -431,7 +571,7 @@ int parse_options(int argc, char** argv)
 //            inputfile = stdin;
 //            inputfilename = hfst_strdup("<stdin>");
 //        }
-        
+
         // no more options, we should now be at the input filename
         if ( (optind + 1) < argc)
         {
@@ -453,49 +593,13 @@ int parse_options(int argc, char** argv)
 #include "inc/check-params-common.h"
 
 
-    
+
     return EXIT_FAILURE;
 }
 
-bool first_transducer_is_called_TOP(std::istream & f)
+bool first_transducer_is_called_TOP(const HfstTransducer & dictionary)
 {
-    const char* header1 = "HFST";
-    unsigned int header_loc = 0;
-    int c;
-    while(header_loc < strlen(header1) + 1) {
-        c = f.get();
-        ++header_loc;
-        if(c != header1[header_loc]) {
-            return false;
-        }
-    }
-    if(header_loc == strlen(header1) + 1) {
-        unsigned short remaining_header_len;
-        f.read((char*) &remaining_header_len, sizeof(remaining_header_len));
-        if (f.get() != '\0') {
-            return false;
-        }
-        char * headervalue = new char[remaining_header_len];
-        f.read(headervalue, remaining_header_len);
-        if (headervalue[remaining_header_len - 1] != '\0') {
-            delete[] headervalue;
-            return false;
-        }
-        int i = 0;
-        while (i < remaining_header_len) {
-            if (strcmp(headervalue + i, "name") == 0) {
-                bool retval = strcmp(headervalue + i + strlen("name") + 1, "TOP") == 0;
-                delete[] headervalue;
-                return retval;
-            }
-            while (headervalue[i] != '\0') {
-                ++i;
-            }
-            ++i;
-        }
-        delete[] headervalue;
-    }
-    return false;
+    return dictionary.get_name() == "TOP";
 }
 
 int main(int argc, char ** argv)
@@ -513,7 +617,9 @@ int main(int argc, char ** argv)
         return EXIT_FAILURE;
     }
     try {
-        if (first_transducer_is_called_TOP(instream)) {
+        hfst::HfstInputStream is(tokenizer_filename);
+        HfstTransducer dictionary(is);
+        if (first_transducer_is_called_TOP(dictionary)) {
             instream.seekg(0);
             instream.clear();
             hfst_ol::PmatchContainer container(instream);
@@ -522,8 +628,6 @@ int main(int argc, char ** argv)
             return process_input(container, std::cout);
         } else {
             instream.close();
-            hfst::HfstInputStream is(tokenizer_filename);
-            HfstTransducer dictionary(is);
             hfst_ol::PmatchContainer container = make_naive_tokenizer(dictionary);
             container.set_verbose(verbose);
             container.set_single_codepoint_tokenization(!tokenize_multichar);

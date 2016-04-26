@@ -1331,7 +1331,6 @@ int main(int argc, char * argv[])
     SFST::Transducer * t = SfstTransducer::define_transducer("a", "b");
 
     SFST::Transducer * t_input = SfstTransducer::extract_input_language(t);
-    std::cout << "#1.5" << std::endl;
     assert( does_sfst_alphabet_contain(t_input, "a") && 
         does_sfst_alphabet_contain(t_input, "b")  );
 

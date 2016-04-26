@@ -27,6 +27,10 @@ do
     continue;
     fi
 
+    echo ""
+    echo "Performing hfst-xfst tests for "$format" format..."
+    echo ""
+
     ## Create a transducer [Foo Bar Baz] where Foo is [foo], Bar [bar] and Baz [Baz].
     ## Definition of Foo is given in startup file, and definitions of Bar and Baz
     ## on command line. Baz is later undefined in input.
@@ -89,11 +93,9 @@ do
         exit 1;
     fi
     if (! ${GREP} "3 states" tmp > /dev/null); then
-        echo "here 1"
         exit 1;
     fi
     if (! ${GREP} "9 arcs" tmp > /dev/null); then
-        echo "here 2"
         exit 1;
     fi
 
@@ -101,7 +103,7 @@ do
     ## is the same as testfile.att using att-to-fst conversion.
     for testfile in compose_net concatenate_net union_net ignore_net invert_net minus_net intersect_net \
     determinize_net epsilon_remove_net invert_net minimize_net negate_net \
-    one_plus_net prune_net reverse_net sort_net upper_side_net zero_plus_net lower_side_net \
+    one_plus_net reverse_net upper_side_net zero_plus_net lower_side_net \
     define define_function prolog \
         substitute_symbol_1 substitute_symbol_2 substitute_symbol_3 \
         substitute_symbol_4 substitute_symbol_5 \
@@ -122,7 +124,7 @@ do
         # angle_brackets omitted, since xfst and foma handle them differently
     do
     ${REMOVE} result result1 result2
-    if ! (${LS} $testfile.xfst 2> /dev/null); then
+    if ! (${LS} $testfile.xfst > /dev/null 2> /dev/null); then
         echo "skipping missing test for "$testfile"..."
         continue
     fi
@@ -138,6 +140,7 @@ do
         echo "ERROR: "$testfile" test failed"
         exit 1;
     fi
+    echo "* hfst-xfst subtest "$testfile" passed"
     done
 
     ## The same as above but only for openfst format
@@ -145,7 +148,7 @@ do
         for testfile in merge_weighted
         do
         ${REMOVE} result result1 result2
-        if ! (${LS} $testfile.xfst 2> /dev/null); then
+        if ! (${LS} $testfile.xfst > /dev/null 2> /dev/null); then
             echo "skipping missing test for "$testfile"..."
             continue
         fi
@@ -161,6 +164,7 @@ do
             echo "ERROR: "$testfile" test failed"
             exit 1;
         fi
+        echo "* hfst-xfst subtest "$testfile" passed"
         done
     fi
 
@@ -185,15 +189,15 @@ do
     ## Test that the result of testfile.xfst (written to standard output)
     ## is the same as testfile.output
     for testfile in print_stack print_labels print_label_tally \
-    shortest_string set_variable info print_net eliminate_flag empty_context xerox_composition \
+    shortest_string set_variable print_net eliminate_flag empty_context xerox_composition \
         compile_replace_1 compile_replace_2 compile_replace_3 flag_with_unknown
     do
-    if ! (${LS} $testfile.xfst 2> /dev/null); then
+    if ! (${LS} $testfile.xfst > /dev/null 2> /dev/null); then
         echo "skipping missing test for "$testfile"..."
         continue
     fi
         # apply up/down leak to stdout with readline..
-    if ! (${CAT} $testfile.xfst | ../hfst-xfst --pipe-mode=input -f $format -s | ${TR} -d '\r' > tmp); then
+    if ! (${CAT} $testfile.xfst | ../hfst-xfst --pipe-mode=input -f $format -s 2> /dev/null | ${TR} -d '\r' > tmp); then
         echo "ERROR: in compiling "$testfile.xfst
         exit 1;
     fi
@@ -212,12 +216,13 @@ do
             fi
             ${REMOVE} tmpdiff
     fi
+    echo "* hfst-xfst subtest "$testfile" passed"
     done
 
     ## Interactive commands
     for testfile in apply_up apply_down inspect_net
     do
-    if ! (${LS} $testfile.xfst 2> /dev/null); then
+    if ! (${LS} $testfile.xfst > /dev/null 2> /dev/null); then
         echo "skipping missing test for "$testfile"..."
         continue
     fi
@@ -248,6 +253,7 @@ do
                 ${REMOVE} tmpdiff
         fi
         done
+        echo "* hfst-xfst subtest "$testfile" passed"
     done
 
 
@@ -257,7 +263,7 @@ do
     do
     for testfile in test_overlap test_sublanguage # the function to be tested
     do
-        if ! (${LS} $testfile$testcase.xfst 2> /dev/null); then
+        if ! (${LS} $testfile$testcase.xfst > /dev/null 2> /dev/null); then
         echo "skipping missing test for "$testfile$testcase"..."
         continue
         fi
@@ -286,6 +292,7 @@ do
             echo "ERROR: in testing "$file
             exit 1;
         fi
+    echo "* hfst-xfst subtest "$file" passed"
     done
 
     if [ "$format" = "openfst-tropical" ]; 
@@ -302,7 +309,7 @@ do
         weighted_ltr_longest_match_1 weighted_ltr_longest_match_2 weighted_ltr_longest_match_3 \
         weighted_ltr_shortest_match_1 weighted_ltr_shortest_match_2 weighted_ltr_shortest_match_3
         do
-        if ! (${LS} $file.xfst 2> /dev/null); then
+        if ! (${LS} $file.xfst > /dev/null 2> /dev/null); then
             echo "skipping missing test for "$file"..."
             continue
         fi
@@ -322,6 +329,7 @@ do
             echo "ERROR: "$file" test failed"
             exit 1;
         fi
+        echo "* hfst-xfst subtest "$file" passed"
         done
         for file in contains contains_with_weight contains_once contains_once_optional \
             replace_test_1 replace_test_2 replace_test_3 replace_test_4 replace_test_5 \
@@ -341,7 +349,7 @@ do
             weighted_parallel_rules_10 weighted_parallel_rules_11 weighted_parallel_rules_12 \
             weighted_parallel_rules_13
         do
-            if ! (${LS} $file.xfst 2> /dev/null); then
+            if ! (${LS} $file.xfst > /dev/null 2> /dev/null); then
             echo "skipping missing test for "$file"..."
             continue
         fi
@@ -353,9 +361,11 @@ do
             echo "ERROR: "$file" test failed"
             exit 1;
         fi
+        echo "* hfst-xfst subtest "$file" passed"
         done
     fi
 
+    echo ""
     ${REMOVE} result tmp1 tmp2 foo
 
 ## add properties

@@ -169,6 +169,7 @@ std::ostream &operator<<
 { return p.print(out); }
 
 #include <cassert>
+#include <sstream>
 
 int main(int argc, char * argv[])
 {
@@ -195,8 +196,12 @@ int main(int argc, char * argv[])
     }
   catch (const StateNotDefined &e)
   { std::cerr << e() << std::endl; } */ // FIXME get_transitions wants size_t as second argument
-  std::cout << "Print:" << std::endl;
-  std::cout << compose_intersect_rule_pair << std::endl;
+
+  
+  std::string str;
+  std::stringstream sstr(str);
+  sstr << "Print:" << std::endl;
+  sstr << compose_intersect_rule_pair << std::endl;
 
   std::cout << "ok" << std::endl;
 

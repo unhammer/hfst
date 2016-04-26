@@ -289,10 +289,10 @@ namespace hfst
         // Contexts
         // define NOS1 [ %[ -> 0 || b / B _ ];
         // define NOF1 [ %] -> 0 || _ c / B ];
-        static HfstTransducer removeBracketsInContext( const HfstTransducerPairVector &context,
+        /*static HfstTransducer removeBracketsInContext( const HfstTransducerPairVector &context,
                                                    const HfstTransducer &leftMark,
                                                    const HfstTransducer &rightMark,
-                                                   int i);
+                                                   int i);*/ // NOT DEFINED
         // Restriction function "=>"
         HfstTransducer restriction( const HfstTransducer &automata, const HfstTransducerPairVector &context);
         HfstTransducer before( const HfstTransducer &left, const HfstTransducer &right);

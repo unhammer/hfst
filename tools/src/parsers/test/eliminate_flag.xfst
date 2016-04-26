@@ -31,3 +31,12 @@ eliminate flags
 equivalent
 regex [ [x|X] a [x|X] ]  |  [ [y|Y|z|Z] a [y|Y|z|Z] ];
 equivalent
+#
+#
+clear stack
+#
+#
+regex a "@P.FOO.ON@" "@P.BAR.ON@" "@D.FOO.ON@";
+eliminate flags
+regex 0 - 0;
+equivalent

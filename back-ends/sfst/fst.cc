@@ -885,18 +885,23 @@ namespace SFST {
   static void read_node( FILE *file, Node *node, Node **p, Transducer *a )
   {
     char c;
-    fread(&c,sizeof(c),1,file);
+    if (fread(&c,sizeof(c),1,file) != 1) // HFST addition: checking return value of fread
+      throw "read_node: fread failed";
     node->set_final(c);
 
     unsigned short n;
-    fread( &n, sizeof(n), 1, file);
+    if (fread( &n, sizeof(n), 1, file) != 1)  // HFST addition: checking return value of fread
+      throw "read_node: fread failed";
 
     for( int i=0; i<n; i++ ) {
       Character lc,uc;
       unsigned int t;
-      fread(&lc,sizeof(lc),1,file);
-      fread(&uc,sizeof(uc),1,file);
-      fread(&t,sizeof(t),1,file);
+      if (fread(&lc,sizeof(lc),1,file) != 1) // HFST addition: checking return value of fread
+        throw "read_node: fread failed";
+      if (fread(&uc,sizeof(uc),1,file) != 1) // HFST addition: checking return value of fread
+        throw "read_node: fread failed";
+      if (fread(&t,sizeof(t),1,file) != 1) // HFST addition: checking return value of fread
+        throw "read_node: fread failed";
       if (ferror(file))
         throw "Error encountered while reading transducer from file";
       if (p[t])
@@ -924,7 +929,8 @@ namespace SFST {
 
     vmark = deterministic = 0;
     unsigned int n;
-    fread(&n,sizeof(n),1,file); // number of nodes
+    if (fread(&n,sizeof(n),1,file) != 1) // number of nodes // HFST addition: checking return value of fread
+      throw "read_transducer_binary: fread failed";
     if (ferror(file))
       throw "Error encountered while reading transducer from file";
 

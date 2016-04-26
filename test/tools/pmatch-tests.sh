@@ -8,6 +8,13 @@ fi
 
 . $srcdir/pmatch-tester.sh
 
+exclude_tests="(Converting tags with replacement)\
+|(Replace semantics)\
+|(Add characters with replacement or transduction)\
+|(Transductions and replacements with EndTag)\
+|(OptCap, ToUpper, ToLower)\
+|(Named expressions in OptCap, ToUpper)\
+|(Long input lines)"
 
 testset_begin "Testing Pmatch"
 

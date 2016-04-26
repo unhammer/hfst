@@ -1943,7 +1943,7 @@ static HfstTransducer * get_flag_filter
                 succeed_flags.disjunct(HfstTransducer("_" + *ff, type));
                 flag_found = true;
               } else {
-                succeed_flags.disjunct(HfstTransducer("_" + *ff, type));
+                ;
               }
 
             }

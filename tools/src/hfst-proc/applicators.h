@@ -27,7 +27,7 @@ class Applicator
  public:
   Applicator(const ProcTransducer& t, TokenIOStream& ts): transducer(t), token_stream(ts) {}
   virtual ~Applicator() {}
-  
+
   virtual void apply() = 0;
 };
 
@@ -60,13 +60,13 @@ class GenerationApplicator: public Applicator
  private:
   GenerationMode mode;
   CapitalizationMode caps_mode;
-  
+
   /**
    * Split the given token string into a set of token strings to generate with,
    * breaking on + after apertium-style tags.
    */
   std::vector<TokenVector> split(const TokenVector& tokens) const;
-  
+
   bool lookup(const TokenVector& tokens, bool generate_on_fail);
 
  public:
