@@ -305,19 +305,19 @@ int
 main(int, char**)
   {
     std::cout << "Unit tests for " __FILE__ ":";
-    std::cout << std::endl << "constructors: ";
-    std::cout << " (default)...";
+    std::cout << std::endl << "constructors: " << std::endl;
+    std::cout << " (default)..." << std::endl;;
     XreCompiler defaultXre();
 #if HAVE_SFST
-    std::cout << " (SFST)...";
+    std::cout << " (SFST)..." << std::endl;;
     XreCompiler sfstXre = XreCompiler(SFST_TYPE);
 #endif
 #if HAVE_OPENFST
-    std::cout << " (OpenFst)...";
+    std::cout << " (OpenFst)..." << std::endl;;
     XreCompiler ofstXre = XreCompiler(TROPICAL_OPENFST_TYPE);
 #endif
 #if HAVE_FOMA
-    std::cout << " (Foma)...";
+    std::cout << " (Foma)..." << std::endl;;
     XreCompiler fomaXre = XreCompiler(FOMA_TYPE);
 #endif
     HfstBasicTransducer basicCat;
@@ -363,48 +363,48 @@ main(int, char**)
     basicAaOrBc.add_transition(0, HfstBasicTransition(3, "b", "b", 0));
     basicAaOrBc.add_transition(3, HfstBasicTransition(2, "c", "c", 0));
     basicAaOrBc.set_final_weight(2, 0);
-    std::cout << std::endl << "compilation: ";
+    std::cout << std::endl << "compilation: " << std::endl;;
 #if HAVE_SFST
-    std::cout << "sfst compile(c a t)...";
+    std::cout << " sfst compile(c a t)..." << std::endl;;
     HfstTransducer* sfstCat = sfstXre.compile("c a t");
     assert(sfstCat != 0);
     assert(sfstCat->compare(HfstTransducer(basicCat, SFST_TYPE)));
     delete sfstCat;
-    std::cout << "(f i:o 0:u g h t)...";
+    std::cout << " (f i:o 0:u g h t)..." << std::endl;;
     HfstTransducer* sfstFight = sfstXre.compile("f i:o 0:u g h t");
     assert(sfstFight != 0);
     assert(sfstFight->compare(HfstTransducer(basicFight, SFST_TYPE)));
     delete sfstFight;
-    std::cout << "(c a t | dog)...";
+    std::cout << " (c a t | dog)..." << std::endl;;
     HfstTransducer* sfstCatOrDog = sfstXre.compile("c a t | dog");
     assert(sfstCatOrDog != 0);
     assert(sfstCatOrDog->compare(HfstTransducer(basicCatOrDog, SFST_TYPE)));
     delete sfstCatOrDog;
-    std::cout << "(a a | b c)...";
+    std::cout << " (a a | b c)..." << std::endl;;
     HfstTransducer* sfstAaOrBc = sfstXre.compile("a a | b c");
     assert(sfstAaOrBc != 0);
     assert(sfstAaOrBc->compare(HfstTransducer(basicAaOrBc, SFST_TYPE)));
     delete sfstAaOrBc;
 #endif
 #if HAVE_OPENFST
-    std::cout << "ofst compile(c a t)...";
+    std::cout << " ofst compile(c a t)..." << std::endl;;
     HfstTransducer* ofstCat = ofstXre.compile("c a t");
     assert(ofstCat != 0);
     assert(ofstCat->compare(HfstTransducer(basicCat, TROPICAL_OPENFST_TYPE)));
     delete ofstCat;
-    std::cout << "(f i:o 0:u g h t)...";
+    std::cout << " (f i:o 0:u g h t)..." << std::endl;;
     HfstTransducer* ofstFight = ofstXre.compile("f i:o 0:u g h t");
     assert(ofstFight != 0);
     assert(ofstFight->compare(HfstTransducer(basicFight,
                                              TROPICAL_OPENFST_TYPE)));
     delete ofstFight;
-    std::cout << "(c a t | dog)...";
+    std::cout << " (c a t | dog)..." << std::endl;;
     HfstTransducer* ofstCatOrDog = ofstXre.compile("c a t | dog");
     assert(ofstCatOrDog != 0);
     assert(ofstCatOrDog->compare(HfstTransducer(basicCatOrDog,
                                                 TROPICAL_OPENFST_TYPE)));
     delete ofstCatOrDog;
-    std::cout << "(a a | b c)...";
+    std::cout << " (a a | b c)..." << std::endl;;
     HfstTransducer* ofstAaOrBc = ofstXre.compile("a a | b c");
     assert(ofstAaOrBc != 0);
     assert(ofstAaOrBc->compare(HfstTransducer(basicAaOrBc, 
@@ -412,38 +412,38 @@ main(int, char**)
     delete ofstAaOrBc;
 #endif
 #if HAVE_FOMA
-    std::cout << "foma compile(c a t)...";
+    std::cout << " foma compile(c a t)..." << std::endl;;
     HfstTransducer* fomaCat = fomaXre.compile("c a t");
     assert(fomaCat != 0);
     assert(fomaCat->compare(HfstTransducer(basicCat, FOMA_TYPE)));
     delete fomaCat;
-    std::cout << "(f i:o 0:u g h t)...";
+    std::cout << " (f i:o 0:u g h t)..." << std::endl;;
     HfstTransducer* fomaFight = fomaXre.compile("f i:o 0:u g h t");
     assert(fomaFight != 0);
     assert(fomaFight->compare(HfstTransducer(basicFight, FOMA_TYPE)));
     delete fomaFight;
-    std::cout << "(c a t | dog)...";
+    std::cout << " (c a t | dog)..." << std::endl;;
     HfstTransducer* fomaCatOrDog = fomaXre.compile("c a t | dog");
     assert(fomaCatOrDog != 0);
     assert(fomaCatOrDog->compare(HfstTransducer(basicCatOrDog, FOMA_TYPE)));
     delete fomaCatOrDog;
-    std::cout << "(a a | b c)...";
+    std::cout << " (a a | b c)..." << std::endl;;
     HfstTransducer* fomaAaOrBc = fomaXre.compile("a a | b c");
     assert(fomaAaOrBc != 0);
     assert(fomaAaOrBc->compare(HfstTransducer(basicAaOrBc, FOMA_TYPE)));
     delete fomaAaOrBc;
 #endif
-    std::cout << std::endl << "define:";
+    std::cout << std::endl << "define:" << std::endl;;
 #if HAVE_SFST
-    std::cout << "sfst define(vowels, a | e | i | o | u | y)...";
+    std::cout << " sfst define(vowels, a | e | i | o | u | y)..." << std::endl;;
     sfstXre.define("vowels", "a | e | i | o | u | y");
 #endif
 #if HAVE_OPENFST
-    std::cout << "openfst define(vowels, a | e | i | o | u | y)...";
+    std::cout << " openfst define(vowels, a | e | i | o | u | y)..." << std::endl;;
     ofstXre.define("vowels", "a | e | i | o | u | y");
 #endif
 #if HAVE_FOMA
-    std::cout << "foma define(vowels, a | e | i | o | u | y)...";
+    std::cout << " foma define(vowels, a | e | i | o | u | y)..." << std::endl;;
     fomaXre.define("vowels", "a | e | i | o | u | y");
 #endif
     std::cout << "ok." << std::endl;
