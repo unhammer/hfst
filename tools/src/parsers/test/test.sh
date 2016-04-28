@@ -114,12 +114,11 @@ do
         at_re_1 at_re_2 at_re_3 at_txt at_stxt at_txt_and_stxt at_pl \
         quoted_literals replace_identity one_transition_regex merge \
         replace_test_flags_1 \
-        replace_markup_1 replace_markup_2 replace_markup_3 replace_markup_4 replace_markup_5\
+        replace_markup_1 replace_markup_2 replace_markup_3 replace_markup_4 replace_markup_5 \
         replace_markup_6 replace_markup_7 \
         priority_union_1 priority_union_2 priority_union_3 priority_union_4 \
-        
-        
-        #replace_test_flags_2        
+
+        # replace_test_flags_2
         # substitute_symbol_6 fails on sfst,  substitute_symbol_7 substitute_symbol_8 should be added
         # angle_brackets omitted, since xfst and foma handle them differently
     do

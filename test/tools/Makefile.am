@@ -162,6 +162,9 @@ endif
 if WANT_PROC
 TESTS += proc-functionality.sh
 endif
+if WANT_TOKENIZE
+TESTS += tokenize-functionality.sh
+endif
 
 TESTS += $(STRESSES)
 TESTS += mismatching-input-streams.sh
