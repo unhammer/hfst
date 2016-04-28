@@ -111,11 +111,11 @@ UNICODE_ESCAPE ("\\u"{HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR})|("\\U00"{HEXCHAR}{HEX
 "count-patterns" { return VAR_COUNT; }
 "delete-patterns" { return VAR_DELETE; }
 "extract-patterns" { return VAR_EXTRACT; }
-"locate-patterns"
-"mark-patterns"
-"max-context-length"
-"max-recursion"
-"need-separators"
+"locate-patterns" { return VAR_LOCATE; }
+"mark-patterns" { return VAR_MARK; }
+"need-separators" { return VAR_NEED_SEPARATORS; }
+"max-context-length" { return VAR_MAX_CONTEXT_LEN; }
+"max-recursion" { return VAR_MAX_RECURSION; }
 
 "~"   { return COMPLEMENT; }
 "\\"  { return TERM_COMPLEMENT; }

@@ -585,13 +585,13 @@ std::map<std::string, std::string> PmatchContainer::parse_hfst3_header(std::istr
         }
         int i = 0;
         while (i < remaining_header_len) {
-            int length = strlen(headervalue);
+            int length = strlen(headervalue + i);
             std::string property(headervalue + i, headervalue + i + length);
             i += length + 1;
-            length = strlen(headervalue);
+            length = strlen(headervalue + i);
             std::string value(headervalue + i, headervalue + i + length);
             properties[property] = value;
-            ++i;
+            i += length + 1;
         }
         delete[] headervalue;
         return properties;
