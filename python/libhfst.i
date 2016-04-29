@@ -995,7 +995,7 @@ class XreCompiler
 //  void set_harmonization(bool harmonize);
 //  void set_flag_harmonization(bool harmonize_flags);
 //  void set_verbosity(bool verbose);
-//  XreCompiler& setOutputToConsole(bool value);
+    XreCompiler& setOutputToConsole(bool value);
 //  bool getOutputToConsole();
 };
 }
