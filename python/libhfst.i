@@ -971,35 +971,51 @@ class HfstBasicTransition {
 //  };
 //}
 
+// *** XreCompiler: offer only a limited set of functions ***
+
 namespace xre {
 class XreCompiler
 {
   public:
   XreCompiler();
   XreCompiler(hfst::ImplementationType impl);
-//  void define(const std::string& name, const std::string& xre);
-//  void define_list(const std::string& name, const std::set<std::string>& symbol_list);
-//  bool define_function(const std::string& name, 
-//                       unsigned int arguments,
-//                       const std::string& xre);
-//  bool is_definition(const std::string& name);
-//  bool is_function_definition(const std::string& name);
-//  void define(const std::string& name, const HfstTransducer & transducer);
-//  void undefine(const std::string& name);
-//  HfstTransducer* compile(const std::string& xre);
-//  HfstTransducer* compile_first(const std::string& xre, unsigned int & chars_read);
-//  bool contained_only_comments();
-//  bool get_positions_of_symbol_in_xre
-//    (const std::string & symbol, const std::string & xre, std::set<unsigned int> & positions);
-//  void set_expand_definitions(bool expand);
-//  void set_harmonization(bool harmonize);
-//  void set_flag_harmonization(bool harmonize_flags);
-//  void set_verbosity(bool verbose);
-    XreCompiler& setOutputToConsole(bool value);
-//  bool getOutputToConsole();
+  void define_list(const std::string& name, const std::set<std::string>& symbol_list);
+  bool define_function(const std::string& name, unsigned int arguments, const std::string& xre);
+  bool is_definition(const std::string& name);
+  bool is_function_definition(const std::string& name);
+  void undefine(const std::string& name);
+  HfstTransducer* compile(const std::string& xre);
+  void set_verbosity(bool verbose);
+  bool getOutputToConsole();
+  void set_expand_definitions(bool expand); // TODO: should this be set automatically to True?
+
+  // *** Some wrappers *** //
+%extend{
+  void define_xre(const std::string& name, const std::string& xre)
+  {
+    self->define(name, xre);
+  }
+  void define_transducer(const std::string& name, const HfstTransducer & transducer)
+  {
+    self->define(name, transducer);
+  }
+  void setOutputToConsole(bool value) 
+  {
+    (void)self->setOutputToConsole(value);
+  }
+}
+
+  // *** These functions are not offered via Python *** //
+  //  HfstTransducer* compile_first(const std::string& xre, unsigned int & chars_read);
+  //  bool contained_only_comments();
+  //  bool get_positions_of_symbol_in_xre
+  //    (const std::string & symbol, const std::string & xre, std::set<unsigned int> & positions);
+  //  void set_harmonization(bool harmonize);
+  //  void set_flag_harmonization(bool harmonize_flags);
 };
 }
 
+// *** The LexcCompiler functions are offered only because they are needed in some python functions... *** //
 
 namespace lexc {
   class LexcCompiler
@@ -1043,6 +1059,7 @@ namespace lexc {
 
 }
 
+// *** The XfstCompiler functions are offered only because they are needed in some python functions... *** //
 
 namespace xfst {
   class XfstCompiler
@@ -1125,6 +1142,8 @@ namespace hfst_rules {
 
 
 } // namespace hfst
+
+// *** PmatchCompiler *** //
 
 namespace hfst_ol {
     class PmatchContainer

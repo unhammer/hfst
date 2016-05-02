@@ -527,6 +527,48 @@ def compile_lexc_file(filename, **kvargs):
 def compile_xfst_file(filename, **kvargs):
     pass
 
+## Compile pmatch expressions as defined in \a filename1 and store them in binary format in \a filename2.
+# @see libhfst.create_pmatch_compiler
+#
+# An example:
+# 
+# If we have a file named streets.txt that contains:
+#
+# define CapWord UppercaseAlpha Alpha* ;
+# define StreetWordFr [{avenue} | {boulevard} | {rue}] ;
+# define DeFr [ [{de} | {du} | {des} | {de la}] Whitespace ] | [{d'} | {l'}] ;
+# define StreetFr StreetWordFr (Whitespace DeFr) CapWord+ ;
+# regex StreetFr EndTag(FrenchStreetName) ;
+# 
+# we can run:
+#
+# libhfst.compile_pmatch_file('streets.txt','streets.pmatch')
+# cont = libhfst.PmatchContainer('streets.pmatch')
+# assert cont.match("Je marche seul dans l'avenue des Ternes.") == "Je marche seul dans l'<FrenchStreetName>avenue des Ternes</FrenchStreetName>."
+def compile_pmatch_file(filename1, filename2, **kvargs):
+    pass
+
+## Create a libhfst.PmatchContainer as defined in binary format in file \a filename.
+# @see libhfst.compile_pmatch_file
+#
+# An example:
+# 
+# If we have a file named streets.txt that contains:
+#
+# define CapWord UppercaseAlpha Alpha* ;
+# define StreetWordFr [{avenue} | {boulevard} | {rue}] ;
+# define DeFr [ [{de} | {du} | {des} | {de la}] Whitespace ] | [{d'} | {l'}] ;
+# define StreetFr StreetWordFr (Whitespace DeFr) CapWord+ ;
+# regex StreetFr EndTag(FrenchStreetName) ;
+# 
+# we can run:
+#
+# libhfst.compile_pmatch_file('streets.txt','streets.pmatch')
+# cont = libhfst.PmatchContainer('streets.pmatch')
+# assert cont.match("Je marche seul dans l'avenue des Ternes.") == "Je marche seul dans l'<FrenchStreetName>avenue des Ternes</FrenchStreetName>."
+def create_pmatch_container(filename):
+    pass
+
 ## Start interactive xfst compiler.
 # @param kvargs Arguments recognized are: type, quit_on_fail.
 # @param quit_on_fail Whether the compiler exits on any error, defaults to False.
