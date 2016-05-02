@@ -1990,97 +1990,97 @@ class HfstTokenizer:
 ## A compiler holding information contained in lexc style lexicons.
 # A single LexcCompiler can be extended by adding entries to it, but little
 # else can be done with it. It is sufficient to implement clone of lexc.
-class LexcCompiler:
+#class LexcCompiler:
 
   ## Create a lexc compiler for unspecified transducer format.
-  def __init__(self):
-      pass
+  #def __init__(self):
+  #    pass
 
   ## Create a lexc compiler with \a impl as transducer format.
-  def __init__(self, impl):
-      pass
+  #def __init__(self, impl):
+  #    pass
 
   ## Create a lexc compiler with \a impl as transducer format.
-  def __init__(self, impl, withFlags):
-      pass
+  #def __init__(self, impl, withFlags):
+  #    pass
 
   ## Compile lexc description from \a infile into current compiler.
-  def parse(infile):
-      pass
+  #def parse(infile):
+  #    pass
 
   ## Compile lexc description from file @a filename into current compiler.
-  def parse(filename):
-      pass
+  #def parse(filename):
+  #    pass
 
   ## Set verbosity options. When \a verbose is true, LexcCompiler will output the messages that Xerox lexc compiler does.
-  def setVerbosity(verbose):
-      pass
+  #def setVerbosity(verbose):
+  #    pass
 
   ## todo
-  def isQuiet():
-      pass
+  #def isQuiet():
+  #    pass
   ## todo
-  def setTreatWarningsAsErrors(value):
-      pass
+  #def setTreatWarningsAsErrors(value):
+  #    pass
   ## todo
-  def areWarningsTreatedAsErrors():
-      pass
+  #def areWarningsTreatedAsErrors():
+  #    pass
   ## todo
-  def setAllowMultipleSublexiconDefinitions(value):
-      pass
+  #def setAllowMultipleSublexiconDefinitions(value):
+  #    pass
   ## todo
-  def setWithFlags(value):
-      pass
+  #def setWithFlags(value):
+  #    pass
   ## todo
-  def setMinimizeFlags(value):
-      pass
+  #def setMinimizeFlags(value):
+  #    pass
   ## todo
-  def setRenameFlags(value):
-      pass
+  #def setRenameFlags(value):
+  #    pass
 
   ## Add @a alphabet to multicharacter symbol set.
   # These symbols may be used for regular expression ? for backends that do
   # not support open alphabets.
-  def addAlphabet(alphabet):
-      pass
+  #def addAlphabet(alphabet):
+  #    pass
 
   ## todo
-  def addNoFlag(lexname):
-      pass
+  #def addNoFlag(lexname):
+  #    pass
 
   ## Set current processing lexicon name to @a lexicon_name.
-  def setCurrentLexiconName(lexicon_name):
-      pass
+  #def setCurrentLexiconName(lexicon_name):
+  #    pass
 
   ## Add entry defined by a @a entry to current lexicon, pointing to @a continuation weighing @a weight to current lexicon.
-  def addStringEntry(entry, continuation, weight):
-      pass
+  #def addStringEntry(entry, continuation, weight):
+  #    pass
 
   ## Add entry defined by @a upper:@a lower, pointing to @a continuation weighing @a weight to current lexicon.
-  def addStringPairEntry(upper, lower, continuation, weight):
-      pass
+  #def addStringPairEntry(upper, lower, continuation, weight):
+  #    pass
 
   ## Add entry defined by regular expression @a xre, pointing to @a continuation weighing @a weight to current lexicon.
-  def addXreEntry(xre, continuation, weight):
-      pass
+  #def addXreEntry(xre, continuation, weight):
+  #    pass
 
   ## Add macro definition named @a name matching regular expression @a xre to known xerox regular expressions.
-  def addXreDefinition(name, xre):
-      pass
+  #def addXreDefinition(name, xre):
+  #    pass
 
   ## Set start lexicon's name to @a lexicon_name.
-  def setInitialLexiconName(lexicon_name):
-      pass
+  #def setInitialLexiconName(lexicon_name):
+  #    pass
 
   ## Create final usable version of current lexicons and entries.
   # @return HfstTransducer pointer.
-  def compileLexical():
-      pass
+  #def compileLexical():
+  #    pass
 
   ## Check that current morphotax is connected and print anomalies.
   # Works like xerox lexc, for compatibility.
-  def printConnectedness():
-      pass
+  #def printConnectedness():
+  #    pass
 
 ## A compiler holding information needed to compile XREs.
 class XreCompiler:
@@ -2093,8 +2093,12 @@ class XreCompiler:
   def __init__(self, impl):
       pass
 
-  ## Add a definition macro. Compilers will replace arcs labeled \a name, with the transducer defined by \a xre in later phases of compilation.
-  def define(name, xre):
+  ## Add a definition macro. Compilers will replace arcs labeled \a name, with a transducer defined by regular expression \a xre in later phases of compilation.
+  def define_xre(name, xre):
+      pass
+
+  ## Add a definition macro. Compilers will replace arcs labeled \a name, with a transducer \a transducer in later phases of compilation.
+  def define_transducer(name, transducer):
       pass
 
   ## todo
@@ -2115,6 +2119,64 @@ class XreCompiler:
   # @return An HfstTransducer pointer.
   def compile(xre):
       pass
+
+  ## Whether \a name is a definition.
+  def is_definition(name):
+      pass
+
+  ## Whether \a name is a function definition.
+  def is_function_definition(name):
+      pass
+
+  ## Set the verbosity of the compiler.
+  # @arg v True or False
+  def set_verbosity(v):
+      pass
+
+  ## (Windows-specific) Whether output is printed to console instead of standard output.
+  # @arg v True or False
+  def setOutputToConsole(v):
+      pass
+
+  ## (Windows-specific) Whether output is printed to console instead of standard output.
+  def getOutputToConsole():
+      pass
+
+  ## Whether definitions are expanded.
+  # @arg v True or False  
+  def set_expand_definitions(v):
+      pass
+
+## A class for performing pattern matching.
+class PmatchContainer:
+
+  ## Initialize a PmatchContainer. Is this needed?
+  def __init__(self):
+      pass
+
+  ## Read pmatch definitions in binary format from file \a filename and create a PmatchContainer based on the definitions.
+  # @arg filename The name of the file containing binary transducers in libhfst.HFST_OLW_FORMAT defining how matching is performed. Basically a result from libhfst.compile_pmatch_file.
+  def __init__(self, filename):
+      pass
+  ## Match input \a input.
+  def match(input, time_cutoff = 0):
+      pass
+  ## todo
+  def get_profiling_info():
+      pass
+  ## todo
+  def set_verbose(b):
+      pass
+  ## todo
+  def set_extract_tags_mode(b):
+      pass
+  ## todo
+  def set_profile(b):
+      pass
+
+## TODO
+def compile_pmatch_file(filename1, filename2, **kvargs):
+    pass
 
 # For example the transducer 
 # 
