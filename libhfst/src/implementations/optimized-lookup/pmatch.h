@@ -14,6 +14,7 @@
 #include <sstream>
 #include <algorithm>
 #include <ctime>
+#include "HfstTransducer.h"
 #include "transducer.h"
 
 namespace hfst_ol {
@@ -187,10 +188,13 @@ namespace hfst_ol {
         // A flag to set for when time has been overstepped
         bool limit_reached;
 
+        void collect_first_symbols(void);
+
     public:
 
         PmatchContainer(std::istream & is);
         PmatchContainer(Transducer * toplevel);
+        PmatchContainer(std::vector<hfst::HfstTransducer> transducers);
         PmatchContainer(void);
         ~PmatchContainer(void);
 

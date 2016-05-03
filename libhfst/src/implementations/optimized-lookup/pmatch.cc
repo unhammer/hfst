@@ -9,6 +9,8 @@
 #include "pmatch.h"
 #include "hfst.h"
 
+using hfst::HfstTransducer;
+
 namespace hfst_ol {
 
 PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
@@ -221,13 +223,76 @@ void PmatchAlphabet::count(SymbolNumber sym)
     }
 }
 
+void PmatchContainer::collect_first_symbols(void)
+{
+    // Fetch the first symbols from any
+    // first-position rtn arcs in TOP. If they are potential epsilon loops,
+    // clear out the set.
+    toplevel->collect_possible_first_symbols();
+
+    SymbolNumber max_input_sym = 0;
+    std::set<SymbolNumber> & possible_firsts = toplevel->possible_first_symbols;
+    for (std::set<SymbolNumber>::iterator it = possible_firsts.begin();
+         it != possible_firsts.end(); ++it) {
+        if (*it > max_input_sym) { max_input_sym = *it; }
+        if (alphabet.has_rtn(*it)) {
+            if (alphabet.get_rtn(*it) == toplevel) {
+                possible_firsts.clear();
+                break;
+            }
+            alphabet.get_rtn(*it)->collect_possible_first_symbols();
+            std::set<SymbolNumber> rtn_firsts =
+                alphabet.get_rtn(*it)->possible_first_symbols;
+            for (RtnNameMap::const_iterator it = alphabet.rtn_names.begin();
+                 it != alphabet.rtn_names.end(); ++it) {
+                if (rtn_firsts.count(it->second) == 1) {
+                    // For now we are very conservative:
+                    // if we can go through two levels of rtns
+                    // without any input, we just assume the full
+                    // input set is possible
+                    possible_firsts.clear();
+                }
+            }
+            if (rtn_firsts.empty() || possible_firsts.empty()) {
+                possible_firsts.clear();
+                break;
+            } else {
+                for (std::set<SymbolNumber>::
+                         const_iterator rtn_it = rtn_firsts.begin();
+                     rtn_it != rtn_firsts.end(); ++rtn_it) {
+                    if (*rtn_it > max_input_sym) { max_input_sym = *rtn_it ;}
+                    possible_firsts.insert(*rtn_it);
+                }
+            }
+        }
+    }
+    for (RtnNameMap::const_iterator it = alphabet.rtn_names.begin();
+         it != alphabet.rtn_names.end(); ++it) {
+        possible_firsts.erase(it->second);
+    }
+    if (!possible_firsts.empty() &&
+        alphabet.get_special(boundary) != NO_SYMBOL_NUMBER) {
+        possible_firsts.insert(alphabet.get_special(boundary));
+    }
+    if (!possible_firsts.empty()) {
+        for (int i = 0; i <= max_input_sym; ++i) {
+            if (possible_firsts.count(i) == 1) {
+                possible_first_symbols.push_back(1);
+            } else {
+                possible_first_symbols.push_back(0);
+            }
+        }
+    }
+}
+
 PmatchContainer::PmatchContainer(std::istream & inputstream):
     verbose(false),
     locate_mode(false),
     profile_mode(false),
     single_codepoint_tokenization(false),
     recursion_depth_left(PMATCH_MAX_RECURSION_DEPTH),
-    entry_stack()
+    entry_stack(),
+    line_number(0)
 {
     std::string transducer_name;
     std::map<std::string, std::string> properties = parse_hfst3_header(inputstream);
@@ -251,7 +316,6 @@ PmatchContainer::PmatchContainer(std::istream & inputstream):
     alphabet = PmatchAlphabet(inputstream, header.symbol_count());
     orig_symbol_count = symbol_count = alphabet.get_orig_symbol_count();
     alphabet.extract_tags = locate_mode;
-    line_number = 0;
     encoder = new Encoder(alphabet.get_symbol_table(), orig_symbol_count);
     toplevel = new hfst_ol::PmatchTransducer(
         inputstream,
@@ -281,66 +345,7 @@ PmatchContainer::PmatchContainer(std::istream & inputstream):
             delete rtn;
         }
     }
-    
-    toplevel->collect_possible_first_symbols();
-
-    // Finally fetch the first symbols from any
-    // first-position rtn arcs in TOP. If they are potential epsilon loops,
-    // clear out the set.
-    SymbolNumber max_input_sym = 0;
-    std::set<SymbolNumber> & possible_firsts = toplevel->possible_first_symbols;
-    for (std::set<SymbolNumber>::iterator it = possible_firsts.begin();
-         it != possible_firsts.end(); ++it) {
-        if (*it > max_input_sym) { max_input_sym = *it; }
-        if (alphabet.has_rtn(*it)) {
-            if (alphabet.get_rtn(*it) == toplevel) {
-                possible_firsts.clear();
-                break;
-            }
-            alphabet.get_rtn(*it)->collect_possible_first_symbols();
-            std::set<SymbolNumber> rtn_firsts =
-                alphabet.get_rtn(*it)->possible_first_symbols;
-            for (RtnNameMap::const_iterator it = alphabet.rtn_names.begin();
-                 it != alphabet.rtn_names.end(); ++it) {
-                if (rtn_firsts.count(it->second) == 1) {
-                    // For now we are very conservative:
-                    // if we can go through two levels of rtns
-                    // without any input, we just assume the full
-                    // input set is possible
-                    possible_firsts.clear();
-                }
-            }
-            if (rtn_firsts.empty() || possible_firsts.empty()) {
-                possible_firsts.clear();
-                break;
-            } else {
-                for (std::set<SymbolNumber>::
-                         const_iterator rtn_it = rtn_firsts.begin();
-                     rtn_it != rtn_firsts.end(); ++rtn_it) {
-                    if (*rtn_it > max_input_sym) { max_input_sym = *rtn_it ;}
-                    possible_firsts.insert(*rtn_it);
-                }
-            }
-        }
-    }
-    for (RtnNameMap::const_iterator it = alphabet.rtn_names.begin();
-         it != alphabet.rtn_names.end(); ++it) {
-        possible_firsts.erase(it->second);
-    }
-    if (!possible_firsts.empty() &&
-        alphabet.get_special(boundary) != NO_SYMBOL_NUMBER) {
-        possible_firsts.insert(alphabet.get_special(boundary));
-    }
-    if (!possible_firsts.empty()) {
-        for (int i = 0; i <= max_input_sym; ++i) {
-            if (possible_firsts.count(i) == 1) {
-                possible_first_symbols.push_back(1);
-            } else {
-                possible_first_symbols.push_back(0);
-            }
-        }
-    }
-    
+    collect_first_symbols();
 }
 
 PmatchContainer::PmatchContainer(Transducer * t):
@@ -364,64 +369,154 @@ PmatchContainer::PmatchContainer(Transducer * t):
         indices.get_vector(),
         alphabet,
         this);
-    toplevel->collect_possible_first_symbols();
+    collect_first_symbols();
+}
 
-    // Finally fetch the first symbols from any
-    // first-position rtn arcs in TOP. If they are potential epsilon loops,
-    // clear out the set.
-    SymbolNumber max_input_sym = 0;
-    std::set<SymbolNumber> & possible_firsts = toplevel->possible_first_symbols;
-    for (std::set<SymbolNumber>::iterator it = possible_firsts.begin();
-         it != possible_firsts.end(); ++it) {
-        if (*it > max_input_sym) { max_input_sym = *it; }
-        if (alphabet.has_rtn(*it)) {
-            if (alphabet.get_rtn(*it) == toplevel) {
-                possible_firsts.clear();
-                break;
-            }
-            alphabet.get_rtn(*it)->collect_possible_first_symbols();
-            std::set<SymbolNumber> rtn_firsts =
-                alphabet.get_rtn(*it)->possible_first_symbols;
-            for (RtnNameMap::const_iterator it = alphabet.rtn_names.begin();
-                 it != alphabet.rtn_names.end(); ++it) {
-                if (rtn_firsts.count(it->second) == 1) {
-                    // For now we are very conservative:
-                    // if we can go through two levels of rtns
-                    // without any input, we just assume the full
-                    // input set is possible
-                    possible_firsts.clear();
+// This constructor handles all the awkward optimized-lookup specific
+// harmonization, for which the conversion needs to be done anyway,
+// so there's no advantage to passing it transducers in optimized-lookup
+// format.
+PmatchContainer::PmatchContainer(std::vector<HfstTransducer> transducers):
+    verbose(false),
+    locate_mode(false),
+    profile_mode(false),
+    single_codepoint_tokenization(false),
+    recursion_depth_left(PMATCH_MAX_RECURSION_DEPTH),
+    entry_stack(),
+    line_number(0)
+{
+    if (transducers.size() == 0) {
+        return;
+    } else if (transducers.size() == 1) {
+        HfstTransducer * top = NULL;
+        if (transducers[0].get_type() != hfst::HFST_OLW_TYPE) {
+            top = new HfstTransducer(transducers[0]);
+            top->convert(hfst::HFST_OLW_TYPE);
+        } else {
+            top = &(transducers[0]);
+        }
+        Transducer * backend = hfst::implementations::ConversionFunctions::
+            hfst_transducer_to_hfst_ol(top);
+        TransducerHeader header(backend->get_header());
+        alphabet = PmatchAlphabet(backend->get_alphabet());
+        orig_symbol_count = symbol_count = alphabet.get_orig_symbol_count();
+        alphabet.extract_tags = locate_mode;
+        encoder = new Encoder(alphabet.get_symbol_table(), orig_symbol_count);
+        TransducerTable<TransitionW> transitions = backend->copy_transitionw_table();
+        TransducerTable<TransitionWIndex> indices = backend->copy_windex_table();
+        toplevel = new hfst_ol::PmatchTransducer(
+            transitions.get_vector(),
+            indices.get_vector(),
+            alphabet,
+            this);
+        if (transducers[0].get_type() != hfst::HFST_OLW_TYPE) {
+            // clean up if we needed a temp transducer
+            delete top;
+        }
+    } else {
+        // This is the difficult case where we have to make sure multiple
+        // optimized-lookup transducers are harmonized with each other.
+
+        HfstTransducer * top = NULL;
+        std::vector<HfstTransducer *> temporaries(transducers.size(), NULL);
+        // A dummy transducer with an alphabet with all the symbols
+        HfstTransducer harmonizer(hfst::TROPICAL_OPENFST_TYPE);
+        // First we need to collect a unified alphabet from all the transducers.
+        hfst::StringSet symbols_seen;
+        // We collect all the symbols and also copy and convert any non-olw bits
+        for (size_t i = 0; i < transducers.size(); ++i) {
+            hfst::StringSet string_set = transducers[i].get_alphabet();
+            for (hfst::StringSet::const_iterator sym = string_set.begin();
+                 sym != string_set.end(); ++sym) {
+                if (symbols_seen.count(*sym) == 0) {
+                    harmonizer.disjunct(HfstTransducer(*sym, harmonizer.get_type()));
+                    symbols_seen.insert(*sym);
                 }
             }
-            if (rtn_firsts.empty() || possible_firsts.empty()) {
-                possible_firsts.clear();
-                break;
+            if (transducers[i].get_name() == "TOP") {
+                if (transducers[i].get_type() == hfst::HFST_OLW_TYPE) {
+                top = &(transducers[i]);
+                } else {
+                    top = new HfstTransducer(transducers[i]);
+                    top->convert(hfst::HFST_OLW_TYPE);
+                }
             } else {
-                for (std::set<SymbolNumber>::
-                         const_iterator rtn_it = rtn_firsts.begin();
-                     rtn_it != rtn_firsts.end(); ++rtn_it) {
-                    if (*rtn_it > max_input_sym) { max_input_sym = *rtn_it ;}
-                    possible_firsts.insert(*rtn_it);
+                if (transducers[i].get_type() == hfst::HFST_OLW_TYPE) {
+                    temporaries[i] = &(transducers[i]);
+                } else {
+                    temporaries[i] = new HfstTransducer(transducers[i]);
+                    (temporaries[i])->convert(hfst::HFST_OLW_TYPE);
+                }
+            }
+        }
+        if (top == NULL) {
+            std::cerr << "pmatch: warning: TOP not defined in archive, using first as TOP\n";
+            top = temporaries[0];
+        }
+        // Then we convert the harmonizer...
+        harmonizer.convert(hfst::HFST_OLW_TYPE);
+        // Use these for naughty intermediate steps to make sure
+        // everything has the same alphabet
+        hfst::HfstBasicTransducer * intermediate_tmp;
+        hfst_ol::Transducer * harmonized_tmp;
+
+        // We take care of TOP first
+        intermediate_tmp = hfst::implementations::ConversionFunctions::
+            hfst_transducer_to_hfst_basic_transducer(*top);
+        harmonized_tmp = hfst::implementations::ConversionFunctions::
+            hfst_basic_transducer_to_hfst_ol(intermediate_tmp,
+                                             true, // weighted
+                                             "", // no special options
+                                             &harmonizer); // harmonize with this
+        TransducerHeader header = harmonized_tmp->get_header();
+        // this will be the alphabet of the entire container
+        alphabet = PmatchAlphabet(harmonized_tmp->get_alphabet());
+        orig_symbol_count = symbol_count = alphabet.get_orig_symbol_count();
+        alphabet.extract_tags = locate_mode;
+        encoder = new Encoder(alphabet.get_symbol_table(), orig_symbol_count);
+        TransducerTable<TransitionW> transitions = harmonized_tmp->copy_transitionw_table();
+        TransducerTable<TransitionWIndex> indices = harmonized_tmp->copy_windex_table();
+        toplevel = new hfst_ol::PmatchTransducer(
+            transitions.get_vector(),
+            indices.get_vector(),
+            alphabet,
+            this);
+        // Then we do the same for the other transducers except without
+        // alphabets or encoders because those should be identical
+        for (size_t i = 0; i < temporaries.size(); ++i) {
+            if (temporaries[i] != NULL) {
+                // there's a NULL where TOP should be
+                intermediate_tmp = hfst::implementations::ConversionFunctions::
+                    hfst_transducer_to_hfst_basic_transducer(*(temporaries[i]));
+                harmonized_tmp = hfst::implementations::ConversionFunctions::
+                    hfst_basic_transducer_to_hfst_ol(intermediate_tmp,
+                                                     true, // weighted
+                                                     "", // no special options
+                                                     &harmonizer); // harmonize with this
+                TransducerTable<TransitionW> transitions = harmonized_tmp->copy_transitionw_table();
+                TransducerTable<TransitionWIndex> indices = harmonized_tmp->copy_windex_table();
+                PmatchTransducer * rtn = new hfst_ol::PmatchTransducer(
+                    transitions.get_vector(),
+                    indices.get_vector(),
+                    alphabet,
+                    this);
+                alphabet.add_rtn(rtn, temporaries[i]->get_name());
+            }
+        }
+        // clean up the temporaries
+        for (size_t i = 0; i < transducers.size(); ++i) {
+            if (transducers[i].get_name() == "TOP") {
+                if (transducers[i].get_type() != hfst::HFST_OLW_TYPE) {
+                    delete top;
+                }
+            } else {
+                if (transducers[i].get_type() != hfst::HFST_OLW_TYPE) {
+                    delete temporaries[i];
                 }
             }
         }
     }
-    for (RtnNameMap::const_iterator it = alphabet.rtn_names.begin();
-         it != alphabet.rtn_names.end(); ++it) {
-        possible_firsts.erase(it->second);
-    }
-    if (!possible_firsts.empty() &&
-        alphabet.get_special(boundary) != NO_SYMBOL_NUMBER) {
-        possible_firsts.insert(alphabet.get_special(boundary));
-    }
-    if (!possible_firsts.empty()) {
-        for (int i = 0; i <= max_input_sym; ++i) {
-            if (possible_firsts.count(i) == 1) {
-                possible_first_symbols.push_back(1);
-            } else {
-                possible_first_symbols.push_back(0);
-            }
-        }
-    }
+    collect_first_symbols();
 }
 
 void PmatchContainer::add_rtn(Transducer * rtn, const std::string & name)
