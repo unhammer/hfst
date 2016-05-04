@@ -19,7 +19,8 @@ exclude_tests="(Converting tags with replacement)\
 |(Long input lines)\
 |(Any character except in a set)\
 |(Referring to a double quote in a regexp)\
-|(Character literal escapes)"
+|(Character literal escapes)\
+|(Named expressions in replace)"
 
 testset_begin "Testing Pmatch"
 
