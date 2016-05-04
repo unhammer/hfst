@@ -356,6 +356,16 @@ ALL_SRCS=$(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) \
 
 EXTRA_FILES=cat2dog.substitute cat.strings cat.txt cats_and_dogs.xre utf-8.strings latin-1.strings c_a_t.strings dos.strings not-contains-a.xre not-contains-a-comment-emptyline.xre parallel-left-arrow-multicom-emptyline.xre  parallel-left-arrow.xre cat.prolog negative_epsilon_cycles.txt no_negative_epsilon_cycles.txt substituting_transducer.txt substituted_transducer.txt
 
+TOKENIZE_FILES=tokenize-dog-gen.hfst \
+tokenize-dog.hfst \
+tokenize-dog-in.lexc \
+tokenize-dog-out-cg.strings \
+tokenize-dog-out-gtd.strings \
+tokenize-dog-out.strings \
+tokenize-dog-out-xerox.strings \
+tokenize-dog.pmscript
+
+
 RESULT_FILES=basic.cat-dog-bird.lexc.flag.result.prolog \
 basic.cat-dog-bird.lexc.result.prolog \
 basic.colons.lexc.flag.result.prolog \
@@ -431,7 +441,7 @@ warn.one-sided-flags.lexc.result.prolog
 
 # files needed for test programs
 EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) $(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TXTS) $(XFST_TXTS) $(TESTS) $(EXTRA_FILES) $(LEXC_TXTS) $(PMATCH_TXTS) $(PMATCHSCRIPTS) script.xfst lexc2fst-stress.sh lookup-stress.sh proc-stress.sh valgrind.sh \
-calculate-functionality.sh shuffle-functionality.sh $(RESULT_FILES)
+calculate-functionality.sh shuffle-functionality.sh $(RESULT_FILES) $(TOKENIZE_FILES)
 
 
 valgrind: $(CHECK_DATA)
