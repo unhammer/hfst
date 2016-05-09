@@ -35,7 +35,11 @@ script:
 notifications:
     irc:
         channels:
-            - "chat.freenode.net#hfst"
+            - secure: "akriDwCdJjtTTitDmDSqXAXcA33pHlj+N9TYmjuaJHP8WPjxNI/rHEA5n3rDdJkUI/+2oN9Pf5+2uiZsC5ChArwIJQDxe+WV/jxykFFJ/lNgD3YHLdHHlGKzdKtzFVxxDJuWmARsyRyxv3yzzAoTgE3dFkrWNwb3Yjhh5AfVugAsmc948W0bAr3nEyW72g6G4eyabdQZND4wA2phmrOUIF0GFBgAStAiNEiCajeziSgOpr0CBJQ6QKCx3E/fmsw9X6/+PPQsfKWDxJpbbSfAzusBiTAKUNu+Wqrqsg8fi+bNXLkXQvRw4te3kLww3AOIACRo/a/5O1z8QzASvE7+Vyh6OBDUvNcmMB5xl3h9h3Y0c2x6r8dNC/vtqYLpUi6J8nj1lQPwcL6HJ/P4zwf6XrBqoWbLhfeJqZ3jRXqP61OtIu2DO86SEm1zCBZND1r3ed2nUaYHQMbGQwI86IKns9NXbIWaQ4FqDbrhEV5MRKuRAZ4SIzBnrF3T1ZCXkX03dbliakgAFrFn9nDik9KTqXMDgLmKTie0Xr0g3BAfHXci4KpMU3ka9vkKzxGnLvcK+P8QvbG/y4ino8w6ho/KsQdCaVuWe2SFwZ8zj4uZhDTIvOl7hjAYd6YdIY2KHHRw3wyC+8vRXNmuHIouN05LpzeGhnG6bgoGGjtn8ksSyu0="
         on_failure: always
-        on_success: never
+        on_success: always
+# The irc channel is encrypted for hfst/hfst, so build notifications from forks won't show up on the IRC channel
+# Encrypt with:
+# $ gem install --user-install travis
+# $ ~/.gem/ruby/*/bin/travis encrypt -r hfst/hfst 'chat.freenode.net#hfst'
 
