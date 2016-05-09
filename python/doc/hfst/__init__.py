@@ -1729,7 +1729,7 @@ class HfstTokenizer:
     # >>> tok = hfst.HfstTokenizer()
     # >>> tok.add_skip_symbol('foo')
     # >>> tok.tokenize_one_level('foofofoobar')
-    # ('f', 'o', 'b', 'a', 'r')  
+    # ('f', 'o', 'b', 'a', 'r')
     # \endverbatim
     #
     # Note that both multicharacter symbols and skip symbols are matched from left to right
@@ -1817,6 +1817,24 @@ class HfstTokenizer:
         pass
 
     ## Tokenize \a str and skip all spaces.
+    #
+    # \verbatim
+    # >>> tok = hfst.HfstTokenizer()
+    # >>> tok.tokenize_space_separated('f o o b a r')
+    # (('f', 'f'), ('o', 'o'), ('o', 'o'), ('b', 'b'), ('a', 'a'), ('r', 'r'))
+    # >>> tok.tokenize_space_separated('foo b a r')
+    # (('foo', 'foo'), ('b', 'b'), ('a', 'a'), ('r', 'r'))
+    # >>> tok.tokenize_space_separated('f o o bar')
+    # (('f', 'f'), ('o', 'o'), ('o', 'o'), ('bar', 'bar'))
+    # >>> tok.tokenize_space_separated('foo bar')
+    # (('foo', 'foo'), ('bar', 'bar'))
+    # >>> tok.tokenize_space_separated('foobar')
+    # (('foobar', 'foobar'),)    
+    # \endverbatim
+    #
+    # Note that skip symbols and multicharacter symbols defined with #add_skip_symbol and #add_multichar_symbol
+    # have no effect when #tokenize_space_separated is called.
+    #
     # @return A tuple of strings.
     def tokenize_space_separated(self, str):
         pass
@@ -1837,6 +1855,13 @@ class HfstTokenizer:
     #     -# Initial bytes 11110xxx are followed by exactly three 
     #        continuation bytes.
     # (For reference: http://en.wikipedia.org/wiki/UTF-8)
+    #
+    # \verbatim
+    # try:
+    #     hfst.HfstTokenizer.check_utf8_correctness('föö')
+    # except hfst.exceptions.IncorrectUtf8CodingException as e:
+    #     print('FAIL')
+    # \verbatim
     #
     # This function is a static one.
     def check_utf8_correctness(input_string):
