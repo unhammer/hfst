@@ -617,11 +617,21 @@ class HfstBasicTransducer:
         pass
 
     ## Create a transducer with one initial state that has state number zero and is not a final state, i.e. create an empty transducer.
+    #
+    # \verbatim
+    # tr = hfst.HfstBasicTransducer()
+    # \endverbatim
     def __init__(self):
         pass
 
     ## Create a transducer equivalent to \a transducer.
     # @param transducer The transducer to be copied, #hfst.HfstBasicTransducer or #hfst.HfstTransducer.
+    #
+    # \verbatim
+    # tr = hfst.regex('foo') # creates an HfstTransducer
+    # TR = hfst.HfstBasicTransducer(tr)
+    # TR2 = hfst.HfstBasicTransducer(TR)
+    # \endverbatim
     def __init__(self, transducer):
         pass
 
@@ -780,6 +790,10 @@ class HfstBasicTransition:
     # @param output The output string.
     # @param weight The weight.
     # @throws EmptyStringException
+    #
+    # \verbatim
+    # transition = hfst.HfstBasicTransition(1, 'foo', 'bar', 0.5)
+    # \endverbatim    
     def __init__(self, state, input, output, weight):
         pass
 
@@ -855,7 +869,7 @@ class HfstTransducer:
     # @note This constructor leaves the backend implementation variable
     # uninitialized. An uninitialized transducer is likely to cause a
     # TransducerHasWrongTypeException at some point unless it is given
-    # a value at some point. 
+    # a value at some point.
     def __init__(self):
         pass
 
@@ -1562,6 +1576,11 @@ class HfstInputStream:
     # @throws NotTransducerStreamException
     # @throws EndOfStreamException
     # @throws TransducerHeaderException
+    #
+    # \verbatim
+    # istr_to_stdin = hfst.HfstInputStream()
+    # istr_to_file = hfst.HfstInputStream(filename='transducer.hfst')
+    # \endverbatim
     def __init__(self, filename=None):
         pass
 
@@ -1617,6 +1636,25 @@ class HfstOutputStream:
     # @param filename The name of the file where transducers are written. If the file exists, it is overwritten. If \a filename is not given, transducers are written to standard output.
     # @param hfst_format Whether transducers are written in hfst format (default is True) or as such in their backend format.
     # @param type The type of the transducers that will be written to the stream. Default is #hfst.get_default_fst_type().
+    #
+    # \verbatim
+    # ostr = hfst.HfstOutputStream()  # a stream for writing default type transducers in hfst format to standard output
+    # transducer = hfst.regex('foo:bar::0.5')
+    # ostr.write(transducer)
+    # ostr.flush()
+    # \endverbatim
+    #
+    # \verbatim
+    # ostr = hfst.HfstOutputStream(filename='transducer.sfst', hfst_format=False, type=hfst.SFST_TYPE)  # a stream for writing SFST_TYPE transducers in their back-end format to a file
+    # transducer1 = hfst.regex('foo:bar')
+    # transducer1.convert(hfst.SFST_TYPE)  # if not set as the default type
+    # transducer2 = hfst.regex('bar:baz')
+    # transducer2.convert(hfst.SFST_TYPE)  # if not set as the default type
+    # ostr.write(transducer1)
+    # ostr.write(transducer2)
+    # ostr.flush()
+    # ostr.close()
+    # \endverbatim
     def __init__(self, **kvargs):
         pass
 
@@ -1628,7 +1666,7 @@ class HfstOutputStream:
     #
     # All transducers must have the same type as the stream, else a TransducerTypeMismatchException is thrown. 
     #
-    # @throws TransducerTypeMismatchException
+    # @throws hfst.exceptions.TransducerTypeMismatchException
     def write(transducer):
         pass
 
@@ -1654,15 +1692,22 @@ class MultiCharSymbolTrie:
   
 ## A tokenizer for creating transducers from UTF-8 strings.
 #
-# Strings are tokenized from left to right using longest match tokenization.
-# For example, if the tokenizer contains a multicharacter symbol 
-# 'foo' and a skip symbol 'fo', the string "foo" is tokenized as 'foo:foo'.
-# If the tokenizer contains a multicharacter symbol 'fo' and a skip 
-# symbol 'foo', the string "foo" is tokenized as an empty string.
+# With an HfstTokenizer, it is possible to split UTF-8 strings into
+# tuples of symbols which can then in turn be used to create transducers:
 #
-# An example:
 # \verbatim
+# >>> tok = hfst.HfstTokenizer()
+# >>> tok.add_multichar_symbol('foo')
+# >>> tok.add_skip_symbol('b')
+# >>> tok.tokenize('foobar')
+# (('foo', 'foo'), ('a', 'a'), ('r', 'r'))
+# >>> tok.tokenize_one_level('foobar')
+# ('foo', 'a', 'r')
+# >>> tok.tokenize('foobar','barfoo')
+# (('foo', 'a'), ('a', 'r'), ('r', 'foo'))
 # \endverbatim
+#
+# Strings are tokenized from left to right using longest match tokenization.
 #
 # @note The tokenizer only tokenizes utf-8 strings. 
 # Special symbols are not included in the tokenizer 
@@ -1670,33 +1715,85 @@ class MultiCharSymbolTrie:
 class HfstTokenizer:
 
     ## Create a tokenizer that recognizes utf-8 symbols. 
+    #
+    # \verbatim
+    # tok = hfst.HfstTokenizer()
+    # \endverbatim
+    #
     def __init__(self):
         pass
 
     ## Add a symbol to be skipped to this tokenizer. 
     #
-    # After skipping a symbol, tokenization is always started again.
-    # For example if we have a multicharacter symbol 'foo' and a 
-    # skip symbol 'bar', the string "fobaro" will be tokenized 
-    # 'f' 'o' 'o', not 'foo'. 
+    # \verbatim
+    # >>> tok = hfst.HfstTokenizer()
+    # >>> tok.add_skip_symbol('foo')
+    # >>> tok.tokenize_one_level('foofofoobar')
+    # ('f', 'o', 'b', 'a', 'r')  
+    # \endverbatim
+    #
+    # Note that both multicharacter symbols and skip symbols are matched from left to right
+    # using longest match tokenization:
+    #
+    # \verbatim
+    # >>> tok = hfst.HfstTokenizer()
+    # >>> tok.add_multichar_symbol('foo')
+    # >>> tok.add_skip_symbol('fo')
+    # >>> tok.tokenize_one_level('foofo')
+    # ('foo',)
+    # \endverbatim
+    # 
+    # \verbatim
+    # >>> tok = hfst.HfstTokenizer()
+    # >>> tok.add_multichar_symbol('fo')
+    # >>> tok.add_skip_symbol('foo')
+    # >>> tok.tokenize_one_level('foofo')
+    # ('fo',)
+    # \endverbatim
+    #
     def add_skip_symbol(self, symbol):
         pass
 
     ## Add a multicharacter symbol \a symbol to this tokenizer. 
     #
-    # If a multicharacter symbol has a skip symbol inside it, it is
-    # not considered a multicharacter symbol. For example if we have 
-    # a multicharacter symbol 'foo' and a skip symbol 'bar', the string
-    # "fobaro" will be tokenized 'f' 'o' 'o', not 'foo'. 
+    # Strings are always tokenized from left to right using longest match tokenization.
+    #
+    # \verbatim
+    # >>> tok = hfst.HfstTokenizer()
+    # >>> tok.add_multichar_symbol('fo')
+    # >>> tok.add_multichar_symbol('foo')
+    # >>> tok.add_multichar_symbol('of')
+    # >>> tok.tokenize_one_level('fofoofooof')
+    # ('fo', 'foo', 'foo', 'of')
+    # \endverbatim
+    #
     def add_multichar_symbol(self, symbol):
         pass
 
-    ## Tokenize the string \a input_string. 
+    ## Tokenize the string \a input_string.
+    #
+    # \verbatim
+    # >>> tok = hfst.HfstTokenizer()
+    # >>> t = tok.tokenize('foobar')
+    # >>> print(t)
+    # (('f', 'f'), ('o', 'o'), ('o', 'o'), ('b', 'b'), ('a', 'a'), ('r', 'r'))
+    # \endverbatim
+    # 
+    # @see #tokenize_one_level
     # @return A tuple of string pairs.
     def tokenize(self, input_string):
         pass
 
     ## Tokenize the string \a input_string.
+    #
+    # \verbatim
+    # >>> tok = hfst.HfstTokenizer()
+    # >>> t = tok.tokenize_one_level('foobar')
+    # >>> print(t)
+    # ('f', 'o', 'o', 'b', 'a', 'r')
+    # \endverbatim
+    #
+    # @see #tokenize
     # @return A tuple of strings.
     def tokenize_one_level(self, input_string):
         pass
@@ -1706,6 +1803,14 @@ class HfstTokenizer:
     # If one string has more tokens than the other, epsilons will be
     # inserted to the end of the tokenized string with less tokens
     # so that both tokenized strings have the same number of tokens.
+    #
+    # \verbatim
+    # >>> tok = hfst.HfstTokenizer()
+    # >>> tok.add_multichar_symbol('foo')
+    # >>> tok.add_skip_symbol('b')
+    # >>> tok.tokenize('foobar','Foobar')
+    # (('foo', 'F'), ('a', 'o'), ('r', 'o'), ('@_EPSILON_SYMBOL_@', 'a'), ('@_EPSILON_SYMBOL_@', 'r'))  
+    # \endverbatim
     #
     # @return A tuple of string pairs.
     def tokenize(self, input_string, output_string):
