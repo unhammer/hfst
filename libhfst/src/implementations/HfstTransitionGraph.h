@@ -1137,7 +1137,7 @@
            return true;
          }
 
-         HFSTDLL static bool parse_prolog_network_line(const std::string & line, std::string & name)
+         HFSTDLL static bool parse_prolog_network_line(const std::string & line, HfstTransitionGraph & graph)
          {
            // 'network(NAME).'
            char namearr[100];
@@ -1150,7 +1150,7 @@
            if (!strip_ending_parenthesis_and_comma(namestr))
              return false;
 
-           name = namestr;
+           graph.name = namestr;
            return true;
          }
 
@@ -1449,7 +1449,7 @@
              }
 
 
-           if (! parse_prolog_network_line(linestr, retval.name))
+           if (! parse_prolog_network_line(linestr, retval))
              {
                std::string message("first line not valid prolog: ");
                message.append(linestr);
@@ -1731,6 +1731,56 @@
          }
 
 
+         bool add_att_line(char * line, const std::string & epsilon_symbol)
+         {
+           // scan one line that can have a maximum of five fields
+           char a1 [100]; char a2 [100]; char a3 [100]; 
+           char a4 [100]; char a5 [100];
+           // how many fields could be parsed
+           int n = sscanf(line, "%s%s%s%s%s", a1, a2, a3, a4, a5);
+           
+           // set value of weight
+           float weight = 0;
+           if (n == 2) // a final state line with weight
+             weight = atof(a2);
+           if (n == 5) // a transition line with weight
+             weight = atof(a5);
+           
+           if (n == 1 || n == 2)  // a final state line
+             set_final_weight( atoi(a1), weight );
+           
+           else if (n == 4 || n == 5) { // a transition line
+             std::string input_symbol=std::string(a3);
+             std::string output_symbol=std::string(a4);
+             
+             // replace "@_SPACE_@"s with " " and "@0@"s with 
+             // "@_EPSILON_SYMBOL_@" 
+             replace_all(input_symbol, "@_SPACE_@", " ");
+             replace_all(input_symbol, "@0@", "@_EPSILON_SYMBOL_@");
+             replace_all(input_symbol, "@_TAB_@", "\t");
+             replace_all(input_symbol, "@_COLON_@", ":");
+             
+             replace_all(output_symbol, "@_SPACE_@", " ");
+             replace_all(output_symbol, "@0@", "@_EPSILON_SYMBOL_@");
+             replace_all(output_symbol, "@_TAB_@", "\t");
+             replace_all(output_symbol, "@_COLON_@", ":");
+             
+             if (epsilon_symbol.compare(input_symbol) == 0)
+               input_symbol="@_EPSILON_SYMBOL_@";
+             if (epsilon_symbol.compare(output_symbol) == 0)
+               output_symbol="@_EPSILON_SYMBOL_@";
+             
+             HfstTransition <C> tr( atoi(a2), input_symbol, 
+                                    output_symbol, weight );
+             add_transition( atoi(a1), tr );
+           }
+           
+           else  {  // line could not be parsed
+             return false;
+           } 
+           return true;
+         }
+
          /* Create an HfstTransitionGraph as defined in AT&T format 
             in istream \a is or FILE \a file. \a epsilon_symbol defines
             how epsilon is represented. 
@@ -1793,54 +1843,13 @@
              if (*line == '-') // transducer separator line is "--"
                return retval;
 
-             // scan one line that can have a maximum of five fields
-             char a1 [100]; char a2 [100]; char a3 [100]; 
-             char a4 [100]; char a5 [100];
-             // how many fields could be parsed
-             int n = sscanf(line, "%s%s%s%s%s", a1, a2, a3, a4, a5);
-
-             // set value of weight
-             float weight = 0;
-             if (n == 2) // a final state line with weight
-               weight = atof(a2);
-             if (n == 5) // a transition line with weight
-               weight = atof(a5);
-
-             if (n == 1 || n == 2)  // a final state line
-               retval.set_final_weight( atoi(a1), weight );
-
-             else if (n == 4 || n == 5) { // a transition line
-               std::string input_symbol=std::string(a3);
-               std::string output_symbol=std::string(a4);
-
-               // replace "@_SPACE_@"s with " " and "@0@"s with 
-               // "@_EPSILON_SYMBOL_@" 
-               replace_all(input_symbol, "@_SPACE_@", " ");
-               replace_all(input_symbol, "@0@", "@_EPSILON_SYMBOL_@");
-               replace_all(input_symbol, "@_TAB_@", "\t");
-               replace_all(input_symbol, "@_COLON_@", ":");
-
-               replace_all(output_symbol, "@_SPACE_@", " ");
-               replace_all(output_symbol, "@0@", "@_EPSILON_SYMBOL_@");
-               replace_all(output_symbol, "@_TAB_@", "\t");
-               replace_all(output_symbol, "@_COLON_@", ":");
-
-               if (epsilon_symbol.compare(input_symbol) == 0)
-                 input_symbol="@_EPSILON_SYMBOL_@";
-               if (epsilon_symbol.compare(output_symbol) == 0)
-                 output_symbol="@_EPSILON_SYMBOL_@";
-
-               HfstTransition <C> tr( atoi(a2), input_symbol, 
-                                       output_symbol, weight );
-               retval.add_transition( atoi(a1), tr );
-             }
-
-             else  {  // line could not be parsed
-               std::string message(line);
-               HFST_THROW_MESSAGE
-                 (NotValidAttFormatException,
-                  message);
-             }    
+             if (! retval.add_att_line(line, epsilon_symbol))
+               {
+                 std::string message(line);
+                 HFST_THROW_MESSAGE
+                   (NotValidAttFormatException,
+                    message);
+               }
            }
            return retval;
          }
