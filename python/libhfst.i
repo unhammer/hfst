@@ -48,7 +48,7 @@
 #include "hfst_pmatch_extensions.cc"
 #include "hfst_lookup_extensions.cc"
 #include "hfst_rules_extensions.cc"
-
+#include "hfst_prolog_extensions.cc"
 %}
 
 #ifdef _MSC_VER
@@ -1054,11 +1054,16 @@ void hfst::set_default_fst_type(hfst::ImplementationType t);
 hfst::ImplementationType hfst::get_default_fst_type();
 std::string hfst::fst_type_to_string(hfst::ImplementationType t);
 
-hfst::HfstTransducer * hfst::read_att(hfst::HfstFile & f, std::string epsilon="@_EPSILON_SYMBOL_@") throw(EndOfStreamException, NotValidAttFormatException);
-hfst::HfstTransducer * hfst::read_prolog(hfst::HfstFile & f) throw(EndOfStreamException);
+//hfst::HfstTransducer * hfst::read_att(hfst::HfstFile & f, std::string epsilon="@_EPSILON_SYMBOL_@") throw(EndOfStreamException, NotValidAttFormatException);
+//hfst::HfstTransducer * hfst::read_prolog(hfst::HfstFile & f) throw(EndOfStreamException);
 
 std::string hfst::one_level_paths_to_string(const HfstOneLevelPaths &);
 std::string hfst::two_level_paths_to_string(const HfstTwoLevelPaths &);
+
+bool parse_prolog_network_line(const std::string & line, hfst::implementations::HfstBasicTransducer * graph);
+bool parse_prolog_arc_line(const std::string & line, hfst::implementations::HfstBasicTransducer * graph);
+bool parse_prolog_symbol_line(const std::string & line, hfst::implementations::HfstBasicTransducer * graph);
+bool parse_prolog_final_line(const std::string & line, hfst::implementations::HfstBasicTransducer * graph);
 
 // *** hfst_rules (via module hfst.rules) *** //
 
@@ -1159,7 +1164,9 @@ def regex(re, **kvargs):
        return retval
 
 # internal function
-def replace_symbols(symbol):
+def replace_symbols(symbol, epsilonstr=EPSILON):
+    if symbol == epsilonstr:
+       return EPSILON
     if symbol == "@0@":
        return EPSILON
     symbol = symbol.replace("@_SPACE_@", " ")
@@ -1168,7 +1175,7 @@ def replace_symbols(symbol):
     return symbol
 
 # internal function
-def parse_att_line(line, fsm):
+def parse_att_line(line, fsm, epsilonstr=EPSILON):
     # get rid of extra whitespace
     line = line.replace('\t',' ')
     line = " ".join(line.split())
@@ -1210,7 +1217,7 @@ def read_att_input():
            raise NotValidAttFormatException("","",0)
     return HfstTransducer(fsm, _libhfst.get_default_fst_type())
 
-def read_att_transducer(f):
+def read_att_transducer(f, epsilonstr=EPSILON):
     linecount = 0
     fsm = HfstBasicTransducer()
     while True:
@@ -1223,9 +1230,42 @@ def read_att_transducer(f):
         if line[0] == '-':
            break
         linecount = linecount + 1
-        if not parse_att_line(line, fsm):
+        if not parse_att_line(line, fsm, epsilonstr):
            raise NotValidAttFormatException("","",0)
     return HfstTransducer(fsm, _libhfst.get_default_fst_type())
+
+def read_prolog_transducer(f):
+    fsm = HfstBasicTransducer()
+    
+    line = ""
+    while(True):
+        line = f.readline()
+        if line == "":
+           raise NotValidPrologFormatException("","",0)
+        line = line.rstrip()
+        if line[0] == '#':
+           pass # comment line
+        else:
+           break
+
+    if not parse_prolog_network_line(line, fsm):
+       raise NotValidPrologFormatException(line,"",0)
+
+    while(True):
+        line = f.readline()
+        if (line == ""):
+           return fsm
+        line = line.rstrip()
+        if line == "":
+           return fsm  # prolog separator
+        if parse_prolog_arc_line(line, fsm):
+           pass
+        elif parse_prolog_final_line(line, fsm):
+           pass
+        elif parse_prolog_symbol_line(line, fsm):
+           pass
+        else:
+           raise NotValidPrologFormatException(line,"",0)
 
 def start_xfst(**kvargs):
     import sys

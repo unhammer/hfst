@@ -304,8 +304,87 @@ def read_att_input():
 def read_att_string(att):
     pass
 
-## Read next transducer from AT&T file pointed by \a f. \a epsilonstr defines the symbol used for epsilon in the file.
+# TODO: REMOVE THIS
+# Read next transducer from AT&T file pointed by \a f. \a epsilonstr defines the symbol used for epsilon in the file.
 # @param f A file pointer (#hfst.HfstFile) to the file.
+# @param epsilonstr How epsilon is represented in the file. By default, "@_EPSILON_SYMBOL_@" and "@0@" are both recognized.
+#
+# If the file contains several transducers, they must be separated by "--" lines.
+    # In AT&T format, the transition lines are of the form:
+    # 
+    # \verbatim 
+    # [0-9]+[\w]+[0-9]+[\w]+[^\w]+[\w]+[^\w]([\w]+(-)[0-9]+(\.[0-9]+)) 
+    # \endverbatim
+    # 
+    # and final state lines:
+    # 
+    # \verbatim
+    # [0-9]+[\w]+([\w]+(-)[0-9]+(\.[0-9]+))
+    # \endverbatim
+    # 
+    # If several transducers are listed in the same file, they are separated by lines of 
+    # two consecutive hyphens "--". If the weight 
+    # \verbatim
+    # ([\w]+(-)[0-9]+(\.[0-9]+))
+    # \endverbatim
+    # is missing, the transition or final state is given a zero weight.
+    # 
+    # NOTE: If transition symbols contains spaces, they must be escaped
+    # as '\@_SPACE_\@' because spaces are used as field separators.
+    # Both '\@0\@' and '\@_EPSILON_SYMBOL_\@' are always interpreted as
+    # epsilons.
+    # 
+    # 
+    # An example: 
+    # \verbatim
+    # 0      1      foo      bar      0.3
+    # 1      0.5
+    # --
+    # 0      0.0
+    # --
+    # --
+    # 0      0.0
+    # 0      0      a        <eps>    0.2
+    # \endverbatim
+    # 
+    # The example lists four transducers in AT&T format: 
+    # one transducer accepting the string pair &lt;'foo','bar'&gt;, one
+    # epsilon transducer, one empty transducer (represented by an empty string) and one transducer 
+    # that accepts any number of 'a's and produces an empty string
+    # in all cases. The transducers can be read with the following commands (from a file named 
+    # 'testfile.att'):
+    # \verbatim
+    # transducers = []
+    # ifile = hfst.hfst_open('testfile.att', 'r')
+    # try:
+    #     while (not ifile.is_eof()):
+    #         t = hfst.read_att(ifile, '<eps>')
+    #         transducers.append(t)
+    #         print("read one transducer")
+    # except hfst.exceptions.NotValidAttFormatException:
+    #     print("Error reading transducer: not valid AT&T format.")
+    # ifile.close()
+    # print("Read %i transducers in total" % len(transducers))
+    # \endverbatim
+    # 
+    # Epsilon will be represented as hfst.EPSILON in the resulting transducer.
+    # The argument \a epsilon_symbol only denotes how epsilons are represented 
+    # in \a ifile.
+    # 
+    # @bug Empty transducers are in theory represented as empty strings in AT&T format. 
+    #      However, this sometimes results in them getting interpreted as end-of-file.
+    #      To avoid this, use an empty line instead, i.e. a single newline character.
+    #
+    # @throws NotValidAttFormatException 
+    # @throws StreamNotReadableException
+    # @throws StreamIsClosedException
+    # @throws EndOfStreamException
+    # @see #write_att
+# def read_att(f, epsilonstr=hfst.EPSILON):
+#    pass
+
+## Read next transducer from AT&T file pointed by \a f. \a epsilonstr defines the symbol used for epsilon in the file.
+# @param f A python file 
 # @param epsilonstr How epsilon is represented in the file. By default, "@_EPSILON_SYMBOL_@" and "@0@" are both recognized.
 #
 # If the file contains several transducers, they must be separated by "--" lines.
@@ -354,14 +433,16 @@ def read_att_string(att):
     # 'testfile.att'):
     # \verbatim
     # transducers = []
-    # ifile = hfst.hfst_open('testfile2.att', 'r')
+    # ifile = open('testfile.att', 'r')
     # try:
-    #     while (not ifile.is_eof()):
-    #         t = hfst.read_att(ifile, '<eps>')
+    #     while (True):
+    #         t = hfst.read_att_transducer(ifile, '<eps>')
     #         transducers.append(t)
     #         print("read one transducer")
-    # except hfst.exceptions.NotValidAttFormatException:
+    # except hfst.exceptions.NotValidAttFormatException as e:
     #     print("Error reading transducer: not valid AT&T format.")
+    # except hfst.exceptions.EndOfStreamException as e:
+    #     pass
     # ifile.close()
     # print("Read %i transducers in total" % len(transducers))
     # \endverbatim
@@ -370,19 +451,31 @@ def read_att_string(att):
     # The argument \a epsilon_symbol only denotes how epsilons are represented 
     # in \a ifile.
     # 
+    # @bug Empty transducers are in theory represented as empty strings in AT&T format. 
+    #      However, this sometimes results in them getting interpreted as end-of-file.
+    #      To avoid this, use an empty line instead, i.e. a single newline character.
+    #
     # @throws NotValidAttFormatException 
     # @throws StreamNotReadableException
     # @throws StreamIsClosedException
     # @throws EndOfStreamException
     # @see #write_att
-def read_att(f, epsilonstr=hfst.EPSILON):
+def read_att_transducer(f, epsilonstr=hfst.EPSILON):
     pass
 
-## Read next transducer from prolog file pointed by \a f.
+# TODO: REMOVE THIS
+# Read next transducer from prolog file pointed by \a f.
 # @param f A file pointer (#hfst.HfstFile) to the file.
 #
 # If the file contains several transducers, they must be separated by empty lines.
 def read_prolog(f):
+    pass
+
+# Read next transducer from prolog file pointed by \a f.
+# @param f A python file.
+#
+# If the file contains several transducers, they must be separated by empty lines.
+def read_prolog_transducer(f):
     pass
 
 ## A simple transducer class with tropical weights. 
