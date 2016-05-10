@@ -13,6 +13,9 @@ authors specified in AUTHORS file may be contacted about licencing issues.
 There's an online wiki-based information source about HFST in
 `Kitwiki HFST pages <https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome>`_.
 
+.. image:: https://travis-ci.org/hfst/hfst.svg
+   :target: https://travis-ci.org/hfst/hfst
+
 Installation
 ============
 
@@ -388,9 +391,9 @@ a message such as::
   Please report to hfst-bugs@helsinki.fi
   ======================================
 
-These errors can be reported either to the stated mail address or the `HFST
-bug tracker in sf.net infrastructure
-<https://sourceforge.net/tracker/?atid=1061990&group_id=224521&func=browse>`_.
+These errors can be reported either to the stated mail address or the `HFST bug
+tracker on Github
+<https://github.com/hfst/hfst/issues>`_.
 
 cat: hvVqf:o:l:u:: No such file or directory
 --------------------------------------------
