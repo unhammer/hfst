@@ -1,3 +1,5 @@
+#include "parsers/PmatchCompiler.h"
+
 namespace hfst {
 
   hfst::ImplementationType get_default_fst_type();

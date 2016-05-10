@@ -1,7 +1,3 @@
-import sys
-sys.path.insert(1, '/home/eaxelson/hfst-git/hfst/python/')
-
-
 # The examples given in doxygen documentation
 
 import libhfst

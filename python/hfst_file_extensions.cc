@@ -23,6 +23,7 @@ namespace hfst {
 
   HfstFile hfst_open(const char * filename, const char * mode) {
     FILE * f = fopen(filename, mode);
+    if (f == NULL) { throw StreamNotReadableException("", "", 0); }
     HfstFile file;
     file.set_file(f);
     return file;

@@ -17,6 +17,11 @@
 # All back-end implementations - SFST, OpenFst and foma - work according to the same interface, so it is possible to compile the same piece of code using different back-end libraries.
 # There are some differences related to weights, as only OpenFst supports them.
 #
+# HFST is written in C++, but there is a Python interface available which is documented on these pages. 
+# The Python API is basically a wrapper around the C++ API with some additional code and modifications. 
+# The C++ API has developed around the HFST command line tools, but the Python version is intended to be used as such and has been designed to be more user-friendly.
+# 
+#
 # For a quick start to the HFST interface with examples, see <a href="QuickStart.html">here</a>.
 #
 # The examples given in this documentation use <a href="http://www.fsmbook.com/">Xerox transducer notation</a>.
@@ -91,7 +96,7 @@ TO_INITIAL_STATE = _libhfst.TO_INITIAL_STATE
 TO_FINAL_STATE = _libhfst.TO_FINAL_STATE
 
 
-## A wrapper class for file operations.
+## A wrapper class for file operations. TODO: get rid of this
 # @see hfst.hfst_open, hfst.hfst_stdin, hfst.hfst_stdout, hfst.hfst_stderr
 class HfstFile:
     ## Close the file. 
@@ -105,18 +110,18 @@ class HfstFile:
     def is_eof(self):
         pass
 
-## Open file named \a filename in mode \a mode.
+## Open file named \a filename in mode \a mode. TODO: get rid of this
 # @param filename The name of the file.
 # @param mode Mode in which the file is opened.
 def hfst_open(filename, mode):
     pass
-## Get file that points to standard input.
+## Get file that points to standard input. TODO: get rid of this
 def hfst_stdin():
     pass
-## Get file that points to standard output.
+## Get file that points to standard output. TODO: get rid of this
 def hfst_stdout():
     pass
-## Get file that points to standard error stream.
+## Get file that points to standard error stream. TODO: get rid of this
 def hfst_stderr():
     pass
 
@@ -2158,12 +2163,12 @@ def is_diacritic(symbol):
 # 
 # \section using_hfst Using HFST in your own code
 # 
-# After <a href="InstallHfst.html">installing</a> HFST on your computer, start python and execute <code>import libhfst</code>.
+# After <a href="InstallHfst.html">installing</a> HFST on your computer, start python and execute <code>import hfst</code>.
 # 
 # For example, the following simple program 
 #
 # \verbatim
-# import libhfst
+# import hfst
 # 
 # tr1 = hfst.regex('foo:bar')
 # tr2 = hfst.regex('bar:baz')
@@ -2182,17 +2187,23 @@ def is_diacritic(symbol):
 # 
 # \section hfst_structure Structure of the API
 # 
-# The HFST API is written in module libhfst that includes the following classes:
+# The HFST API is located in a package 'hfst' that includes the following classes:
 # 
-#    - HfstTransducer: A class for creating transducers and performing operations on them.
+#    - #HfstTransducer: A class for creating transducers and performing operations on them.
 # 
-#    - HfstInputStream and HfstOutputStream: Classes for writing and reading binary transducers.
+#    - #HfstInputStream and #HfstOutputStream: Classes for writing and reading binary transducers.
 # 
-#    - HfstBasicTransducer: A class for creating transducers from scratch and iterating through their states and transitions.
+#    - #HfstBasicTransducer: A class for creating transducers from scratch and iterating through their states and transitions.
 # 
-#    - HfstTokenizer: A class used in creating transducers from UTF-8 strings.
+#    - #HfstTokenizer: A class used in creating transducers from UTF-8 strings.
 #  
-# There are also functions in module libhfst that are not part of any class. For example #hfst.fst
+# There are also functions in package 'hfst' that are not part of any class. For example #hfst.fst
+#
+# There are also the following submodules:
+#
+#    - #hfst.exceptions: #HfstException and its subclasses that are used to handle exceptional situations and errors
+#
+#    - #hfst.rules: Functions for creating transducers that implement two-level rules
 #
 # <BR>
 # 
@@ -2202,7 +2213,7 @@ def is_diacritic(symbol):
 # transducer properties and handling exceptions: 
 # 
 # \verbatim
-# import libhfst
+# import hfst
 # # Create as HFST basic transducer [a:b] with transition weight 0.3 and final weight 0.5.
 # t = hfst.HfstBasicTransducer()
 # t.add_state(1)
@@ -2224,8 +2235,8 @@ def is_diacritic(symbol):
 #         print("TEST FAILED")
 #         exit(1)
 # # If the state does not exist or is not final
-# except hfst.exceptions.HfstException:
-#     print("TEST FAILED: An exception thrown.")
+# except hfst.exceptions.HfstException as e:
+#     print("TEST FAILED: An exception was thrown.")
 #     exit(1)
 # \endverbatim
 # 
@@ -2233,8 +2244,8 @@ def is_diacritic(symbol):
 # An example of creating transducers from strings, applying rules to them and printing the string pairs recognized by the resulting transducer.
 #  
 # \verbatim
-# import libhfst
-# hfst.set_default_fst_type(hfst.FOMA_TYPE)
+# import hfst
+# hfst.set_default_fst_type(hfst.FOMA_TYPE) # we use foma implementation as there are no weights involved
 # 
 # # Create a simple lexicon transducer [[foo bar foo] | [foo bar baz]].
 # tok = hfst.HfstTokenizer()
@@ -2257,7 +2268,7 @@ def is_diacritic(symbol):
 # try:
 #     # Extract paths and remove tokenization
 #     results = words.extract_paths(output='dict')
-# except hfst.exceptions.TransducerIsCyclicException:
+# except hfst.exceptions.TransducerIsCyclicException as e:
 #     # This should not happen because transducer is not cyclic.
 #     print("TEST FAILED")
 #     exit(1)

@@ -527,8 +527,7 @@ def compile_lexc_file(filename, **kvargs):
 def compile_xfst_file(filename, **kvargs):
     pass
 
-## Compile pmatch expressions as defined in \a filename1 and store them in binary format in \a filename2.
-# @see libhfst.create_pmatch_compiler
+## Compile pmatch expressions as defined in \a filename and return a tuple of transducers.
 #
 # An example:
 # 
@@ -542,31 +541,16 @@ def compile_xfst_file(filename, **kvargs):
 # 
 # we can run:
 #
-# libhfst.compile_pmatch_file('streets.txt','streets.pmatch')
-# cont = libhfst.PmatchContainer('streets.pmatch')
+# defs = libhfst.compile_pmatch_file('streets.txt')
+# const = libhfst.PmatchContainer(defs)
 # assert cont.match("Je marche seul dans l'avenue des Ternes.") == "Je marche seul dans l'<FrenchStreetName>avenue des Ternes</FrenchStreetName>."
-def compile_pmatch_file(filename1, filename2, **kvargs):
+def compile_pmatch_file(filename):
     pass
 
-## Create a libhfst.PmatchContainer as defined in binary format in file \a filename.
+## Compile a pmatch expression into a tuple of transducers.
 # @see libhfst.compile_pmatch_file
-#
-# An example:
-# 
-# If we have a file named streets.txt that contains:
-#
-# define CapWord UppercaseAlpha Alpha* ;
-# define StreetWordFr [{avenue} | {boulevard} | {rue}] ;
-# define DeFr [ [{de} | {du} | {des} | {de la}] Whitespace ] | [{d'} | {l'}] ;
-# define StreetFr StreetWordFr (Whitespace DeFr) CapWord+ ;
-# regex StreetFr EndTag(FrenchStreetName) ;
-# 
-# we can run:
-#
-# libhfst.compile_pmatch_file('streets.txt','streets.pmatch')
-# cont = libhfst.PmatchContainer('streets.pmatch')
-# assert cont.match("Je marche seul dans l'avenue des Ternes.") == "Je marche seul dans l'<FrenchStreetName>avenue des Ternes</FrenchStreetName>."
-def create_pmatch_container(filename):
+# @arg expr A string defining how pmatch is done.
+def compile_pmatch_expression(expr):
     pass
 
 ## Start interactive xfst compiler.
@@ -1737,7 +1721,7 @@ class HfstTransducer:
     # def lookup(tok_input, limit=-1):
     #    pass
     
-    ## Lookup or apply a single string \a input and return a maximum of \a limit results.
+    # Lookup or apply a single string \a input and return a maximum of \a limit results.
     # 
     # This is an overloaded lookup function that leaves tokenizing to the transducer.
     # @return HfstOneLevelPaths pointer
@@ -1791,7 +1775,7 @@ class HfstTransducer:
     # def lookup_fd(tok, input, limit = -1):
     #    pass
 
-    # Whether lookup of path \a input will have infinite results.
+    ## Whether lookup of path \a input will have infinite results.
     #
     # Currently, this function will return whether the transducer
     # is infinitely ambiguous on any lookup path found in the transducer,
@@ -2029,97 +2013,97 @@ class HfstTokenizer:
         pass
 
 
-## A compiler holding information contained in lexc style lexicons.
+# A compiler holding information contained in lexc style lexicons.
 # A single LexcCompiler can be extended by adding entries to it, but little
 # else can be done with it. It is sufficient to implement clone of lexc.
 #class LexcCompiler:
 
-  ## Create a lexc compiler for unspecified transducer format.
+  # Create a lexc compiler for unspecified transducer format.
   #def __init__(self):
   #    pass
 
-  ## Create a lexc compiler with \a impl as transducer format.
+  # Create a lexc compiler with \a impl as transducer format.
   #def __init__(self, impl):
   #    pass
 
-  ## Create a lexc compiler with \a impl as transducer format.
+  # Create a lexc compiler with \a impl as transducer format.
   #def __init__(self, impl, withFlags):
   #    pass
 
-  ## Compile lexc description from \a infile into current compiler.
+  # Compile lexc description from \a infile into current compiler.
   #def parse(infile):
   #    pass
 
-  ## Compile lexc description from file @a filename into current compiler.
+  # Compile lexc description from file @a filename into current compiler.
   #def parse(filename):
   #    pass
 
-  ## Set verbosity options. When \a verbose is true, LexcCompiler will output the messages that Xerox lexc compiler does.
+  # Set verbosity options. When \a verbose is true, LexcCompiler will output the messages that Xerox lexc compiler does.
   #def setVerbosity(verbose):
   #    pass
 
-  ## todo
+  # todo
   #def isQuiet():
   #    pass
-  ## todo
+  # todo
   #def setTreatWarningsAsErrors(value):
   #    pass
-  ## todo
+  # todo
   #def areWarningsTreatedAsErrors():
   #    pass
-  ## todo
+  # todo
   #def setAllowMultipleSublexiconDefinitions(value):
   #    pass
-  ## todo
+  # todo
   #def setWithFlags(value):
   #    pass
-  ## todo
+  # todo
   #def setMinimizeFlags(value):
   #    pass
-  ## todo
+  # todo
   #def setRenameFlags(value):
   #    pass
 
-  ## Add @a alphabet to multicharacter symbol set.
+  # Add @a alphabet to multicharacter symbol set.
   # These symbols may be used for regular expression ? for backends that do
   # not support open alphabets.
   #def addAlphabet(alphabet):
   #    pass
 
-  ## todo
+  # todo
   #def addNoFlag(lexname):
   #    pass
 
-  ## Set current processing lexicon name to @a lexicon_name.
+  # Set current processing lexicon name to @a lexicon_name.
   #def setCurrentLexiconName(lexicon_name):
   #    pass
 
-  ## Add entry defined by a @a entry to current lexicon, pointing to @a continuation weighing @a weight to current lexicon.
+  # Add entry defined by a @a entry to current lexicon, pointing to @a continuation weighing @a weight to current lexicon.
   #def addStringEntry(entry, continuation, weight):
   #    pass
 
-  ## Add entry defined by @a upper:@a lower, pointing to @a continuation weighing @a weight to current lexicon.
+  # Add entry defined by @a upper:@a lower, pointing to @a continuation weighing @a weight to current lexicon.
   #def addStringPairEntry(upper, lower, continuation, weight):
   #    pass
 
-  ## Add entry defined by regular expression @a xre, pointing to @a continuation weighing @a weight to current lexicon.
+  # Add entry defined by regular expression @a xre, pointing to @a continuation weighing @a weight to current lexicon.
   #def addXreEntry(xre, continuation, weight):
   #    pass
 
-  ## Add macro definition named @a name matching regular expression @a xre to known xerox regular expressions.
+  # Add macro definition named @a name matching regular expression @a xre to known xerox regular expressions.
   #def addXreDefinition(name, xre):
   #    pass
 
-  ## Set start lexicon's name to @a lexicon_name.
+  # Set start lexicon's name to @a lexicon_name.
   #def setInitialLexiconName(lexicon_name):
   #    pass
 
-  ## Create final usable version of current lexicons and entries.
+  # Create final usable version of current lexicons and entries.
   # @return HfstTransducer pointer.
   #def compileLexical():
   #    pass
 
-  ## Check that current morphotax is connected and print anomalies.
+  # Check that current morphotax is connected and print anomalies.
   # Works like xerox lexc, for compatibility.
   #def printConnectedness():
   #    pass
@@ -2195,10 +2179,10 @@ class PmatchContainer:
   ## Initialize a PmatchContainer. Is this needed?
   def __init__(self):
       pass
-
-  ## Read pmatch definitions in binary format from file \a filename and create a PmatchContainer based on the definitions.
-  # @arg filename The name of the file containing binary transducers in libhfst.HFST_OLW_FORMAT defining how matching is performed. Basically a result from libhfst.compile_pmatch_file.
-  def __init__(self, filename):
+  ## Create a PmatchContainer based on definitions \a defs.
+  # @arg defs A tuple of transducers in libhfst.HFST_OLW_FORMAT defining how pmatch is done.
+  # @see libhfst.compile_pmatch_file
+  def __init__(self, defs):
       pass
   ## Match input \a input.
   def match(input, time_cutoff = 0):
@@ -2215,10 +2199,6 @@ class PmatchContainer:
   ## todo
   def set_profile(b):
       pass
-
-## TODO
-def compile_pmatch_file(filename1, filename2, **kvargs):
-    pass
 
 # For example the transducer 
 # 

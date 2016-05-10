@@ -35,7 +35,6 @@
 #include "HfstFlagDiacritics.h"
 #include "parsers/XreCompiler.h"
 #include "parsers/LexcCompiler.h"
-#include "parsers/PmatchCompiler.h" // MOVE TO hfst_pmatch_extensions.cc ???
 #include "parsers/XfstCompiler.h"
 #include "implementations/HfstTransitionGraph.h"
 #include "implementations/optimized-lookup/pmatch.h"
@@ -84,7 +83,7 @@ namespace std {
 
 // ********** WHAT IS MADE AVAILABLE ON PYTHON ********** //
 
-// *** HfstException and its subclasses *** //
+// *** HfstException and its subclasses (via module hfst.exceptions) *** //
 
 class HfstException 
 {
@@ -158,7 +157,7 @@ class HfstFile {
 
 HfstFile hfst_stdout();
 HfstFile hfst_stdin();
-HfstFile hfst_open(const char * filename, const char * mode);
+HfstFile hfst_open(const char * filename, const char * mode) throw (StreamNotReadableException);
 
 
 // *** Some enumerations *** //
@@ -171,7 +170,7 @@ enum ImplementationType
 enum PushType { TO_INITIAL_STATE, TO_FINAL_STATE };
 
 bool is_diacritic(const std::string & symbol);
-std::vector<hfst::HfstTransducer> compile_pmatch_expression(const std::string & pmatch);
+hfst::HfstTransducerVector compile_pmatch_expression(const std::string & pmatch);
  
 %pythoncode %{
   def is_string(s):
@@ -322,9 +321,10 @@ public:
     }
     // For python's 'print'
     char *__str__() {
-         static char tmp[1024];
-         $self->write_in_att_format(tmp);
-         return tmp;
+         std::ostringstream oss;
+         hfst::implementations::HfstBasicTransducer fsm(*$self);
+         fsm.write_in_att_format(oss,true);
+         return strdup(oss.str().c_str());
     }
     void write(hfst::HfstOutputStream & os) { (void) os.redirect(*$self); }
     void write_att(hfst::HfstFile & f, bool write_weights=true) { $self->write_in_att_format(f.get_file(), write_weights); }
@@ -385,6 +385,17 @@ public:
     }
 
 %pythoncode %{
+
+  def write_to_file(self, filename_):
+      ostr = HfstOutputStream(filename=filename_, type=self.get_type(), hfst_format=True)
+      ostr.write(self)
+      ostr.close()
+
+  def read_from_file(filename_):
+      istr = HfstInputStream(filename_)
+      tr = istr.read()
+      istr.close()
+      return tr
 
   def lookup(self, input, **kvargs):
       
@@ -958,18 +969,8 @@ class HfstBasicTransition {
 
 } // namespace implementations
 
-//namespace pmatch {
-//  class PmatchCompiler
-//  {
-//    public:
-//      PmatchCompiler();
-//      PmatchCompiler(hfst::ImplementationType impl);
-//      void set_flatten(bool val) { flatten = val; }
-//      void set_verbose(bool val) { verbose = val; }
-//      void define(const std::string& name, const std::string& pmatch);
-//      std::map<std::string, HfstTransducer*> compile(const std::string& pmatch);
-//  };
-//}
+
+// *** PmatchCompiler class is not visible via python, compile_pmatch_expression and compile_pmatch_file are enough. *** //
 
 // *** XreCompiler: offer only a limited set of functions ***
 
@@ -1005,13 +1006,6 @@ class XreCompiler
   }
 }
 
-  // *** These functions are not offered via Python *** //
-  //  HfstTransducer* compile_first(const std::string& xre, unsigned int & chars_read);
-  //  bool contained_only_comments();
-  //  bool get_positions_of_symbol_in_xre
-  //    (const std::string & symbol, const std::string & xre, std::set<unsigned int> & positions);
-  //  void set_harmonization(bool harmonize);
-  //  void set_flag_harmonization(bool harmonize_flags);
 };
 }
 
@@ -1024,37 +1018,8 @@ namespace lexc {
       LexcCompiler();
       LexcCompiler(hfst::ImplementationType impl);
       LexcCompiler(hfst::ImplementationType impl, bool withFlags, bool alignStrings);
-//      LexcCompiler& parse(FILE* infile);
-//      LexcCompiler& parse(const char* filename);
       LexcCompiler& setVerbosity(unsigned int verbose);
-//      unsigned int getVerbosity();
-//      bool isQuiet();
-//      LexcCompiler& setTreatWarningsAsErrors(bool value);
-//      bool areWarningsTreatedAsErrors();
-//      LexcCompiler& setAllowMultipleSublexiconDefinitions(bool value);
-//      LexcCompiler& setWithFlags(bool value);
-//      LexcCompiler& setMinimizeFlags(bool value);
-//      LexcCompiler& setRenameFlags(bool value);
-//      LexcCompiler& addAlphabet(const std::string& alphabet);
-//      LexcCompiler& addNoFlag(const std::string& lexname);
-//      LexcCompiler& setCurrentLexiconName(const std::string& lexicon_name);
-//      LexcCompiler& addStringEntry(const std::string& entry,
-//                                   const std::string& continuation,
-//                                   const double weight);
-//      LexcCompiler& addStringPairEntry(const std::string& upper,
-//                                       const std::string& lower,
-//                                       const std::string& continuation,
-//                                       const double weight);
-//      LexcCompiler& addXreEntry(const std::string& xre,
-//                                const std::string& continuation, 
-//                                const double weight);
-//      LexcCompiler& addXreDefinition(const std::string& name,
-//                                     const std::string& xre);
-//      LexcCompiler& setInitialLexiconName(const std::string& lexicon_name);
-//      hfst::HfstTransducer* compileLexical();
-//      const LexcCompiler& printConnectedness(bool & warnings_printed);
       void setOutputToConsole(bool);
-//      bool getOutputToConsole();
   };
 
 }
@@ -1067,15 +1032,8 @@ namespace xfst {
     public:
       XfstCompiler();
       XfstCompiler(hfst::ImplementationType impl);
-      //int parse_line(std::string line);
-      //XfstCompiler& setReadInteractiveTextFromStdin(bool value);
       XfstCompiler& setOutputToConsole(bool value);
       XfstCompiler& setVerbosity(bool verbosity);
-      //XfstCompiler& setPromptVerbosity(bool verbosity);
-      //bool quit_requested();
-      //std::string get(const char *);
-      //const XfstCompiler& prompt();
-      //char* get_prompt() const;
       XfstCompiler& set(const char* name, const char* text);
   };
 }
@@ -1102,14 +1060,7 @@ hfst::HfstTransducer * hfst::read_prolog(hfst::HfstFile & f) throw(EndOfStreamEx
 std::string hfst::one_level_paths_to_string(const HfstOneLevelPaths &);
 std::string hfst::two_level_paths_to_string(const HfstTwoLevelPaths &);
 
-
-hfst_ol::PmatchContainer * create_pmatch_container(const std::string & filename);
-
-// TODO: remove if not needed?
-//namespace rules {
-//  enum ReplaceType {REPL_UP, REPL_DOWN, REPL_RIGHT, REPL_LEFT, REPL_DOWN_KARTTUNEN};
-//  enum TwolType {twol_right, twol_left, twol_both};
-//}
+// *** hfst_rules (via module hfst.rules) *** //
 
 namespace hfst_rules {
 
@@ -1143,30 +1094,20 @@ namespace hfst_rules {
 
 } // namespace hfst
 
-// *** PmatchCompiler *** //
+// *** PmatchContainer *** //
 
 namespace hfst_ol {
     class PmatchContainer
     {
     public:
         PmatchContainer(void);
+        PmatchContainer(hfst::HfstTransducerVector transducers);
         ~PmatchContainer(void);
         std::string match(const std::string & input, double time_cutoff = 0.0);
         std::string get_profiling_info(void);
         void set_verbose(bool b);
         void set_extract_tags_mode(bool b);
         void set_profile(bool b);
-
-%extend {
-
-%pythoncode %{
-
-def __init__(self, filename):
-    self.this = _libhfst.create_pmatch_container(filename)
-
-%}
-
-}
 
 }; // class PmatchContainer
 } // namespace hfst_ol
@@ -1217,6 +1158,7 @@ def regex(re, **kvargs):
        err.write(_libhfst.get_hfst_regex_error_message())
        return retval
 
+# internal function
 def replace_symbols(symbol):
     if symbol == "@0@":
        return EPSILON
@@ -1225,23 +1167,29 @@ def replace_symbols(symbol):
     symbol = symbol.replace("@_COLON_@", ":")
     return symbol
 
+# internal function
 def parse_att_line(line, fsm):
     # get rid of extra whitespace
     line = line.replace('\t',' ')
     line = " ".join(line.split())
     fields = line.split(' ')
-    if len(fields) == 1:
+    try:
+        if len(fields) == 1:
+           if fields[0] == '': # empty transducer...
+               return True
            fsm.add_state(int(fields[0]))
            fsm.set_final_weight(int(fields[0]), 0)
-    elif len(fields) == 2:
+        elif len(fields) == 2:
            fsm.add_state(int(fields[0]))
            fsm.set_final_weight(int(fields[0]), float(fields[1]))
-    elif len(fields) == 4:
+        elif len(fields) == 4:
            fsm.add_transition(int(fields[0]), int(fields[1]), replace_symbols(fields[2]), replace_symbols(fields[3]), 0)
-    elif len(fields) == 5:
+        elif len(fields) == 5:
            fsm.add_transition(int(fields[0]), int(fields[1]), replace_symbols(fields[2]), replace_symbols(fields[3]), float(fields[4]))
-    else:
+        else:
            return False
+    except ValueError as e:
+        return False
     return True
 
 def read_att_string(att):
@@ -1249,7 +1197,7 @@ def read_att_string(att):
     lines = att.split('\n')
     for line in lines:
         if not parse_att_line(line, fsm):
-           raise NotValidAttFormatException()
+           raise NotValidAttFormatException("","",0)
     return HfstTransducer(fsm, _libhfst.get_default_fst_type())
 
 def read_att_input():
@@ -1259,7 +1207,24 @@ def read_att_input():
         if line == "":
            break
         if not parse_att_line(line, fsm):
-           raise NotValidAttFormatException()
+           raise NotValidAttFormatException("","",0)
+    return HfstTransducer(fsm, _libhfst.get_default_fst_type())
+
+def read_att_transducer(f):
+    linecount = 0
+    fsm = HfstBasicTransducer()
+    while True:
+        line = f.readline()
+        if line == "":
+           if linecount == 0:
+              raise EndOfStreamException("","",0)
+           else:
+              break
+        if line[0] == '-':
+           break
+        linecount = linecount + 1
+        if not parse_att_line(line, fsm):
+           raise NotValidAttFormatException("","",0)
     return HfstTransducer(fsm, _libhfst.get_default_fst_type())
 
 def start_xfst(**kvargs):
@@ -1382,15 +1347,12 @@ def compile_xfst_file(filename, **kvargs):
       print('Parsed file with return value %i (0 indicating succesful parsing).' % retval)
     return retval
 
-def compile_pmatch_file(filename1, filename2, **kvargs):
-    with open(filename1, 'r') as myfile:
+def compile_pmatch_file(filename):
+    with open(filename, 'r') as myfile:
       data=myfile.read()
       myfile.close()
-    expr = compile_pmatch_expression(data)
-    ostr = HfstOutputStream(filename=filename2, type=HFST_OLW_TYPE)
-    for tr in expr:
-      ostr.write(tr)
-    ostr.close()
+    defs = compile_pmatch_expression(data)
+    return defs
 
 def compile_lexc_file(filename, **kvargs):
     verbosity=0
@@ -1433,11 +1395,13 @@ def compile_lexc_file(filename, **kvargs):
 
     return retval
 
+# internal function
 def is_weighted_word(arg):
     if isinstance(arg, tuple) and len(arg) == 2 and isinstance(arg[0], str) and isinstance(arg[1], (int, float)):
        return True
     return False
 
+# internal function
 def check_word(arg):
     if len(arg) == 0:
        raise RuntimeError('Empty word.')
@@ -1535,6 +1499,5 @@ def intersect(transducers):
         retval.intersect(tr)
     retval.minimize()
     return retval
-
 
 %}

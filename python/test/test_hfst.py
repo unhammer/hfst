@@ -1,6 +1,3 @@
-import sys
-sys.path.insert(1, '/home/eaxelson/hfst-git/hfst/python/')
-
 import libhfst
 import os.path
 from inspect import currentframe
