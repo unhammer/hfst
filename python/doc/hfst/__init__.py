@@ -1842,7 +1842,7 @@ class HfstTokenizer:
     #     hfst.HfstTokenizer.check_utf8_correctness('föö')
     # except hfst.exceptions.IncorrectUtf8CodingException as e:
     #     print('FAIL')
-    # \verbatim
+    # \endverbatim
     #
     # This function is a static one.
     def check_utf8_correctness(input_string):
@@ -2165,19 +2165,19 @@ def is_diacritic(symbol):
 # 
 # The HFST API is located in a package 'hfst' that includes the following classes:
 # 
-#    - #HfstTransducer: A class for creating transducers and performing operations on them.
+#    - #hfst.HfstTransducer: A class for creating transducers and performing operations on them.
 # 
-#    - #HfstInputStream and #HfstOutputStream: Classes for writing and reading binary transducers.
+#    - #hfst.HfstInputStream and #hfst.HfstOutputStream: Classes for writing and reading binary transducers.
 # 
-#    - #HfstBasicTransducer: A class for creating transducers from scratch and iterating through their states and transitions.
+#    - #hfst.HfstBasicTransducer: A class for creating transducers from scratch and iterating through their states and transitions.
 # 
-#    - #HfstTokenizer: A class used in creating transducers from UTF-8 strings.
+#    - #hfst.HfstTokenizer: A class used in creating transducers from UTF-8 strings.
 #  
 # There are also functions in package 'hfst' that are not part of any class. For example #hfst.fst
 #
 # There are also the following submodules:
 #
-#    - #hfst.exceptions: #HfstException and its subclasses that are used to handle exceptional situations and errors
+#    - #hfst.exceptions: #hfst.exceptions.HfstException and its subclasses that are used to handle exceptional situations and errors
 #
 #    - #hfst.rules: Functions for creating transducers that implement two-level rules
 #
