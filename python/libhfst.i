@@ -40,7 +40,6 @@
 #include "implementations/optimized-lookup/pmatch.h"
 
 // C++ extension code is located in separate files
-#include "hfst_file_extensions.cc"
 #include "hfst_extensions.cc"
 #include "hfst_regex_extensions.cc"
 #include "hfst_lexc_extensions.cc"
@@ -145,20 +144,6 @@ typedef std::vector<std::pair<hfst::HfstTransducer, hfst::HfstTransducer> > Hfst
 
 
 // *** Basically a wrapper for C file *** //
-
-class HfstFile {
-  public:
-    HfstFile();
-    ~HfstFile();
-    void write(const char * str);
-    void close();
-    bool is_eof(void);
-};
-
-HfstFile hfst_stdout();
-HfstFile hfst_stdin();
-HfstFile hfst_open(const char * filename, const char * mode) throw (StreamNotReadableException);
-
 
 // *** Some enumerations *** //
 
@@ -327,8 +312,6 @@ public:
          return strdup(oss.str().c_str());
     }
     void write(hfst::HfstOutputStream & os) { (void) os.redirect(*$self); }
-    void write_att(hfst::HfstFile & f, bool write_weights=true) { $self->write_in_att_format(f.get_file(), write_weights); }
-    //void write_prolog(hfst::HfstFile & f, const std::string & name, bool write_weights=true) { $self->write_in_prolog_format(f.get_file(), name, write_weights); }
 
     hfst::HfstTwoLevelPaths extract_shortest_paths_()
     {
@@ -402,6 +385,18 @@ public:
       fsm.name = self.get_name()
       prologstr = fsm.get_prolog_string(write_weights)
       f.write(prologstr)
+
+  def write_xfst(self, f, write_weights=True):
+      fsm = HfstBasicTransducer(self)
+      fsm.name = self.get_name()
+      xfststr = fsm.get_xfst_string(write_weights)
+      f.write(xfst)
+
+  def write_att(self, f, write_weights=True):
+      fsm = HfstBasicTransducer(self)
+      fsm.name = self.get_name()
+      attstr = fsm.get_att_string(write_weights)
+      f.write(attstr)
 
   def lookup(self, input, **kvargs):
       
@@ -824,7 +819,6 @@ class HfstBasicTransducer {
     $self->lookup_fd(lookup_path, results, infinite_cutoff, max_weight);
     return results;
   }
-  //void write_prolog(hfst::HfstFile & f, const std::string & name, bool write_weights=true) { $self->write_in_prolog_format(f.get_file(), name, write_weights); }
 
   std::string get_prolog_string(bool write_weights)
   {
@@ -833,22 +827,25 @@ class HfstBasicTransducer {
     return oss.str();
   }
 
-  //static HfstBasicTransducer read_prolog(hfst::HfstFile & f) {
-  //  unsigned int linecount = 0;
-  //  return hfst::implementations::HfstBasicTransducer::read_in_prolog_format(f.get_file(), linecount);
-  //}
-  void write_xfst(hfst::HfstFile & f, bool write_weights=true) { $self->write_in_xfst_format(f.get_file(), write_weights); }
-  void write_att(hfst::HfstFile & f, bool write_weights=true) { $self->write_in_att_format(f.get_file(), write_weights); }
-  static HfstBasicTransducer read_att(hfst::HfstFile & f, std::string epsilon="@_EPSILON_SYMBOL_@") throw(EndOfStreamException, NotValidAttFormatException) {
-    unsigned int linecount = 0;
-    return hfst::implementations::HfstBasicTransducer::read_in_att_format(f.get_file(), epsilon, linecount);
+  std::string get_xfst_string(bool write_weights)
+  {
+    std::ostringstream oss;
+    $self->write_in_xfst_format(oss, write_weights);
+    return oss.str();
+  }
+
+  std::string get_att_string(bool write_weights)
+  {
+    std::ostringstream oss;
+    $self->write_in_att_format(oss, write_weights);
+    return oss.str();
   }
 
   char * __str__()
   {
-    static char str[1024];
-    $self->write_in_att_format(str, true); // write_weights=true  
-    return str;
+    std::ostringstream oss;
+    $self->write_in_att_format(oss, true);
+    return strdup(oss.str().c_str());
   }
 
   void add_transition(HfstState source, HfstState target, std::string input, std::string output, float weight=0) {
@@ -866,6 +863,14 @@ class HfstBasicTransducer {
   def write_prolog(self, f, write_weights=True):
       prologstr = self.get_prolog_string(write_weights)
       f.write(prologstr)
+
+  def write_xfst(self, f, write_weights=True):
+      xfststr = self.get_xfst_string(write_weights)
+      f.write(prologstr)
+
+  def write_att(self, f, write_weights=True):
+      attstr = self.get_att_string(write_weights)
+      f.write(attstr)
 
   def lookup_fd(self, lookup_path, **kvargs):
       max_weight = None
@@ -1072,9 +1077,6 @@ hfst::HfstTransducer * hfst::hfst_compile_lexc(hfst::lexc::LexcCompiler & comp, 
 void hfst::set_default_fst_type(hfst::ImplementationType t);
 hfst::ImplementationType hfst::get_default_fst_type();
 std::string hfst::fst_type_to_string(hfst::ImplementationType t);
-
-//hfst::HfstTransducer * hfst::read_att(hfst::HfstFile & f, std::string epsilon="@_EPSILON_SYMBOL_@") throw(EndOfStreamException, NotValidAttFormatException);
-//hfst::HfstTransducer * hfst::read_prolog(hfst::HfstFile & f) throw(EndOfStreamException);
 
 std::string hfst::one_level_paths_to_string(const HfstOneLevelPaths &);
 std::string hfst::two_level_paths_to_string(const HfstTwoLevelPaths &);

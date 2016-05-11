@@ -30,17 +30,4 @@ hfst_ol::PmatchContainer * create_pmatch_container(const std::string & filename)
     return new hfst_ol::PmatchContainer(instream);
 }
 
-
-hfst::HfstTransducer * read_att(hfst::HfstFile & f, std::string epsilon="@_EPSILON_SYMBOL_@")
-{
-      return new hfst::HfstTransducer(f.get_file(), type, epsilon);
-}
-
-hfst::HfstTransducer * read_prolog(hfst::HfstFile & f)
-{
-    unsigned int linecount = 0;
-    hfst::implementations::HfstBasicTransducer fsm = hfst::implementations::HfstBasicTransducer::read_in_prolog_format(f.get_file(), linecount);
-    return new hfst::HfstTransducer(fsm, hfst::type);
-}
-
 }
