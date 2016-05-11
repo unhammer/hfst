@@ -328,7 +328,7 @@ public:
     }
     void write(hfst::HfstOutputStream & os) { (void) os.redirect(*$self); }
     void write_att(hfst::HfstFile & f, bool write_weights=true) { $self->write_in_att_format(f.get_file(), write_weights); }
-    void write_prolog(hfst::HfstFile & f, const std::string & name, bool write_weights=true) { $self->write_in_prolog_format(f.get_file(), name, write_weights); }
+    //void write_prolog(hfst::HfstFile & f, const std::string & name, bool write_weights=true) { $self->write_in_prolog_format(f.get_file(), name, write_weights); }
 
     hfst::HfstTwoLevelPaths extract_shortest_paths_()
     {
@@ -396,6 +396,12 @@ public:
       tr = istr.read()
       istr.close()
       return tr
+
+  def write_prolog(self, f, write_weights=True):
+      fsm = HfstBasicTransducer(self)
+      fsm.name = self.get_name()
+      prologstr = fsm.get_prolog_string(write_weights)
+      f.write(prologstr)
 
   def lookup(self, input, **kvargs):
       
@@ -771,6 +777,7 @@ class HfstBasicTransducer {
     HfstBasicTransducer(const HfstBasicTransducer &graph);
     HfstBasicTransducer(const hfst::HfstTransducer &transducer);
 
+    std::string name;
     void add_symbol_to_alphabet(const std::string &symbol);
     void remove_symbol_from_alphabet(const std::string &symbol);
     void remove_symbols_from_alphabet(const StringSet &symbols);
@@ -817,11 +824,19 @@ class HfstBasicTransducer {
     $self->lookup_fd(lookup_path, results, infinite_cutoff, max_weight);
     return results;
   }
-  void write_prolog(hfst::HfstFile & f, const std::string & name, bool write_weights=true) { $self->write_in_prolog_format(f.get_file(), name, write_weights); }
-  static HfstBasicTransducer read_prolog(hfst::HfstFile & f) {
-    unsigned int linecount = 0;
-    return hfst::implementations::HfstBasicTransducer::read_in_prolog_format(f.get_file(), linecount);
+  //void write_prolog(hfst::HfstFile & f, const std::string & name, bool write_weights=true) { $self->write_in_prolog_format(f.get_file(), name, write_weights); }
+
+  std::string get_prolog_string(bool write_weights)
+  {
+    std::ostringstream oss;
+    $self->write_in_prolog_format(oss, self->name, write_weights);
+    return oss.str();
   }
+
+  //static HfstBasicTransducer read_prolog(hfst::HfstFile & f) {
+  //  unsigned int linecount = 0;
+  //  return hfst::implementations::HfstBasicTransducer::read_in_prolog_format(f.get_file(), linecount);
+  //}
   void write_xfst(hfst::HfstFile & f, bool write_weights=true) { $self->write_in_xfst_format(f.get_file(), write_weights); }
   void write_att(hfst::HfstFile & f, bool write_weights=true) { $self->write_in_att_format(f.get_file(), write_weights); }
   static HfstBasicTransducer read_att(hfst::HfstFile & f, std::string epsilon="@_EPSILON_SYMBOL_@") throw(EndOfStreamException, NotValidAttFormatException) {
@@ -847,6 +862,10 @@ class HfstBasicTransducer {
 
   def __enumerate__(self):
       return enumerate(self.states_and_transitions())
+
+  def write_prolog(self, f, write_weights=True):
+      prologstr = self.get_prolog_string(write_weights)
+      f.write(prologstr)
 
   def lookup_fd(self, lookup_path, **kvargs):
       max_weight = None
@@ -1241,8 +1260,10 @@ def read_prolog_transducer(f):
     while(True):
         line = f.readline()
         if line == "":
-           raise NotValidPrologFormatException("","",0)
+           raise EndOfStreamException("","",0)
         line = line.rstrip()
+        if line == "":
+           pass # allow extra prolog separator(s)
         if line[0] == '#':
            pass # comment line
         else:
@@ -1254,10 +1275,14 @@ def read_prolog_transducer(f):
     while(True):
         line = f.readline()
         if (line == ""):
-           return fsm
+           retval = HfstTransducer(fsm, _libhfst.get_default_fst_type())
+           retval.set_name(fsm.name)
+           return retval
         line = line.rstrip()
-        if line == "":
-           return fsm  # prolog separator
+        if line == "":  # prolog separator
+           retval = HfstTransducer(fsm, _libhfst.get_default_fst_type())
+           retval.set_name(fsm.name)
+           return retval           
         if parse_prolog_arc_line(line, fsm):
            pass
         elif parse_prolog_final_line(line, fsm):
