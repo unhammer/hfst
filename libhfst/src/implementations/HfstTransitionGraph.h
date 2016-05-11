@@ -210,6 +210,7 @@
            initialize_alphabet(alphabet);
            HfstTransitions tr;
            state_vector.push_back(tr);
+           name = std::string("");
          }
 
        HFSTDLL HfstTransitionGraph(FILE *file) {
@@ -218,6 +219,7 @@
          state_vector.push_back(tr);
          unsigned int linecount=0;
          this->assign(read_in_att_format(file, "@0@", linecount));
+         name = std::string("");
        }
 
 
@@ -230,6 +232,7 @@
          final_weight_map = graph.final_weight_map;
          alphabet = graph.alphabet;
          assert(alphabet.count(HfstSymbol()) == 0);
+         name = graph.name;
          return *this;
        }
 
@@ -243,6 +246,7 @@
        state_vector = graph.state_vector;
        final_weight_map = graph.final_weight_map;
        alphabet = graph.alphabet;
+       name = graph.name;
        assert(alphabet.count(HfstSymbol()) == 0);
      }
 

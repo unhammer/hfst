@@ -69,30 +69,44 @@ namespace hfst { namespace implementations
   HfstBasicTransducer * ConversionFunctions::
   hfst_transducer_to_hfst_basic_transducer
   (const hfst::HfstTransducer &t) {
-
 #if HAVE_SFST
-    if (t.type == SFST_TYPE)
-      return sfst_to_hfst_basic_transducer(t.implementation.sfst); 
+    if (t.type == SFST_TYPE) {
+      HfstBasicTransducer * retval = sfst_to_hfst_basic_transducer(t.implementation.sfst); 
+      retval->name = t.get_name();
+      return retval;
+    }
 #endif // HAVE_SFST
 
 #if HAVE_OPENFST
-    if (t.type == TROPICAL_OPENFST_TYPE)
-      return tropical_ofst_to_hfst_basic_transducer
+    if (t.type == TROPICAL_OPENFST_TYPE) {
+      HfstBasicTransducer * retval = tropical_ofst_to_hfst_basic_transducer
         (t.implementation.tropical_ofst); 
+      retval->name = t.get_name();
+      return retval;
+    }
 #if HAVE_OPENFST_LOG
-    if (t.type == LOG_OPENFST_TYPE)
-      return log_ofst_to_hfst_basic_transducer(t.implementation.log_ofst); 
+    if (t.type == LOG_OPENFST_TYPE) {
+      HfstBasicTransducer * retval = log_ofst_to_hfst_basic_transducer(t.implementation.log_ofst); 
+      retval->name = t.get_name();
+      return retval;
+    }
 #endif
 #endif // HAVE_OPENFST
     
 #if HAVE_FOMA
-    if (t.type == FOMA_TYPE)
-      return foma_to_hfst_basic_transducer(t.implementation.foma); 
+    if (t.type == FOMA_TYPE) {
+      HfstBasicTransducer * retval = foma_to_hfst_basic_transducer(t.implementation.foma); 
+      retval->name = t.get_name();
+      return retval;
+    }
 #endif // HAVE_FOMA
 
 #if HAVE_XFSM
-    if (t.type == XFSM_TYPE)
-      return xfsm_to_hfst_basic_transducer(t.implementation.xfsm); 
+    if (t.type == XFSM_TYPE) {
+      HfstBasicTransducer * retval = xfsm_to_hfst_basic_transducer(t.implementation.xfsm); 
+      retval->name = t.get_name();
+      return retval;
+    }
 #endif // HAVE_FOMA
 
     
@@ -104,7 +118,11 @@ namespace hfst { namespace implementations
     //#endif // HAVE_MY_TRANSDUCER_LIBRARY
 
     if (t.type == HFST_OL_TYPE || t.type == HFST_OLW_TYPE)
-      return hfst_ol_to_hfst_basic_transducer(t.implementation.hfst_ol);
+      {
+      HfstBasicTransducer * retval = hfst_ol_to_hfst_basic_transducer(t.implementation.hfst_ol);
+      retval->name = t.get_name();
+      return retval;
+      }
 
     HFST_THROW(FunctionNotImplementedException);
   }

@@ -1321,6 +1321,7 @@ HfstTransducer::HfstTransducer
     default:
         HFST_THROW(FunctionNotImplementedException);
     }
+    name = net.name;
 }
 
 HfstTransducer::~HfstTransducer(void)
@@ -5057,6 +5058,7 @@ convert_to_hfst_transducer(implementations::HfstBasicTransducer *t)
       {
         implementation.sfst = 
         ConversionFunctions::hfst_basic_transducer_to_sfst(t);
+        name = t->name;
         delete t;
     return *this;
       }
@@ -5066,6 +5068,7 @@ convert_to_hfst_transducer(implementations::HfstBasicTransducer *t)
       {
         implementation.tropical_ofst = 
         ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(t);
+        name = t->name;
         delete t;
     return *this;
       }
@@ -5074,6 +5077,7 @@ convert_to_hfst_transducer(implementations::HfstBasicTransducer *t)
       {
         implementation.log_ofst = 
         ConversionFunctions::hfst_basic_transducer_to_log_ofst(t);
+        name = t->name;
         delete t;
     return *this;
       }
@@ -5084,6 +5088,7 @@ convert_to_hfst_transducer(implementations::HfstBasicTransducer *t)
       {
         implementation.foma = 
         ConversionFunctions::hfst_basic_transducer_to_foma(t);
+        name = t->name;
         delete t;
     return *this;
       }
