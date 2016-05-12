@@ -1,23 +1,23 @@
 # The examples given in doxygen documentation
 
-import libhfst
+import hfst
 
 # StreamIsClosedException
 try:
-    tr = libhfst.regex('foo')
-    outstr = libhfst.HfstOutputStream(filename='testfile')
+    tr = hfst.regex('foo')
+    outstr = hfst.HfstOutputStream(filename='testfile')
     outstr.close()
     outstr.write(tr)
-except libhfst.StreamIsClosedException:
+except hfst.exceptions.StreamIsClosedException:
     print("Could not write transducer: stream to file was closed.")
 
 # TransducerIsCyclicException
-transducer = libhfst.regex('[a:b]*')
+transducer = hfst.regex('[a:b]*')
 try:
     results = transducer.extract_paths(output='text')
     print("The transducer has %i paths:" % len(results))
     print(results)
-except libhfst.TransducerIsCyclicException:
+except hfst.exceptions.TransducerIsCyclicException:
     print("The transducer is cyclic and has an infinite number of paths. Some of them:")
     results = transducer.extract_paths(output='text', max_cycles=5)
     print(results)
@@ -27,11 +27,11 @@ f = open('foofile', 'w')
 f.write('This is an ordinary text file.\n')
 f.close()
 try:
-    instr = libhfst.HfstInputStream('foofile')
+    instr = hfst.HfstInputStream('foofile')
     tr = instr.read()
     print(tr)
     instr.close()
-except libhfst.NotTransducerStreamException:
+except hfst.exceptions.NotTransducerStreamException:
     print("Could not print transducer: the file does not contain binary transducers.")
 
 f = open('testfile1.att', 'w')
@@ -39,100 +39,100 @@ f.write('0 1 a b\n\
 1 2 c\n\
 2\n')
 f.close()
-f = libhfst.hfst_open('testfile1.att', 'r')
+f = open('testfile1.att', 'r')
 try:
-    tr = libhfst.read_att(f)
-except libhfst.NotValidAttFormatException:
+    tr = hfst.read_att_transducer(f)
+except hfst.exceptions.NotValidAttFormatException:
     print('Could not read file: it is not in valid ATT format.')
 f.close()
 
 # StateIsNotFinalException
-tr = libhfst.HfstBasicTransducer()
+tr = hfst.HfstBasicTransducer()
 tr.add_state(1)
 # An exception is thrown as state number 1 is not final
 try:
     w = tr.get_final_weight(1)
-except libhfst.StateIsNotFinalException:
+except hfst.exceptions.StateIsNotFinalException:
     print("State is not final.")
 
 # ContextTransducersAreNotAutomataException
 # try:
-#    tr = libhfst.regex('a -> b || c:c __ c:d')
-# except libhfst.ContextTransducersAreNotAutomataException:
+#    tr = hfst.regex('a -> b || c:c __ c:d')
+# except hfst.exceptions.ContextTransducersAreNotAutomataException:
 #    print("Context transducers must be automata.")
 
 # TransducersAreNotAutomataException
-tr1 = libhfst.regex('foo:bar')
-tr2 = libhfst.regex('bar:baz')
+tr1 = hfst.regex('foo:bar')
+tr2 = hfst.regex('bar:baz')
 try:
     tr1.cross_product(tr2)
-except libhfst.TransducersAreNotAutomataException:
+except hfst.exceptions.TransducersAreNotAutomataException:
     print('Transducers must be automata in cross product.')
 
 # StateIndexOutOfBoundsException
-tr = libhfst.HfstBasicTransducer()
+tr = hfst.HfstBasicTransducer()
 tr.add_state(1)
 try:
     w = tr.get_final_weight(2)
-except libhfst.StateIndexOutOfBoundsException:
+except hfst.exceptions.StateIndexOutOfBoundsException:
     print('State number 2 does not exist')
 
 # TransducerTypeMismatchException:
-libhfst.set_default_fst_type(libhfst.TROPICAL_OPENFST_TYPE)
-tr1 = libhfst.regex('foo')
-tr2 = libhfst.regex('bar')
-tr2.convert(libhfst.FOMA_TYPE)
+hfst.set_default_fst_type(hfst.TROPICAL_OPENFST_TYPE)
+tr1 = hfst.regex('foo')
+tr2 = hfst.regex('bar')
+tr2.convert(hfst.FOMA_TYPE)
 try:
     tr1.disjunct(tr2)
-except libhfst.TransducerTypeMismatchException:
+except hfst.exceptions.TransducerTypeMismatchException:
     print('The implementation types of transducers must be the same.')
 
 # fst
 # One unweighted identity path:
-if not libhfst.fst('foo').compare(libhfst.regex('{foo}')):
+if not hfst.fst('foo').compare(hfst.regex('{foo}')):
     raise RuntimeError('')
 # Weighted path: a tuple of string and number, e.g. 
-if not libhfst.fst(('foo',1.4)).compare(libhfst.regex('{foo}::1.4')):
+if not hfst.fst(('foo',1.4)).compare(hfst.regex('{foo}::1.4')):
     raise RuntimeError('')
-if not libhfst.fst(('bar',-3)).compare(libhfst.regex('{bar}::-3')):
+if not hfst.fst(('bar',-3)).compare(hfst.regex('{bar}::-3')):
     raise RuntimeError('')
-if not libhfst.fst(('baz',0)).compare(libhfst.regex('{baz}')):
+if not hfst.fst(('baz',0)).compare(hfst.regex('{baz}')):
     raise RuntimeError('')
 # Several paths: a list or a tuple of paths and/or weighted paths, e.g.
-if not libhfst.fst(['foo', 'bar']).compare(libhfst.regex('{foo}|{bar}')):
+if not hfst.fst(['foo', 'bar']).compare(hfst.regex('{foo}|{bar}')):
     raise RuntimeError('')
-if not libhfst.fst(('foo', ('bar',5.0))).compare(libhfst.regex('{foo}|{bar}::5.0')):
+if not hfst.fst(('foo', ('bar',5.0))).compare(hfst.regex('{foo}|{bar}::5.0')):
     raise RuntimeError('')
-if not libhfst.fst(('foo', ('bar',5.0), 'baz', 'Foo', ('Bar',2.4))).compare(libhfst.regex('{foo}|{bar}::5.0|{baz}|{Foo}|{Bar}::2.4')):
+if not hfst.fst(('foo', ('bar',5.0), 'baz', 'Foo', ('Bar',2.4))).compare(hfst.regex('{foo}|{bar}::5.0|{baz}|{Foo}|{Bar}::2.4')):
     raise RuntimeError('')
-if not libhfst.fst([('foo',-1), ('bar',0), ('baz',3.5)]).compare(libhfst.regex('{foo}::-1|{bar}|{baz}::3.5')):
+if not hfst.fst([('foo',-1), ('bar',0), ('baz',3.5)]).compare(hfst.regex('{foo}::-1|{bar}|{baz}::3.5')):
     raise RuntimeError('')
 # A dictionary
-if not libhfst.fst({'foo':'foo', 'bar':('foo',1.4), 'baz':(('foo',-1),'BAZ')}).compare(libhfst.regex('{foo}|{bar}:{foo}::1.4|{baz}:{foo}::-1|{baz}:{BAZ}')):
+if not hfst.fst({'foo':'foo', 'bar':('foo',1.4), 'baz':(('foo',-1),'BAZ')}).compare(hfst.regex('{foo}|{bar}:{foo}::1.4|{baz}:{foo}::-1|{baz}:{BAZ}')):
     raise RuntimeError('')
 
 # tokenized_fst
-tok = libhfst.HfstTokenizer()
+tok = hfst.HfstTokenizer()
 tok.add_multichar_symbol('foo')
 tok.add_multichar_symbol('bar')
-tr = libhfst.tokenized_fst(tok.tokenize('foobar', 'foobaz'))
-if not tr.compare(libhfst.regex('[foo:foo bar:b 0:a 0:z]')):
+tr = hfst.tokenized_fst(tok.tokenize('foobar', 'foobaz'))
+if not tr.compare(hfst.regex('[foo:foo bar:b 0:a 0:z]')):
     raise RuntimeError('')
 
 # HfstBasicTransducer
 # Create an empty transducer
 # The transducer has initially one start state (number zero) 
 # that is not final
-fsm = libhfst.HfstBasicTransducer()
+fsm = hfst.HfstBasicTransducer()
 # Add two states to the transducer
 fsm.add_state(1)
 fsm.add_state(2)
 # Create a transition [foo:bar] leading to state 1 with weight 0.1
-tr = libhfst.HfstBasicTransition(1, 'foo', 'bar', 0.1)
+tr = hfst.HfstBasicTransition(1, 'foo', 'bar', 0.1)
 # and add it to state zero
 fsm.add_transition(0, tr)
 # Add a transition [baz:baz] with weight 0 from state 1 to state 2 
-fsm.add_transition(1, libhfst.HfstBasicTransition(2, 'baz', 'baz', 0.0))
+fsm.add_transition(1, hfst.HfstBasicTransition(2, 'baz', 'baz', 0.0))
 # Set state 2 as final with weight 0.3
 fsm.set_final_weight(2, 0.3)
 # Go through all states
@@ -151,13 +151,13 @@ for state in fsm.states():
         print('%i %f' % (state, fsm.get_final_weight(state)) )
 
 # HfstBasicTransducer.disjunct
-lexicon = libhfst.HfstBasicTransducer()
-tok = libhfst.HfstTokenizer()
+lexicon = hfst.HfstBasicTransducer()
+tok = hfst.HfstTokenizer()
 lexicon.disjunct(tok.tokenize('dog'), 0.3)
 lexicon.disjunct(tok.tokenize('cat'), 0.5)
 lexicon.disjunct(tok.tokenize('elephant'), 1.6)
-lexicon = libhfst.HfstTransducer(lexicon)
-if not lexicon.compare(libhfst.regex('{dog}::0.3|{cat}::0.5|{elephant}::1.6')):
+lexicon = hfst.HfstTransducer(lexicon)
+if not lexicon.compare(hfst.regex('{dog}::0.3|{cat}::0.5|{elephant}::1.6')):
     raise RuntimeError('')
 
 # HfstBasicTransducer.transitions
@@ -169,34 +169,34 @@ for state in fsm.states():
         print('%i %f' % (state, fsm.get_final_weight(state)) )
 
 # HfstBasicTransducer.substitute and HfstTransducer.substitute
-hfst = libhfst.regex('a:a')
-basic = libhfst.HfstBasicTransducer(hfst)
-hfst.substitute('a', 'A', input=True, output=False)
+HFST = hfst.regex('a:a')
+basic = hfst.HfstBasicTransducer(HFST)
+HFST.substitute('a', 'A', input=True, output=False)
 basic.substitute('a', 'A', input=True, output=False)
 
-hfst = libhfst.regex('a a:b b')
-basic = libhfst.HfstBasicTransducer(hfst)
-hfst.substitute(('a','b'),('A','B'))
+HFST = hfst.regex('a a:b b')
+basic = hfst.HfstBasicTransducer(HFST)
+HFST.substitute(('a','b'),('A','B'))
 basic.substitute(('a','b'),('A','B'))
 
-hfst = libhfst.regex('a a:b b')
-basic = libhfst.HfstBasicTransducer(hfst)
-hfst.substitute(('a','b'), (('A','B'),('a','B'),('A','b')))
+HFST = hfst.regex('a a:b b')
+basic = hfst.HfstBasicTransducer(HFST)
+HFST.substitute(('a','b'), (('A','B'),('a','B'),('A','b')))
 basic.substitute(('a','b'), (('A','B'),('a','B'),('A','b')))
 
-hfst = libhfst.regex('a a:b b')
-basic = libhfst.HfstBasicTransducer(hfst)
-hfst.substitute(('a','b'), libhfst.regex('[a:b]+'))
-basic.substitute(('a','b'), libhfst.HfstBasicTransducer(libhfst.regex('[a:b]+')))
+HFST = hfst.regex('a a:b b')
+basic = hfst.HfstBasicTransducer(HFST)
+HFST.substitute(('a','b'), hfst.regex('[a:b]+'))
+basic.substitute(('a','b'), hfst.HfstBasicTransducer(hfst.regex('[a:b]+')))
 
-hfst = libhfst.regex('a b c d')
-basic = libhfst.HfstBasicTransducer(hfst)
-hfst.substitute({'a':'A', 'b':'B', 'c':'C'})
+HFST = hfst.regex('a b c d')
+basic = hfst.HfstBasicTransducer(HFST)
+HFST.substitute({'a':'A', 'b':'B', 'c':'C'})
 basic.substitute({'a':'A', 'b':'B', 'c':'C'})
 
-hfst = libhfst.regex('a a:b b b:c c c:d d')
-basic = libhfst.HfstBasicTransducer(hfst)
-hfst.substitute( {('a','a'):('A','A'), ('b','b'):('B','B'), ('c','c'):('C','C')} )
+HFST = hfst.regex('a a:b b b:c c c:d d')
+basic = hfst.HfstBasicTransducer(HFST)
+HFST.substitute( {('a','a'):('A','A'), ('b','b'):('B','B'), ('c','c'):('C','C')} )
 basic.substitute( {('a','a'):('A','A'), ('b','b'):('B','B'), ('c','c'):('C','C')} )
 
 # HfstBasicTransducer.enumerate
@@ -209,25 +209,25 @@ for state, arcs in enumerate(fsm):
 
 # HfstTransducer
 # argument handling
-transducer1 = libhfst.regex('foo:bar baz')
-transducer2 = libhfst.regex('FOO:BAR BAZ')
+transducer1 = hfst.regex('foo:bar baz')
+transducer2 = hfst.regex('FOO:BAR BAZ')
 transducer1.reverse()
 transducer1.disjunct(transducer2)
-if not transducer2.compare(libhfst.regex('FOO:BAR BAZ')):
+if not transducer2.compare(hfst.regex('FOO:BAR BAZ')):
     raise RuntimeError('')
 transducer1.reverse()
 transducer1.determinize()
 transducer1.reverse()
 transducer1.determinize()
 # implementation types
-tropical_transducer = libhfst.regex('foo')
-tropical_transducer.convert(libhfst.TROPICAL_OPENFST_TYPE)
-foma_transducer = libhfst.regex('foo')
-foma_transducer.convert(libhfst.FOMA_TYPE)
+tropical_transducer = hfst.regex('foo')
+tropical_transducer.convert(hfst.TROPICAL_OPENFST_TYPE)
+foma_transducer = hfst.regex('foo')
+foma_transducer.convert(hfst.FOMA_TYPE)
 # TODO: segfaults
 try:
     tropical_transducer.compare(foma_transducer)
-except libhfst.TransducerTypeMismatchException:
+except hfst.exceptions.TransducerTypeMismatchException:
    print('Implementation types of transducers must be the same.')
 
 # read_att from file
@@ -245,14 +245,16 @@ f.write(
 f.close()
 
 transducers = []
-ifile = libhfst.hfst_open('testfile2.att', 'r')
+ifile = open('testfile2.att', 'r')
 try:
-    while (not ifile.is_eof()):
-        t = libhfst.read_att(ifile, '<eps>')
+    while (True):
+        t = hfst.read_att_transducer(ifile, '<eps>')
         transducers.append(t)
         print("read one transducer")
-except libhfst.NotValidAttFormatException:
+except hfst.exceptions.NotValidAttFormatException:
     print("Error reading transducer: not valid AT&T format.")
+except hfst.exceptions.EndOfStreamException:
+    pass
 ifile.close()
 print("Read %i transducers in total" % len(transducers))
 
@@ -262,18 +264,18 @@ print("Read %i transducers in total" % len(transducers))
 #2
 #"""
 #print(att_str)
-#tr = libhfst.read_att(att_str, '@0@')
+#tr = hfst.read_att(att_str, '@0@')
 #print(tr)
 #exit(0)
 
 # write_att
-tr1 = libhfst.regex('[foo:bar baz:0 " "]::0.3')
-tr2 = libhfst.empty_fst()
-tr3 = libhfst.epsilon_fst(0.5)
-tr4 = libhfst.regex('[foo]')
-tr5 = libhfst.empty_fst()
+tr1 = hfst.regex('[foo:bar baz:0 " "]::0.3')
+tr2 = hfst.empty_fst()
+tr3 = hfst.epsilon_fst(0.5)
+tr4 = hfst.regex('[foo]')
+tr5 = hfst.empty_fst()
 
-f = libhfst.hfst_open('testfile3.att', 'w')
+f = open('testfile3.att', 'w')
 for tr in [tr1, tr2, tr3, tr4]:
     tr.write_att(f)
     f.write('--\n')
@@ -281,7 +283,7 @@ tr5.write_att(f)
 f.close()
 
 # extract_paths
-tr = libhfst.regex('a:b+ (a:c+)')
+tr = hfst.regex('a:b+ (a:c+)')
 print(tr)
 print(tr.extract_paths(max_cycles=1, output='text'))
 print(tr.extract_paths(max_number=4, output='text'))
@@ -289,14 +291,14 @@ print(tr.extract_paths(max_cycles=1, max_number=4, output='text'))
 
 # HfstOutputStream
 res = ['foo:bar','0','0 - 0','"?":?','a* b+']
-ostr = libhfst.HfstOutputStream(filename='testfile1.hfst')
+ostr = hfst.HfstOutputStream(filename='testfile1.hfst')
 for re in res:
-    ostr.write(libhfst.regex(re))
+    ostr.write(hfst.regex(re))
     ostr.flush()
 ostr.close()
 
 # HfstInputStream
-istr = libhfst.HfstInputStream('testfile1.hfst')
+istr = hfst.HfstInputStream('testfile1.hfst')
 transducers = []
 while not (istr.is_eof()):
     transducers.append(istr.read())
@@ -305,7 +307,7 @@ if not len(transducers) == len(res):
     raise RuntimeError('')
 i=0
 for tr in transducers:
-    if not tr.compare(libhfst.regex(res[i])):
+    if not tr.compare(hfst.regex(res[i])):
         raise RuntimeError('')
     i+=1
 
@@ -313,25 +315,25 @@ for tr in transducers:
 
 # QuickStart (1/3)
 
-tr1 = libhfst.regex('foo:bar')
-tr2 = libhfst.regex('bar:baz')
+tr1 = hfst.regex('foo:bar')
+tr2 = hfst.regex('bar:baz')
 tr1.compose(tr2)
 print(tr1)
 
 # QuickStart (2/3)
 
 # Create as HFST basic transducer [a:b] with transition weight 0.3 and final weight 0.5.
-t = libhfst.HfstBasicTransducer()
+t = hfst.HfstBasicTransducer()
 t.add_state(1)
 t.add_transition(0, 1, 'a', 'b', 0.3)
 t.set_final_weight(1, 0.5)
 
 # Convert to tropical OpenFst format (the default) and push weights toward final state.
-T = libhfst.HfstTransducer(t)
-T.push_weights(libhfst.TO_FINAL_STATE)
+T = hfst.HfstTransducer(t)
+T.push_weights(hfst.TO_FINAL_STATE)
 
 # Convert back to HFST basic transducer.
-tc = libhfst.HfstBasicTransducer(T)
+tc = hfst.HfstBasicTransducer(T)
 try:
     # Rounding might affect the precision.
     if (0.79 < tc.get_final_weight(1)) and (tc.get_final_weight(1) < 0.81):
@@ -339,26 +341,26 @@ try:
     else:
         raise RuntimeError('')
 # If the state does not exist or is not final
-except libhfst.HfstException:
+except hfst.exceptions.HfstException:
     print("TEST FAILED: An exception thrown.")
     raise RuntimeError('')
 
 # QuickStart (3/3)
 
-libhfst.set_default_fst_type(libhfst.FOMA_TYPE)
+hfst.set_default_fst_type(hfst.FOMA_TYPE)
 
 # Create a simple lexicon transducer [[foo bar foo] | [foo bar baz]].
-tok = libhfst.HfstTokenizer()
+tok = hfst.HfstTokenizer()
 tok.add_multichar_symbol('foo')
 tok.add_multichar_symbol('bar')
 tok.add_multichar_symbol('baz')
 
-words = libhfst.tokenized_fst(tok.tokenize('foobarfoo'))
-t = libhfst.tokenized_fst(tok.tokenize('foobarbaz'))
+words = hfst.tokenized_fst(tok.tokenize('foobarfoo'))
+t = hfst.tokenized_fst(tok.tokenize('foobarbaz'))
 words.disjunct(t)
 
 # Create a rule transducer that optionally replaces 'bar' with 'baz' between 'foo' and 'foo'.
-rule = libhfst.regex('bar (->) baz || foo _ foo')
+rule = hfst.regex('bar (->) baz || foo _ foo')
 
 # Apply the rule transducer to the lexicon.
 words.compose(rule)
@@ -369,7 +371,7 @@ results = 0
 try:
     # Extract paths and remove tokenization
     results = words.extract_paths(output='dict')
-except libhfst.TransducerIsCyclicException:
+except hfst.exceptions.TransducerIsCyclicException:
     # This should not happen because transducer is not cyclic.
     print("TEST FAILED")
     exit(1)

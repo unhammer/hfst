@@ -38,7 +38,7 @@ fi
 
 for file in test_pmatch.py test_prolog.py test_exceptions.py test_dir_hfst.py \
     test_dir_hfst_exceptions.py test_dir_hfst_rules.py test_tokenizer.py \
-    test_read_att_transducer.py test_xre.py test_hfst.py ;
+    test_read_att_transducer.py test_xre.py test_hfst.py examples.py ;
 do
     if ! [ "$PYTHONPATH" = "" ]; then
         echo 'import sys' > tmp
