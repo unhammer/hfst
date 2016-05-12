@@ -1,21 +1,3 @@
-#for file in test_hfst.py examples.py test.py; do
-#    if python3 $file > /dev/null 2> /dev/null; then
-#        echo $file" passed" 
-#    else
-#        echo $file" failed" 
-#    fi
-#done
-
-#for n in 2 3 5 7 9; do
-#    if python3 test$n.py > /dev/null 2> /dev/null; then
-#        echo "test"$n".py passed" 
-#    else
-#        echo "test"$n".py failed" 
-#    fi
-#done
-
-#echo "skipping test4.py"
-#echo "skipping test8.py"
 
 PYTHON="python3"
 PYTHONPATH=""
@@ -47,9 +29,31 @@ do
     else
         cat $file > tmp
     fi
-    if (python3 tmp); then
+    if ( $PYTHON tmp 2> /dev/null > /dev/null ); then
         echo $file" passed"
     else
         echo $file" failed"
     fi
 done
+
+if ! [ "$PYTHONPATH" = "" ]; then
+    echo 'import sys' > tmp1
+    echo 'sys.path.insert(0, "'$PYTHONPATH'")' >> tmp1
+    cat test_streams_1.py >> tmp1
+    echo 'import sys' > tmp2
+    echo 'sys.path.insert(0, "'$PYTHONPATH'")' >> tmp2
+    cat test_streams_2.py >> tmp2
+    echo 'import sys' > tmp3
+    echo 'sys.path.insert(0, "'$PYTHONPATH'")' >> tmp3
+    cat test_streams_3.py >> tmp3
+else
+    cat test_streams_1.py > tmp1
+    cat test_streams_2.py > tmp2
+    cat test_streams_3.py > tmp3
+fi
+
+if ( $PYTHON tmp1 | $PYTHON tmp2 | $PYTHON tmp3 ); then
+    echo "test_streams[1|2|3].py passed"
+else
+    echo "test_streams[1|2|3].py failed"
+fi

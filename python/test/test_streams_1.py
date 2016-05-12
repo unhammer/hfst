@@ -1,10 +1,10 @@
-import libhfst
+import hfst
 
-tr1 = libhfst.regex('föö:bär')
-tr2 = libhfst.regex('0')
-tr3 = libhfst.regex('0-0')
+tr1 = hfst.regex('föö:bär')
+tr2 = hfst.regex('0')
+tr3 = hfst.regex('0-0')
 
-ostr = libhfst.HfstOutputStream()
+ostr = hfst.HfstOutputStream()
 ostr.write(tr1)
 ostr.write(tr2)
 ostr.write(tr3)
