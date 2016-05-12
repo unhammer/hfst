@@ -855,7 +855,10 @@ class HfstBasicTransducer {
   {
     std::ostringstream oss;
     $self->write_in_att_format(oss, write_weights);
-    return oss.str();
+    std::string retval = oss.str();
+    if (retval == "") // empty transducer must be represented as empty line in python, else read_att fails...
+      retval = std::string("\n");
+    return retval;
   }
 
   char * __str__()
