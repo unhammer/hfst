@@ -7,8 +7,13 @@
 // See the file COPYING included with this distribution for more      
 // information.
 
+// This is a swig interface file that is used to create python bindings for HFST.
+// Everything will be visible under module 'libhfst', but will be wrapped under
+// package 'hfst' and its subpackages 'hfst.exceptions' and 'hfst.rules' (see
+// folder 'hfst' in the current directory).
+
 %module libhfst
-// For type conversions between c++ and python
+// Needed for type conversions between c++ and python.
 %include "std_string.i"
 %include "std_vector.i"
 %include "std_pair.i"
@@ -18,12 +23,12 @@
 
 %feature("autodoc", "3");
 
-// We want warnings to be printed to standard error
+// We want warnings to be printed to standard error.
 %init %{
     hfst::set_warning_stream(&std::cerr);
 %}
 
-// Make swig aware of what hfst offers
+// Make swig aware of what hfst offers.
 %{
 #define HFSTIMPORT
 #include "HfstDataTypes.h"
@@ -39,7 +44,7 @@
 #include "implementations/HfstTransitionGraph.h"
 #include "implementations/optimized-lookup/pmatch.h"
 
-// C++ extension code is located in separate files
+// Most of C++ extension code is located in separate files.
 #include "hfst_extensions.cc"
 #include "hfst_regex_extensions.cc"
 #include "hfst_lexc_extensions.cc"
@@ -54,7 +59,13 @@
 %include <windows.h>
 #endif
 
-// Needed for conversion between c++ and python datatypes
+// Templates needed for conversion between c++ and python datatypes.
+//
+// Note that templating order matters; simple templates used as part of
+// more complex templates must be defined first, e.g. StringPair must be
+// defined before StringPairSet. Also templates that are not used as such
+// but are used as part of other templates must be defined, e.g. 
+// HfstBasicTransitions which is needed for HfstBasicStates.
 
 %include "typemaps.i"
 
@@ -68,8 +79,10 @@ namespace std {
 %template(HfstTransducerVector) vector<hfst::HfstTransducer>;
 %template(HfstSymbolSubstitutions) map<string, string>;
 %template(HfstSymbolPairSubstitutions) map<pair<string, string>, pair<string, string> >;
-%template(FooBarBaz) vector<hfst::implementations::HfstBasicTransition>;
+// needed for HfstBasicTransducer.states()
 %template(BarBazFoo) vector<unsigned int>;
+// HfstBasicTransitions is needed for templating HfstBasicStates:
+%template(HfstBasicTransitions) vector<hfst::implementations::HfstBasicTransition>;
 %template(HfstBasicStates) vector<vector<hfst::implementations::HfstBasicTransition> >;
 %template(HfstOneLevelPath) pair<float, vector<string> >;
 %template(HfstOneLevelPaths) set<pair<float, vector<string> > >;
@@ -80,9 +93,11 @@ namespace std {
 }
 
 
+// ****************************************************** //
 // ********** WHAT IS MADE AVAILABLE ON PYTHON ********** //
+// ****************************************************** //
 
-// *** HfstException and its subclasses (via module hfst.exceptions) *** //
+// *** HfstException and its subclasses (will be wrapped under module hfst.exceptions). *** //
 
 class HfstException 
 {
@@ -124,7 +139,7 @@ class FlagDiacriticsAreNotIdentitiesException : public HfstException { public: F
 namespace hfst
 {
 
-// Needed for conversion between c++ and python datatypes
+// Needed for conversion between c++ and python datatypes.
 
 typedef std::vector<std::string> StringVector;
 typedef std::pair<std::string, std::string> StringPair;
@@ -143,8 +158,6 @@ typedef std::pair<hfst::HfstTransducer, hfst::HfstTransducer> HfstTransducerPair
 typedef std::vector<std::pair<hfst::HfstTransducer, hfst::HfstTransducer> > HfstTransducerPairVector;
 
 
-// *** Basically a wrapper for C file *** //
-
 // *** Some enumerations *** //
 
 enum ImplementationType
@@ -154,9 +167,12 @@ enum ImplementationType
 
 enum PushType { TO_INITIAL_STATE, TO_FINAL_STATE };
 
+// *** Some other functions *** //
+
 bool is_diacritic(const std::string & symbol);
 hfst::HfstTransducerVector compile_pmatch_expression(const std::string & pmatch);
- 
+
+// internal functions 
 %pythoncode %{
   def is_string(s):
       if isinstance(s, str):
@@ -214,9 +230,10 @@ hfst::HfstTransducerVector compile_pmatch_expression(const std::string & pmatch)
 
 // *** HfstTransducer *** //
 
-// NOTE: all functions returning an HfstTransducer& are commented out and extended by replacing them with equivalent functions that return void.
-// This is done in order to avoid use of references that are not handled well by swig/python.
-// Some constructors and destructor are also redefined.
+// NOTE: all functions returning an HfstTransducer& are commented out and extended 
+// by replacing them with equivalent functions that return void. This is done in
+// order to avoid use of references that are not handled well by swig/python.
+// Some constructors and the destructor are also redefined.
 
 class HfstTransducer 
 {
@@ -1062,6 +1079,7 @@ namespace xfst {
   };
 }
 
+// internal functions
 
 std::string hfst::get_hfst_regex_error_message();
 hfst::HfstTransducer * hfst::hfst_regex(hfst::xre::XreCompiler & comp, const std::string & regex_string, const std::string & error_stream);
@@ -1074,10 +1092,6 @@ int hfst::hfst_compile_xfst(hfst::xfst::XfstCompiler & comp, std::string input, 
 std::string hfst::get_hfst_lexc_output();
 hfst::HfstTransducer * hfst::hfst_compile_lexc(hfst::lexc::LexcCompiler & comp, const std::string & filename, const std::string & error_stream);
 
-void hfst::set_default_fst_type(hfst::ImplementationType t);
-hfst::ImplementationType hfst::get_default_fst_type();
-std::string hfst::fst_type_to_string(hfst::ImplementationType t);
-
 std::string hfst::one_level_paths_to_string(const HfstOneLevelPaths &);
 std::string hfst::two_level_paths_to_string(const HfstTwoLevelPaths &);
 
@@ -1086,7 +1100,15 @@ bool parse_prolog_arc_line(const std::string & line, hfst::implementations::Hfst
 bool parse_prolog_symbol_line(const std::string & line, hfst::implementations::HfstBasicTransducer * graph);
 bool parse_prolog_final_line(const std::string & line, hfst::implementations::HfstBasicTransducer * graph);
 
-// *** hfst_rules (via module hfst.rules) *** //
+
+// fuctions visible under module hfst
+
+void hfst::set_default_fst_type(hfst::ImplementationType t);
+hfst::ImplementationType hfst::get_default_fst_type();
+std::string hfst::fst_type_to_string(hfst::ImplementationType t);
+
+
+// *** hfst_rules (will be wrapped under module hfst.rules) *** //
 
 namespace hfst_rules {
 
@@ -1139,7 +1161,9 @@ namespace hfst_ol {
 } // namespace hfst_ol
 
 
+// ******************************** //
 // *** Actual python extensions *** //
+// ******************************** //
  
 %pythoncode %{
 
@@ -1149,6 +1173,7 @@ EPSILON='@_EPSILON_SYMBOL_@'
 UNKNOWN='@_UNKNOWN_SYMBOL_@'
 IDENTITY='@_IDENTITY_SYMBOL_@'
 
+# Windows...
 OUTPUT_TO_CONSOLE=False
 def set_output_to_console(val):
     global OUTPUT_TO_CONSOLE

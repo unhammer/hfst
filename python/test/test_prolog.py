@@ -1,7 +1,7 @@
 import hfst
 import sys
 f = open('cats_and_dogs.prolog', 'r')
-F = open('cats_and_dogs.output.prolog', 'w')
+F = open('tmp', 'w')
 
 tr = hfst.read_prolog_transducer(f)
 re = hfst.regex('{cat}')
@@ -35,7 +35,7 @@ except hfst.exceptions.EndOfStreamException as e:
 f.close()
 F.close()
 
-f = open('cats_and_dogs.output.prolog', 'r')
+f = open('tmp', 'r')
 
 tr = hfst.read_prolog_transducer(f)
 re = hfst.regex('{cat}')
