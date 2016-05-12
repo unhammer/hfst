@@ -956,17 +956,21 @@ Location PmatchAlphabet::locatefy(unsigned int input_offset,
             continue;
         }
         if (is_printable(output)) {
-            retval.output.append(string_from_symbol(output));
+            std::string s = string_from_symbol(output);
+            retval.output.append(s);
+            retval.output_symbol_strings.push_back(s);
         }
         if (is_printable(input)) {
-            retval.input.append(string_from_symbol(input));
+            std::string s = string_from_symbol(input);
+            retval.input.append(s);
+            retval.input_symbol_strings.push_back(s);
             ++input_offset;
         }
         if (is_input_mark(output)) {
             retval.output_parts.push_back(output_mark);
             retval.input_parts.push_back(input_mark);
-            output_mark = retval.output.size();
-            input_mark = retval.input.size();
+            output_mark = retval.output_symbol_strings.size();
+            input_mark = retval.input_symbol_strings.size();
         }
     }
     if (output_mark > 0) {

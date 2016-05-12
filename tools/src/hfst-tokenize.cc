@@ -230,35 +230,71 @@ hfst_ol::PmatchContainer make_naive_tokenizer(HfstTransducer & dictionary)
     return retval;
 }
 
+/** 
+ * Return empty string if it wasn't a tag, otherwise the tag without the initial/final +
+ */
+const std::string as_cg_tag(const std::string & str) {
+    size_t len = str.size();
+    if(len > 1) {
+        if (str.at(0) == '+') {
+            return str.substr(1);
+        }
+        else if(str.at(len - 1) == '+') {
+            return str.substr(0, len - 1);
+        }
+    }
+    return "";
+}
 
 void print_cg_subreading(std::string const & indent,
-                         std::string const & str,
+                         hfst::StringVector::const_iterator & out_beg,
+                         hfst::StringVector::const_iterator & out_end,
                          hfst_ol::Weight const & weight,
-                         std::string const & input,
+                         hfst::StringVector::const_iterator & in_beg,
+                         hfst::StringVector::const_iterator & in_end,
                          std::ostream & outstream)
 {
-    // Assume tags are +-separated, the first '+' marks the
-    // end of lemma, and there are no unescaped '+' symbols
-    // TODO: handle escaped '+'? (cg-conv doesn't)
-    size_t i = 0, j = 0;
-    outstream << indent << "\"";
-    if((j = str.find(tag_separator, i)) != std::string::npos) {
-        outstream << str.substr(i, j-i);
-        i = j+1;
+    outstream << indent;
+    bool in_lemma = false;
+    bool want_spc = false;
+    for(hfst::StringVector::const_iterator it = out_beg;
+        it != out_end; ++it) {
+        const std::string & tag = as_cg_tag(*it);
+        if(in_lemma) {
+            if(tag.empty()) {
+                outstream << (*it);
+            }
+            else {
+                in_lemma = false;
+                outstream << "\" " << tag;
+                want_spc = true;
+            }
+        }
+        else {
+            if(want_spc) {
+                outstream << " ";
+            }
+            if(tag.empty()) {
+                in_lemma = true;
+                outstream << "\"" << (*it);
+            }
+            else {
+                outstream << tag;
+                want_spc = true;
+            }
+        }
     }
-    outstream << "\"";
-    while((j = str.find(tag_separator, i)) != std::string::npos) {
-        outstream << " " << str.substr(i, j-i);
-        i = j+1;
+    if(in_lemma) {
+        outstream << "\"";
     }
-    if(!str.substr(i).empty()) {
-        outstream << " " << str.substr(i);
-    }
+
     if (print_weights) {
         outstream << " <" << wtag << ":" << weight << ">";
     }
-    if (!input.empty()) {
-        outstream << " \"<" << input << ">\"";
+    if (in_beg != in_end) {
+        std::ostringstream form;
+        std::copy(in_beg, in_end, std::ostream_iterator<std::string>(form, ""));
+        outstream << " \"<" << form.str() << ">\"";
     }
     outstream << std::endl;
 }
@@ -277,46 +313,58 @@ void print_location_vector_gtd(LocationVector const & locations, std::ostream & 
                 continue;
             }
             std::string indent = "\t";
-            size_t out_beg = 0, out_end = loc_it->output.size();
-            size_t in_beg = 0, in_end = loc_it->input.size();
+            hfst::StringVector::const_iterator
+                out_beg = loc_it->output_symbol_strings.begin(),
+                out_end = loc_it->output_symbol_strings.end(),
+                in_beg = loc_it->input_symbol_strings.end(), // beg=end: don't print input unless we have to
+                in_end = loc_it->input_symbol_strings.end();
             size_t part = loc_it->input_parts.size();
             while(true) {
-                std::string inpart, outpart;
-                size_t sub_beg = loc_it->output.rfind(subreading_separator, out_end-1);
-                if(sub_beg == std::string::npos) {
-                    sub_beg = 0;
-                }
-                size_t part_beg = part > 0 ? loc_it->output_parts.at(part-1) : 0;
-                if(part_beg > sub_beg) {
-                    out_beg = part_beg;
-                    in_beg = loc_it->input_parts.at(part-1);
-                    inpart = loc_it->input.substr(in_beg, in_end - in_beg);
-                    in_end = in_beg;
-                    --part;
-                }
-                else if (sub_beg > 0) {
-                    out_beg = sub_beg + subreading_separator.size();
-                }
-                else {
-                    out_beg = 0;
-                    if(in_end != loc_it->input.size()) {
-                        inpart = loc_it->input.substr(0, in_end);
+                std::string inpart;
+                bool sub_found = false;
+                size_t out_part = part > 0 ? loc_it->output_parts.at(part-1) : 0;
+                for(hfst::StringVector::const_iterator it = out_end-1;
+                    it > loc_it->output_symbol_strings.begin() + out_part;
+                    --it) {
+                    if(subreading_separator.compare(*it) == 0) {
+                        // Found a sub-reading mark
+                        out_beg = ++it;
+                        sub_found = true;
+                        break;
                     }
                 }
-                outpart = loc_it->output.substr(out_beg, out_end - out_beg);
+                if(!sub_found) {
+                    if(out_part > 0) {
+                        // Found an input mark
+                        out_beg = loc_it->output_symbol_strings.begin() + out_part;
+                        in_beg = loc_it->input_symbol_strings.begin() + loc_it->input_parts.at(part-1);
+                        --part;
+                    }
+                    else {
+                        // No remaining sub-marks or input-marks to the left
+                        out_beg = loc_it->output_symbol_strings.begin();
+                        if(in_end != loc_it->input_symbol_strings.end()) {
+                            // We've seen at least one input-mark, so we need to output the remaining input as well
+                            in_beg = loc_it->input_symbol_strings.begin();
+                        }
+                    }
+                }
                 print_cg_subreading(indent,
-                                    outpart,
+                                    out_beg,
+                                    out_end,
                                     loc_it->weight,
-                                    inpart,
+                                    in_beg,
+                                    in_end,
                                     outstream);
-                if(out_beg == 0) {
+                if(out_beg == loc_it->output_symbol_strings.begin()) {
                     break;
                 }
                 else {
                     indent += "\t";
                     out_end = out_beg;
-                    if(sub_beg > part_beg) {
-                        out_end -= subreading_separator.size();
+                    in_end = in_beg;
+                    if(sub_found) {
+                        out_end--; // skip the subreading separator symbol
                     }
                 }
             }
@@ -638,7 +686,7 @@ int main(int argc, char ** argv)
             "\nDid you make it with hfst-pmatch2fst or make sure it's in weighted optimized-lookup format?\n";
         return 1;
     }
-        
+
 //     if (outfile != stdout) {
 //         std::filebuf fb;
 // fb.open(outfilename, std::ios::out);

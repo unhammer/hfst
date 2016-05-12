@@ -255,8 +255,10 @@ namespace hfst_ol {
         std::string output;
         std::string tag;
         Weight weight;
-        std::vector<size_t> input_parts;
-        std::vector<size_t> output_parts;
+        std::vector<size_t> input_parts; // indices in input_symbol_strings
+        std::vector<size_t> output_parts; // indices in output_symbol_strings
+        std::vector<std::string> input_symbol_strings;
+        std::vector<std::string> output_symbol_strings;
 
         bool operator<(Location rhs) const
             { return this->weight < rhs.weight; }
