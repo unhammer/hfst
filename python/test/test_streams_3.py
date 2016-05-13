@@ -1,6 +1,15 @@
 import hfst
 import sys
 
+if sys.argv[1] == 'sfst':
+    hfst.set_default_fst_type(hfst.SFST_TYPE)
+elif sys.argv[1] == 'foma':
+    hfst.set_default_fst_type(hfst.FOMA_TYPE)
+elif sys.argv[1] == 'openfst':
+    hfst.set_default_fst_type(hfst.TROPICAL_OPENFST_TYPE)
+else:
+    raise RuntimeError('implementation format not recognized')
+
 transducers = []
 
 try:

@@ -52,8 +52,11 @@ else
     cat test_streams_3.py > tmp3
 fi
 
-if ( $PYTHON tmp1 | $PYTHON tmp2 | $PYTHON tmp3 ); then
-    echo "test_streams[1|2|3].py passed"
-else
-    echo "test_streams[1|2|3].py failed"
-fi
+for format in sfst openfst foma;
+do
+    if ( $PYTHON tmp1 $format | $PYTHON tmp2 $format | $PYTHON tmp3 $format ); then
+        echo "test_streams[1|2|3].py with "$format" format passed"
+    else
+        echo "test_streams[1|2|3].py with "$format" format failed"
+    fi
+done
