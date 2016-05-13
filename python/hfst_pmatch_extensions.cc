@@ -2,20 +2,20 @@
 
 namespace hfst {
 
-  hfst::ImplementationType get_default_fst_type();
+  //hfst::ImplementationType get_default_fst_type();
 
 // Mostly copied from file 'tools/src/hfst-pmatch2fst.cc'.
 // TODO: HfstTransducer pointers in variable 'definitions' need to be deleted manually?
 std::vector<hfst::HfstTransducer> compile_pmatch_expression(const std::string & pmatch)
 {
     std::vector<hfst::HfstTransducer> retval;
-    hfst::pmatch::PmatchCompiler comp(get_default_fst_type());
+    hfst::pmatch::PmatchCompiler comp(hfst::TROPICAL_OPENFST_TYPE);
     comp.set_verbose(false/*verbose*/);
     comp.set_flatten(false/*flatten*/);
     std::map<std::string, hfst::HfstTransducer*> definitions = comp.compile(pmatch);
 
     // A dummy transducer with an alphabet with all the symbols
-    hfst::HfstTransducer harmonizer(get_default_fst_type());
+    hfst::HfstTransducer harmonizer(hfst::TROPICAL_OPENFST_TYPE);
 
     // First we need to collect a unified alphabet from all the transducers.
     hfst::StringSet symbols_seen;
@@ -25,7 +25,7 @@ std::vector<hfst::HfstTransducer> compile_pmatch_expression(const std::string & 
         for (hfst::StringSet::const_iterator sym = string_set.begin();
              sym != string_set.end(); ++sym) {
             if (symbols_seen.count(*sym) == 0) {
-                harmonizer.disjunct(hfst::HfstTransducer(*sym, get_default_fst_type()));
+              harmonizer.disjunct(hfst::HfstTransducer(*sym, hfst::TROPICAL_OPENFST_TYPE));
                 symbols_seen.insert(*sym);
             }
         }
