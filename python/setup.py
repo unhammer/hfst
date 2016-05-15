@@ -30,8 +30,9 @@ setup(name = 'libhfst_swig',
       author = 'HFST team',
       author_email = 'hfst-bugs@helsinki.fi',
       url = 'http://hfst.github.io/',
-      description = 'SWIG-bound new libhfst interface',
+      description = 'SWIG-bound hfst interface',
       ext_modules = [libhfst_module],
       py_modules = ["libhfst"],
+      packages = ["hfst", "hfst.exceptions", "hfst.rules"],
       data_files = []
       )
