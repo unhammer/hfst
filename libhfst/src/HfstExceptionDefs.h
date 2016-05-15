@@ -33,6 +33,8 @@ struct HfstException
   ~HfstException();
   //! @brief Get the error message.
   HFSTDLL std::string operator() (void) const;
+  // An alias for python
+  HFSTDLL std::string what() const;
 };
 
 //! @brief Macro to throw an exception of type @a E.
