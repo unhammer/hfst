@@ -21,7 +21,7 @@ fi
 for file in test_pmatch.py test_prolog.py test_exceptions.py test_dir_hfst.py \
     test_dir_hfst_exceptions.py test_dir_hfst_rules.py test_tokenizer.py \
     test_read_att_transducer.py test_xre.py test_hfst.py examples.py \
-    test_att_reader.py ;
+    test_att_reader.py test_prolog_reader.py ;
 do
     if ! [ "$PYTHONPATH" = "" ]; then
         echo 'import sys' > tmp
@@ -30,11 +30,11 @@ do
     else
         cat $file > tmp
     fi
-#    if ( $PYTHON tmp 2> /dev/null > /dev/null ); then
-    if ( $PYTHON tmp ); then
+    if ( $PYTHON tmp 2> /dev/null > /dev/null ); then
         echo $file" passed"
     else
         echo $file" failed"
+        return 1
     fi
 done
 
@@ -60,5 +60,6 @@ do
         echo "test_streams[1|2|3].py with "$format" format passed"
     else
         echo "test_streams[1|2|3].py with "$format" format failed"
+        return 1
     fi
 done

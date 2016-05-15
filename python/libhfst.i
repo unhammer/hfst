@@ -1344,6 +1344,27 @@ def read_prolog_transducer(f):
         else:
            raise NotValidPrologFormatException(line,"",0)
 
+class PrologReader:
+      def __init__(self, f):
+          self.file = f
+
+      def read(self):
+          return read_prolog_transducer(self.file)
+
+      def __iter__(self):
+          return self
+
+      # Python 2
+      def next(self):
+          try:
+             return self.read()
+          except EndOfStreamException as e:
+             raise StopIteration
+
+      # Python 3
+      def __next__(self):
+          return self.next()
+
 def start_xfst(**kvargs):
     import sys
     idle = 'idlelib' in sys.modules
