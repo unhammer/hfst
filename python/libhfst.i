@@ -1283,6 +1283,28 @@ def read_att_transducer(f, epsilonstr=EPSILON):
            raise NotValidAttFormatException("","",0)
     return HfstTransducer(fsm, _libhfst.get_default_fst_type())
 
+class AttReader:
+      def __init__(self, f, epsilonstr=EPSILON):
+          self.file = f
+          self.epsilonstr = epsilonstr
+
+      def read(self):
+          return read_att_transducer(self.file, self.epsilonstr)
+
+      def __iter__(self):
+          return self
+
+      # Python 2
+      def next(self):
+          try:
+             return self.read()
+          except EndOfStreamException as e:
+             raise StopIteration
+
+      # Python 3
+      def __next__(self):
+          return self.next()
+
 def read_prolog_transducer(f):
     fsm = HfstBasicTransducer()
     
