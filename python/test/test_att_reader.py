@@ -18,7 +18,7 @@ with open('testfile_fail.att', 'r') as f:
         for tr in r:
             transducers.append(tr)
     except hfst.exceptions.NotValidAttFormatException as e:
-        pass
+        assert("1      baz    baz      0.3" in e.what())
 
 assert(f.closed)
 assert(len(transducers)) == 4

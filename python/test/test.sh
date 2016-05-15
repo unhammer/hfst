@@ -34,7 +34,7 @@ do
         echo $file" passed"
     else
         echo $file" failed"
-        return 1
+        exit 1
     fi
 done
 
@@ -60,6 +60,6 @@ do
         echo "test_streams[1|2|3].py with "$format" format passed"
     else
         echo "test_streams[1|2|3].py with "$format" format failed"
-        return 1
+        exit 1
     fi
 done
