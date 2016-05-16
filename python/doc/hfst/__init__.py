@@ -262,7 +262,7 @@ def start_xfst(**kvargs):
 
 ## Read AT&T input from the user and return a transducer.
 # @return An HfstTransducer whose type is hfst.get_default_fst_type().
-# Read one AT&T line at a time from standard input and create an equivalent transducer.
+# Read one AT&T line at a time from standard input and finally return an equivalent transducer.
 # An empty line signals the end of input.
 def read_att_input():
     pass
@@ -354,12 +354,119 @@ def read_att_string(att):
 def read_att_transducer(f, epsilonstr=hfst.EPSILON):
     pass
 
+## A class for reading input in AT&T text format and converting it into transducer(s).
+#
+# An example that reads AT&T input from file 'testfile.att' where epsilon is represented as "<eps>"
+# and creates the corresponding transducers and prints them. If the input cannot be parsed, a message showing the
+# invalid line in AT&T input is printed and reading is stopped.
+#
+# \verbatim
+# with open('testfile.att', 'r') as f:
+#     try:
+#         r = hfst.AttReader(f, "<eps>")
+#         for tr in r:
+#             print(tr)
+#     except hfst.exceptions.NotValidAttFormatException as e:
+#         print(e.what())
+# \endverbatim
+class AttReader:
+    ## Create an AttReader that reads input from file \a f where the epsilon is represented as \a epsilonstr.
+    # @param f A python file.
+    # @param epsilonstr How epsilon is represented in the file. By default, "@_EPSILON_SYMBOL_@" and "@0@" are both recognized.
+    def __init__(self, f, epsilonstr=EPSILON):
+        pass
+    ## Read next transducer.
+    # Read next transducer description in AT&T format and return a corresponding transducer.
+    # @throws hfst.exceptions.NotValidAttFormatException
+    # @throws hfst.exceptions.EndOfStreamException
+    def read(self):
+        pass
+    ## An iterator to the reader.
+    # Needed for 'for ... in' statement.
+    # \verbatim
+    # for transducer in att_reader:
+    #     print(transducer)
+    # \endverbatim
+    def __iter__(self):
+        pass
+    ## Return next element (for python version 2).
+    # Needed for 'for ... in' statement.
+    # \verbatim
+    # for transducer in att_reader:
+    #     print(transducer)
+    # \endverbatim
+    # @throws StopIteration
+    def next(self):
+        pass
+    ## Return next element (for python version 3).
+    # Needed for 'for ... in' statement.
+    # \verbatim
+    # for transducer in att_reader:
+    #     print(transducer)
+    # \endverbatim
+    # @throws StopIteration
+    def __next__(self):
+        pass
+
 # Read next transducer from prolog file pointed by \a f.
 # @param f A python file.
 #
 # If the file contains several transducers, they must be separated by empty lines.
 def read_prolog_transducer(f):
     pass
+
+## A class for reading input in prolog text format and converting it into transducer(s).
+#
+# An example that reads prolog input from file 'testfile.prolog'
+# and creates the corresponding transducers and prints them. If the input cannot be parsed, a message showing the
+# invalid line in prolog input is printed and reading is stopped.
+#
+# \verbatim
+# with open('testfile.prolog', 'r') as f:
+#     try:
+#         r = hfst.PrologReader(f)
+#         for tr in r:
+#             print(tr)
+#     except hfst.exceptions.NotValidPrologFormatException as e:
+#         print(e.what())
+# \endverbatim
+class PrologReader:
+    ## Create a PrologReader that reads input from file \a f.
+    # @param f A python file.
+    def __init__(self, f):
+        pass
+    ## Read next transducer.
+    # Read next transducer description in prolog format and return a corresponding transducer.
+    # @throws hfst.exceptions.NotValidPrologFormatException
+    # @throws hfst.exceptions.EndOfStreamException
+    def read(self):
+        pass
+    ## An iterator to the reader.
+    # Needed for 'for ... in' statement.
+    # \verbatim
+    # for transducer in prolog_reader:
+    #     print(transducer)
+    # \endverbatim
+    def __iter__(self):
+        pass
+    ## Return next element (for python version 2).
+    # Needed for 'for ... in' statement.
+    # \verbatim
+    # for transducer in prolog_reader:
+    #     print(transducer)
+    # \endverbatim
+    # @throws StopIteration
+    def next(self):
+        pass
+    ## Return next element (for python version 3).
+    # Needed for 'for ... in' statement.
+    # \verbatim
+    # for transducer in prolog_reader:
+    #     print(transducer)
+    # \endverbatim
+    # @throws StopIteration
+    def __next__(self):
+        pass
 
 ## A simple transducer class with tropical weights. 
 #
