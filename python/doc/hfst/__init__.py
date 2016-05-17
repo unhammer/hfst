@@ -248,8 +248,8 @@ def compile_pmatch_file(filename):
     pass
 
 ## Compile a pmatch expression into a tuple of transducers.
+# @param expr A string defining how pmatch is done.
 # @see hfst.compile_pmatch_file
-# @arg expr A string defining how pmatch is done.
 def compile_pmatch_expression(expr):
     pass
 
