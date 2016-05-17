@@ -57,8 +57,16 @@ using std::pair;
 #include "inc/globals-unary.h"
 
 static bool blankline_separated = true;
-static std::string extract_tags = "";
-static std::string locate_mode = "";
+
+enum var_val{on, off, not_defined};
+static var_val count_patterns = not_defined;
+static var_val delete_patterns = not_defined;
+static var_val extract_patterns = not_defined;
+static var_val locate_mode = not_defined;
+static var_val mark_patterns = not_defined;
+static int max_recursion = -1;
+static int max_context = -1;
+
 static double time_cutoff = 0.0;
 static bool profile = false;
 std::string pmatch_filename;
@@ -72,11 +80,16 @@ print_usage()
             "\n", program_name);
     print_common_program_options(message_out);
     fprintf(message_out,
-            "  -n  --newline          Newline as input separator (default is blank line)\n"
-            "  -x  --extract-tags     Only print tagged parts in output\n"
-            "  -l  --locate           Only print locations of matches\n"
-            "  -t, --time-cutoff=S    Limit search after having used S seconds per input\n"
-            "  -p  --profile          Produce profiling data\n");
+            "  -n  --newline           Newline as input separator (default is blank line)\n"
+            "  -x  --extract-patterns  Only print tagged parts in output\n"
+            "  -l  --locate            Only print locations of matches\n"
+            "  -c  --count-patterns    Print the total number of matches when done\n"
+            "      --delete-patterns   Replace matches with opening tags\n"
+            "      --no-mark-patterns  Don't tag matched patterns\n"
+            "      --max-context       Upper limit to context length allowed\n"
+            "      --max-recursion     Upper limit for recursion\n"
+            "  -t, --time-cutoff=S     Limit search after having used S seconds per input\n"
+            "  -p  --profile           Produce profiling data\n");
     fprintf(message_out, 
             "Use standard streams for input and output.\n"
             "\n"
@@ -156,6 +169,9 @@ int process_input(hfst_ol::PmatchContainer & container,
     if (blankline_separated && !input_text.empty()) {
         match_and_print(container, outstream, input_text);
     }
+    if (count_patterns == on) {
+        outstream << "\n" << container.get_pattern_count_info() << "\n";
+    }
     if (profile) {
         outstream << "\n" << container.get_profiling_info() << "\n";
     }
@@ -173,14 +189,19 @@ int parse_options(int argc, char** argv)
             {
                 HFST_GETOPT_COMMON_LONG,
                 {"newline", no_argument, 0, 'n'},
-                {"extract-tags", no_argument, 0, 'x'},
+                {"extract-patterns", no_argument, 0, 'x'},
                 {"locate", no_argument, 0, 'l'},
+                {"count-patterns", no_argument, 0, 'c'},
+                {"delete-patterns", no_argument, 0, 'z'},
+                {"no-mark-patterns", no_argument, 0, 'm'},
+                {"max-context", required_argument, 0, 'b'},
+                {"max-recursion", required_argument, 0, 'r'},
                 {"time-cutoff", required_argument, 0, 't'},
                 {"profile", no_argument, 0, 'p'},
                 {0,0,0,0}
             };
         int option_index = 0;
-        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nxlt:p",
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nxlcdmq:r:t:p",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -195,10 +216,35 @@ int parse_options(int argc, char** argv)
             blankline_separated = false;
             break;
         case 'x':
-            extract_tags = "yes";
+            extract_patterns = on;
             break;
         case 'l':
-            locate_mode = "yes";
+            locate_mode = on;
+            break;
+        case 'c':
+            count_patterns = on;
+            break;
+        case 'z':
+            delete_patterns = on;
+            break;
+        case 'm':
+            mark_patterns = off;
+            break;
+        case 'b':
+            max_context = atoi(optarg);
+            if (max_context < 0)
+            {
+                std::cerr << "Invalid argument for --max-context\n";
+                return EXIT_FAILURE;
+            }
+            break;
+        case 'r':
+            max_recursion = atoi(optarg);
+            if (max_recursion < 0)
+            {
+                std::cerr << "Invalid argument for --max-recursion\n";
+                return EXIT_FAILURE;
+            }
             break;
         case 't':
             time_cutoff = atof(optarg);
@@ -266,10 +312,20 @@ int main(int argc, char ** argv)
     try {
         hfst_ol::PmatchContainer container(instream);
         container.set_verbose(verbose);
-        if (extract_tags != "")
-            container.set_extract_tags_mode(extract_tags == "yes");
-        if (locate_mode != "")
-            container.set_locate_mode(locate_mode == "yes");
+        if (extract_patterns != not_defined)
+            container.set_extract_patterns(extract_patterns == on);
+        if (locate_mode != not_defined)
+            container.set_locate_mode(locate_mode == on);
+        if (count_patterns != not_defined)
+            container.set_count_patterns(count_patterns == on);
+        if (delete_patterns != not_defined)
+            container.set_delete_patterns(delete_patterns == on);
+        if (mark_patterns != not_defined)
+            container.set_mark_patterns(mark_patterns == on);
+        if (max_context >= 0)
+            container.set_max_context(max_context);
+        if (max_recursion >= 0)
+            container.set_max_recursion(max_recursion);
         container.set_profile(profile);
 #ifdef _MSC_VER
         //hfst::print_output_to_console(true);

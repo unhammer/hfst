@@ -108,14 +108,38 @@ UNICODE_ESCAPE ("\\u"{HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR})|("\\U00"{HEXCHAR}{HEX
 "Punct" { return PUNCT; }
 "Whitespace" { return WHITESPACE; }
 
-"count-patterns" { return VAR_COUNT; }
-"delete-patterns" { return VAR_DELETE; }
-"extract-patterns" { return VAR_EXTRACT; }
-"locate-patterns" { return VAR_LOCATE; }
-"mark-patterns" { return VAR_MARK; }
-"need-separators" { return VAR_NEED_SEPARATORS; }
-"max-context-length" { return VAR_MAX_CONTEXT_LEN; }
-"max-recursion" { return VAR_MAX_RECURSION; }
+"count-patterns" {
+    pmatchlval.label = strcpy((char *) malloc(strlen("count-patterns") + 1), "count-patterns");
+    return VARIABLE_NAME;
+}
+"delete-patterns" {
+    pmatchlval.label = strcpy((char *) malloc(strlen("delete-patterns") + 1), "delete-patterns");
+    return VARIABLE_NAME;
+}
+"extract-patterns" {
+    pmatchlval.label = strcpy((char *) malloc(strlen("extract-patterns") + 1), "extract-patterns");
+    return VARIABLE_NAME;
+}
+"locate-patterns" {
+    pmatchlval.label = strcpy((char *) malloc(strlen("locate-patterns") + 1), "locate-patterns");
+    return VARIABLE_NAME;
+}
+"mark-patterns" {
+    pmatchlval.label = strcpy((char *) malloc(strlen("mark-patterns") + 1), "mark-patterns");
+    return VARIABLE_NAME;
+}
+"need-separators" {
+    pmatchlval.label = strcpy((char *) malloc(strlen("need-separators") + 1), "need-separators");
+    return VARIABLE_NAME;
+}
+"max-context-length" {
+    pmatchlval.label = strcpy((char *) malloc(strlen("max-context_length") + 1), "max-context-length");
+    return VARIABLE_NAME;
+}
+"max-recursion" {
+    pmatchlval.label = strcpy((char *) malloc(strlen("max-recursion") + 1), "max-recursion");
+    return VARIABLE_NAME;
+}
 
 "~"   { return COMPLEMENT; }
 "\\"  { return TERM_COMPLEMENT; }

@@ -98,8 +98,7 @@ LTR_LONGEST_MATCH LTR_SHORTEST_MATCH
 %token PAIR_SEPARATOR PAIR_SEPARATOR_SOLE PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
 %token EPSILON_TOKEN ANY_TOKEN BOUNDARY_MARKER
 %token LEXER_ERROR SYMBOL SYMBOL_WITH_LEFT_PAREN QUOTED_LITERAL CURLY_LITERAL
-%token ALPHA LOWERALPHA UPPERALPHA NUM PUNCT WHITESPACE
-%token VAR_COUNT VAR_DELETE VAR_EXTRACT VAR_LOCATE VAR_MARK VAR_NEED_SEPARATORS VAR_MAX_CONTEXT_LEN VAR_MAX_RECURSION
+%token ALPHA LOWERALPHA UPPERALPHA NUM PUNCT WHITESPACE VARIABLE_NAME
 //  MAP_LEFT
 %right DEFINE SET_VARIABLE
 LIT_LEFT INS_LEFT REGEX DEFINS DEFINED_LIST CAP_LEFT OPTCAP_LEFT OPT_TOLOWER_LEFT TOLOWER_LEFT
@@ -127,17 +126,14 @@ PMATCH: //empty
  }
 | PMATCH SET_VARIABLE VARIABLE_NAME SYMBOL {
     hfst::pmatch::variables[$3] = $4;
-    free($4);
+    free($3); free($4);
+ } |
+ PMATCH SET_VARIABLE VARIABLE_NAME EPSILON_TOKEN {
+     // the symbol can be 0, and that pretty much has to be reserved for
+     // epsilon, so we detect that possibility here
+     hfst::pmatch::variables[$3] = "0";
+     free($3);
  };
-
-VARIABLE_NAME: VAR_COUNT { $$ = "count-patterns"; } |
-VAR_DELETE { $$ = "delete-patterns"; } |
-VAR_EXTRACT { $$ = "extract-patterns"; } |
-VAR_LOCATE { $$ = "locate-patterns"; } |
-VAR_MARK { $$ = "mark-patterns"; } |
-VAR_NEED_SEPARATORS { $$ = "need-separators"; } |
-VAR_MAX_CONTEXT_LEN { $$ = "max-context-length"; } |
-VAR_MAX_RECURSION SYMBOL { $$ = "max-recursion"; };
 
 DEFINITION: DEFINE SYMBOL EXPRESSION1 {
     $$ = new std::pair<std::string, PmatchObject*>($2, $3);
