@@ -7,8 +7,13 @@
 // See the file COPYING included with this distribution for more      
 // information.
 
+// This is a swig interface file that is used to create python bindings for HFST.
+// Everything will be visible under module 'libhfst', but will be wrapped under
+// package 'hfst' and its subpackages 'hfst.exceptions' and 'hfst.rules' (see
+// folder 'hfst' in the current directory).
+
 %module libhfst
-// For type conversions between c++ and python
+// Needed for type conversions between c++ and python.
 %include "std_string.i"
 %include "std_vector.i"
 %include "std_pair.i"
@@ -18,12 +23,12 @@
 
 %feature("autodoc", "3");
 
-// We want warnings to be printed to standard error
+// We want warnings to be printed to standard error.
 %init %{
     hfst::set_warning_stream(&std::cerr);
 %}
 
-// Make swig aware of what hfst offers
+// Make swig aware of what hfst offers.
 %{
 #define HFSTIMPORT
 #include "HfstDataTypes.h"
@@ -39,7 +44,7 @@
 #include "implementations/HfstTransitionGraph.h"
 #include "implementations/optimized-lookup/pmatch.h"
 
-// C++ extension code is located in separate files
+// Most of C++ extension code is located in separate files.
 #include "hfst_extensions.cc"
 #include "hfst_regex_extensions.cc"
 #include "hfst_lexc_extensions.cc"
@@ -54,7 +59,13 @@
 %include <windows.h>
 #endif
 
-// Needed for conversion between c++ and python datatypes
+// Templates needed for conversion between c++ and python datatypes.
+//
+// Note that templating order matters; simple templates used as part of
+// more complex templates must be defined first, e.g. StringPair must be
+// defined before StringPairSet. Also templates that are not used as such
+// but are used as part of other templates must be defined, e.g. 
+// HfstBasicTransitions which is needed for HfstBasicStates.
 
 %include "typemaps.i"
 
@@ -68,8 +79,10 @@ namespace std {
 %template(HfstTransducerVector) vector<hfst::HfstTransducer>;
 %template(HfstSymbolSubstitutions) map<string, string>;
 %template(HfstSymbolPairSubstitutions) map<pair<string, string>, pair<string, string> >;
-%template(FooBarBaz) vector<hfst::implementations::HfstBasicTransition>;
+// needed for HfstBasicTransducer.states()
 %template(BarBazFoo) vector<unsigned int>;
+// HfstBasicTransitions is needed for templating HfstBasicStates:
+%template(HfstBasicTransitions) vector<hfst::implementations::HfstBasicTransition>;
 %template(HfstBasicStates) vector<vector<hfst::implementations::HfstBasicTransition> >;
 %template(HfstOneLevelPath) pair<float, vector<string> >;
 %template(HfstOneLevelPaths) set<pair<float, vector<string> > >;
@@ -80,9 +93,11 @@ namespace std {
 }
 
 
+// ****************************************************** //
 // ********** WHAT IS MADE AVAILABLE ON PYTHON ********** //
+// ****************************************************** //
 
-// *** HfstException and its subclasses (via module hfst.exceptions) *** //
+// *** HfstException and its subclasses (will be wrapped under module hfst.exceptions). *** //
 
 class HfstException 
 {
@@ -90,41 +105,42 @@ class HfstException
     HfstException();
     HfstException(const std::string&, const std::string&, size_t);
     ~HfstException();
+    std::string what() const;
 };
 
-class HfstTransducerTypeMismatchException : public HfstException { public: HfstTransducerTypeMismatchException(const std::string&, const std::string&, size_t); ~HfstTransducerTypeMismatchException(); };
-class ImplementationTypeNotAvailableException : public HfstException { public: ImplementationTypeNotAvailableException(const std::string&, const std::string&, size_t); ~ImplementationTypeNotAvailableException(); };
-class FunctionNotImplementedException : public HfstException { public: FunctionNotImplementedException(const std::string&, const std::string&, size_t); ~FunctionNotImplementedException(); };
-class StreamNotReadableException : public HfstException { public: StreamNotReadableException(const std::string&, const std::string&, size_t); ~StreamNotReadableException(); };
-class StreamCannotBeWrittenException : public HfstException { public: StreamCannotBeWrittenException(const std::string&, const std::string&, size_t); ~StreamCannotBeWrittenException(); };
-class StreamIsClosedException : public HfstException { public: StreamIsClosedException(const std::string&, const std::string&, size_t); ~StreamIsClosedException(); };
-class EndOfStreamException : public HfstException { public: EndOfStreamException(const std::string&, const std::string&, size_t); ~EndOfStreamException(); };
-class TransducerIsCyclicException : public HfstException { public: TransducerIsCyclicException(const std::string&, const std::string&, size_t); ~TransducerIsCyclicException(); };
-class NotTransducerStreamException : public HfstException { public: NotTransducerStreamException(const std::string&, const std::string&, size_t); ~NotTransducerStreamException(); };
-class NotValidAttFormatException : public HfstException { public: NotValidAttFormatException(const std::string&, const std::string&, size_t); ~NotValidAttFormatException(); };
-class NotValidPrologFormatException : public HfstException { public: NotValidPrologFormatException(const std::string&, const std::string&, size_t); ~NotValidPrologFormatException(); };
-class NotValidLexcFormatException : public HfstException { public: NotValidLexcFormatException(const std::string&, const std::string&, size_t); ~NotValidLexcFormatException(); };
-class StateIsNotFinalException : public HfstException { public: StateIsNotFinalException(const std::string&, const std::string&, size_t); ~StateIsNotFinalException(); };
-class ContextTransducersAreNotAutomataException : public HfstException { public: ContextTransducersAreNotAutomataException(const std::string&, const std::string&, size_t); ~ContextTransducersAreNotAutomataException(); };
-class TransducersAreNotAutomataException : public HfstException { public: TransducersAreNotAutomataException(const std::string&, const std::string&, size_t); ~TransducersAreNotAutomataException(); };
-class StateIndexOutOfBoundsException : public HfstException { public: StateIndexOutOfBoundsException(const std::string&, const std::string&, size_t); ~StateIndexOutOfBoundsException(); };
-class TransducerHeaderException : public HfstException { public: TransducerHeaderException(const std::string&, const std::string&, size_t); ~TransducerHeaderException(); };
-class MissingOpenFstInputSymbolTableException : public HfstException { public: MissingOpenFstInputSymbolTableException(const std::string&, const std::string&, size_t); ~MissingOpenFstInputSymbolTableException(); };
-class TransducerTypeMismatchException : public HfstException { public: TransducerTypeMismatchException(const std::string&, const std::string&, size_t); ~TransducerTypeMismatchException(); };
-class EmptySetOfContextsException : public HfstException { public: EmptySetOfContextsException(const std::string&, const std::string&, size_t); ~EmptySetOfContextsException(); };
-class SpecifiedTypeRequiredException : public HfstException { public: SpecifiedTypeRequiredException(const std::string&, const std::string&, size_t); ~SpecifiedTypeRequiredException(); };
-class HfstFatalException : public HfstException { public: HfstFatalException(const std::string&, const std::string&, size_t); ~HfstFatalException(); };
-class TransducerHasWrongTypeException : public HfstException { public: TransducerHasWrongTypeException(const std::string&, const std::string&, size_t); ~TransducerHasWrongTypeException(); };
-class IncorrectUtf8CodingException : public HfstException { public: IncorrectUtf8CodingException(const std::string&, const std::string&, size_t); ~IncorrectUtf8CodingException(); };
-class EmptyStringException : public HfstException { public: EmptyStringException(const std::string&, const std::string&, size_t); ~EmptyStringException(); };
-class SymbolNotFoundException : public HfstException { public: SymbolNotFoundException(const std::string&, const std::string&, size_t); ~SymbolNotFoundException(); };
-class MetadataException : public HfstException { public: MetadataException(const std::string&, const std::string&, size_t); ~MetadataException(); };
-class FlagDiacriticsAreNotIdentitiesException : public HfstException { public: FlagDiacriticsAreNotIdentitiesException(const std::string&, const std::string&, size_t); ~FlagDiacriticsAreNotIdentitiesException(); };
+class HfstTransducerTypeMismatchException : public HfstException { public: HfstTransducerTypeMismatchException(const std::string&, const std::string&, size_t); ~HfstTransducerTypeMismatchException(); std::string what() const; };
+class ImplementationTypeNotAvailableException : public HfstException { public: ImplementationTypeNotAvailableException(const std::string&, const std::string&, size_t); ~ImplementationTypeNotAvailableException(); std::string what() const; };
+class FunctionNotImplementedException : public HfstException { public: FunctionNotImplementedException(const std::string&, const std::string&, size_t); ~FunctionNotImplementedException(); std::string what() const; };
+class StreamNotReadableException : public HfstException { public: StreamNotReadableException(const std::string&, const std::string&, size_t); ~StreamNotReadableException(); std::string what() const; };
+class StreamCannotBeWrittenException : public HfstException { public: StreamCannotBeWrittenException(const std::string&, const std::string&, size_t); ~StreamCannotBeWrittenException(); std::string what() const; };
+class StreamIsClosedException : public HfstException { public: StreamIsClosedException(const std::string&, const std::string&, size_t); ~StreamIsClosedException(); std::string what() const; };
+class EndOfStreamException : public HfstException { public: EndOfStreamException(const std::string&, const std::string&, size_t); ~EndOfStreamException(); std::string what() const; };
+class TransducerIsCyclicException : public HfstException { public: TransducerIsCyclicException(const std::string&, const std::string&, size_t); ~TransducerIsCyclicException(); std::string what() const; };
+class NotTransducerStreamException : public HfstException { public: NotTransducerStreamException(const std::string&, const std::string&, size_t); ~NotTransducerStreamException(); std::string what() const; };
+class NotValidAttFormatException : public HfstException { public: NotValidAttFormatException(const std::string&, const std::string&, size_t); ~NotValidAttFormatException(); std::string what() const; };
+class NotValidPrologFormatException : public HfstException { public: NotValidPrologFormatException(const std::string&, const std::string&, size_t); ~NotValidPrologFormatException(); std::string what() const; };
+class NotValidLexcFormatException : public HfstException { public: NotValidLexcFormatException(const std::string&, const std::string&, size_t); ~NotValidLexcFormatException(); std::string what() const; };
+class StateIsNotFinalException : public HfstException { public: StateIsNotFinalException(const std::string&, const std::string&, size_t); ~StateIsNotFinalException(); std::string what() const; };
+class ContextTransducersAreNotAutomataException : public HfstException { public: ContextTransducersAreNotAutomataException(const std::string&, const std::string&, size_t); ~ContextTransducersAreNotAutomataException(); std::string what() const; };
+class TransducersAreNotAutomataException : public HfstException { public: TransducersAreNotAutomataException(const std::string&, const std::string&, size_t); ~TransducersAreNotAutomataException(); std::string what() const; };
+class StateIndexOutOfBoundsException : public HfstException { public: StateIndexOutOfBoundsException(const std::string&, const std::string&, size_t); ~StateIndexOutOfBoundsException(); std::string what() const; };
+class TransducerHeaderException : public HfstException { public: TransducerHeaderException(const std::string&, const std::string&, size_t); ~TransducerHeaderException(); std::string what() const; };
+class MissingOpenFstInputSymbolTableException : public HfstException { public: MissingOpenFstInputSymbolTableException(const std::string&, const std::string&, size_t); ~MissingOpenFstInputSymbolTableException(); std::string what() const; };
+class TransducerTypeMismatchException : public HfstException { public: TransducerTypeMismatchException(const std::string&, const std::string&, size_t); ~TransducerTypeMismatchException(); std::string what() const; };
+class EmptySetOfContextsException : public HfstException { public: EmptySetOfContextsException(const std::string&, const std::string&, size_t); ~EmptySetOfContextsException(); std::string what() const; };
+class SpecifiedTypeRequiredException : public HfstException { public: SpecifiedTypeRequiredException(const std::string&, const std::string&, size_t); ~SpecifiedTypeRequiredException(); std::string what() const; };
+class HfstFatalException : public HfstException { public: HfstFatalException(const std::string&, const std::string&, size_t); ~HfstFatalException(); std::string what() const; };
+class TransducerHasWrongTypeException : public HfstException { public: TransducerHasWrongTypeException(const std::string&, const std::string&, size_t); ~TransducerHasWrongTypeException(); std::string what() const; };
+class IncorrectUtf8CodingException : public HfstException { public: IncorrectUtf8CodingException(const std::string&, const std::string&, size_t); ~IncorrectUtf8CodingException(); std::string what() const; };
+class EmptyStringException : public HfstException { public: EmptyStringException(const std::string&, const std::string&, size_t); ~EmptyStringException(); std::string what() const; };
+class SymbolNotFoundException : public HfstException { public: SymbolNotFoundException(const std::string&, const std::string&, size_t); ~SymbolNotFoundException(); std::string what() const; };
+class MetadataException : public HfstException { public: MetadataException(const std::string&, const std::string&, size_t); ~MetadataException(); std::string what() const; };
+class FlagDiacriticsAreNotIdentitiesException : public HfstException { public: FlagDiacriticsAreNotIdentitiesException(const std::string&, const std::string&, size_t); ~FlagDiacriticsAreNotIdentitiesException(); std::string what() const; };
 
 namespace hfst
 {
 
-// Needed for conversion between c++ and python datatypes
+// Needed for conversion between c++ and python datatypes.
 
 typedef std::vector<std::string> StringVector;
 typedef std::pair<std::string, std::string> StringPair;
@@ -143,8 +159,6 @@ typedef std::pair<hfst::HfstTransducer, hfst::HfstTransducer> HfstTransducerPair
 typedef std::vector<std::pair<hfst::HfstTransducer, hfst::HfstTransducer> > HfstTransducerPairVector;
 
 
-// *** Basically a wrapper for C file *** //
-
 // *** Some enumerations *** //
 
 enum ImplementationType
@@ -154,9 +168,12 @@ enum ImplementationType
 
 enum PushType { TO_INITIAL_STATE, TO_FINAL_STATE };
 
+// *** Some other functions *** //
+
 bool is_diacritic(const std::string & symbol);
 hfst::HfstTransducerVector compile_pmatch_expression(const std::string & pmatch);
- 
+
+// internal functions 
 %pythoncode %{
   def is_string(s):
       if isinstance(s, str):
@@ -214,9 +231,10 @@ hfst::HfstTransducerVector compile_pmatch_expression(const std::string & pmatch)
 
 // *** HfstTransducer *** //
 
-// NOTE: all functions returning an HfstTransducer& are commented out and extended by replacing them with equivalent functions that return void.
-// This is done in order to avoid use of references that are not handled well by swig/python.
-// Some constructors and destructor are also redefined.
+// NOTE: all functions returning an HfstTransducer& are commented out and extended 
+// by replacing them with equivalent functions that return void. This is done in
+// order to avoid use of references that are not handled well by swig/python.
+// Some constructors and the destructor are also redefined.
 
 class HfstTransducer 
 {
@@ -838,7 +856,10 @@ class HfstBasicTransducer {
   {
     std::ostringstream oss;
     $self->write_in_att_format(oss, write_weights);
-    return oss.str();
+    std::string retval = oss.str();
+    if (retval == "") // empty transducer must be represented as empty line in python, else read_att fails...
+      retval = std::string("\n");
+    return retval;
   }
 
   char * __str__()
@@ -1062,6 +1083,7 @@ namespace xfst {
   };
 }
 
+// internal functions
 
 std::string hfst::get_hfst_regex_error_message();
 hfst::HfstTransducer * hfst::hfst_regex(hfst::xre::XreCompiler & comp, const std::string & regex_string, const std::string & error_stream);
@@ -1074,10 +1096,6 @@ int hfst::hfst_compile_xfst(hfst::xfst::XfstCompiler & comp, std::string input, 
 std::string hfst::get_hfst_lexc_output();
 hfst::HfstTransducer * hfst::hfst_compile_lexc(hfst::lexc::LexcCompiler & comp, const std::string & filename, const std::string & error_stream);
 
-void hfst::set_default_fst_type(hfst::ImplementationType t);
-hfst::ImplementationType hfst::get_default_fst_type();
-std::string hfst::fst_type_to_string(hfst::ImplementationType t);
-
 std::string hfst::one_level_paths_to_string(const HfstOneLevelPaths &);
 std::string hfst::two_level_paths_to_string(const HfstTwoLevelPaths &);
 
@@ -1086,7 +1104,15 @@ bool parse_prolog_arc_line(const std::string & line, hfst::implementations::Hfst
 bool parse_prolog_symbol_line(const std::string & line, hfst::implementations::HfstBasicTransducer * graph);
 bool parse_prolog_final_line(const std::string & line, hfst::implementations::HfstBasicTransducer * graph);
 
-// *** hfst_rules (via module hfst.rules) *** //
+
+// fuctions visible under module hfst
+
+void hfst::set_default_fst_type(hfst::ImplementationType t);
+hfst::ImplementationType hfst::get_default_fst_type();
+std::string hfst::fst_type_to_string(hfst::ImplementationType t);
+
+
+// *** hfst_rules (will be wrapped under module hfst.rules) *** //
 
 namespace hfst_rules {
 
@@ -1139,7 +1165,9 @@ namespace hfst_ol {
 } // namespace hfst_ol
 
 
+// ******************************** //
 // *** Actual python extensions *** //
+// ******************************** //
  
 %pythoncode %{
 
@@ -1149,6 +1177,7 @@ EPSILON='@_EPSILON_SYMBOL_@'
 UNKNOWN='@_UNKNOWN_SYMBOL_@'
 IDENTITY='@_IDENTITY_SYMBOL_@'
 
+# Windows...
 OUTPUT_TO_CONSOLE=False
 def set_output_to_console(val):
     global OUTPUT_TO_CONSOLE
@@ -1225,7 +1254,7 @@ def read_att_string(att):
     lines = att.split('\n')
     for line in lines:
         if not parse_att_line(line, fsm):
-           raise NotValidAttFormatException("","",0)
+           raise NotValidAttFormatException(line, "", 0)
     return HfstTransducer(fsm, _libhfst.get_default_fst_type())
 
 def read_att_input():
@@ -1235,7 +1264,7 @@ def read_att_input():
         if line == "":
            break
         if not parse_att_line(line, fsm):
-           raise NotValidAttFormatException("","",0)
+           raise NotValidAttFormatException(line, "", 0)
     return HfstTransducer(fsm, _libhfst.get_default_fst_type())
 
 def read_att_transducer(f, epsilonstr=EPSILON):
@@ -1252,8 +1281,30 @@ def read_att_transducer(f, epsilonstr=EPSILON):
            break
         linecount = linecount + 1
         if not parse_att_line(line, fsm, epsilonstr):
-           raise NotValidAttFormatException("","",0)
+           raise NotValidAttFormatException(line, "", 0)
     return HfstTransducer(fsm, _libhfst.get_default_fst_type())
+
+class AttReader:
+      def __init__(self, f, epsilonstr=EPSILON):
+          self.file = f
+          self.epsilonstr = epsilonstr
+
+      def read(self):
+          return read_att_transducer(self.file, self.epsilonstr)
+
+      def __iter__(self):
+          return self
+
+      # Python 2
+      def next(self):
+          try:
+             return self.read()
+          except EndOfStreamException as e:
+             raise StopIteration
+
+      # Python 3
+      def __next__(self):
+          return self.next()
 
 def read_prolog_transducer(f):
     fsm = HfstBasicTransducer()
@@ -1293,6 +1344,27 @@ def read_prolog_transducer(f):
            pass
         else:
            raise NotValidPrologFormatException(line,"",0)
+
+class PrologReader:
+      def __init__(self, f):
+          self.file = f
+
+      def read(self):
+          return read_prolog_transducer(self.file)
+
+      def __iter__(self):
+          return self
+
+      # Python 2
+      def next(self):
+          try:
+             return self.read()
+          except EndOfStreamException as e:
+             raise StopIteration
+
+      # Python 3
+      def __next__(self):
+          return self.next()
 
 def start_xfst(**kvargs):
     import sys

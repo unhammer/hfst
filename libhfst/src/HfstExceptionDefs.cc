@@ -35,6 +35,13 @@ std::string HfstException::operator() (void) const
   return o.str();
 }
 
+std::string HfstException::what() const
+{
+  std::ostringstream o;
+  o << "Exception: "<< name << " in file: " << file << " on line: " << line;
+  return o.str();
+}
+
 //! Define a subclass of @a HfstException of type @a CHILD.
 #define HFST_EXCEPTION_CHILD_DEFINITION(CHILD) \
     CHILD::CHILD \
