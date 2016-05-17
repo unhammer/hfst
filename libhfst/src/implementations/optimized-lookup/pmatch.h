@@ -24,8 +24,6 @@ namespace hfst_ol {
     struct Location;
     class WeightedDoubleTape;
 
-    const unsigned int PMATCH_MAX_RECURSION_DEPTH = 5000;
-    
     typedef std::vector<PmatchTransducer *> RtnVector;
     typedef std::map<std::string, SymbolNumber> RtnNameMap;
     typedef std::vector<Location> LocationVector;
@@ -122,11 +120,11 @@ namespace hfst_ol {
         bool is_counter(const SymbolNumber symbol) const;
         std::string end_tag(const SymbolNumber symbol);
         std::string start_tag(const SymbolNumber symbol);
-        bool extract_tags;
+        PmatchContainer * container;
 
     public:
-        PmatchAlphabet(std::istream& is, SymbolNumber symbol_count);
-        PmatchAlphabet(TransducerAlphabet const & a);
+        PmatchAlphabet(std::istream& is, SymbolNumber symbol_count, PmatchContainer * cont);
+        PmatchAlphabet(TransducerAlphabet const & a, PmatchContainer * cont);
         PmatchAlphabet(void);
         ~PmatchAlphabet(void);
         virtual void add_symbol(const std::string & symbol);
@@ -175,7 +173,18 @@ namespace hfst_ol {
         LocationVectorVector locations;
         std::vector<char> possible_first_symbols;
         bool verbose;
+        
+        bool count_patterns;
+        bool delete_patterns;
+        bool extract_patterns;
         bool locate_mode;
+        bool mark_patterns;
+        size_t max_context_length;
+        size_t max_recursion;
+        bool need_separators;
+
+        unsigned long line_number;
+        std::map<std::string, size_t> pattern_counts;
         bool profile_mode;
         bool single_codepoint_tokenization;
         unsigned int recursion_depth_left;
@@ -198,8 +207,9 @@ namespace hfst_ol {
         PmatchContainer(void);
         ~PmatchContainer(void);
 
-        unsigned long line_number;
 
+        void set_properties(void);
+        void set_properties(std::map<std::string, std::string> & properties);
         void initialize_input(const char * input);
         bool has_unsatisfied_rtns(void) const;
         std::string get_unsatisfied_rtn_name(void) const;
@@ -210,6 +220,7 @@ namespace hfst_ol {
         LocationVectorVector locate(std::string & input,
                                     double time_cutoff = 0.0);
         std::string get_profiling_info(void);
+        std::string get_pattern_count_info(void);
         bool has_queued_input(unsigned int input_pos);
         bool not_possible_first_symbol(SymbolNumber sym)
         {
@@ -226,10 +237,20 @@ namespace hfst_ol {
         static std::map<std::string, std::string> parse_hfst3_header(std::istream & f);
         void set_verbose(bool b) { verbose = b; }
         void set_locate_mode(bool b) { locate_mode = b; }
-        void set_extract_tags_mode(bool b)
-            { alphabet.extract_tags = b; }
+        void set_extract_patterns(bool b)
+            { extract_patterns = b; }
         void set_single_codepoint_tokenization(bool b)
             { single_codepoint_tokenization = b; }
+        void set_count_patterns(bool b)
+            { count_patterns = b; }
+        void set_delete_patterns(bool b)
+            { delete_patterns = b; }
+        void set_mark_patterns(bool b)
+            { mark_patterns = b; }
+        void set_max_recursion(size_t max)
+            { max_recursion = max; }
+        void set_max_context(size_t max)
+            { max_context_length = max; }
         bool is_in_locate_mode(void) { return locate_mode; }
         void set_profile(bool b) { profile_mode = b; }
         bool try_recurse(void)
@@ -242,9 +263,10 @@ namespace hfst_ol {
             }
         }
         void unrecurse(void) { ++recursion_depth_left; }
-        void reset_recursion(void) { recursion_depth_left = PMATCH_MAX_RECURSION_DEPTH; }
+        void reset_recursion(void) { recursion_depth_left = max_recursion; }
 
         friend class PmatchTransducer;
+        friend class PmatchAlphabet;
     };
 
     struct Location
@@ -283,6 +305,7 @@ namespace hfst_ol {
         {
             hfst::FdState<SymbolNumber> flag_state;
             char tape_step;
+            size_t max_context_length_remaining;
             unsigned int context_placeholder;
             ContextChecking context;
             bool default_symbol_trap;

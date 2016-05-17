@@ -14,9 +14,11 @@ using hfst::HfstTransducer;
 namespace hfst_ol {
 
 PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
-                               SymbolNumber symbol_count):
+                               SymbolNumber symbol_count,
+                               PmatchContainer * cont):
     TransducerAlphabet(inputstream, symbol_count, false),
-    special_symbols(SPECIALSYMBOL_NR_ITEMS, NO_SYMBOL_NUMBER) // SpecialSymbols enum
+    special_symbols(SPECIALSYMBOL_NR_ITEMS, NO_SYMBOL_NUMBER), // SpecialSymbols enum
+    container(cont)
 {
     symbol2lists = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
     list2symbols = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
@@ -32,9 +34,11 @@ PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
     }
 }
 
-PmatchAlphabet::PmatchAlphabet(TransducerAlphabet const & a):
+PmatchAlphabet::PmatchAlphabet(TransducerAlphabet const & a,
+                               PmatchContainer * cont):
     TransducerAlphabet(a),
-    special_symbols(SPECIALSYMBOL_NR_ITEMS, NO_SYMBOL_NUMBER) {
+    special_symbols(SPECIALSYMBOL_NR_ITEMS, NO_SYMBOL_NUMBER),
+    container(cont) {
     symbol2lists = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
     list2symbols = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
     rtns = RtnVector(orig_symbol_count, NULL);
@@ -290,10 +294,11 @@ PmatchContainer::PmatchContainer(std::istream & inputstream):
     locate_mode(false),
     profile_mode(false),
     single_codepoint_tokenization(false),
-    recursion_depth_left(PMATCH_MAX_RECURSION_DEPTH),
     entry_stack(),
     line_number(0)
 {
+    set_properties();
+    reset_recursion();
     std::string transducer_name;
     std::map<std::string, std::string> properties = parse_hfst3_header(inputstream);
     if (properties.count("name") == 0) {
@@ -312,10 +317,10 @@ PmatchContainer::PmatchContainer(std::istream & inputstream):
             std::cerr << "pmatch: warning: archive type isn't weighted optimized-lookup according to header\n";
         }
     }
+    set_properties(properties);
     TransducerHeader header(inputstream);
-    alphabet = PmatchAlphabet(inputstream, header.symbol_count());
+    alphabet = PmatchAlphabet(inputstream, header.symbol_count(), this);
     orig_symbol_count = symbol_count = alphabet.get_orig_symbol_count();
-    alphabet.extract_tags = locate_mode;
     encoder = new Encoder(alphabet.get_symbol_table(), orig_symbol_count);
     toplevel = new hfst_ol::PmatchTransducer(
         inputstream,
@@ -353,13 +358,13 @@ PmatchContainer::PmatchContainer(Transducer * t):
     locate_mode(false),
     profile_mode(false),
     single_codepoint_tokenization(false),
-    recursion_depth_left(PMATCH_MAX_RECURSION_DEPTH),
     entry_stack()
 {
+    set_properties();
+    reset_recursion();
     TransducerHeader header = t->get_header();
-    alphabet = PmatchAlphabet(t->get_alphabet());
+    alphabet = PmatchAlphabet(t->get_alphabet(), this);
     orig_symbol_count = symbol_count = alphabet.get_orig_symbol_count();
-    alphabet.extract_tags = locate_mode;
     line_number = 0;
     encoder = new Encoder(alphabet.get_symbol_table(), orig_symbol_count);
     TransducerTable<TransitionW> transitions = t->copy_transitionw_table();
@@ -381,13 +386,17 @@ PmatchContainer::PmatchContainer(std::vector<HfstTransducer> transducers):
     locate_mode(false),
     profile_mode(false),
     single_codepoint_tokenization(false),
-    recursion_depth_left(PMATCH_MAX_RECURSION_DEPTH),
     entry_stack(),
     line_number(0)
 {
+    set_properties();
+    reset_recursion();
     if (transducers.size() == 0) {
         return;
-    } else if (transducers.size() == 1) {
+    }
+    std::map<std::string, std::string> properties = transducers[0].get_properties();
+    set_properties(properties);
+    if (transducers.size() == 1) {
         HfstTransducer * top = NULL;
         if (transducers[0].get_type() != hfst::HFST_OLW_TYPE) {
             top = new HfstTransducer(transducers[0]);
@@ -398,9 +407,8 @@ PmatchContainer::PmatchContainer(std::vector<HfstTransducer> transducers):
         Transducer * backend = hfst::implementations::ConversionFunctions::
             hfst_transducer_to_hfst_ol(top);
         TransducerHeader header(backend->get_header());
-        alphabet = PmatchAlphabet(backend->get_alphabet());
+        alphabet = PmatchAlphabet(backend->get_alphabet(), this);
         orig_symbol_count = symbol_count = alphabet.get_orig_symbol_count();
-        alphabet.extract_tags = locate_mode;
         encoder = new Encoder(alphabet.get_symbol_table(), orig_symbol_count);
         TransducerTable<TransitionW> transitions = backend->copy_transitionw_table();
         TransducerTable<TransitionWIndex> indices = backend->copy_windex_table();
@@ -470,9 +478,8 @@ PmatchContainer::PmatchContainer(std::vector<HfstTransducer> transducers):
                                              &harmonizer); // harmonize with this
         TransducerHeader header = harmonized_tmp->get_header();
         // this will be the alphabet of the entire container
-        alphabet = PmatchAlphabet(harmonized_tmp->get_alphabet());
+        alphabet = PmatchAlphabet(harmonized_tmp->get_alphabet(), this);
         orig_symbol_count = symbol_count = alphabet.get_orig_symbol_count();
-        alphabet.extract_tags = locate_mode;
         encoder = new Encoder(alphabet.get_symbol_table(), orig_symbol_count);
         TransducerTable<TransitionW> transitions = harmonized_tmp->copy_transitionw_table();
         TransducerTable<TransitionWIndex> indices = harmonized_tmp->copy_windex_table();
@@ -880,6 +887,29 @@ std::string PmatchContainer::get_profiling_info(void)
     return retval.str();
 }
 
+std::string PmatchContainer::get_pattern_count_info(void)
+{
+    size_t total = 0;
+    std::string retval = "Pattern\t\t# of matches\n------------------------\n";
+    for (std::map<std::string, size_t>::iterator it = pattern_counts.begin();
+         it != pattern_counts.end(); ++it) {
+        retval.append(it->first);
+        retval.append("\t\t");
+        std::ostringstream converter;
+        converter << it->second;
+        retval.append(converter.str());
+        retval.append("\n");
+        total += it->second;
+    }
+    retval.append("------------------------\n");
+    std::ostringstream converter;
+    converter << total;
+    retval.append("Total:\t\t");
+    retval.append(converter.str());
+    retval.append("\n");
+    return retval;
+}
+
 void PmatchContainer::copy_to_output(const DoubleTape & best_result)
 {
     for (DoubleTape::const_iterator it = best_result.begin();
@@ -917,6 +947,13 @@ std::string PmatchAlphabet::stringify(const DoubleTape & str)
                 start_tag_pos.pop();
             }
         } else if (is_end_tag(output)) {
+            if (container->count_patterns) {
+                if ((container->pattern_counts).count(start_tag(output)) == 0) {
+                    (container->pattern_counts)[start_tag(output)] = 1;
+                } else {
+                    (container->pattern_counts)[start_tag(output)] += 1;
+                }
+            }
             unsigned int pos;
             if (start_tag_pos.size() == 0) {
                 std::cerr << "Warning: end tag without start tag\n";
@@ -924,10 +961,15 @@ std::string PmatchAlphabet::stringify(const DoubleTape & str)
             } else {
                 pos = start_tag_pos.top();
             }
-            retval.insert(pos, start_tag(output));
-            retval.append(end_tag(output));
+            if (container->delete_patterns) {
+                size_t how_much_to_delete = retval.size() - pos;
+                retval.replace(pos, how_much_to_delete, start_tag(output));
+            } else if (container->mark_patterns) {
+                retval.insert(pos, start_tag(output));
+                retval.append(end_tag(output));
+            }
         } else {
-            if ((!extract_tags || start_tag_pos.size() != 0)
+            if ((!(container->extract_patterns) || start_tag_pos.size() != 0)
                 && is_printable(output)) {
                 retval.append(string_from_symbol(output));
             }
@@ -952,6 +994,13 @@ Location PmatchAlphabet::locatefy(unsigned int input_offset,
         SymbolNumber input = it->input;
         SymbolNumber output = it->output;
         if (is_end_tag(output)) {
+            if (container->count_patterns) {
+                if ((container->pattern_counts).count(start_tag(output)) == 0) {
+                    (container->pattern_counts)[start_tag(output)] = 1;
+                } else {
+                    (container->pattern_counts)[start_tag(output)] += 1;
+                }
+            }
             retval.tag = start_tag(output);
             continue;
         }
@@ -1012,6 +1061,7 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
     LocalVariables locals_front;
     locals_front.flag_state = alphabet.get_fd_table();
     locals_front.tape_step = 1;
+    locals_front.max_context_length_remaining = 254;
     locals_front.context = none;
     locals_front.context_placeholder = 0;
     locals_front.default_symbol_trap = false;
@@ -1072,6 +1122,7 @@ PmatchTransducer::PmatchTransducer(std::vector<TransitionW> transition_vector,
     LocalVariables locals_front;
     locals_front.flag_state = alphabet.get_fd_table();
     locals_front.tape_step = 1;
+    locals_front.max_context_length_remaining = 254;
     locals_front.context = none;
     locals_front.context_placeholder = 0;
     locals_front.default_symbol_trap = false;
@@ -1276,7 +1327,77 @@ void PmatchTransducer::collect_first(TransitionTableIndex i,
     }
 }
 
+void PmatchContainer::set_properties(void)
+{
+    count_patterns = false;
+    delete_patterns = false;
+    extract_patterns = false;
+    locate_mode = false;
+    mark_patterns = true;
+    max_context_length = 254;
+    max_recursion = 5000;
+    need_separators = true;
+}
 
+void PmatchContainer::set_properties(std::map<std::string, std::string> & properties)
+{
+    for (std::map<std::string, std::string>::iterator it = properties.begin();
+         it != properties.end(); ++it) {
+        if (it->first == "count-patterns") {
+            if (it->second == "on") {
+                count_patterns = true;
+            } else if (it->second == "off") {
+                count_patterns = false;
+            }
+        } else if (it->first == "delete-patterns") {
+            if (it->second == "on") {
+                delete_patterns = true;
+            } else if (it->second == "off") {
+                delete_patterns = false;
+            }
+        } else if (it->first == "extract-patterns") {
+            if (it->second == "on") {
+                extract_patterns = true;
+            } else if (it->second == "off") {
+                extract_patterns = false;
+            }
+        } else if (it->first == "locate-patterns") {
+            if (it->second == "on") {
+                locate_mode = true;
+            } else if (it->second == "off") {
+                locate_mode = false;
+            }
+        } else if (it->first == "mark-patterns") {
+            if (it->second == "on") {
+                mark_patterns = true;
+            } else if (it->second == "off") {
+                mark_patterns = false;
+            }
+        } else if (it->first == "max-context-length") {
+            std::stringstream converter(it->second);
+            converter >> max_context_length;
+            if (max_context_length == 0) {
+                if (it->second != "0") {
+                    max_context_length = 254;
+                }
+            }
+        } else if (it->first == "max-recursion") {
+            std::stringstream converter(it->second);
+            converter >> max_recursion;
+            if (max_recursion == 0) {
+                if (it->second != "0") {
+                    max_recursion = 5000;
+                }
+            }
+        } else if (it->first == "need-separators") {
+            if (it->second == "on") {
+                need_separators = true;
+            } else if (it->second == "off") {
+                need_separators = false;
+            }
+        }
+    }
+}
 
 void PmatchContainer::initialize_input(const char * input_s)
 {
@@ -1626,7 +1747,7 @@ void PmatchTransducer::take_transitions(SymbolNumber input,
                 local_stack.top().running_weight +=
                     transition_table[i].get_weight();
                 if (this_input == alphabet.get_special(Pmatch_passthrough)) {
-                    get_analyses(input_pos, tape_pos, target); // FIXME
+                    get_analyses(input_pos, tape_pos, target); // awkward
                 } else {
                     container->tape.write(tape_pos, this_input, this_output);
                     get_analyses(input_pos + 1, tape_pos + 1, target);
@@ -1634,7 +1755,11 @@ void PmatchTransducer::take_transitions(SymbolNumber input,
                 local_stack.top().running_weight = tmp;
             } else {
                 // Checking context so don't touch output
-                get_analyses(input_pos + local_stack.top().tape_step, tape_pos, target);
+                if (local_stack.top().max_context_length_remaining > 0) {
+                    local_stack.top().max_context_length_remaining -= 1;
+                    get_analyses(input_pos + local_stack.top().tape_step, tape_pos, target);
+                    local_stack.top().max_context_length_remaining += 1;
+                }
             }
             local_stack.top().default_symbol_trap = false;
         } else {
@@ -1725,21 +1850,29 @@ bool PmatchTransducer::try_entering_context(SymbolNumber symbol)
         local_stack.push(local_stack.top());
         local_stack.top().context = LC;
         local_stack.top().tape_step = -1;
+        local_stack.top().max_context_length_remaining =
+            container->max_context_length;
         return true;
     } else if (symbol == alphabet.get_special(RC_entry)) {
         local_stack.push(local_stack.top());
         local_stack.top().context = RC;
         local_stack.top().tape_step = 1;
+        local_stack.top().max_context_length_remaining =
+            container->max_context_length;
         return true;
     } else if (symbol == alphabet.get_special(NLC_entry)) {
         local_stack.push(local_stack.top());
         local_stack.top().context = NLC;
         local_stack.top().tape_step = -1;
+        local_stack.top().max_context_length_remaining =
+            container->max_context_length;
         return true;
     } else if (symbol == alphabet.get_special(NRC_entry)) {
         local_stack.push(local_stack.top());
         local_stack.top().context = NRC;
         local_stack.top().tape_step = 1;
+        local_stack.top().max_context_length_remaining =
+            container->max_context_length;
         return true;
     } else {
         return false;
