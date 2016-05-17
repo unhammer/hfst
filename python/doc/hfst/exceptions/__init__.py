@@ -3,13 +3,9 @@
 
 ## Base class for HfstExceptions. Holds its own name and the file and line number where it was thrown.
 class HfstException:
-    ## The name of the exception. 
-    self.name
-    ## The source file where the exception originated.
-    self.file
-    ## The line of the source file where the exception originated.
-    self.line
-
+    ## A message describing the error in more detail.
+    def what():
+        pass
 
 ## Two or more HfstTransducers are not of the same type. Same as HfstTransducerTypeMismatchException ???
 class HfstTransducerTypeMismatchException(HfstException):
