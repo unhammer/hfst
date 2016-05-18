@@ -18,7 +18,8 @@ with open('cats_and_dogs_fail.prolog', 'r') as f:
         for tr in r:
             transducers.append(tr)
     except hfst.exceptions.NotValidPrologFormatException as e:
-        pass
+        assert 'arc(1, 2, "bar").' in e.what()
+        assert 'line: 24' in e.what()
 
 assert(f.closed)
 assert(len(transducers)) == 4

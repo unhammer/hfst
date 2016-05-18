@@ -1158,7 +1158,7 @@ namespace hfst_ol {
         std::string match(const std::string & input, double time_cutoff = 0.0);
         std::string get_profiling_info(void);
         void set_verbose(bool b);
-        void set_extract_tags_mode(bool b);
+        //void set_extract_tags_mode(bool b);
         void set_profile(bool b);
 
 }; // class PmatchContainer
@@ -1250,47 +1250,54 @@ def parse_att_line(line, fsm, epsilonstr=EPSILON):
     return True
 
 def read_att_string(att):
+    linecount = 0
     fsm = HfstBasicTransducer()
     lines = att.split('\n')
     for line in lines:
+        linecount = linecount + 1
         if not parse_att_line(line, fsm):
-           raise NotValidAttFormatException(line, "", 0)
+           raise NotValidAttFormatException(line, "", linecount)
     return HfstTransducer(fsm, _libhfst.get_default_fst_type())
 
 def read_att_input():
+    linecount = 0
     fsm = HfstBasicTransducer()
     while True:
         line = input().rstrip()
         if line == "":
            break
+        linecount = linecount + 1
         if not parse_att_line(line, fsm):
-           raise NotValidAttFormatException(line, "", 0)
+           raise NotValidAttFormatException(line, "", linecount)
     return HfstTransducer(fsm, _libhfst.get_default_fst_type())
 
-def read_att_transducer(f, epsilonstr=EPSILON):
-    linecount = 0
+def read_att_transducer(f, epsilonstr=EPSILON, linecount=[0]):
+    linecount_ = 0
     fsm = HfstBasicTransducer()
     while True:
         line = f.readline()
         if line == "":
-           if linecount == 0:
+           if linecount_ == 0:
               raise EndOfStreamException("","",0)
            else:
+              linecount_ = linecount_ + 1
               break
+        linecount_ = linecount_ + 1
         if line[0] == '-':
            break
-        linecount = linecount + 1
         if not parse_att_line(line, fsm, epsilonstr):
-           raise NotValidAttFormatException(line, "", 0)
+           raise NotValidAttFormatException(line, "", linecount[0] + linecount_)
+    linecount[0] = linecount[0] + linecount_
     return HfstTransducer(fsm, _libhfst.get_default_fst_type())
 
 class AttReader:
       def __init__(self, f, epsilonstr=EPSILON):
           self.file = f
           self.epsilonstr = epsilonstr
+          self.linecount = [0]
 
       def read(self):
-          return read_att_transducer(self.file, self.epsilonstr)
+          return read_att_transducer(self.file, self.epsilonstr, self.linecount)
 
       def __iter__(self):
           return self
@@ -1306,14 +1313,16 @@ class AttReader:
       def __next__(self):
           return self.next()
 
-def read_prolog_transducer(f):
+def read_prolog_transducer(f, linecount=[0]):
+    linecount_ = 0
     fsm = HfstBasicTransducer()
     
     line = ""
     while(True):
         line = f.readline()
+        linecount_ = linecount_ + 1
         if line == "":
-           raise EndOfStreamException("","",0)
+           raise EndOfStreamException("","",linecount[0] + linecount_)
         line = line.rstrip()
         if line == "":
            pass # allow extra prolog separator(s)
@@ -1323,18 +1332,21 @@ def read_prolog_transducer(f):
            break
 
     if not parse_prolog_network_line(line, fsm):
-       raise NotValidPrologFormatException(line,"",0)
+       raise NotValidPrologFormatException(line,"",linecount[0] + linecount_)
 
     while(True):
         line = f.readline()
         if (line == ""):
            retval = HfstTransducer(fsm, _libhfst.get_default_fst_type())
            retval.set_name(fsm.name)
+           linecount[0] = linecount[0] + linecount_
            return retval
         line = line.rstrip()
+        linecount_ = linecount_ + 1
         if line == "":  # prolog separator
            retval = HfstTransducer(fsm, _libhfst.get_default_fst_type())
            retval.set_name(fsm.name)
+           linecount[0] = linecount[0] + linecount_
            return retval           
         if parse_prolog_arc_line(line, fsm):
            pass
@@ -1343,14 +1355,15 @@ def read_prolog_transducer(f):
         elif parse_prolog_symbol_line(line, fsm):
            pass
         else:
-           raise NotValidPrologFormatException(line,"",0)
+           raise NotValidPrologFormatException(line,"",linecount[0] + linecount_)
 
 class PrologReader:
       def __init__(self, f):
           self.file = f
+          self.linecount = [0]
 
       def read(self):
-          return read_prolog_transducer(self.file)
+          return read_prolog_transducer(self.file, self.linecount)
 
       def __iter__(self):
           return self
