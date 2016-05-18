@@ -393,6 +393,10 @@ for type in (hfst.TROPICAL_OPENFST_TYPE, hfst.FOMA_TYPE):
     # print('This is the output from lexc:')
     # print(msg.getvalue())
 
+    # default constructor
+    tr = hfst.HfstTransducer()
+    assert(tr.compare(hfst.empty_fst()))
+
 # print('\n--- Testing HfstBasicTransducer ---\n')
 
 # Create basic transducer, write it to file, read it, and test equivalence

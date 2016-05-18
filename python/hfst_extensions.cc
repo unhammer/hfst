@@ -10,6 +10,11 @@ std::string fst_type_to_string(hfst::ImplementationType t) { std::string retval 
 
 bool is_diacritic(const std::string & symbol) { return hfst::FdOperation::is_diacritic(symbol); }
 
+HfstTransducer * empty_transducer() 
+{
+  hfst::xre::XreCompiler comp(hfst::get_default_fst_type());
+  return hfst::hfst_regex(comp, "[0 - 0]", "");
+}
 HfstTransducer * copy_hfst_transducer(const hfst::HfstTransducer & t) { return new HfstTransducer(t); }
 HfstTransducer * copy_hfst_transducer_from_basic_transducer(const hfst::implementations::HfstBasicTransducer & t) { return new HfstTransducer(t, type); }
 HfstTransducer * copy_hfst_transducer_from_basic_transducer(const hfst::implementations::HfstBasicTransducer & t, hfst::ImplementationType impl) { return new HfstTransducer(t, impl); }

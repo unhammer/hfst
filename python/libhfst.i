@@ -45,8 +45,8 @@
 #include "implementations/optimized-lookup/pmatch.h"
 
 // Most of C++ extension code is located in separate files.
-#include "hfst_extensions.cc"
 #include "hfst_regex_extensions.cc"
+#include "hfst_extensions.cc"
 #include "hfst_lexc_extensions.cc"
 #include "hfst_xfst_extensions.cc"
 #include "hfst_pmatch_extensions.cc"
@@ -239,7 +239,6 @@ hfst::HfstTransducerVector compile_pmatch_expression(const std::string & pmatch)
 class HfstTransducer 
 {
 public:
-  HfstTransducer();
   void set_name(const std::string &name);
   std::string get_name() const;
   hfst::ImplementationType get_type() const;
@@ -311,6 +310,7 @@ public:
 
   // Then the actual extensions:
 
+    HfstTransducer() { return hfst::empty_transducer(); }
     HfstTransducer(const hfst::HfstTransducer & t) { return hfst::copy_hfst_transducer(t); }
     HfstTransducer(const hfst::implementations::HfstBasicTransducer & t) { return hfst::copy_hfst_transducer_from_basic_transducer(t); }
     HfstTransducer(const hfst::implementations::HfstBasicTransducer & t, hfst::ImplementationType impl) { return hfst::copy_hfst_transducer_from_basic_transducer(t, impl); }
