@@ -310,6 +310,9 @@ public:
 
   // Then the actual extensions:
 
+  void lookup_optimize() { self->convert(hfst::HFST_OLW_TYPE); }
+  void remove_optimization() { self->convert(hfst::get_default_fst_type()); }
+
     HfstTransducer() { return hfst::empty_transducer(); }
     HfstTransducer(const hfst::HfstTransducer & t) { return hfst::copy_hfst_transducer(t); }
     HfstTransducer(const hfst::implementations::HfstBasicTransducer & t) { return hfst::copy_hfst_transducer_from_basic_transducer(t); }
@@ -386,6 +389,9 @@ public:
     }
 
 %pythoncode %{
+
+  def copy(self):
+      return HfstTransducer(self)
 
   def write_to_file(self, filename_):
       ostr = HfstOutputStream(filename=filename_, type=self.get_type(), hfst_format=True)

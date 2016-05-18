@@ -201,6 +201,12 @@ for type in (hfst.TROPICAL_OPENFST_TYPE, hfst.FOMA_TYPE):
         TR.convert(hfst.HFST_OLW_TYPE)
         print(TR.lookup('foo', max_number=5, output='text'), file=f)
 
+    tr_ = tr.copy()
+    tr.lookup_optimize()
+    tr.lookup('foo', max_number=5, output='text', file=f)
+    tr.remove_optimization()
+    assert(tr.compare(tr_))
+
 #  def lookup_fd(self, lookup_path, **kvargs):
 #      max_weight = None
 #      infinite_cutoff = -1 # Is this right?
