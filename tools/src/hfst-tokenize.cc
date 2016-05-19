@@ -64,6 +64,7 @@ static string tag_separator = "+"; // + and # are hardcoded in cg-conv at least
 static string subreading_separator = "#";
 static string wtag = "W"; // TODO: cg-conv has an argument --wtag, allow changing here as well?
 static double time_cutoff = 0.0;
+static int max_weight_classes = std::numeric_limits<int>::max();
 std::string tokenizer_filename;
 static hfst::ImplementationType default_format = hfst::TROPICAL_OPENFST_TYPE;
 enum OutputFormat {
@@ -94,11 +95,13 @@ print_usage()
             "  -m, --tokenize-multichar Tokenize multicharacter symbols\n"
             "                           (by default only one utf-8 character is tokenized at a time\n"
             "                           regardless of what is present in the alphabet)\n"
-            "  -t, --time-cutoff=S      Limit search after having used S seconds per input\n"
+            "  -tS, --time-cutoff=S     Limit search after having used S seconds per input\n"
+            "  -lN, --weight-classes=N  Output no more than N best weight classes\n"
+            "                           (where analyses with equal weight constitute a class\n"
             "  -z, --segment            Segmenting / tokenization mode (default)\n"
             "  -x, --xerox              Xerox output\n"
             "  -c, --cg                 Constraint Grammar output\n"
-            "  -g, --gtd                Giellatekno/Divvun CG output\n"
+            "  -g, --gtd                Giellatekno/Divvun CG output (implies -l2)\n"
             "  -f, --finnpos            FinnPos output\n");
     fprintf(message_out,
             "Use standard streams for input and output (for now).\n"
@@ -230,7 +233,7 @@ hfst_ol::PmatchContainer make_naive_tokenizer(HfstTransducer & dictionary)
     return retval;
 }
 
-/** 
+/**
  * Return empty string if it wasn't a tag, otherwise the tag without the initial/final +
  */
 const std::string as_cg_tag(const std::string & str) {
@@ -463,6 +466,38 @@ void print_location_vector(LocationVector const & locations, std::ostream & outs
 //    std::cerr << "from print_location_vector\n";
 }
 
+/**
+ * Keep only the N best weight classes
+ */
+const LocationVector keep_n_best_weight(const int N, LocationVector const & locations)
+{
+    int classes_found = -1;
+    hfst_ol::Weight last_weight_class = 0.0;
+    LocationVector goodweight;
+    for (LocationVector::const_iterator it = locations.begin();
+         it != locations.end(); ++it) {
+        hfst_ol::Weight current_weight = it->weight;
+        if (classes_found == -1) // we're just starting
+        {
+            classes_found = 1;
+            last_weight_class = current_weight;
+        }
+        else if (last_weight_class != current_weight)
+        {
+            last_weight_class = current_weight;
+            ++classes_found;
+        }
+        if (classes_found > N)
+        {
+            break;
+        }
+        else {
+            goodweight.push_back(*it);
+        }
+    }
+    return goodweight;
+}
+
 void match_and_print(hfst_ol::PmatchContainer & container,
                      std::ostream & outstream,
                      std::string & input_text)
@@ -484,7 +519,13 @@ void match_and_print(hfst_ol::PmatchContainer & container,
             continue;
             // All nonmatching cases have been handled
         }
-        print_location_vector(*it, outstream);
+        if(max_weight_classes < std::numeric_limits<int>::max()) {
+            print_location_vector(keep_n_best_weight(max_weight_classes, *it),
+                                  outstream);
+        }
+        else {
+            print_location_vector(*it, outstream);
+        }
     }
     if (output_format == finnpos) {
         outstream << std::endl;
@@ -529,7 +570,6 @@ int process_input(hfst_ol::PmatchContainer & container,
     return EXIT_SUCCESS;
 }
 
-
 int parse_options(int argc, char** argv)
 {
     extend_options_getenv(&argc, &argv);
@@ -545,6 +585,7 @@ int parse_options(int argc, char** argv)
                 {"print-weights", no_argument, 0, 'w'},
                 {"tokenize-multichar", no_argument, 0, 'm'},
                 {"time-cutoff", required_argument, 0, 't'},
+                {"weight-classes", required_argument, 0, 'l'},
                 {"segment", no_argument, 0, 'z'},
                 {"xerox", no_argument, 0, 'x'},
                 {"cg", no_argument, 0, 'c'},
@@ -553,7 +594,7 @@ int parse_options(int argc, char** argv)
                 {0,0,0,0}
             };
         int option_index = 0;
-        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nkawmt:zxcgf",
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nkawmt:l:zxcgf",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -588,6 +629,14 @@ int parse_options(int argc, char** argv)
                 return EXIT_FAILURE;
             }
             break;
+        case 'l':
+            max_weight_classes = atoi(optarg);
+            if (max_weight_classes < 1)
+            {
+                std::cerr << "Invalid or no argument --weight-classes count\n";
+                return EXIT_FAILURE;
+            }
+            break;
         case 'z':
             output_format = tokenize;
             break;
@@ -603,6 +652,9 @@ int parse_options(int argc, char** argv)
             print_all = true;
             keep_newlines = true;
             blankline_separated = false;
+            if(max_weight_classes == std::numeric_limits<int>::max()) {
+                max_weight_classes = 2;
+            }
             break;
         case 'f':
             output_format = finnpos;
