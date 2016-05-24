@@ -10,7 +10,7 @@ linguistic systems. HFST library and tools are licenced under GNU GPL licence
 version 3, you may read the full licence in the file named COPYING. The
 authors specified in AUTHORS file may be contacted about licencing issues.
 
-For additional information, see the project page `https://hfst.github.io`_.
+For additional information, see the project page `<https://hfst.github.io>`_.
 
 .. image:: https://travis-ci.org/hfst/hfst.svg
    :target: https://travis-ci.org/hfst/hfst
