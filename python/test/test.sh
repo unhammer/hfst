@@ -20,8 +20,8 @@ fi
 
 for file in test_pmatch.py test_prolog.py test_exceptions.py test_dir_hfst.py \
     test_dir_hfst_exceptions.py test_dir_hfst_rules.py test_tokenizer.py \
-    test_read_att_transducer.py test_xre.py test_hfst.py examples.py \
-    test_att_reader.py test_prolog_reader.py ;
+    test_read_att_transducer.py test_xre.py examples.py \
+    test_att_reader.py test_prolog_reader.py test_hfst.py ;
 do
     if ! [ "$PYTHONPATH" = "" ]; then
         echo 'import sys' > tmp
@@ -58,6 +58,8 @@ for format in sfst openfst foma;
 do
     if ( $PYTHON tmp1 $format | $PYTHON tmp2 $format | $PYTHON tmp3 $format ); then
         echo "test_streams[1|2|3].py with "$format" format passed"
+    elif [ "$?" = "77" ]; then
+        echo "test_streams[1|2|3].py with "$format" format skipped"
     else
         echo "test_streams[1|2|3].py with "$format" format failed"
         exit 1

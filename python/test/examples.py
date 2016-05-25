@@ -2,7 +2,15 @@
 
 import hfst
 
-for type in [hfst.SFST_TYPE, hfst.TROPICAL_OPENFST_TYPE, hfst.FOMA_TYPE]:
+types = []
+if hfst.HfstTransducer.is_implementation_type_available(hfst.SFST_TYPE):
+    types.append(hfst.SFST_TYPE)
+if hfst.HfstTransducer.is_implementation_type_available(hfst.TROPICAL_OPENFST_TYPE):
+    types.append(hfst.TROPICAL_OPENFST_TYPE)
+if hfst.HfstTransducer.is_implementation_type_available(hfst.FOMA_TYPE):
+    types.append(hfst.FOMA_TYPE)
+
+for type in types:
     if hfst.HfstTransducer.is_implementation_type_available(type):
 
         hfst.set_default_fst_type(type)
@@ -81,16 +89,17 @@ for type in [hfst.SFST_TYPE, hfst.TROPICAL_OPENFST_TYPE, hfst.FOMA_TYPE]:
             print('State number 2 does not exist')
         
         # TransducerTypeMismatchException:
-        hfst.set_default_fst_type(hfst.TROPICAL_OPENFST_TYPE)
-        tr1 = hfst.regex('foo')
-        tr2 = hfst.regex('bar')
-        tr2.convert(hfst.FOMA_TYPE)
-        try:
-            tr1.disjunct(tr2)
-        except hfst.exceptions.TransducerTypeMismatchException:
-            print('The implementation types of transducers must be the same.')
+        if hfst.FOMA_TYPE in types:
+            hfst.set_default_fst_type(hfst.TROPICAL_OPENFST_TYPE)
+            tr1 = hfst.regex('foo')
+            tr2 = hfst.regex('bar')
+            tr2.convert(hfst.FOMA_TYPE)
+            try:
+                tr1.disjunct(tr2)
+            except hfst.exceptions.TransducerTypeMismatchException:
+                print('The implementation types of transducers must be the same.')
 
-        hfst.set_default_fst_type(type)
+            hfst.set_default_fst_type(type)
 
         # fst
         # One unweighted identity path:
@@ -225,15 +234,16 @@ for type in [hfst.SFST_TYPE, hfst.TROPICAL_OPENFST_TYPE, hfst.FOMA_TYPE]:
         transducer1.reverse()
         transducer1.determinize()
         # implementation types
-        tropical_transducer = hfst.regex('foo')
-        tropical_transducer.convert(hfst.TROPICAL_OPENFST_TYPE)
-        foma_transducer = hfst.regex('foo')
-        foma_transducer.convert(hfst.FOMA_TYPE)
-        # TODO: segfaults
-        try:
-            tropical_transducer.compare(foma_transducer)
-        except hfst.exceptions.TransducerTypeMismatchException:
-            print('Implementation types of transducers must be the same.')
+        if hfst.FOMA_TYPE in types:
+            tropical_transducer = hfst.regex('foo')
+            tropical_transducer.convert(hfst.TROPICAL_OPENFST_TYPE)
+            foma_transducer = hfst.regex('foo')
+            foma_transducer.convert(hfst.FOMA_TYPE)
+            # TODO: segfaults
+            try:
+                tropical_transducer.compare(foma_transducer)
+            except hfst.exceptions.TransducerTypeMismatchException:
+                print('Implementation types of transducers must be the same.')
 
         # read_att from file
         f = open('testfile2.att', 'w')
