@@ -3,12 +3,12 @@
 import hfst
 
 types = []
-if hfst.HfstTransducer.is_implementation_type_available(hfst.SFST_TYPE):
-    types.append(hfst.SFST_TYPE)
-if hfst.HfstTransducer.is_implementation_type_available(hfst.TROPICAL_OPENFST_TYPE):
-    types.append(hfst.TROPICAL_OPENFST_TYPE)
-if hfst.HfstTransducer.is_implementation_type_available(hfst.FOMA_TYPE):
-    types.append(hfst.FOMA_TYPE)
+if hfst.HfstTransducer.is_implementation_type_available(hfst.types.SFST_TYPE):
+    types.append(hfst.types.SFST_TYPE)
+if hfst.HfstTransducer.is_implementation_type_available(hfst.types.TROPICAL_OPENFST_TYPE):
+    types.append(hfst.types.TROPICAL_OPENFST_TYPE)
+if hfst.HfstTransducer.is_implementation_type_available(hfst.types.FOMA_TYPE):
+    types.append(hfst.types.FOMA_TYPE)
 
 for type in types:
     if hfst.HfstTransducer.is_implementation_type_available(type):
@@ -89,11 +89,11 @@ for type in types:
             print('State number 2 does not exist')
         
         # TransducerTypeMismatchException:
-        if hfst.FOMA_TYPE in types:
-            hfst.set_default_fst_type(hfst.TROPICAL_OPENFST_TYPE)
+        if hfst.types.FOMA_TYPE in types:
+            hfst.set_default_fst_type(hfst.types.TROPICAL_OPENFST_TYPE)
             tr1 = hfst.regex('foo')
             tr2 = hfst.regex('bar')
-            tr2.convert(hfst.FOMA_TYPE)
+            tr2.convert(hfst.types.FOMA_TYPE)
             try:
                 tr1.disjunct(tr2)
             except hfst.exceptions.TransducerTypeMismatchException:
@@ -234,11 +234,11 @@ for type in types:
         transducer1.reverse()
         transducer1.determinize()
         # implementation types
-        if hfst.FOMA_TYPE in types:
+        if hfst.types.FOMA_TYPE in types:
             tropical_transducer = hfst.regex('foo')
-            tropical_transducer.convert(hfst.TROPICAL_OPENFST_TYPE)
+            tropical_transducer.convert(hfst.types.TROPICAL_OPENFST_TYPE)
             foma_transducer = hfst.regex('foo')
-            foma_transducer.convert(hfst.FOMA_TYPE)
+            foma_transducer.convert(hfst.types.FOMA_TYPE)
             # TODO: segfaults
             try:
                 tropical_transducer.compare(foma_transducer)
@@ -354,7 +354,7 @@ for type in types:
             if (0.79 < tc.get_final_weight(1)) and (tc.get_final_weight(1) < 0.81):
                 print("TEST PASSED")
             else:
-                if hfst.get_default_fst_type() == hfst.TROPICAL_OPENFST_TYPE:
+                if hfst.get_default_fst_type() == hfst.types.TROPICAL_OPENFST_TYPE:
                     raise RuntimeError('')
                 else:
                     pass # ok to fail if weights are not in use

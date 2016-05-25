@@ -36,12 +36,12 @@ e = hfst.exceptions.FlagDiacriticsAreNotIdentitiesException('foo','bar', 10)
 import hfst
 
 # Test that importing exceptions via a package works
-if hfst.HfstTransducer.is_implementation_type_available(hfst.FOMA_TYPE) and hfst.HfstTransducer.is_implementation_type_available(hfst.TROPICAL_OPENFST_TYPE):
+if hfst.HfstTransducer.is_implementation_type_available(hfst.types.FOMA_TYPE) and hfst.HfstTransducer.is_implementation_type_available(hfst.types.TROPICAL_OPENFST_TYPE):
     try:
         foo = hfst.regex('foo')
         bar = hfst.regex('bar')
-        foo.convert(hfst.FOMA_TYPE)
-        bar.convert(hfst.TROPICAL_OPENFST_TYPE)
+        foo.convert(hfst.types.FOMA_TYPE)
+        bar.convert(hfst.types.TROPICAL_OPENFST_TYPE)
         foo.concatenate(bar)
         assert False
     except hfst.exceptions.TransducerTypeMismatchException as e:

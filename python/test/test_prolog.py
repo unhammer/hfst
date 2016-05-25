@@ -1,7 +1,7 @@
 import hfst
 import sys
 
-for type in [hfst.SFST_TYPE, hfst.TROPICAL_OPENFST_TYPE, hfst.FOMA_TYPE]:
+for type in [hfst.types.SFST_TYPE, hfst.types.TROPICAL_OPENFST_TYPE, hfst.types.FOMA_TYPE]:
     if hfst.HfstTransducer.is_implementation_type_available(type):
         
         f = open('cats_and_dogs.prolog', 'r')
