@@ -60,40 +60,40 @@
 #
 #   <br>
 
-## An SFST transducer, unweighted.
-SFST_TYPE = _libhfst.SFST_TYPE
+# An SFST transducer, unweighted.
+#SFST_TYPE = _libhfst.SFST_TYPE
+#
+# An OpenFst transducer with tropical weights.
+#TROPICAL_OPENFST_TYPE = _libhfst.TROPICAL_OPENFST_TYPE
+#
+# An OpenFst transducer with logarithmic weights (limited support). 
+#LOG_OPENFST_TYPE = _libhfst.LOG_OPENFST_TYPE
+#
+# A foma transducer, unweighted.
+#FOMA_TYPE = _libhfst.FOMA_TYPE
+#
+# An HFST optimized lookup transducer, unweighted.
+#HFST_OL_TYPE = _libhfst.HFST_OL_TYPE
+#
+# An HFST optimized lookup transducer with weights.
+#HFST_OLW_TYPE = _libhfst.HFST_OLW_TYPE
+#
+# HFST2 header present, conversion required.
+#HFST2_TYPE = _libhfst.HFST2_TYPE
+#
+# Format left open by e.g. default constructor.
+#UNSPECIFIED_TYPE = _libhfst.UNSPECIFIED_TYPE
+#
+# Type not recognised. This type might be returned by a function if an error occurs.
+#ERROR_TYPE = _libhfst.ERROR_TYPE
 
-## An OpenFst transducer with tropical weights.
-TROPICAL_OPENFST_TYPE = _libhfst.TROPICAL_OPENFST_TYPE
-
-## An OpenFst transducer with logarithmic weights (limited support). 
-LOG_OPENFST_TYPE = _libhfst.LOG_OPENFST_TYPE
-
-## A foma transducer, unweighted.
-FOMA_TYPE = _libhfst.FOMA_TYPE
-
-## An HFST optimized lookup transducer, unweighted.
-HFST_OL_TYPE = _libhfst.HFST_OL_TYPE
-
-## An HFST optimized lookup transducer with weights.
-HFST_OLW_TYPE = _libhfst.HFST_OLW_TYPE
-
-## HFST2 header present, conversion required.
-HFST2_TYPE = _libhfst.HFST2_TYPE
-
-## Format left open by e.g. default constructor.
-UNSPECIFIED_TYPE = _libhfst.UNSPECIFIED_TYPE
-
-## Type not recognised. This type might be returned by a function if an error occurs.
-ERROR_TYPE = _libhfst.ERROR_TYPE
-
-## Push weights toward initial state.
+# Push weights toward initial state.
 # @see #hfst.HfstTransducer.push_weights
-TO_INITIAL_STATE = _libhfst.TO_INITIAL_STATE
-
-## Push weights toward final state(s).
+# TO_INITIAL_STATE = _libhfst.TO_INITIAL_STATE
+#
+# Push weights toward final state(s).
 # @see #hfst.HfstTransducer.push_weights
-TO_FINAL_STATE = _libhfst.TO_FINAL_STATE
+# TO_FINAL_STATE = _libhfst.TO_FINAL_STATE
 
 ## Set the default implementation type.
 # @param impl An hfst.ImplementationType.
@@ -104,7 +104,7 @@ TO_FINAL_STATE = _libhfst.TO_FINAL_STATE
 def set_default_fst_type(impl):
     pass
 ## Get default transducer implementation type.
-# If the default type is not set, it defaults to hfst.TROPICAL_OPENFST_TYPE
+# If the default type is not set, it defaults to hfst.types.TROPICAL_OPENFST_TYPE
 def get_default_fst_type():
     pass
 ## Get a string representation of transducer implementation type \a type.
@@ -934,9 +934,9 @@ class HfstBasicTransition:
 # # this will cause a TransducerTypeMismatchException:
 # tropical_transducer.disjunct(foma_transducer)
 # # this works, but weights are lost in the conversion
-# tropical_transducer.convert(hfst.SFST_TYPE).disjunct(sfst_transducer)     
+# tropical_transducer.convert(hfst.types.SFST_TYPE).disjunct(sfst_transducer)     
 # # this works, information is not lost
-# tropical_transducer.disjunct(sfst_transducer.convert(hfst.TROPICAL_OPENFST_TYPE)) 
+# tropical_transducer.disjunct(sfst_transducer.convert(hfst.types.TROPICAL_OPENFST_TYPE)) 
 # \endverbatim
 # 
 # \section creating_transducers Creating transducers
@@ -952,12 +952,12 @@ class HfstTransducer:
     def is_implementation_type_available(type):
         pass
 
-    ## Create an uninitialized transducer (use with care). 
+    ## Create an empty transducer.
     # 
-    # @note This constructor leaves the backend implementation variable
-    # uninitialized. An uninitialized transducer is likely to cause a
-    # TransducerHasWrongTypeException at some point unless it is given
-    # a value at some point.
+    # \verbatim
+    # tr = hfst.HfstTransducer()
+    # assert(tr.compare(hfst.empty_fst()))
+    # \endverbatim
     def __init__(self):
         pass
 
@@ -981,6 +981,16 @@ class HfstTransducer:
     # If you want to use the default type, you can just call
     # hfst.HfstTransducer(fsm)
     def __init__(self, t, type):
+        pass
+
+    ## Return a deep copy of the transducer.
+    #
+    # \verbatim
+    # tr = hfst.regex('[foo:bar::0.3]*')
+    # TR = tr.copy()
+    # assert(tr.compare(TR))
+    # \endverbatim
+    def copy(self):
         pass
 
     ## Rename the transducer \a name.
@@ -1147,18 +1157,18 @@ class HfstTransducer:
     
     ## Extract \a n best paths of the transducer. 
     # 
-    # In the case of a weighted transducer (#TROPICAL_OPENFST_TYPE or 
-    # #LOG_OPENFST_TYPE), best paths are defined as paths with 
+    # In the case of a weighted transducer (#hfst.types.TROPICAL_OPENFST_TYPE or 
+    # #hfst.types.LOG_OPENFST_TYPE), best paths are defined as paths with 
     # the lowest weight.
-    # In the case of an unweighted transducer (#SFST_TYPE or #FOMA_TYPE), 
+    # In the case of an unweighted transducer (#hfst.types.SFST_TYPE or #hfst.types.FOMA_TYPE), 
     # the function returns random paths.
     # 
-    # This function is not implemented for #FOMA_TYPE or #SFST_TYPE.
-    # If this function is called by an HfstTransducer of type #FOMA_TYPE 
-    # or #SFST_TYPE, it is converted to #TROPICAL_OPENFST_TYPE,
-    # paths are extracted and it is converted back to #FOMA_TYPE or 
-    # #SFST_TYPE. If HFST is not linked to OpenFst library, an
-    # ImplementationTypeNotAvailableException is thrown.
+    # This function is not implemented for #hfst.types.FOMA_TYPE or #hfst.types.SFST_TYPE.
+    # If this function is called by an HfstTransducer of type #hfst.types.FOMA_TYPE 
+    # or #hfst.types.SFST_TYPE, it is converted to #hfst.types.TROPICAL_OPENFST_TYPE,
+    # paths are extracted and it is converted back to #hfst.types.FOMA_TYPE or 
+    # #hfst.types.SFST_TYPE. If HFST is not linked to OpenFst library, an
+    # #hfst.exceptions.ImplementationTypeNotAvailableException is thrown.
     def n_best(self, n):
         pass
     
@@ -1272,10 +1282,10 @@ class HfstTransducer:
     # all weights are lost. In the reverse case, all weights are initialized to the 
     # semiring's one. 
     # 
-    # A transducer of type #hfst.SFST_TYPE, #hfst.TROPICAL_OPENFST_TYPE,
-    # #hfst.LOG_OPENFST_TYPE or #hfst.FOMA_TYPE can be converted into an 
-    # #hfst.HFST_OL_TYPE or #hfst.HFST_OLW_TYPE transducer, but an #hfst.HFST_OL_TYPE
-    # or #hfst.HFST_OLW_TYPE transducer cannot be converted to any other type.
+    # A transducer of type #hfst.types.SFST_TYPE, #hfst.types.TROPICAL_OPENFST_TYPE,
+    # #hfst.types.LOG_OPENFST_TYPE or #hfst.types.FOMA_TYPE can be converted into an 
+    # #hfst.types.HFST_OL_TYPE or #hfst.types.HFST_OLW_TYPE transducer, but an #hfst.types.HFST_OL_TYPE
+    # or #hfst.types.HFST_OLW_TYPE transducer cannot be converted to any other type.
     # 
     # @note For conversion between HfstBasicTransducer and HfstTransducer,
     # see #hfst.HfstTransducer.__init__ and #hfst.HfstBasicTransducer.__init__
@@ -1399,28 +1409,41 @@ class HfstTransducer:
         pass
     
     ## Set the weights of all final states to \a weight. 
-    # If the HfstTransducer is of unweighted type (#hfst.SFST_TYPE or #hfst.FOMA_TYPE), nothing is done.
+    # If the HfstTransducer is of unweighted type (#hfst.types.SFST_TYPE or #hfst.types.FOMA_TYPE), nothing is done.
     def set_final_weights(self, weight):
         pass
     
-    ## Push weights towards initial or final state(s) as defined by \a type.
-    # @param PushType defining if weights are pushed towards initial state or final states, possible values are hfst.TO_INITIAL_STATE and libhst.TO_FINALSTATE
+    ## Push weights towards initial state.
     # 
-    # If the HfstTransducer is of unweighted type (#SFST_TYPE or #FOMA_TYPE), nothing is done.
+    # If the HfstTransducer is of unweighted type (#hfst.types.SFST_TYPE or #hfst.types.FOMA_TYPE), nothing is done.
     #
     # An example:
     # \verbatim
-    # >>> import libhfst
+    # >>> import hfst
     # >>> tr = hfst.regex('[a::1 a:b::0.3 (b::0)]::0.7;')
-    # >>> tr.push_weights(hfst.TO_INITIAL_STATE)
+    # >>> tr.push_weights_to_start()
     # >>> print(tr)
     # 0       1       a       a       2.000000
     # 1       2       a       b       0.000000
     # 2       3       b       b       0.000000
     # 2       0.000000
     # 3       0.000000
+    # \endverbatim
+    #
+    # @see hfst.HfstTransducer.push_weights_to_end
+    #
+    def push_weights_to_start(self):
+        pass
+
+    ## Push weights towards final state(s).
     # 
-    # >>> tr.push_weights(hfst.TO_FINAL_STATE)
+    # If the HfstTransducer is of unweighted type (#hfst.types.SFST_TYPE or #hfst.types.FOMA_TYPE), nothing is done.
+    #
+    # An example:
+    # \verbatim
+    # >>> import hfst
+    # >>> tr = hfst.regex('[a::1 a:b::0.3 (b::0)]::0.7;')
+    # >>> tr.push_weights_to_end()
     # >>> print(tr)
     # 0       1       a       a       0.000000
     # 1       2       a       b       0.000000
@@ -1430,9 +1453,9 @@ class HfstTransducer:
     # 
     # \endverbatim
     #
-    # @see #hfst.TO_INITIAL_STATE #hfst.TO_FINAL_STATE
-    # 
-    def push_weights(self, type):
+    # @see hfst.HfstTransducer.push_weights_to_start
+    #
+    def push_weights_to_end(self):
         pass
 
     ## Substitute symbols or transitions in the transducer.
@@ -1459,12 +1482,22 @@ class HfstTransducer:
     # @param time_cutoff How long the function can search for results before returning, expressed in seconds. Defaults to 0.0, i.e. infinitely.
     # @param output Possible values are 'tuple', 'text' and 'raw', 'tuple' being the default.
     #
-    # @note This function is implemented only for optimized lookup format (hfst.HFST_OL_TYPE or hfst.HFST_OLW_TYPE). 
+    # @note This function is implemented only for optimized lookup format (#hfst.types.HFST_OL_TYPE or #hfst.types.HFST_OLW_TYPE). 
     #       Either convert to optimized lookup format or to HfstBasicTransducer if you wish to perform lookup.
     #       Conversion to OL might take a while but it lookup is fast.
     #       Conversion to HfstBasicTransducer is quick but lookup is slower.
     #
     def lookup(self, input, **kvargs):
+        pass
+
+    ## Optimize the transducer for lookup.
+    # This effectively converts the transducer into #hfst.types.HFST_OL_TYPE.
+    def lookup_optimize(self):
+        pass
+
+    ## Remove lookup optimization.
+    # This effectively converts transducer (back) into default fst type.
+    def remove_optimization(self):
         pass
 
     ## Extract paths that are recognized by the transducer. 
@@ -1575,7 +1608,7 @@ class HfstTransducer:
     # Epsilons on the second level are represented by empty strings
     # in the results.
     #
-    # @pre The transducer must be of type #hfst.HFST_OL_TYPE or #hfst.HFST_OLW_TYPE. This function is not implemented for other transducer types.
+    # @pre The transducer must be of type #hfst.types.HFST_OL_TYPE or #hfst.types.HFST_OLW_TYPE. This function is not implemented for other transducer types.
     #
     # @param tok_input  A tuple of consecutive symbols (strings) to look up.
     # @param limit  (Currently ignored.) Number of strings to look up. -1 tries to look up all and may get stuck if infinitely ambiguous.
@@ -1733,11 +1766,11 @@ class HfstOutputStream:
     # \endverbatim
     #
     # \verbatim
-    # ostr = hfst.HfstOutputStream(filename='transducer.sfst', hfst_format=False, type=hfst.SFST_TYPE)  # a stream for writing SFST_TYPE transducers in their back-end format to a file
+    # ostr = hfst.HfstOutputStream(filename='transducer.sfst', hfst_format=False, type=hfst.types.SFST_TYPE)  # a stream for writing SFST_TYPE transducers in their back-end format to a file
     # transducer1 = hfst.regex('foo:bar')
-    # transducer1.convert(hfst.SFST_TYPE)  # if not set as the default type
+    # transducer1.convert(hfst.types.SFST_TYPE)  # if not set as the default type
     # transducer2 = hfst.regex('bar:baz')
-    # transducer2.convert(hfst.SFST_TYPE)  # if not set as the default type
+    # transducer2.convert(hfst.types.SFST_TYPE)  # if not set as the default type
     # ostr.write(transducer1)
     # ostr.write(transducer2)
     # ostr.flush()
@@ -2305,7 +2338,7 @@ def is_diacritic(symbol):
 #
 # # Convert to tropical OpenFst format (the default) and push weights toward final state.
 # T = hfst.HfstTransducer(t)
-# T.push_weights(hfst.TO_FINAL_STATE)
+# T.push_weights_to_end()
 #
 # # Convert back to HFST basic transducer.
 # tc = hfst.HfstBasicTransducer(T)
@@ -2328,7 +2361,7 @@ def is_diacritic(symbol):
 #  
 # \verbatim
 # import hfst
-# hfst.set_default_fst_type(hfst.FOMA_TYPE) # we use foma implementation as there are no weights involved
+# hfst.set_default_fst_type(hfst.types.FOMA_TYPE) # we use foma implementation as there are no weights involved
 # 
 # # Create a simple lexicon transducer [[foo bar foo] | [foo bar baz]].
 # tok = hfst.HfstTokenizer()
@@ -2466,7 +2499,7 @@ def is_diacritic(symbol):
 # read from standard input with gz tools (foma tools do not write to or read
 # from standard streams). So we choose to write, and accordingly read, 
 # foma transducers unzipped when writing or reading binary HfstTransducers 
-# of hfst.FOMA_TYPE. As a result, when we write an HfstTransducer of FOMA_TYPE
+# of hfst.types.FOMA_TYPE. As a result, when we write an HfstTransducer of FOMA_TYPE
 # in its plain backend format, the user must zip it themselves before it 
 # can be used by foma tools. (update: at least the newest releases of foma
 # are able to read also unzipped transducers.) Similarily, a foma transducer must be unzipped 
@@ -2478,7 +2511,7 @@ def is_diacritic(symbol):
 # 
 # \verbatim
 # import libhfst
-# hfst.set_default_fst_type(hfst.FOMA_TYPE)
+# hfst.set_default_fst_type(hfst.types.FOMA_TYPE)
 # ab = libfst.regex('a:b')
 # out = hfst.HfstOutputStream(hfst_format=False)
 # out.write(ab)

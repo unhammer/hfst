@@ -151,8 +151,8 @@ for type in types:
 
     # push weights
     tr = hfst.regex('[a::1 a:b::0.3 b::0]::0.7;')
-    tr.push_weights(hfst.TO_INITIAL_STATE)
-    tr.push_weights(hfst.TO_FINAL_STATE)
+    tr.push_weights_to_start()
+    tr.push_weights_to_end()
 
     # set final weights
     tr = hfst.regex('(a a:b (b));')

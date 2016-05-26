@@ -345,7 +345,7 @@ for type in types:
 
 # Convert to tropical OpenFst format (the default, if not set) and push weights toward final state.
         T = hfst.HfstTransducer(t)
-        T.push_weights(hfst.TO_FINAL_STATE)
+        T.push_weights_to_end()
 
 # Convert back to HFST basic transducer.
         tc = hfst.HfstBasicTransducer(T)
