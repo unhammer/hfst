@@ -185,7 +185,7 @@ for type in types:
     f.write('-- in ATT format --\n')
     TR.write_att(f)
     f.write('-- in prolog format --\n')
-    TR.write_prolog(f, 'FOOBAR_TRANSDUCER')
+    TR.write_prolog(f)
     f.close()
 
     fsm = hfst.read_att_string(' 0\t 1 a b\n\
