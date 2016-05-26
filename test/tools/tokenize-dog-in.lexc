@@ -5,6 +5,8 @@ Multichar_Symbols
 +Foc
 +Cmp
 @PMATCH_INPUT_MARK@
+@PMATCH_BACKTRACK@
++ErrSpace
 %#
 
 LEXICON Root
@@ -14,6 +16,7 @@ be+V:be SPACEDOG;
 leat+V+Du3:lea UNSPACEDOG;
 leat+V+Sg3:leaba ENDLEX;
 bedog+V:be% dog ENDLEX;
+< {skuvla} "@PMATCH_BACKTRACK@":0 "@PMATCH_INPUT_MARK@":" " {busse} "+N":0 "+ErrSpace":0 > ENDLEX ;
 
 LEXICON ENDLEX
 #;

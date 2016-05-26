@@ -310,6 +310,7 @@ void print_location_vector_gtd(LocationVector const & locations, std::ostream & 
         outstream << "\t\"" << locations.at(0).input << "\" ?" << std::endl;
     }
     else {
+        std::vector<size_t> backtrack;
         for (LocationVector::const_iterator loc_it = locations.begin();
              loc_it != locations.end(); ++loc_it) {
             if(loc_it->output.empty()) {
@@ -326,6 +327,11 @@ void print_location_vector_gtd(LocationVector const & locations, std::ostream & 
                 std::string inpart;
                 bool sub_found = false;
                 size_t out_part = part > 0 ? loc_it->output_parts.at(part-1) : 0;
+                while(out_part > 0 && loc_it->output_symbol_strings.at(out_part-1) == "@PMATCH_BACKTRACK@") {
+                    backtrack.push_back(part);
+                    --part;
+                    out_part = part > 0 ? loc_it->output_parts.at(part-1) : 0;
+                }
                 for(hfst::StringVector::const_iterator it = out_end-1;
                     it > loc_it->output_symbol_strings.begin() + out_part;
                     --it) {
@@ -371,6 +377,9 @@ void print_location_vector_gtd(LocationVector const & locations, std::ostream & 
                     }
                 }
             }
+        }
+        for(size_t i = 0; i<backtrack.size(); ++i) {
+            std::cout << "Backtrack from part "<<backtrack[i] <<std::endl;
         }
     }
 }
