@@ -310,7 +310,7 @@ void print_location_vector_gtd(LocationVector const & locations, std::ostream & 
         outstream << "\t\"" << locations.at(0).input << "\" ?" << std::endl;
     }
     else {
-        std::vector<size_t> backtrack;
+        std::set<size_t> backtrack;
         for (LocationVector::const_iterator loc_it = locations.begin();
              loc_it != locations.end(); ++loc_it) {
             if(loc_it->output.empty()) {
@@ -328,7 +328,7 @@ void print_location_vector_gtd(LocationVector const & locations, std::ostream & 
                 bool sub_found = false;
                 size_t out_part = part > 0 ? loc_it->output_parts.at(part-1) : 0;
                 while(out_part > 0 && loc_it->output_symbol_strings.at(out_part-1) == "@PMATCH_BACKTRACK@") {
-                    backtrack.push_back(part);
+                    backtrack.insert(part);
                     --part;
                     out_part = part > 0 ? loc_it->output_parts.at(part-1) : 0;
                 }
@@ -378,8 +378,22 @@ void print_location_vector_gtd(LocationVector const & locations, std::ostream & 
                 }
             }
         }
-        for(size_t i = 0; i<backtrack.size(); ++i) {
-            std::cout << "Backtrack from part "<<backtrack[i] <<std::endl;
+        if(!backtrack.empty()) {
+            Location loc_in = locations.at(0);
+            backtrack.insert(1);
+            for(std::set<size_t>::const_iterator it = backtrack.begin(); it != backtrack.end(); ++it) {
+                std::cout << "Backtrack from part "<<(*it)<<" i_beg="<<(*it)-1<<" i_end="<<(*it) <<std::endl;
+                hfst::StringVector::const_iterator
+                    in_beg = loc_in.input_symbol_strings.begin() + loc_in.input_parts.at((*it)-1);
+                hfst::StringVector::const_iterator in_end = loc_in.input_symbol_strings.end();
+                if((*it) < loc_in.input_parts.size()) {
+                    in_end = loc_in.input_symbol_strings.begin() + loc_in.input_parts.at((*it));
+                }
+                for(hfst::StringVector::const_iterator it = in_beg; it != in_end; ++it) {
+                    std::cout << (*it);
+                }
+                std::cout<<std::endl;
+            }
         }
     }
 }
