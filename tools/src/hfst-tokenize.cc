@@ -414,96 +414,125 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
             }
         }
         if(!backtrack.empty()) {
-            Location loc_in = locations.at(0);
             backtrack.insert(1);
-            for(std::set<size_t>::const_iterator it = backtrack.begin(); it != backtrack.end(); ++it) {
-                std::cout << "; backtrack from part "<<(*it)<<" i_beg="<<(*it)-1<<" i_end="<<(*it) <<std::endl;
+            Location loc_in = locations.at(0);
+            LocationVectorVector locs_rebuilt = LocationVectorVector(backtrack.size());
+            size_t i_b = 0;
+            for(std::set<size_t>::const_iterator it = backtrack.begin();
+                it != backtrack.end(); ++it, ++i_b) {
                 hfst::StringVector::const_iterator
-                    in_beg = loc_in.input_symbol_strings.begin() + loc_in.input_parts.at((*it)-1);
-                hfst::StringVector::const_iterator in_end = loc_in.input_symbol_strings.end();
+                    in_beg = loc_in.input_symbol_strings.begin() + loc_in.input_parts.at((*it)-1),
+                    in_end = loc_in.input_symbol_strings.end();
                 if((*it) < loc_in.input_parts.size()) {
                     in_end = loc_in.input_symbol_strings.begin() + loc_in.input_parts.at((*it));
                 }
                 while((in_end-1)->find_first_not_of(' ') == std::string::npos) { // rtrim
                     --in_end;
                 }
-                std::ostringstream form;
-                std::copy(in_beg, in_end, std::ostream_iterator<std::string>(form, ""));
-                std::string sform = form.str();
-                LocationVectorVector locations = container.locate(sform, time_cutoff);
+                std::ostringstream ssform;
+                std::copy(in_beg, in_end, std::ostream_iterator<std::string>(ssform, ""));
+                std::string form = ssform.str();
+                LocationVectorVector locations = container.locate(form, time_cutoff);
+                if(locations.size() != 1) {
+                    outstream << "locations.size() != 1"<<std::endl;
+                }
                 for(LocationVectorVector::const_iterator it = locations.begin();
                     it != locations.end(); ++it) {
-                    if ((it->size() == 1 && it->at(0).output.compare("@_NONMATCHING_@") == 0)) {
+                    if (it->empty()
+                        || (it->size() == 1 && it->at(0).output.compare("@_NONMATCHING_@") == 0)
+                        // keep only those that cover the full form
+                        || it->at(0).length != form.length()) {
                         continue;
                     }
                     LocationVector loc = keep_n_best_weight(max_weight_classes, *it);
                     for (LocationVector::const_iterator loc_it = loc.begin();
                          loc_it != loc.end(); ++loc_it) {
-                        if(loc_it->output.empty()) {
-                            continue;
+                        if(!loc_it->output.empty()
+                            &&
+                           // TODO: why aren't the <W:inf> excluded earlier?
+                           loc_it->weight < std::numeric_limits<float>::max()) {
+                            locs_rebuilt.at(i_b).push_back(*loc_it);
                         }
-                        std::string indent = "\t";
-                        hfst::StringVector::const_iterator
-                            out_beg = loc_it->output_symbol_strings.begin(),
-                            out_end = loc_it->output_symbol_strings.end(),
-                            in_beg = loc_it->input_symbol_strings.end(), // beg=end: don't print input unless we have to
-                            in_end = loc_it->input_symbol_strings.end();
-                        size_t part = loc_it->input_parts.size();
-                        while(true) {
-                            std::string inpart;
-                            bool sub_found = false;
-                            size_t out_part = part > 0 ? loc_it->output_parts.at(part-1) : 0;
-                            // while(out_part > 0 && loc_it->output_symbol_strings.at(out_part-1) == "@PMATCH_BACKTRACK@") {
-                            //     backtrack.insert(part);
-                            //     --part;
-                            //     out_part = part > 0 ? loc_it->output_parts.at(part-1) : 0;
-                            // }
-                            for(hfst::StringVector::const_iterator it = out_end-1;
-                                it > loc_it->output_symbol_strings.begin() + out_part;
-                                --it) {
-                                if(subreading_separator.compare(*it) == 0) {
-                                    // Found a sub-reading mark
-                                    out_beg = ++it;
-                                    sub_found = true;
-                                    break;
-                                }
-                            }
-                            if(!sub_found) {
-                                if(out_part > 0) {
-                                    // Found an input mark
-                                    out_beg = loc_it->output_symbol_strings.begin() + out_part;
-                                    in_beg = loc_it->input_symbol_strings.begin() + loc_it->input_parts.at(part-1);
-                                    --part;
-                                }
-                                else {
-                                    // No remaining sub-marks or input-marks to the left
-                                    out_beg = loc_it->output_symbol_strings.begin();
-                                    if(in_end != loc_it->input_symbol_strings.end()) {
-                                        // We've seen at least one input-mark, so we need to output the remaining input as well
-                                        in_beg = loc_it->input_symbol_strings.begin();
-                                    }
-                                }
-                            }
-                            print_cg_subreading(indent,
-                                                out_beg,
-                                                out_end,
-                                                loc_it->weight,
-                                                in_beg,
-                                                in_end,
-                                                outstream);
-                            if(out_beg == loc_it->output_symbol_strings.begin()) {
-                                break;
-                            }
-                            else {
-                                indent += "\t";
-                                out_end = out_beg;
-                                in_end = in_beg;
-                                if(sub_found) {
-                                    out_end--; // skip the subreading separator symbol
-                                }
+                    }
+                }
+            }
+            size_t depth = 0;
+            std::vector<std::ostringstream> out(locs_rebuilt.size());
+            LocationVectorVector todo = (LocationVectorVector){locs_rebuilt.at(depth)};
+            while(!todo.empty() && !todo.back().empty()) {
+                std::string indent = std::string(depth+1, '\t');
+                Location cur = todo.back().back();
+                todo.back().pop_back();
+                hfst::StringVector::const_iterator
+                    out_beg = cur.output_symbol_strings.begin(),
+                    out_end = cur.output_symbol_strings.end(),
+                    in_beg = cur.input_symbol_strings.end(), // beg=end: don't print input unless we have to
+                    in_end = cur.input_symbol_strings.end();
+                size_t part = cur.input_parts.size();
+                out.at(depth) = std::ostringstream();
+                while(true) {
+                    std::string inpart;
+                    bool sub_found = false;
+                    size_t out_part = part > 0 ? cur.output_parts.at(part-1) : 0;
+                    for(hfst::StringVector::const_iterator it = out_end-1;
+                        it > cur.output_symbol_strings.begin() + out_part;
+                        --it) {
+                        if(subreading_separator.compare(*it) == 0) {
+                            // Found a sub-reading mark
+                            out_beg = ++it;
+                            sub_found = true;
+                            break;
+                        }
+                    }
+                    if(!sub_found) {
+                        if(out_part > 0) {
+                            // Found an input mark
+                            out_beg = cur.output_symbol_strings.begin() + out_part;
+                            in_beg = cur.input_symbol_strings.begin() + cur.input_parts.at(part-1);
+                            --part;
+                        }
+                        else {
+                            // No remaining sub-marks or input-marks to the left
+                            out_beg = cur.output_symbol_strings.begin();
+                            if(in_end != cur.input_symbol_strings.end()) {
+                                // We've seen at least one input-mark, so we need to output the remaining input as well
+                                in_beg = cur.input_symbol_strings.begin();
                             }
                         }
                     }
+                    print_cg_subreading(indent,
+                                        out_beg,
+                                        out_end,
+                                        cur.weight,
+                                        in_beg,
+                                        in_end,
+                                        out.at(depth));
+                    if(out_beg == cur.output_symbol_strings.begin()) {
+                        break;
+                    }
+                    else {
+                        indent += "\t";
+                        out_end = out_beg;
+                        in_end = in_beg;
+                        if(sub_found) {
+                            out_end--; // skip the subreading separator symbol
+                        }
+                    }
+                }
+                if(depth == locs_rebuilt.size()-1) {
+                    for(std::vector<std::ostringstream>::const_iterator it = out.begin();
+                        it != out.end();
+                        it++) {
+                        outstream << it->str();
+                    }
+                }
+                if(depth < locs_rebuilt.size()-1) {
+                    ++depth;
+                    todo.push_back(locs_rebuilt.at(depth));
+                }
+                else if(todo.back().empty()){
+                    depth--;
+                    todo.pop_back();
                 }
             }
         }
