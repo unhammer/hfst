@@ -10,10 +10,9 @@ from distutils.core import setup, Extension
 libhfst_src_path = '../libhfst/src/'
 absolute_libhfst_src_path = os.path.abspath(libhfst_src_path)
 
-# extra_link_arguments = []
-# if you wish to link to the local hfst library created in the folder '../libhfst/src',
-# replace the above with:
 extra_link_arguments = ["-Wl,-rpath=" + absolute_libhfst_src_path + "/.libs"]
+# If you wish to use an installed version of HFST C++ library instead, replace the above with:
+# extra_link_arguments = []
 
 # when making the debian package, replace extra_link_args
 # with ["-L/usr/lib/", "-Wl,-rpath=/usr/lib/"]

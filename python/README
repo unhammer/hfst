@@ -15,20 +15,13 @@ extension eg. like so:
     python setup.py build_ext --inplace
 
 
-If you already have HFST installed, it is possible that SWIG will use 
-the installed version of HFST library instead of the one located in
-"../libhfst/src/.libs/". To avoid this, either add the full path to HFST
-library to LD_LIBRARY_PATH before building the Python extension, e.g. by
-executing
+The script setup.py links by default to HFST C++ library which is located in
+folder "../libhfst/src/.libs/". If you have HFST installed and wish to use it
+instead, modify 'extra_link_arguments' as commented in setup.py:
 
-    LD_LIBRARY_PATH="path/to/hfst-top-dir/libhfst/src/.libs/:"$LD_LIBRARY_PATH
-
-or edit extra_link_arguments as commented in setup.py:
-
-  extra_link_arguments = []
-  # if you wish to link to the local hfst library created in the folder '../libhfst/src',
-  # replace the above with:
-  # extra_link_arguments = ["-Wl,-rpath=" + absolute_libhfst_src_path + "/.libs"]
+   extra_link_arguments = ["-Wl,-rpath=" + absolute_libhfst_src_path + "/.libs"]
+   # If you wish to use an installed version of HFST C++ library instead, replace the above with:
+   # extra_link_arguments = []
 
 
 =================
