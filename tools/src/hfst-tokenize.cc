@@ -23,6 +23,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <iterator>
 
 #include <vector>
 #include <map>
@@ -234,6 +235,38 @@ hfst_ol::PmatchContainer make_naive_tokenizer(HfstTransducer & dictionary)
 }
 
 /**
+ * Keep only the N best weight classes
+ */
+const LocationVector keep_n_best_weight(const int N, LocationVector const & locations)
+{
+    int classes_found = -1;
+    hfst_ol::Weight last_weight_class = 0.0;
+    LocationVector goodweight;
+    for (LocationVector::const_iterator it = locations.begin();
+         it != locations.end(); ++it) {
+        hfst_ol::Weight current_weight = it->weight;
+        if (classes_found == -1) // we're just starting
+        {
+            classes_found = 1;
+            last_weight_class = current_weight;
+        }
+        else if (last_weight_class != current_weight)
+        {
+            last_weight_class = current_weight;
+            ++classes_found;
+        }
+        if (classes_found > N)
+        {
+            break;
+        }
+        else {
+            goodweight.push_back(*it);
+        }
+    }
+    return goodweight;
+}
+
+/**
  * Return empty string if it wasn't a tag, otherwise the tag without the initial/final +
  */
 const std::string as_cg_tag(const std::string & str) {
@@ -302,7 +335,9 @@ void print_cg_subreading(std::string const & indent,
     outstream << std::endl;
 }
 
-void print_location_vector_gtd(LocationVector const & locations, std::ostream & outstream)
+void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
+                               LocationVector const & locations,
+                               std::ostream & outstream)
 {
     outstream << "\"<" << locations.at(0).input << ">\"" << std::endl;
     if(locations.size() == 1 && locations.at(0).output.empty()) {
@@ -382,23 +417,102 @@ void print_location_vector_gtd(LocationVector const & locations, std::ostream & 
             Location loc_in = locations.at(0);
             backtrack.insert(1);
             for(std::set<size_t>::const_iterator it = backtrack.begin(); it != backtrack.end(); ++it) {
-                std::cout << "Backtrack from part "<<(*it)<<" i_beg="<<(*it)-1<<" i_end="<<(*it) <<std::endl;
+                std::cout << "; backtrack from part "<<(*it)<<" i_beg="<<(*it)-1<<" i_end="<<(*it) <<std::endl;
                 hfst::StringVector::const_iterator
                     in_beg = loc_in.input_symbol_strings.begin() + loc_in.input_parts.at((*it)-1);
                 hfst::StringVector::const_iterator in_end = loc_in.input_symbol_strings.end();
                 if((*it) < loc_in.input_parts.size()) {
                     in_end = loc_in.input_symbol_strings.begin() + loc_in.input_parts.at((*it));
                 }
-                for(hfst::StringVector::const_iterator it = in_beg; it != in_end; ++it) {
-                    std::cout << (*it);
+                while((in_end-1)->find_first_not_of(' ') == std::string::npos) { // rtrim
+                    --in_end;
                 }
-                std::cout<<std::endl;
+                std::ostringstream form;
+                std::copy(in_beg, in_end, std::ostream_iterator<std::string>(form, ""));
+                std::string sform = form.str();
+                LocationVectorVector locations = container.locate(sform, time_cutoff);
+                for(LocationVectorVector::const_iterator it = locations.begin();
+                    it != locations.end(); ++it) {
+                    if ((it->size() == 1 && it->at(0).output.compare("@_NONMATCHING_@") == 0)) {
+                        continue;
+                    }
+                    LocationVector loc = keep_n_best_weight(max_weight_classes, *it);
+                    for (LocationVector::const_iterator loc_it = loc.begin();
+                         loc_it != loc.end(); ++loc_it) {
+                        if(loc_it->output.empty()) {
+                            continue;
+                        }
+                        std::string indent = "\t";
+                        hfst::StringVector::const_iterator
+                            out_beg = loc_it->output_symbol_strings.begin(),
+                            out_end = loc_it->output_symbol_strings.end(),
+                            in_beg = loc_it->input_symbol_strings.end(), // beg=end: don't print input unless we have to
+                            in_end = loc_it->input_symbol_strings.end();
+                        size_t part = loc_it->input_parts.size();
+                        while(true) {
+                            std::string inpart;
+                            bool sub_found = false;
+                            size_t out_part = part > 0 ? loc_it->output_parts.at(part-1) : 0;
+                            // while(out_part > 0 && loc_it->output_symbol_strings.at(out_part-1) == "@PMATCH_BACKTRACK@") {
+                            //     backtrack.insert(part);
+                            //     --part;
+                            //     out_part = part > 0 ? loc_it->output_parts.at(part-1) : 0;
+                            // }
+                            for(hfst::StringVector::const_iterator it = out_end-1;
+                                it > loc_it->output_symbol_strings.begin() + out_part;
+                                --it) {
+                                if(subreading_separator.compare(*it) == 0) {
+                                    // Found a sub-reading mark
+                                    out_beg = ++it;
+                                    sub_found = true;
+                                    break;
+                                }
+                            }
+                            if(!sub_found) {
+                                if(out_part > 0) {
+                                    // Found an input mark
+                                    out_beg = loc_it->output_symbol_strings.begin() + out_part;
+                                    in_beg = loc_it->input_symbol_strings.begin() + loc_it->input_parts.at(part-1);
+                                    --part;
+                                }
+                                else {
+                                    // No remaining sub-marks or input-marks to the left
+                                    out_beg = loc_it->output_symbol_strings.begin();
+                                    if(in_end != loc_it->input_symbol_strings.end()) {
+                                        // We've seen at least one input-mark, so we need to output the remaining input as well
+                                        in_beg = loc_it->input_symbol_strings.begin();
+                                    }
+                                }
+                            }
+                            print_cg_subreading(indent,
+                                                out_beg,
+                                                out_end,
+                                                loc_it->weight,
+                                                in_beg,
+                                                in_end,
+                                                outstream);
+                            if(out_beg == loc_it->output_symbol_strings.begin()) {
+                                break;
+                            }
+                            else {
+                                indent += "\t";
+                                out_end = out_beg;
+                                in_end = in_beg;
+                                if(sub_found) {
+                                    out_end--; // skip the subreading separator symbol
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 }
 
-void print_location_vector(LocationVector const & locations, std::ostream & outstream)
+void print_location_vector(hfst_ol::PmatchContainer & container,
+                           LocationVector const & locations,
+                           std::ostream & outstream)
 {
     if (output_format == tokenize && locations.size() != 0) {
         outstream << locations.at(0).input;
@@ -428,7 +542,7 @@ void print_location_vector(LocationVector const & locations, std::ostream & outs
         }
         outstream << std::endl;
     } else if (output_format == gtd && locations.size() != 0) {
-        print_location_vector_gtd(locations, outstream);
+        print_location_vector_gtd(container, locations, outstream);
     } else if (output_format == xerox) {
         for (LocationVector::const_iterator loc_it = locations.begin();
              loc_it != locations.end(); ++loc_it) {
@@ -489,38 +603,6 @@ void print_location_vector(LocationVector const & locations, std::ostream & outs
 //    std::cerr << "from print_location_vector\n";
 }
 
-/**
- * Keep only the N best weight classes
- */
-const LocationVector keep_n_best_weight(const int N, LocationVector const & locations)
-{
-    int classes_found = -1;
-    hfst_ol::Weight last_weight_class = 0.0;
-    LocationVector goodweight;
-    for (LocationVector::const_iterator it = locations.begin();
-         it != locations.end(); ++it) {
-        hfst_ol::Weight current_weight = it->weight;
-        if (classes_found == -1) // we're just starting
-        {
-            classes_found = 1;
-            last_weight_class = current_weight;
-        }
-        else if (last_weight_class != current_weight)
-        {
-            last_weight_class = current_weight;
-            ++classes_found;
-        }
-        if (classes_found > N)
-        {
-            break;
-        }
-        else {
-            goodweight.push_back(*it);
-        }
-    }
-    return goodweight;
-}
-
 void match_and_print(hfst_ol::PmatchContainer & container,
                      std::ostream & outstream,
                      std::string & input_text)
@@ -543,11 +625,12 @@ void match_and_print(hfst_ol::PmatchContainer & container,
             // All nonmatching cases have been handled
         }
         if(max_weight_classes < std::numeric_limits<int>::max()) {
-            print_location_vector(keep_n_best_weight(max_weight_classes, *it),
+            print_location_vector(container,
+                                  keep_n_best_weight(max_weight_classes, *it),
                                   outstream);
         }
         else {
-            print_location_vector(*it, outstream);
+            print_location_vector(container, *it, outstream);
         }
     }
     if (output_format == finnpos) {
