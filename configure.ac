@@ -158,7 +158,7 @@ AC_ARG_ENABLE([no_tools],
 							  [build no tools @<:@default=no@:>@])],
 			  [enable_no_tools=$enableval],
 			  [enable_no_tools=no])
-
+AM_CONDITIONAL([ENABLE_NO_TOOLS], [test x$enable_no_tools != xno])
 
 # allow programs to be built separately (sort alphabetically)
 AC_ARG_ENABLE([affix_guessify],
