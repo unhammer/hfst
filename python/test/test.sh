@@ -18,10 +18,11 @@ if [ "$3" = "--pythonpath" ]; then
     PYTHONPATH=$4
 fi
 
-for file in test_pmatch.py test_prolog.py test_exceptions.py test_dir_hfst.py \
-    test_dir_hfst_exceptions.py test_dir_hfst_rules.py test_tokenizer.py \
-    test_read_att_transducer.py test_xre.py examples.py \
-    test_att_reader.py test_prolog_reader.py test_hfst.py ;
+for file in test_dir_hfst.py test_dir_hfst_exceptions.py test_dir_hfst_rules.py \
+    test_tokenizer.py test_exceptions.py test_xre.py \
+    test_read_att_transducer.py test_prolog.py \
+    test_att_reader.py test_prolog_reader.py \
+    test_hfst.py test_examples.py test_pmatch.py ;
 do
     if ! [ "$PYTHONPATH" = "" ]; then
         echo 'import sys' > tmp
