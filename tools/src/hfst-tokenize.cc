@@ -469,7 +469,8 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
                     in_beg = cur.input_symbol_strings.end(), // beg=end: don't print input unless we have to
                     in_end = cur.input_symbol_strings.end();
                 size_t part = cur.input_parts.size();
-                out.at(depth) = std::ostringstream();
+                out.at(depth).clear();
+                out.at(depth).str(std::string());
                 while(true) {
                     std::string inpart;
                     bool sub_found = false;
