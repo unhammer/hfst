@@ -393,6 +393,9 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
                         }
                     }
                 }
+                while(out_beg < out_end && out_beg->compare("@PMATCH_BACKTRACK@") == 0) {
+                    ++out_beg;
+                }
                 print_cg_subreading(indent,
                                     out_beg,
                                     out_end,
