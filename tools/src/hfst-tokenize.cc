@@ -444,7 +444,7 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
                     if (it->empty()
                         || (it->size() == 1 && it->at(0).output.compare("@_NONMATCHING_@") == 0)
                         // keep only those that cover the full form
-                        || it->at(0).length != form.length()) {
+                        || it->at(0).input.length() != form.length()) {
                         continue;
                     }
                     LocationVector loc = keep_n_best_weight(max_weight_classes, *it);
@@ -470,7 +470,7 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
                 hfst::StringVector::const_iterator
                     out_beg = cur.output_symbol_strings.begin(),
                     out_end = cur.output_symbol_strings.end(),
-                    in_beg = cur.input_symbol_strings.end(), // beg=end: don't print input unless we have to
+                    in_beg = cur.input_symbol_strings.begin(), // Unlike above, we print wordform tags on all these
                     in_end = cur.input_symbol_strings.end();
                 size_t part = cur.input_parts.size();
                 out.at(depth).clear();
