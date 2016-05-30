@@ -8,20 +8,20 @@ BUILDING THE BINDINGS
 =====================
 
 Building and installation is done using the standard Python module distutils.
-Once you've successfully built HFST library (located in the parent directory,
-if you are compiling from source), use the script setup.py to build the Python
-extension eg. like so:
+Once you've successfully built and installed HFST library (located in the
+parent directory, if you are compiling from source), use the script setup.py
+to build the Python extension eg. like so:
 
     python setup.py build_ext --inplace
 
+If you have only built HFST library but not installed it (or have an earlier
+version of HFST library installed) and want to build the bindings, you either
+have to add full path to ../libhfst/src/.libs to LD_LIBRARY_PATH or hard-code
+the library path by modifying setup.py:
 
-The script setup.py links by default to HFST C++ library which is located in
-folder "../libhfst/src/.libs/". If you have HFST installed and wish to use it
-instead, modify 'extra_link_arguments' as commented in setup.py:
-
-   extra_link_arguments = ["-Wl,-rpath=" + absolute_libhfst_src_path + "/.libs"]
-   # If you wish to use an installed version of HFST C++ library instead, replace the above with:
-   # extra_link_arguments = []
+  extra_link_arguments = []
+  # If you wish to link to the local HFST library, replace the above with:
+  # extra_link_arguments = ["-Wl,-rpath=" + absolute_libhfst_src_path + "/.libs"]
 
 
 =================
@@ -39,6 +39,9 @@ INSTALLING THE BINDINGS
 If you wish to install the extension, run
 
     python setup.py install
+
+The same that was said about linking to HFST C++ library in 'Building the
+bindings' above, applies also to installing.
 
 
 For further information, consult

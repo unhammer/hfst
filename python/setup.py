@@ -10,11 +10,11 @@ from distutils.core import setup, Extension
 libhfst_src_path = '../libhfst/src/'
 absolute_libhfst_src_path = os.path.abspath(libhfst_src_path)
 
-extra_link_arguments = ["-Wl,-rpath=" + absolute_libhfst_src_path + "/.libs"]
-# If you wish to use an installed version of HFST C++ library instead, replace the above with:
-# extra_link_arguments = []
+extra_link_arguments = []
+# If you wish to link to the local HFST library, replace the above with:
+# extra_link_arguments = ["-Wl,-rpath=" + absolute_libhfst_src_path + "/.libs"]
 
-# when making the debian package, replace extra_link_args
+# When making the debian package, replace extra_link_args
 # with ["-L/usr/lib/", "-Wl,-rpath=/usr/lib/"]
 libhfst_module = Extension('_libhfst',
                            language = "c++",
@@ -26,7 +26,7 @@ libhfst_module = Extension('_libhfst',
                            libraries = ["hfst"],
                            extra_link_args = extra_link_arguments
                            )
-# when making the windows package, replace data_files with
+# When making the windows package, replace data_files with
 # ["libhfst-NN.dll", "libgcc_s_seh-1.dll"] or
 # ["libhfst-NN.dll", "libgcc_s_dw2-1.dll"] or
 setup(name = 'libhfst_swig',
