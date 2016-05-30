@@ -426,6 +426,9 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
                 if((*it) < loc_in.input_parts.size()) {
                     in_end = loc_in.input_symbol_strings.begin() + loc_in.input_parts.at((*it));
                 }
+                while(in_beg->find_first_not_of(' ') == std::string::npos) { // ltrim
+                    ++in_beg;
+                }
                 while((in_end-1)->find_first_not_of(' ') == std::string::npos) { // rtrim
                     --in_end;
                 }
@@ -434,7 +437,7 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
                 std::string form = ssform.str();
                 LocationVectorVector locations = container.locate(form, time_cutoff);
                 if(locations.size() != 1) {
-                    outstream << "locations.size() != 1"<<std::endl;
+                    std::cerr << "Backtrack-subform '"<<form<<"' only had split tokenisations, skipping."<<std::endl; // DEBUG
                 }
                 for(LocationVectorVector::const_iterator it = locations.begin();
                     it != locations.end(); ++it) {
@@ -456,6 +459,7 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
                     }
                 }
             }
+            std::reverse(locs_rebuilt.begin(), locs_rebuilt.end());
             size_t depth = 0;
             std::vector<std::ostringstream> out(locs_rebuilt.size());
             LocationVectorVector todo = (LocationVectorVector){locs_rebuilt.at(depth)};
