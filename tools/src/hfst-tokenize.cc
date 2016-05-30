@@ -295,6 +295,9 @@ void print_cg_subreading(std::string const & indent,
     bool want_spc = false;
     for(hfst::StringVector::const_iterator it = out_beg;
         it != out_end; ++it) {
+        if(it->compare("@PMATCH_BACKTRACK@") == 0) {
+            continue;
+        }
         const std::string & tag = as_cg_tag(*it);
         if(in_lemma) {
             if(tag.empty()) {
@@ -392,9 +395,6 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
                             in_beg = loc_it->input_symbol_strings.begin();
                         }
                     }
-                }
-                while(out_beg < out_end && out_beg->compare("@PMATCH_BACKTRACK@") == 0) {
-                    ++out_beg;
                 }
                 print_cg_subreading(indent,
                                     out_beg,
