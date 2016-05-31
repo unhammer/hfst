@@ -232,10 +232,10 @@ class MissingOpenFstInputSymbolTableException(HfstException):
 # 
 # An example:
 # \verbatim
-# hfst.set_default_fst_type(hfst.TROPICAL_OPENFST_TYPE)
+# hfst.set_default_fst_type(hfst.types.TROPICAL_OPENFST_TYPE)
 # tr1 = hfst.regex('foo')
 # tr2 = hfst.regex('bar')
-# tr2.convert(hfst.FOMA_TYPE)
+# tr2.convert(hfst.types.FOMA_TYPE)
 # try:
 #     tr1.disjunct(tr2)
 # except hfst.exceptions.TransducerTypeMismatchException:
@@ -255,7 +255,7 @@ class EmptySetOfContextsException(HfstException):
 ## The type of a transducer is not specified.
 # 
 #    This exception is thrown when an implementation type argument
-#    is ERROR_TYPE.
+#    is hfst.types.ERROR_TYPE.
 class SpecifiedTypeRequiredException(HfstException):
     pass
 

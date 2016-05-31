@@ -166,7 +166,7 @@ enum ImplementationType
   XFSM_TYPE, HFST_OL_TYPE, HFST_OLW_TYPE, HFST2_TYPE,
   UNSPECIFIED_TYPE, ERROR_TYPE };
 
-enum PushType { TO_INITIAL_STATE, TO_FINAL_STATE };
+// enum PushType { TO_INITIAL_STATE, TO_FINAL_STATE };
 
 // *** Some other functions *** //
 
@@ -301,7 +301,9 @@ public:
   void substitute_symbols(const hfst::HfstSymbolSubstitutions &substitutions) { self->substitute_symbols(substitutions); } // alias for the previous function which is shadowed
   void substitute_symbol_pairs(const hfst::HfstSymbolPairSubstitutions &substitutions) { self->substitute_symbol_pairs(substitutions); } // alias for the previous function which is shadowed
   void set_final_weights(float weight, bool increment=false) { self->set_final_weights(weight, increment); };
-  void push_weights(hfst::PushType type) { self->push_weights(type); };
+
+  void push_weights_to_start() { self->push_weights(hfst::TO_INITIAL_STATE); };
+  void push_weights_to_end() { self->push_weights(hfst::TO_FINAL_STATE); };
 
   // And some aliases:
   // 'union' is a reserved word in python, so it cannot be used as an alias for function 'disjunct' 

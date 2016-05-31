@@ -4,7 +4,7 @@ import os.path
 assert os.path.isfile('streets.txt')
 
 # pmatch transducers are always in ol format, so this has actually no effect...
-for type in [hfst.SFST_TYPE, hfst.TROPICAL_OPENFST_TYPE, hfst.FOMA_TYPE]:
+for type in [hfst.types.SFST_TYPE, hfst.types.TROPICAL_OPENFST_TYPE, hfst.types.FOMA_TYPE]:
     if hfst.HfstTransducer.is_implementation_type_available(type):
         print(hfst.fst_type_to_string(type))
         hfst.set_default_fst_type(type)
