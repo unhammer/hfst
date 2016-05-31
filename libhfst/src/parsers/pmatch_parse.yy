@@ -504,6 +504,7 @@ SYMBOL {
         $$ = new PmatchEmpty;
     } else {
         $$ = new PmatchSymbol(sym);
+        used_definitions.insert(sym);
     }
 };
 
