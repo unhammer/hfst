@@ -98,7 +98,7 @@ UNICODE_ESCAPE ("\\u"{HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR})|("\\U00"{HEXCHAR}{HEX
 "Interpolate(" { return INTERPOLATE_LEFT; }
 "Sigma(" { return SIGMA_LEFT; }
 "Counter(" { return COUNTER_LEFT; }
-"Define(" { return DEFINE_LEFT; }
+[Dd]"efine(" { return DEFINE_LEFT; }
 "DefIns" { return DEFINS; }
 
 "Alpha" { return ALPHA; }
