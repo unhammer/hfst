@@ -837,13 +837,14 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
         begins_and_ends_with_non_whitespace.compose(*(retval["TOP"]));
         HfstTransducer empty(format);
         if (begins_and_ends_with_non_whitespace.compare(empty) == false) {
-            HfstTransducer whitespace_context(*(get_utils()->latin1_whitespace_acceptor));
-            whitespace_context.disjunct(HfstTransducer("@BOUNDARY@", format));
+            HfstTransducer whitespace_punct_context(*(get_utils()->latin1_whitespace_acceptor));
+            whitespace_punct_context.disjunct(*(get_utils()->latin1_punct_acceptor));
+            whitespace_punct_context.disjunct(HfstTransducer("@BOUNDARY@", format));
             HfstTransducer * top_with_boundaries = new HfstTransducer(hfst::internal_epsilon, LC_ENTRY_SYMBOL, format);
-            top_with_boundaries->concatenate(whitespace_context);
+            top_with_boundaries->concatenate(whitespace_punct_context);
             top_with_boundaries->concatenate(HfstTransducer(hfst::internal_epsilon, LC_EXIT_SYMBOL, format));
             HfstTransducer RC(hfst::internal_epsilon, RC_ENTRY_SYMBOL, format);
-            RC.concatenate(whitespace_context);
+            RC.concatenate(whitespace_punct_context);
             RC.concatenate(HfstTransducer(hfst::internal_epsilon, RC_EXIT_SYMBOL, format));
             top_with_boundaries->concatenate(*(retval["TOP"]));
             top_with_boundaries->concatenate(RC);
