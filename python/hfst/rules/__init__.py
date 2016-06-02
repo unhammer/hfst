@@ -1,3 +1,7 @@
+"""
+functions for creating transducers implementing two-level rules
+"""
+
 from libhfst import two_level_if, \
 two_level_only_if, \
 two_level_if_and_only_if, \

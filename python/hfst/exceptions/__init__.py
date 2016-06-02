@@ -1,3 +1,7 @@
+"""
+class HfstException and its subclasses
+"""
+
 from libhfst import HfstException,\
 HfstTransducerTypeMismatchException,\
 ImplementationTypeNotAvailableException,\
