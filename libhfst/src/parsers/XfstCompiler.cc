@@ -688,13 +688,21 @@ namespace xfst {
             t->lookup_fd(lookup_path, results, &cutoff, &max_weight);
           }
 
-        HfstOneLevelPaths paths = extract_output_paths(results);
+        bool printed = false; // if anything was printed
 
-        bool printed = this->print_paths(paths);
+        if (variables_["print-pairs"] == "OFF")
+          {
+            HfstOneLevelPaths paths = extract_output_paths(results);
+            printed = this->print_paths(paths);
+          }
+        else
+          {
+            printed = this->print_paths(results);
+          }
+
         if (!printed)
           {
             output() << "???" << std::endl;
-            //hfst_fprintf(outstream_, "???\n");
           }
 
         flush(&output());
