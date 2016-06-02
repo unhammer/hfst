@@ -558,7 +558,6 @@ is_valid_flag_diacritic_path(StringVector arcs)
   }
 
 
-
 int
 lookup_printf(const char* format, const HfstOneLevelPath* input,
               const HfstOneLevelPath* result, const char* markup,
@@ -1204,6 +1203,7 @@ bool is_possible_to_get_result(const HfstOneLevelPath & s,
 // which transducer in the cascade we are handling
 static unsigned int transducer_number=0;
 
+
 void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results, 
                          const HfstOneLevelPath& s, ssize_t limit = -1)
 {
@@ -1226,37 +1226,51 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
       print_lookup_string(s.second);
       fprintf(outfile, "\n");
     }
-    else {  // HERE!!!
+    else {
       float lowest_weight = -1;
       /* For all result strings, */
       for (HfstTwoLevelPaths::const_iterator it
              = results_spv.begin(); it != results_spv.end(); it++) {
 
-        if (it == results_spv.begin())
-          lowest_weight = it->first;
-        if (beam < 0 || it->first <= (lowest_weight + beam))
-          {        
-            /* print the lookup string */
-            print_lookup_string(s.second);
-            fprintf(outfile, "\t");
-            
-            /* and the path that yielded the result string */
-            bool first_pair=true;
-            for (StringPairVector::const_iterator IT = it->second.begin();
-                 IT != it->second.end(); IT++) {
-              if (print_space && ! first_pair) {
-                fprintf(outfile, " ");
-              }
-              first_pair=false;
-              fprintf(outfile, "%s:%s", 
-                      get_print_format(IT->first).c_str(), 
-                      get_print_format(IT->second).c_str());
-            }
-            /* and the weight of that path. */
-            fprintf(outfile, "\t%f\n", it->first);
+        // Extract output side for testing if it is a valid flag diacritic path
+        StringVector sv;
+        for (StringPairVector::const_iterator spv_it = it->second.begin();
+             spv_it != it->second.end(); spv_it++)
+          {
+            sv.push_back(spv_it->second);
           }
+
+        if (is_valid_flag_diacritic_path(sv) || !obey_flags)
+        {
+          if (it == results_spv.begin())
+            lowest_weight = it->first;
+          if (beam < 0 || it->first <= (lowest_weight + beam))
+            {
+              /* print the lookup string */
+              print_lookup_string(s.second);
+              fprintf(outfile, "\t");
+              /* and the path that yielded the result string */
+              bool first_pair=true;
+              for (StringPairVector::const_iterator IT = it->second.begin();
+                   IT != it->second.end(); IT++) {
+                if (show_flags || ! FdOperation::is_diacritic(IT->second))
+                  {
+                    if (print_space && ! first_pair) {
+                      fprintf(outfile, " ");
+                    }
+                    fprintf(outfile, "%s:%s", 
+                            get_print_format(IT->first).c_str(),
+                            get_print_format(IT->second).c_str());
+                    first_pair=false;
+                  }
+              }
+              /* and the weight of that path. */
+              fprintf(outfile, "\t%f\n", it->first);
+            }
+        }
+
       }
-    fprintf(outfile, "\n");
+      fprintf(outfile, "\n");
     }
     fflush(outfile);
   }
@@ -1297,6 +1311,7 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
     }
   results = filtered;
 }
+
 
 
 HfstOneLevelPaths*
@@ -1395,7 +1410,7 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstBasicTransducer> cascade,
 }
 
 
-// HERE!!! limits kvs with beam
+// limits kvs with beam
 void
 print_lookups(const HfstOneLevelPaths& kvs,
               const HfstOneLevelPath& kv, char* markup,
@@ -1481,6 +1496,7 @@ perform_lookups(HfstOneLevelPath& origin, std::vector<HfstTransducer>& cascade,
       }
     return kvs;
 }
+
 
 HfstOneLevelPaths*
 perform_lookups(HfstOneLevelPath& origin, std::vector<HfstBasicTransducer>& cascade, 
