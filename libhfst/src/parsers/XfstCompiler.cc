@@ -3490,9 +3490,13 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::print_net(std::ostream * oss_)
     {
-      std::ostream * oss = get_stream(oss_);
+      if (variables_["print-sigma"] == "ON")
+        {
+          this->print_sigma(oss_, false /*do not prompt*/);
+        }
       GET_TOP(tmp);
       HfstBasicTransducer basic(*tmp);
+      std::ostream * oss = get_stream(oss_);
       basic.write_in_xfst_format(*oss, variables_["print-weight"] == "ON");
       flush(oss);
       PROMPT_AND_RETURN_THIS;
@@ -3500,7 +3504,6 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::print_net(const char* name, std::ostream * oss_)
     {
-      std::ostream * oss = get_stream(oss_);
       //hfst_fprintf(outfile, "missing print net %s:%d\n", __FILE__, __LINE__);
       std::map<std::string,hfst::HfstTransducer*>::const_iterator it =
         definitions_.find(name);
@@ -3513,11 +3516,18 @@ namespace xfst {
         }
       else
         {
+          if (variables_["print-sigma"] == "ON")
+            {
+              stack_.push(it->second);
+              this->print_sigma(oss_, false /*do not prompt*/);
+              stack_.pop();
+            }
           HfstBasicTransducer basic(*(it->second));
+          std::ostream * oss = get_stream(oss_);
           basic.write_in_xfst_format(*oss, variables_["print-weight"] == "ON");
+          flush(oss);
+          PROMPT_AND_RETURN_THIS;
         }
-      flush(oss);
-      PROMPT_AND_RETURN_THIS;
     }
 
   static bool is_special_symbol(const std::string &s)
