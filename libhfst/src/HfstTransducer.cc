@@ -549,7 +549,7 @@ HfstTransducer * HfstTransducer::harmonize_(const HfstTransducer &another)
     In the case of foma transducers, does nothing because foma's own functions
     take care of harmonizing. If harmonization is needed, 
     FomaTransducer::harmonize can be used instead. */
-void HfstTransducer::harmonize(HfstTransducer &another)
+  void HfstTransducer::harmonize(HfstTransducer &another, bool force/*=false*/)
 {
   using namespace implementations;
     if (this->type != another.type) {
@@ -588,7 +588,8 @@ void HfstTransducer::harmonize(HfstTransducer &another)
 #if HAVE_FOMA
     case (FOMA_TYPE):
         // no need to harmonize as foma's functions take care of harmonizing
-        break;
+      if (!force)
+        return;
 #endif // HAVE_FOMA
 #if HAVE_XFSM
     case (XFSM_TYPE):
@@ -617,12 +618,6 @@ void HfstTransducer::harmonize(HfstTransducer &another)
     default:
         HFST_THROW(TransducerHasWrongTypeException);
     }
-
-    if (false)
-      {
-    this->write_in_att_format(stderr);
-    another.write_in_att_format(stderr);
-      }
 }
 
 // test function
