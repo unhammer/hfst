@@ -833,6 +833,8 @@ REGEXP6: REGEXP7 { }
 
 REGEXP7: REGEXP8 { }
        | REGEXP7 IGNORING REGEXP8 {
+            // this is how ignoring is done in foma and xfst
+            $1->harmonize(*$3, true /*force harmonization also for foma type*/);
             $$ = & $1->insert_freely(*$3, false); // no harmonization
             delete $3;
         }
