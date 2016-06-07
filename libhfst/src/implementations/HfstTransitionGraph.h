@@ -26,6 +26,7 @@
  #include "../HfstDataTypes.h"
  #include "../HarmonizeUnknownAndIdentitySymbols.h"
  #include "../HfstFlagDiacritics.h"
+ #include "../HfstLookupFlagDiacritics.h"
  #include "../HfstEpsilonHandler.h"
  #include "ConvertTransducerFormat.h"
  #include "HfstTransition.h"
@@ -3725,16 +3726,29 @@
          HFSTDLL static void push_back_to_two_level_path
            (HfstTwoLevelPath &path,
             const StringPair &sp,
-            const float &weight)
+            const float &weight,
+            StringVector * fds_so_far = NULL)
          {
            path.second.push_back(sp);
            path.first = path.first + weight;
+           if (fds_so_far != NULL)
+             {
+               if (FdOperation::is_diacritic(sp.first))
+                 { fds_so_far->push_back(sp.first); }
+             }
          }
          
          HFSTDLL static void pop_back_from_two_level_path
            (HfstTwoLevelPath &path,
-            const float &weight)
+            const float &weight,
+            StringVector * fds_so_far = NULL)
          {
+           if (fds_so_far != NULL)
+             {
+               StringPair sp = path.second.back();
+               if (FdOperation::is_diacritic(sp.first))
+                 { fds_so_far->pop_back(); }
+             }
            path.second.pop_back();
            path.first = path.first - weight;
          }
@@ -3767,7 +3781,8 @@
             const StringVector &lookup_path,
             const unsigned int &lookup_index,
             const StringSet &alphabet,
-            bool &input_symbol_consumed)
+            bool &input_symbol_consumed,
+            StringVector * fds_so_far = NULL)
          {
            std::string isymbol = transition.get_input_symbol();
            
@@ -3793,11 +3808,27 @@
            // Whether there are more symbols in lookup_path or not,
            // we can always go further if the input symbol of the transition
            // is an epsilon or a flag diacritic.
-           if ( is_epsilon(isymbol) || 
-                FdOperation::is_diacritic(isymbol) )
+           if ( is_epsilon(isymbol) )
              {
                input_symbol_consumed=false;
                return true;
+             }
+           if ( FdOperation::is_diacritic(isymbol) )
+             {
+               if (fds_so_far == NULL)
+                 {
+                   input_symbol_consumed=false;
+                   return true;
+                 }
+               else
+                 {
+                   FlagDiacriticTable FdT;
+                   if (FdT.is_valid_string(*fds_so_far))
+                     {
+                       input_symbol_consumed=false;
+                       return true;
+                     }
+                 }
              }
            
            // No matches.
@@ -3813,7 +3844,8 @@
             StringSet &alphabet,
             HfstEpsilonHandler Eh,
             size_t infinite_cutoff,
-            float * max_weight = NULL)
+            float * max_weight = NULL,
+            StringVector * fds_so_far = NULL)
          {
            // Check whether the number of input epsilon cycles is exceeded
            if (! Eh.can_continue(state)) {
@@ -3847,7 +3879,7 @@
                bool input_symbol_consumed=false;
                if ( is_possible_transition
                     (*it, lookup_path, lookup_index, alphabet, 
-                     input_symbol_consumed) )
+                     input_symbol_consumed, fds_so_far) )
                  {
                    // update path_so_far and lookup_index
                    std::string istr;
@@ -3875,8 +3907,8 @@
                    push_back_to_two_level_path
                      (path_so_far,
                       StringPair(istr, ostr),
-                      it->get_weight());
-                                      
+                      it->get_weight(), fds_so_far);
+
                    HfstEpsilonHandler * Ehp = NULL;
                    if (input_symbol_consumed) {
                      lookup_index++;
@@ -3889,7 +3921,7 @@
                    
                    // call lookup for the target state of the transition
                    lookup_fd(lookup_path, results, it->get_target_state(),
-                             lookup_index, path_so_far, alphabet, *Ehp, infinite_cutoff, max_weight);
+                             lookup_index, path_so_far, alphabet, *Ehp, infinite_cutoff, max_weight, fds_so_far);
                    
                    // return to the original values of path_so_far 
                    // and lookup_index
@@ -3902,7 +3934,7 @@
                      // of Eh is automatically called next
                    }
                    
-                   pop_back_from_two_level_path(path_so_far, it->get_weight());
+                   pop_back_from_two_level_path(path_so_far, it->get_weight(), fds_so_far);
                  }
              }
            
@@ -3912,24 +3944,30 @@
            (const StringVector &lookup_path,
             HfstTwoLevelPaths &results,
             size_t * infinite_cutoff = NULL,
-            float * max_weight = NULL)
+            float * max_weight = NULL,
+            bool obey_flags = false)
          {
            HfstState state = 0;
            unsigned int lookup_index = 0;
            HfstTwoLevelPath path_so_far;
            StringSet alphabet = this->get_alphabet();
+           StringVector * fds_so_far = (obey_flags)? new StringVector() : NULL;
+
            if (infinite_cutoff != NULL)
              {
                HfstEpsilonHandler Eh(*infinite_cutoff);
                lookup_fd(lookup_path, results, state, lookup_index, path_so_far, 
-                     alphabet, Eh, *infinite_cutoff, max_weight);
+                         alphabet, Eh, *infinite_cutoff, max_weight, fds_so_far);
              }
            else
              {
                HfstEpsilonHandler Eh(100000);
                lookup_fd(lookup_path, results, state, lookup_index, path_so_far, 
-                     alphabet, Eh, 100000, max_weight);
+                         alphabet, Eh, 100000, max_weight, fds_so_far);
              }
+           
+           if (fds_so_far != NULL)
+             delete fds_so_far;
          }
 
 
