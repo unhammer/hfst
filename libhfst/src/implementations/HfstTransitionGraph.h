@@ -3626,11 +3626,28 @@
            return false;
          }
 
+         bool is_possible_flag(std::string symbol, StringVector & fds)
+         {
+           if (FdOperation::is_diacritic(symbol))
+             {
+               FlagDiacriticTable FdT;
+               fds.push_back(symbol);
+               if (FdT.is_valid_string(fds))
+                 { return true; }
+               else
+                 { 
+                   fds.pop_back();
+                   return false;
+                 }
+             }
+           return false;
+         }
+
          HFSTDLL bool is_lookup_infinitely_ambiguous
            (const HfstOneLevelPath& s,
             unsigned int& index, HfstState state,
-            std::set<HfstState> &epsilon_path_states
-            )
+            std::set<HfstState> &epsilon_path_states,
+            StringVector & fds)
          {
            // Whether the end of the lookup path s has been reached                    
            bool only_epsilons=false;
@@ -3650,9 +3667,10 @@
                //         so they can be added freely.                                 
                // (Diacritics are also treated as epsilons, although it might cause false                                                   
                //  positive results, because loops with diacritics can be invalidated by                                                    
-               //  other diacritics.)                                                  
+               //  other diacritics.)
+               bool possible_flag = is_possible_flag(it->get_input_symbol(), fds);
                if ( is_epsilon(it->get_input_symbol()) ||
-                    FdOperation::is_diacritic(it->get_input_symbol()) )
+                    possible_flag )
                  {
                    epsilon_path_states.insert(state);
                    if (epsilon_path_states.find(it->get_target_state())
@@ -3661,11 +3679,13 @@
                        return true;
                      }
                    if (is_lookup_infinitely_ambiguous
-                       (s, index, it->get_target_state(), epsilon_path_states))
+                       (s, index, it->get_target_state(), epsilon_path_states, fds))
                      {
                        return true;
                      }
                    epsilon_path_states.erase(state);
+                   if (possible_flag)
+                     { fds.pop_back(); }
                  }
                
                /* CASE 2: Other input symbols consume a symbol in the lookup path s,   
@@ -3689,7 +3709,7 @@
                        index++; // consume an input symbol in the lookup path s            
                        std::set<HfstState> empty_set;
                        if (is_lookup_infinitely_ambiguous
-                           (s, index, it->get_target_state(), empty_set))
+                           (s, index, it->get_target_state(), empty_set, fds))
                          {
                            return true;
                          }
@@ -3705,9 +3725,10 @@
            std::set<HfstState> epsilon_path_states;
            epsilon_path_states.insert(0);
            unsigned int index=0;
+           StringVector fds;
 
            return is_lookup_infinitely_ambiguous(s, index, INITIAL_STATE,
-                                                 epsilon_path_states);
+                                                 epsilon_path_states, fds);
          }
 
          HFSTDLL bool is_lookup_infinitely_ambiguous(const StringVector & s)
@@ -3716,9 +3737,10 @@
            epsilon_path_states.insert(0);
            unsigned int index=0;
            HfstOneLevelPath path((float)0, s);
+           StringVector fds;
 
            return is_lookup_infinitely_ambiguous(path, index, INITIAL_STATE,
-                                                 epsilon_path_states);
+                                                 epsilon_path_states, fds);
          }
 
 
@@ -3823,7 +3845,10 @@
                else
                  {
                    FlagDiacriticTable FdT;
-                   if (FdT.is_valid_string(*fds_so_far))
+                   fds_so_far->push_back(isymbol);
+                   bool valid = FdT.is_valid_string(*fds_so_far);
+                   fds_so_far->pop_back();
+                   if (valid)
                      {
                        input_symbol_consumed=false;
                        return true;
