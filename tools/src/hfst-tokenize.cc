@@ -349,7 +349,7 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
     }
     else {
         typedef hfst::StringVector::const_iterator PartIt;
-        std::map<LocationVector::const_iterator, std::set<size_t> > backtrack;
+        std::set<std::deque<PartIt> > backtrack;
         for (LocationVector::const_iterator loc_it = locations.begin();
              loc_it != locations.end(); ++loc_it) {
             if(loc_it->output.empty()) {
@@ -362,12 +362,13 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
                 in_beg = loc_it->input_symbol_strings.end(), // beg=end: don't print input unless we have to
                 in_end = loc_it->input_symbol_strings.end();
             size_t part = loc_it->input_parts.size();
+            std::deque<PartIt> bt_its;
             while(true) {
                 std::string inpart;
                 bool sub_found = false;
                 size_t out_part = part > 0 ? loc_it->output_parts.at(part-1) : 0;
                 while(out_part > 0 && loc_it->output_symbol_strings.at(out_part-1) == "@PMATCH_BACKTRACK@") {
-                    backtrack[loc_it].insert(part);
+                    bt_its.push_front(in_end);
                     --part;
                     out_part = part > 0 ? loc_it->output_parts.at(part-1) : 0;
                 }
@@ -416,25 +417,25 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
                     }
                 }
             }
-            if(backtrack.find(loc_it) != backtrack.end() && !backtrack[loc_it].empty()) {
-                backtrack[loc_it].insert(1);
+            if(!bt_its.empty()) {
+                bt_its.push_front(loc_it->input_symbol_strings.begin());
+                backtrack.insert(bt_its);
+                bt_its.push_back(loc_it->input_symbol_strings.end());
             }
         }
         if(!backtrack.empty()) {
-            LocationVectorVector locs_rebuilt = LocationVectorVector(backtrack.size());
-            for(std::map<LocationVector::const_iterator, std::set<size_t> >::const_iterator lp_it = backtrack.begin();
+            if(backtrack.size() > 1) {
+                std::cerr << "Warning: Competing backtracking split-points not handled correctly yet"<<std::endl;
+                // TODO: multiple locs_rebuilt
+            }
+            LocationVectorVector locs_rebuilt = LocationVectorVector(1);
+            for(std::set<std::deque<PartIt> >::const_iterator lp_it = backtrack.begin();
                 lp_it != backtrack.end(); ++lp_it) {
-                LocationVector::const_iterator loc_in = lp_it->first;
+                locs_rebuilt.resize(std::max(locs_rebuilt.size(), lp_it->size()-1));
                 size_t i_b = 0;
-                for(std::set<size_t>::const_iterator part = lp_it->second.begin();
-                    part != lp_it->second.end(); ++part, ++i_b) {
-                    std::cerr << "from print_nonmatching_sequence\n";
-                    hfst::StringVector::const_iterator
-                        in_beg = loc_in->input_symbol_strings.begin() + loc_in->input_parts.at((*part)-1),
-                        in_end = loc_in->input_symbol_strings.end();
-                    if((*part) < loc_in->input_parts.size()) {
-                        in_end = loc_in->input_symbol_strings.begin() + loc_in->input_parts.at((*part));
-                    }
+                for(std::deque<PartIt>::const_iterator in_it = lp_it->begin();
+                    1 + in_it < lp_it->end(); ++in_it) {
+                    PartIt in_beg = *in_it, in_end = *(in_it+1);
                     while(in_beg->find_first_not_of(' ') == std::string::npos) { // ltrim
                         ++in_beg;
                     }
