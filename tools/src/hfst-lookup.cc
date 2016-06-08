@@ -259,7 +259,7 @@ print_usage()
             "                                   the best analysis\n"
             "  -t, --time-cutoff=S              Limit search after having used S seconds per input\n"
             "                                   (currently only works in optimized-lookup mode\n"
-            "  -C, --cascade=CASCADE            How multiple transducers in input are handled (todo)\n"
+            "  -C, --cascade=CASCADE            How multiple transducers in input are handled\n"
             "  -P, --progress                   Show neat progress bar if possible\n");
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
@@ -474,11 +474,11 @@ parse_options(int argc, char** argv)
 
         case 'C':
             if (strcmp(optarg, "union") == 0)
-              cascade_ = CASCADE_UNION;
+              { cascade_ = CASCADE_UNION; }
             else if (strcmp(optarg, "priority-union") == 0)
-              { cascade_ = CASCADE_PRIORITY_UNION; error(EXIT_FAILURE, 0, "--cascade=priority-union not yet implemented"); }
+              { cascade_ = CASCADE_PRIORITY_UNION; }
             else if (strcmp(optarg, "composition") == 0)
-              { cascade_ = CASCADE_COMPOSITION; error(EXIT_FAILURE, 0, "--cascade=composition not yet implemented"); }
+              { cascade_ = CASCADE_COMPOSITION; }
             else
               { error(EXIT_FAILURE, 0, "--cascade argument %s unrecognised, possible values are\n"
                       "{ union, priority-union, composition }", optarg); }
@@ -1225,7 +1225,8 @@ static unsigned int transducer_number=0;
 
 
 void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results, 
-                         const HfstOneLevelPath& s, ssize_t limit = -1)
+                         const HfstOneLevelPath& s, ssize_t limit = -1, bool print_pairs_at_this_point = false,
+                         bool print_fail = false)
 {
   (void)limit; // FIX ???
 
@@ -1241,12 +1242,15 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
         obey_flags);
     }
 
-  if (print_pairs) {
+  if (print_pairs_at_this_point && print_pairs) {
     
     /* No results, print just the lookup string. */
     if (results_spv.size() == 0) {
-      print_lookup_string(s.second);
-      fprintf(outfile, "\n");
+      if (print_fail)
+        {
+          print_lookup_string(s.second);
+          fprintf(outfile, "\n");
+        }
     }
     else {
       float lowest_weight = -1;
@@ -1286,8 +1290,8 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
                     first_pair=false;
                   }
               }
-              /* and the weight of that path. */
-              fprintf(outfile, "\t%f\n", it->first);
+              /* and the weight of that path (add the weight of input). */
+              fprintf(outfile, "\t%f\n", it->first + s.first);
             }
         }
 
@@ -1337,7 +1341,7 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
 
 
 HfstOneLevelPaths*
-lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity)
+lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity, bool print_pairs_at_this_point=false, bool print_fail=false)
 {
   HfstOneLevelPaths* results = new HfstOneLevelPaths;
 
@@ -1351,12 +1355,12 @@ lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity)
     warning(0, 0, "Got infinite results, number of cycles limited to " SIZE_T_SPECIFIER "",
         infinite_cutoff);
       }
-      lookup_fd_and_print(t, *results, s, infinite_cutoff);
+      lookup_fd_and_print(t, *results, s, infinite_cutoff, print_pairs_at_this_point, print_fail);
       *infinity = true;
     }
   else
     {
-        lookup_fd_and_print(t, *results, s);
+      lookup_fd_and_print(t, *results, s, -1, print_pairs_at_this_point, print_fail);
     }
 
   if (results->size() == 0)
@@ -1410,7 +1414,33 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstBasicTransducer> cascade,
   for (unsigned int i = 0; i < cascade.size(); i++)
     {
       transducer_number=i; // needed for lookup_simple
-      HfstOneLevelPaths* result = lookup_simple(s, cascade[i], infinity);
+
+      HfstOneLevelPaths* result = NULL;
+      if ((cascade_ == CASCADE_COMPOSITION) && (i != 0))
+        {
+          result = new HfstOneLevelPaths;
+          // use previous value of 'results' as input to composition
+          for (HfstOneLevelPaths::const_iterator it = results->begin();
+               it != results->end(); it++)
+            {
+              HfstOneLevelPaths * one_result = lookup_simple(*it, cascade[i], infinity);
+              for (HfstOneLevelPaths::const_iterator IT = one_result->begin();
+                   IT != one_result->end(); IT++)
+                {
+                  // add the weights
+                  result->insert(HfstOneLevelPath(IT->first + it->first, IT->second));
+                }
+              delete one_result;
+            }
+          // zero 'results'
+          delete results;
+          results = new HfstOneLevelPaths();
+        }
+      else
+        {
+          result = lookup_simple(s, cascade[i], infinity, true, false);
+        }
+
       if (infinity)
         {
           verbose_printf("Inf results @ level %u\n", i);
@@ -1423,24 +1453,15 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstBasicTransducer> cascade,
       for (HfstOneLevelPaths::const_iterator it = result->begin();
            it != result->end(); it++)
         {
-          if (cascade_ == CASCADE_UNION)
-            { 
-              results->insert(*it); 
-            }
-          else if (cascade_ == CASCADE_PRIORITY_UNION)
-            {
-              ;
-            }
-          else if (cascade_ == CASCADE_COMPOSITION)
-            {
-              ;
-            }
-          else
-            {
-              error(EXIT_FAILURE, 0, "unknown value for variable cascade");
-            }
+          results->insert(*it); 
         }
       delete result;
+
+      if ( (cascade_ == CASCADE_PRIORITY_UNION) && (results->size() != 0) )
+        {
+          verbose_printf("results found @ level %u, skipping rest of transducers (--cascade=priority-union)\n", i);
+          break;
+        }
     }
   // all transducers gone through
 
@@ -1545,7 +1566,7 @@ perform_lookups(HfstOneLevelPath& origin, std::vector<HfstBasicTransducer>& casc
       {
         if (cascade.size() == 1)
           {
-            kvs = lookup_simple(origin, cascade[0], infinite);
+            kvs = lookup_simple(origin, cascade[0], infinite, true, true);
           }
         else
          {
@@ -1633,6 +1654,18 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
       }
 
     inputstream.close();
+
+    if (print_pairs && (cascade_ == CASCADE_COMPOSITION)) {
+      error(EXIT_FAILURE, 0, "pair printing not supported if "
+              "--cascade=composition is requested");
+    }
+
+    if ((cascade_ == CASCADE_COMPOSITION || cascade_ == CASCADE_PRIORITY_UNION) && 
+        (inputstream.get_type() == HFST_OL_TYPE || 
+         inputstream.get_type() == HFST_OLW_TYPE) ) {
+      error(EXIT_FAILURE, 0, "option --cascade not supported on "
+              "optimized lookup transducers");
+    }
 
     if (print_pairs && 
         (inputstream.get_type() == HFST_OL_TYPE || 
