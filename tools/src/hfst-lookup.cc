@@ -1605,6 +1605,13 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
               "optimized lookup transducers");
     }
 
+    if ((!obey_flags) &&
+        (inputstream.get_type() == HFST_OL_TYPE ||
+         inputstream.get_type() == HFST_OLW_TYPE) ) {
+      error(EXIT_FAILURE, 0, "not obeying flags not supported on "
+              "optimized lookup transducers");
+    }
+
     // if transducer type is other than optimized_lookup,
     // convert to HfstBasicTransducer
 
