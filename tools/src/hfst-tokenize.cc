@@ -348,14 +348,15 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
         outstream << "\t\"" << locations.at(0).input << "\" ?" << std::endl;
     }
     else {
-        std::set<size_t> backtrack;
+        typedef hfst::StringVector::const_iterator PartIt;
+        std::map<LocationVector::const_iterator, std::set<size_t> > backtrack;
         for (LocationVector::const_iterator loc_it = locations.begin();
              loc_it != locations.end(); ++loc_it) {
             if(loc_it->output.empty()) {
                 continue;
             }
             std::string indent = "\t";
-            hfst::StringVector::const_iterator
+            PartIt
                 out_beg = loc_it->output_symbol_strings.begin(),
                 out_end = loc_it->output_symbol_strings.end(),
                 in_beg = loc_it->input_symbol_strings.end(), // beg=end: don't print input unless we have to
@@ -366,11 +367,11 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
                 bool sub_found = false;
                 size_t out_part = part > 0 ? loc_it->output_parts.at(part-1) : 0;
                 while(out_part > 0 && loc_it->output_symbol_strings.at(out_part-1) == "@PMATCH_BACKTRACK@") {
-                    backtrack.insert(part);
+                    backtrack[loc_it].insert(part);
                     --part;
                     out_part = part > 0 ? loc_it->output_parts.at(part-1) : 0;
                 }
-                for(hfst::StringVector::const_iterator it = out_end-1;
+                for(PartIt it = out_end-1;
                     it > loc_it->output_symbol_strings.begin() + out_part;
                     --it) {
                     if(subreading_separator.compare(*it) == 0) {
@@ -415,49 +416,55 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
                     }
                 }
             }
+            if(backtrack.find(loc_it) != backtrack.end() && !backtrack[loc_it].empty()) {
+                backtrack[loc_it].insert(1);
+            }
         }
         if(!backtrack.empty()) {
-            backtrack.insert(1);
-            Location loc_in = locations.at(0);
             LocationVectorVector locs_rebuilt = LocationVectorVector(backtrack.size());
-            size_t i_b = 0;
-            for(std::set<size_t>::const_iterator it = backtrack.begin();
-                it != backtrack.end(); ++it, ++i_b) {
-                hfst::StringVector::const_iterator
-                    in_beg = loc_in.input_symbol_strings.begin() + loc_in.input_parts.at((*it)-1),
-                    in_end = loc_in.input_symbol_strings.end();
-                if((*it) < loc_in.input_parts.size()) {
-                    in_end = loc_in.input_symbol_strings.begin() + loc_in.input_parts.at((*it));
-                }
-                while(in_beg->find_first_not_of(' ') == std::string::npos) { // ltrim
-                    ++in_beg;
-                }
-                while((in_end-1)->find_first_not_of(' ') == std::string::npos) { // rtrim
-                    --in_end;
-                }
-                std::ostringstream ssform;
-                std::copy(in_beg, in_end, std::ostream_iterator<std::string>(ssform, ""));
-                std::string form = ssform.str();
-                LocationVectorVector bt_locs = container.locate(form, time_cutoff);
-                if(bt_locs.size() != 1) {
-                    std::cerr << "Backtrack-subform '"<<form<<"' only had split tokenisations, skipping."<<std::endl; // DEBUG
-                }
-                for(LocationVectorVector::const_iterator bt_it = bt_locs.begin();
-                    bt_it != bt_locs.end(); ++bt_it) {
-                    if (bt_it->empty()
-                        || (bt_it->size() == 1 && bt_it->at(0).output.compare("@_NONMATCHING_@") == 0)
-                        // keep only those that cover the full form
-                        || bt_it->at(0).input.length() != form.length()) {
-                        continue;
+            for(std::map<LocationVector::const_iterator, std::set<size_t> >::const_iterator lp_it = backtrack.begin();
+                lp_it != backtrack.end(); ++lp_it) {
+                LocationVector::const_iterator loc_in = lp_it->first;
+                size_t i_b = 0;
+                for(std::set<size_t>::const_iterator part = lp_it->second.begin();
+                    part != lp_it->second.end(); ++part, ++i_b) {
+                    std::cerr << "from print_nonmatching_sequence\n";
+                    hfst::StringVector::const_iterator
+                        in_beg = loc_in->input_symbol_strings.begin() + loc_in->input_parts.at((*part)-1),
+                        in_end = loc_in->input_symbol_strings.end();
+                    if((*part) < loc_in->input_parts.size()) {
+                        in_end = loc_in->input_symbol_strings.begin() + loc_in->input_parts.at((*part));
                     }
-                    LocationVector loc = keep_n_best_weight(max_weight_classes, *bt_it);
-                    for (LocationVector::const_iterator loc_it = loc.begin();
-                         loc_it != loc.end(); ++loc_it) {
-                        if(!loc_it->output.empty()
-                            &&
-                           // TODO: why aren't the <W:inf> excluded earlier?
-                           loc_it->weight < std::numeric_limits<float>::max()) {
-                            locs_rebuilt.at(i_b).push_back(*loc_it);
+                    while(in_beg->find_first_not_of(' ') == std::string::npos) { // ltrim
+                        ++in_beg;
+                    }
+                    while((in_end-1)->find_first_not_of(' ') == std::string::npos) { // rtrim
+                        --in_end;
+                    }
+                    std::ostringstream ssform;
+                    std::copy(in_beg, in_end, std::ostream_iterator<std::string>(ssform, ""));
+                    std::string form = ssform.str();
+                    LocationVectorVector bt_locs = container.locate(form, time_cutoff);
+                    if(bt_locs.size() != 1) {
+                        std::cerr << "Backtrack-subform '"<<form<<"' only had split tokenisations, skipping."<<std::endl; // DEBUG
+                    }
+                    for(LocationVectorVector::const_iterator bt_it = bt_locs.begin();
+                        bt_it != bt_locs.end(); ++bt_it) {
+                        if (bt_it->empty()
+                            || (bt_it->size() == 1 && bt_it->at(0).output.compare("@_NONMATCHING_@") == 0)
+                            // keep only those that cover the full form
+                            || bt_it->at(0).input.length() != form.length()) {
+                            continue;
+                        }
+                        LocationVector loc = keep_n_best_weight(max_weight_classes, *bt_it);
+                        for (LocationVector::const_iterator btloc_it = loc.begin();
+                             btloc_it != loc.end(); ++btloc_it) {
+                            if(!btloc_it->output.empty()
+                               &&
+                               // TODO: why aren't the <W:inf> excluded earlier?
+                               btloc_it->weight < std::numeric_limits<float>::max()) {
+                                locs_rebuilt.at(i_b).push_back(*btloc_it);
+                            }
                         }
                     }
                 }
@@ -470,7 +477,7 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
                 std::string indent = std::string(depth+1, '\t');
                 Location cur = todo.back().back();
                 todo.back().pop_back();
-                hfst::StringVector::const_iterator
+                PartIt
                     out_beg = cur.output_symbol_strings.begin(),
                     out_end = cur.output_symbol_strings.end(),
                     in_beg = cur.input_symbol_strings.begin(), // Unlike above, we print wordform tags on all these
@@ -482,9 +489,7 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
                     std::string inpart;
                     bool sub_found = false;
                     size_t out_part = part > 0 ? cur.output_parts.at(part-1) : 0;
-                    for(hfst::StringVector::const_iterator it = out_end-1;
-                        it > cur.output_symbol_strings.begin() + out_part;
-                        --it) {
+                    for(PartIt it = out_end-1; it > cur.output_symbol_strings.begin() + out_part; --it) {
                         if(subreading_separator.compare(*it) == 0) {
                             // Found a sub-reading mark
                             out_beg = ++it;
