@@ -3626,13 +3626,13 @@
            return false;
          }
 
-         bool is_possible_flag(std::string symbol, StringVector & fds)
+         bool is_possible_flag(std::string symbol, StringVector & fds, bool obey_flags)
          {
            if (FdOperation::is_diacritic(symbol))
              {
                FlagDiacriticTable FdT;
                fds.push_back(symbol);
-               if (FdT.is_valid_string(fds))
+               if ((!obey_flags) || FdT.is_valid_string(fds))
                  { return true; }
                else
                  { 
@@ -3647,7 +3647,7 @@
            (const HfstOneLevelPath& s,
             unsigned int& index, HfstState state,
             std::set<HfstState> &epsilon_path_states,
-            StringVector & fds)
+            StringVector & fds, bool obey_flags)
          {
            // Whether the end of the lookup path s has been reached                    
            bool only_epsilons=false;
@@ -3668,7 +3668,7 @@
                // (Diacritics are also treated as epsilons, although it might cause false                                                   
                //  positive results, because loops with diacritics can be invalidated by                                                    
                //  other diacritics.)
-               bool possible_flag = is_possible_flag(it->get_input_symbol(), fds);
+               bool possible_flag = is_possible_flag(it->get_input_symbol(), fds, obey_flags);
                if ( is_epsilon(it->get_input_symbol()) ||
                     possible_flag )
                  {
@@ -3679,7 +3679,7 @@
                        return true;
                      }
                    if (is_lookup_infinitely_ambiguous
-                       (s, index, it->get_target_state(), epsilon_path_states, fds))
+                       (s, index, it->get_target_state(), epsilon_path_states, fds, obey_flags))
                      {
                        return true;
                      }
@@ -3709,7 +3709,7 @@
                        index++; // consume an input symbol in the lookup path s            
                        std::set<HfstState> empty_set;
                        if (is_lookup_infinitely_ambiguous
-                           (s, index, it->get_target_state(), empty_set, fds))
+                           (s, index, it->get_target_state(), empty_set, fds, obey_flags))
                          {
                            return true;
                          }
@@ -3720,7 +3720,7 @@
            return false;
          }
 
-         HFSTDLL bool is_lookup_infinitely_ambiguous(const HfstOneLevelPath & s)
+         HFSTDLL bool is_lookup_infinitely_ambiguous(const HfstOneLevelPath & s, bool obey_flags=false)
          {
            std::set<HfstState> epsilon_path_states;
            epsilon_path_states.insert(0);
@@ -3728,10 +3728,10 @@
            StringVector fds;
 
            return is_lookup_infinitely_ambiguous(s, index, INITIAL_STATE,
-                                                 epsilon_path_states, fds);
+                                                 epsilon_path_states, fds, obey_flags);
          }
 
-         HFSTDLL bool is_lookup_infinitely_ambiguous(const StringVector & s)
+         HFSTDLL bool is_lookup_infinitely_ambiguous(const StringVector & s, bool obey_flags=false)
          {
            std::set<HfstState> epsilon_path_states;
            epsilon_path_states.insert(0);
@@ -3740,7 +3740,7 @@
            StringVector fds;
 
            return is_lookup_infinitely_ambiguous(path, index, INITIAL_STATE,
-                                                 epsilon_path_states, fds);
+                                                 epsilon_path_states, fds, obey_flags);
          }
 
 
