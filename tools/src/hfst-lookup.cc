@@ -1216,7 +1216,9 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
   if (is_possible_to_get_result(s, cascade_symbols_seen[transducer_number], 
                                 cascade_unknown_or_identity_seen[transducer_number]))
     {
-        t.lookup_fd(s.second, results_spv, &infinite_cutoff);
+      t.lookup_fd(s.second, results_spv, &infinite_cutoff, 
+        NULL /*no weight limit, variable 'beam' defines which paths are printed */,
+        obey_flags);
     }
 
   if (print_pairs) {
@@ -1323,7 +1325,7 @@ lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity)
     (s, cascade_symbols_seen[transducer_number], 
      cascade_unknown_or_identity_seen[transducer_number]);
 
-  if (possible && t.is_lookup_infinitely_ambiguous(s))
+  if (possible && t.is_lookup_infinitely_ambiguous(s, obey_flags))
     {
       if (!silent && infinite_cutoff > 0) {
     warning(0, 0, "Got infinite results, number of cycles limited to " SIZE_T_SPECIFIER "",
