@@ -31,7 +31,7 @@ before_install:
 
 script:
     - ./autogen.sh
-    - ./configure --enable-xfst --enable-proc --without-foma --enable-lexc --enable-all-tools
+    - ./configure --enable-xfst --enable-proc --without-foma --enable-lexc --enable-all-tools --enable-silent-rules
     - if [[ $CXX = g++ ]]; then make -j2; else make -j; fi
     - make check
 
