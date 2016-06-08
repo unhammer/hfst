@@ -101,6 +101,11 @@ static bool lookup_given = false;
 static size_t infinite_cutoff = 5;
 static float beam=-1;
 
+#define CASCADE_UNION 1 
+#define CASCADE_PRIORITY_UNION 2
+#define CASCADE_COMPOSITION 3
+static int cascade_ = CASCADE_UNION;
+
 // symbols actually seen in (non-ol) transducers
 static std::vector<std::set<std::string> > cascade_symbols_seen;
 static std::vector<bool> cascade_unknown_or_identity_seen;
@@ -254,6 +259,7 @@ print_usage()
             "                                   the best analysis\n"
             "  -t, --time-cutoff=S              Limit search after having used S seconds per input\n"
             "                                   (currently only works in optimized-lookup mode\n"
+            "  -C, --cascade=CASCADE            How multiple transducers in input are handled (todo)\n"
             "  -P, --progress                   Show neat progress bar if possible\n");
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
@@ -271,6 +277,10 @@ print_usage()
             "results from all transducers is printed for each input string.\n");
     fprintf(message_out, "\n");
 
+    fprintf(message_out, "CASCADE must be one of { union, priority-union, composition }.\n"
+            "If not specified, defaults to {union}.\n");
+    fprintf(message_out, "\n");
+
     fprintf(message_out, "STREAM can be { input, output, both }. If not given, defaults to {both}.\n"
 #ifdef _MSC_VER
           "If input file is not specified with -I, input is read interactively via the\n"
@@ -286,10 +296,7 @@ print_usage()
 
     fprintf(message_out, 
             "Todo:\n"
-            "  For optimized lookup format, only strings that pass "
-            "flag diacritic checks\n"
-            "  are printed and flag diacritic symbols are not printed.\n"
-            "  Support VARIABLE 'print-space' for optimized lookup format\n");
+            "  Support --xfst=obey-flags for optimized lookup format.\n");
     fprintf(message_out,
             "\n"
             "Known bugs:\n"
@@ -325,12 +332,13 @@ parse_options(int argc, char** argv)
             {"time-cutoff", required_argument, 0, 't'},
             {"pipe-mode", optional_argument, 0, 'p'},
             {"progress", no_argument, 0, 'P'},
+            {"cascade", required_argument, 0, 'C'},
             {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "I:O:F:xc:X:e:E:b:t:p::P",
+                             HFST_GETOPT_UNARY_SHORT "I:O:F:xc:X:e:E:b:t:p::PC:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -462,6 +470,18 @@ parse_options(int argc, char** argv)
 
         case 'P':
             show_progress_bar = true;
+            break;
+
+        case 'C':
+            if (strcmp(optarg, "union") == 0)
+              cascade_ = CASCADE_UNION;
+            else if (strcmp(optarg, "priority-union") == 0)
+              { cascade_ = CASCADE_PRIORITY_UNION; error(EXIT_FAILURE, 0, "--cascade=priority-union not yet implemented"); }
+            else if (strcmp(optarg, "composition") == 0)
+              { cascade_ = CASCADE_COMPOSITION; error(EXIT_FAILURE, 0, "--cascade=composition not yet implemented"); }
+            else
+              { error(EXIT_FAILURE, 0, "--cascade argument %s unrecognised, possible values are\n"
+                      "{ union, priority-union, composition }", optarg); }
             break;
 #include "inc/getopt-cases-error.h"
         }
@@ -1399,10 +1419,26 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstBasicTransducer> cascade,
         {
           verbose_printf("" SIZE_T_SPECIFIER " results @ level %u\n", result->size(), i);
         }
+
       for (HfstOneLevelPaths::const_iterator it = result->begin();
            it != result->end(); it++)
         {
-          results->insert(*it);
+          if (cascade_ == CASCADE_UNION)
+            { 
+              results->insert(*it); 
+            }
+          else if (cascade_ == CASCADE_PRIORITY_UNION)
+            {
+              ;
+            }
+          else if (cascade_ == CASCADE_COMPOSITION)
+            {
+              ;
+            }
+          else
+            {
+              error(EXIT_FAILURE, 0, "unknown value for variable cascade");
+            }
         }
       delete result;
     }
