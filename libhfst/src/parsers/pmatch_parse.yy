@@ -409,6 +409,84 @@ TOUPPER_LEFT EXPRESSION2 RIGHT_PARENTHESIS { $$ = new PmatchUnaryOperation(ToUpp
 OPT_TOLOWER_LEFT EXPRESSION2 RIGHT_PARENTHESIS { $$ = new PmatchUnaryOperation(OptToLower, $2); } |
 OPT_TOUPPER_LEFT EXPRESSION2 RIGHT_PARENTHESIS { $$ = new PmatchUnaryOperation(OptToUpper, $2); } |
 ANY_CASE_LEFT EXPRESSION2 RIGHT_PARENTHESIS { $$ = new PmatchUnaryOperation(AnyCase, $2); } |
+
+CAP_LEFT EXPRESSION2 COMMA SYMBOL RIGHT_PARENTHESIS {
+    if (strcmp($4, "U") == 0) {
+        $$ = new PmatchUnaryOperation(CapUpper, $2);
+    } else if (strcmp($4, "L") == 0) {
+        $$ = new PmatchUnaryOperation(CapLower, $2);
+    } else {
+        pmatcherror("Side argument to casing function not understood\n");
+        $$ = new PmatchUnaryOperation(Cap, $2);
+    }
+    free($4);
+} |
+OPTCAP_LEFT EXPRESSION2 COMMA SYMBOL RIGHT_PARENTHESIS {
+    if (strcmp($4, "U") == 0) {
+        $$ = new PmatchUnaryOperation(OptCapUpper, $2);
+    } else if (strcmp($4, "L") == 0) {
+        $$ = new PmatchUnaryOperation(OptCapLower, $2);
+    } else {
+        pmatcherror("Side argument to casing function not understood\n");
+        $$ = new PmatchUnaryOperation(OptCap, $2);
+    }
+    free($4);
+} |
+TOLOWER_LEFT EXPRESSION2 COMMA SYMBOL RIGHT_PARENTHESIS {
+    if (strcmp($4, "U") == 0) {
+        $$ = new PmatchUnaryOperation(ToLowerUpper, $2);
+    } else if (strcmp($4, "L") == 0) {
+        $$ = new PmatchUnaryOperation(ToLowerLower, $2);
+    } else {
+        pmatcherror("Side argument to casing function not understood\n");
+        $$ = new PmatchUnaryOperation(ToLower, $2);
+    }
+    free($4);
+} |
+TOUPPER_LEFT EXPRESSION2 COMMA SYMBOL RIGHT_PARENTHESIS {
+    if (strcmp($4, "U") == 0) {
+        $$ = new PmatchUnaryOperation(ToUpperUpper, $2);
+    } else if (strcmp($4, "L") == 0) {
+        $$ = new PmatchUnaryOperation(ToUpperLower, $2);
+    } else {
+        pmatcherror("Side argument to casing function not understood\n");
+        $$ = new PmatchUnaryOperation(ToUpper, $2);
+    }
+    free($4);
+} |
+OPT_TOLOWER_LEFT EXPRESSION2 COMMA SYMBOL RIGHT_PARENTHESIS {
+    if (strcmp($4, "U") == 0) {
+        $$ = new PmatchUnaryOperation(OptToLowerUpper, $2);
+    } else if (strcmp($4, "L") == 0) {
+        $$ = new PmatchUnaryOperation(OptToLowerLower, $2);
+    } else {
+        pmatcherror("Side argument to casing function not understood\n");
+        $$ = new PmatchUnaryOperation(OptToLower, $2);
+    }
+    free($4);
+} |
+OPT_TOUPPER_LEFT EXPRESSION2 COMMA SYMBOL RIGHT_PARENTHESIS {
+    if (strcmp($4, "U") == 0) {
+        $$ = new PmatchUnaryOperation(OptToUpperUpper, $2);
+    } else if (strcmp($4, "L") == 0) {
+        $$ = new PmatchUnaryOperation(OptToUpperLower, $2);
+    } else {
+        pmatcherror("Side argument to casing function not understood\n");
+        $$ = new PmatchUnaryOperation(OptToUpper, $2);
+    }
+    free($4);
+} |
+ANY_CASE_LEFT EXPRESSION2 COMMA SYMBOL RIGHT_PARENTHESIS {
+    if (strcmp($4, "U") == 0) {
+        $$ = new PmatchUnaryOperation(AnyCaseUpper, $2);
+    } else if (strcmp($4, "L") == 0) {
+        $$ = new PmatchUnaryOperation(AnyCaseLower, $2);
+    } else {
+        pmatcherror("Side argument to casing function not understood\n");
+        $$ = new PmatchUnaryOperation(AnyCase, $2);
+    }
+    free($4);
+} |
 DEFINE_LEFT EXPRESSION2 RIGHT_PARENTHESIS { $$ = new PmatchUnaryOperation(AddDelimiters, $2); } |
 READ_FROM { } |
 CHARACTER_RANGE { $$ = $1; } |
@@ -426,6 +504,7 @@ SYMBOL {
         $$ = new PmatchEmpty;
     } else {
         $$ = new PmatchSymbol(sym);
+        used_definitions.insert(sym);
     }
 };
 

@@ -723,7 +723,7 @@ in \a ifile.
        Then the unknown and identity symbols are expanded
        in both transducers. If this and \a another have type FOMA_TYPE, 
        nothing is done, since foma takes care of harmonization. */
-    HFSTDLL void harmonize(HfstTransducer &another);
+    HFSTDLL void harmonize(HfstTransducer &another, bool force=false);
 
     /** \brief Explicitly insert \a symbol to the alphabet 
     of the transducer. 

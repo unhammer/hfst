@@ -175,37 +175,37 @@ hfst::HfstTransducerVector compile_pmatch_expression(const std::string & pmatch)
 
 // internal functions 
 %pythoncode %{
-  def is_string(s):
+  def _is_string(s):
       if isinstance(s, str):
          return True
       else:
         return False   
-  def is_string_pair(sp):
+  def _is_string_pair(sp):
       if not isinstance(sp, tuple):
          return False
       if len(sp) != 2:
          return False
-      if not is_string(sp[0]):
+      if not _is_string(sp[0]):
          return False
-      if not is_string(sp[1]):
+      if not _is_string(sp[1]):
          return False
       return True
-  def is_string_vector(sv):
+  def _is_string_vector(sv):
       if not isinstance(sv, tuple):
          return False
       for s in sv:
-          if not is_string(s):
+          if not _is_string(s):
              return False
       return True
-  def is_string_pair_vector(spv):
+  def _is_string_pair_vector(spv):
       if not isinstance(spv, tuple):
          return False
       for sp in spv:
-          if not is_string_pair(sp):
+          if not _is_string_pair(sp):
              return False
       return True
 
-  def two_level_paths_to_dict(tlps):
+  def _two_level_paths_to_dict(tlps):
       retval = {}
       for tlp in tlps:
           input = ""
@@ -219,7 +219,7 @@ hfst::HfstTransducerVector compile_pmatch_expression(const std::string & pmatch)
               retval[input] = [(output, tlp[0])]
       return retval
 
-  def one_level_paths_to_tuple(olps):
+  def _one_level_paths_to_tuple(olps):
       retval = []
       for olp in olps:
           path = ""
@@ -294,12 +294,12 @@ public:
   void optionalize() { self->optionalize(); }
   void insert_freely(const StringPair &symbol_pair, bool harmonize=true) { self->insert_freely(symbol_pair, harmonize); }
   void insert_freely(const HfstTransducer &tr, bool harmonize=true) { self->insert_freely(tr, harmonize); }
-  void substitute_symbol(const std::string &old_symbol, const std::string &new_symbol, bool input_side=true, bool output_side=true) { self->substitute_symbol(old_symbol, new_symbol, input_side, output_side); }
-  void substitute_symbol_pair(const StringPair &old_symbol_pair, const StringPair &new_symbol_pair) { self->substitute_symbol_pair(old_symbol_pair, new_symbol_pair); }
-  void substitute_symbol_pair_with_set(const StringPair &old_symbol_pair, const hfst::StringPairSet &new_symbol_pair_set) { self->substitute_symbol_pair_with_set(old_symbol_pair, new_symbol_pair_set); }
-  void substitute_symbol_pair_with_transducer(const StringPair &symbol_pair, HfstTransducer &transducer, bool harmonize=true) { self->substitute_symbol_pair_with_transducer(symbol_pair, transducer, harmonize); }
-  void substitute_symbols(const hfst::HfstSymbolSubstitutions &substitutions) { self->substitute_symbols(substitutions); } // alias for the previous function which is shadowed
-  void substitute_symbol_pairs(const hfst::HfstSymbolPairSubstitutions &substitutions) { self->substitute_symbol_pairs(substitutions); } // alias for the previous function which is shadowed
+  void _substitute_symbol(const std::string &old_symbol, const std::string &new_symbol, bool input_side=true, bool output_side=true) { self->substitute_symbol(old_symbol, new_symbol, input_side, output_side); }
+  void _substitute_symbol_pair(const StringPair &old_symbol_pair, const StringPair &new_symbol_pair) { self->substitute_symbol_pair(old_symbol_pair, new_symbol_pair); }
+  void _substitute_symbol_pair_with_set(const StringPair &old_symbol_pair, const hfst::StringPairSet &new_symbol_pair_set) { self->substitute_symbol_pair_with_set(old_symbol_pair, new_symbol_pair_set); }
+  void _substitute_symbol_pair_with_transducer(const StringPair &symbol_pair, HfstTransducer &transducer, bool harmonize=true) { self->substitute_symbol_pair_with_transducer(symbol_pair, transducer, harmonize); }
+  void _substitute_symbols(const hfst::HfstSymbolSubstitutions &substitutions) { self->substitute_symbols(substitutions); } // alias for the previous function which is shadowed
+  void _substitute_symbol_pairs(const hfst::HfstSymbolPairSubstitutions &substitutions) { self->substitute_symbol_pairs(substitutions); } // alias for the previous function which is shadowed
   void set_final_weights(float weight, bool increment=false) { self->set_final_weights(weight, increment); };
 
   void push_weights_to_start() { self->push_weights(hfst::TO_INITIAL_STATE); };
@@ -336,58 +336,58 @@ public:
     }
     void write(hfst::HfstOutputStream & os) { (void) os.redirect(*$self); }
 
-    hfst::HfstTwoLevelPaths extract_shortest_paths_()
+    hfst::HfstTwoLevelPaths _extract_shortest_paths()
     {
         hfst::HfstTwoLevelPaths results;
         $self->extract_shortest_paths(results);
         return results;
     }
-    hfst::HfstTwoLevelPaths extract_longest_paths_(bool obey_flags)
+    hfst::HfstTwoLevelPaths _extract_longest_paths(bool obey_flags)
     {
         hfst::HfstTwoLevelPaths results;
         $self->extract_longest_paths(results, obey_flags);
         return results;
     }
-    hfst::HfstTwoLevelPaths extract_paths_(int max_num=-1, int cycles=-1) const throw(TransducerIsCyclicException)
+    hfst::HfstTwoLevelPaths _extract_paths(int max_num=-1, int cycles=-1) const throw(TransducerIsCyclicException)
     {
       hfst::HfstTwoLevelPaths results;
       $self->extract_paths(results, max_num, cycles);
       return results;
     }
-    hfst::HfstTwoLevelPaths extract_paths_fd_(int max_num=-1, int cycles=-1, bool filter_fd=true) const throw(TransducerIsCyclicException)
+    hfst::HfstTwoLevelPaths _extract_paths_fd(int max_num=-1, int cycles=-1, bool filter_fd=true) const throw(TransducerIsCyclicException)
     {
       hfst::HfstTwoLevelPaths results;
       $self->extract_paths_fd(results, max_num, cycles, filter_fd);
       return results;
     }
-    hfst::HfstTwoLevelPaths extract_random_paths_(int max_num) const
+    hfst::HfstTwoLevelPaths _extract_random_paths(int max_num) const
     {
       hfst::HfstTwoLevelPaths results;
       $self->extract_random_paths(results, max_num);
       return results;
     }
-    hfst::HfstTwoLevelPaths extract_random_paths_fd_(int max_num, bool filter_fd) const
+    hfst::HfstTwoLevelPaths _extract_random_paths_fd(int max_num, bool filter_fd) const
     {
       hfst::HfstTwoLevelPaths results;
       $self->extract_random_paths_fd(results, max_num, filter_fd);
       return results;
     }
 
-    HfstOneLevelPaths lookup_vector(const StringVector& s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
+    HfstOneLevelPaths _lookup_vector(const StringVector& s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
     { 
-      return hfst::lookup_vector_($self, false /*fd*/, s, limit, time_cutoff);
+      return hfst::lookup_vector($self, false /*fd*/, s, limit, time_cutoff);
     }
-    HfstOneLevelPaths lookup_fd_vector(const StringVector& s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
+    HfstOneLevelPaths _lookup_fd_vector(const StringVector& s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
     { 
-      return hfst::lookup_vector_($self, true /*fd*/, s, limit, time_cutoff);
+      return hfst::lookup_vector($self, true /*fd*/, s, limit, time_cutoff);
     }
-    HfstOneLevelPaths lookup_fd_string(const std::string& s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
+    HfstOneLevelPaths _lookup_fd_string(const std::string& s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
     { 
-      return hfst::lookup_string_($self, true /*fd*/, s, limit, time_cutoff);
+      return hfst::lookup_string($self, true /*fd*/, s, limit, time_cutoff);
     }
-    HfstOneLevelPaths lookup_string(const std::string & s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
+    HfstOneLevelPaths _lookup_string(const std::string & s, int limit = -1, double time_cutoff = 0.0) const throw(FunctionNotImplementedException)
     { 
-      return hfst::lookup_string_($self, false /*fd*/, s, limit, time_cutoff);
+      return hfst::lookup_string($self, false /*fd*/, s, limit, time_cutoff);
     }
 
 %pythoncode %{
@@ -461,27 +461,27 @@ public:
 
       if isinstance(input, tuple):
          if obey_flags:
-            retval=self.lookup_fd_vector(input, max_number, time_cutoff)
+            retval=self._lookup_fd_vector(input, max_number, time_cutoff)
          else:
-            retval=self.lookup_vector(input, max_number, time_cutoff)
+            retval=self._lookup_vector(input, max_number, time_cutoff)
       elif isinstance(input, str):
          if obey_flags:
-            retval=self.lookup_fd_string(input, max_number, time_cutoff)
+            retval=self._lookup_fd_string(input, max_number, time_cutoff)
          else:
-            retval=self.lookup_string(input, max_number, time_cutoff)
+            retval=self._lookup_string(input, max_number, time_cutoff)
       else:
          try:
             if obey_flags:
-                retval=self.lookup_fd_string(str(input), max_number, time_cutoff)
+                retval=self._lookup_fd_string(str(input), max_number, time_cutoff)
             else:
-                retval=self.lookup_string(str(input), max_number, time_cutoff)         
+                retval=self._lookup_string(str(input), max_number, time_cutoff)
          except:
             raise RuntimeError('Input argument must be string or tuple.')
 
       if output == 'text':
          return one_level_paths_to_string(retval)
       elif output == 'tuple':
-         return one_level_paths_to_tuple(retval)
+         return _one_level_paths_to_tuple(retval)
       else:
          return retval
 
@@ -511,12 +511,12 @@ public:
           else:
              print('Warning: ignoring unknown argument %s.' % (k))
 
-      retval = self.extract_longest_paths_(obey_flags)
+      retval = self._extract_longest_paths(obey_flags)
 
       if output == 'text':
          return two_level_paths_to_string(retval)
       elif output == 'dict':
-         return two_level_paths_to_dict(retval)
+         return _two_level_paths_to_dict(retval)
       else:
          return retval
 
@@ -537,12 +537,12 @@ public:
           else:
              print('Warning: ignoring unknown argument %s.' % (k))
 
-      retval = self.extract_shortest_paths_()
+      retval = self._extract_shortest_paths()
 
       if output == 'text':
          return two_level_paths_to_string(retval)
       elif output == 'dict':
-         return two_level_paths_to_dict(retval)
+         return _two_level_paths_to_dict(retval)
       else:
          return retval
 
@@ -601,19 +601,19 @@ public:
 
       if obey_flags :
          if random :
-            retval=self.extract_random_paths_fd_(max_number, filter_flags)
+            retval=self._extract_random_paths_fd(max_number, filter_flags)
          else :
-            retval=self.extract_paths_fd_(max_number, max_cycles)
+            retval=self._extract_paths_fd(max_number, max_cycles)
       else :
          if random :
-            retval=self.extract_random_paths_(max_number)  
+            retval=self._extract_random_paths(max_number)
          else :   
-            retval=self.extract_paths_(max_number, max_cycles)
+            retval=self._extract_paths(max_number, max_cycles)
 
       if output == 'text':
          return two_level_paths_to_string(retval)
       elif output == 'dict':
-         return two_level_paths_to_dict(retval)
+         return _two_level_paths_to_dict(retval)
       else:
          return retval
 
@@ -626,30 +626,30 @@ public:
          subst_type=""
 
          for k, v in s.items():
-             if is_string(k):
+             if _is_string(k):
                 if subst_type == "":
                    subst_type="string"
                 elif subst_type == "string pair":
                    raise RuntimeError('')
-                if not is_string(v):
+                if not _is_string(v):
                    raise RuntimeError('')
-             elif is_string_pair(k):
+             elif _is_string_pair(k):
                 if subst_type == "":
                    subst_type="string pair"
                 elif subst_type == "string":
                    raise RuntimeError('')
-                if not is_string_pair(v):
+                if not _is_string_pair(v):
                    raise RuntimeError('')
              else:
                 raise RuntimeError('')
 
          if subst_type == "string":
-            return self.substitute_symbols(s)
+            return self._substitute_symbols(s)
          else:
-            return self.substitute_symbol_pairs(s)
+            return self._substitute_symbol_pairs(s)
 
-      if is_string(s):
-         if is_string(S):
+      if _is_string(s):
+         if _is_string(S):
             input=True
             output=True
             for k,v in kvargs.items():
@@ -661,16 +661,16 @@ public:
                       output=False
                 else:
                    raise RuntimeError('Free argument not recognized.')
-            return self.substitute_symbol(s, S, input, output)
+            return self._substitute_symbol(s, S, input, output)
          else:
             raise RuntimeError('...')
-      elif is_string_pair(s):
-         if is_string_pair(S):
-            return self.substitute_symbol_pair(s, S)
-         elif is_string_pair_vector(S):
-            return self.substitute_symbol_pair_with_set(s, S)
+      elif _is_string_pair(s):
+         if _is_string_pair(S):
+            return self._substitute_symbol_pair(s, S)
+         elif _is_string_pair_vector(S):
+            return self._substitute_symbol_pair_with_set(s, S)
          elif isinstance(S, HfstTransducer):
-            return self.substitute_symbol_pair_with_transducer(s, S, True)
+            return self._substitute_symbol_pair_with_transducer(s, S, True)
          else:
             raise RuntimeError('...')
       else:
@@ -744,14 +744,12 @@ hfst::HfstTransducer * read() throw (EndOfStreamException) { return new hfst::Hf
 def __iter__(self):
     return self
 
-# Python 2
 def next(self):
     if self.is_eof():
         raise StopIteration
     else:
         return self.read();
 
-# Python 3
 def __next__(self):
     return self.next()
 
@@ -827,19 +825,19 @@ class HfstBasicTransducer {
 
 %extend {
 
-    void substitute_symbol(const std::string &old_symbol, const std::string &new_symbol, bool input_side=true, bool output_side=true) { self->substitute_symbol(old_symbol, new_symbol, input_side, output_side); }
-    void substitute_symbol_pair(const StringPair &old_symbol_pair, const StringPair &new_symbol_pair) { self->substitute_symbol_pair(old_symbol_pair, new_symbol_pair); }
-    void substitute_symbol_pair_with_set(const StringPair &old_symbol_pair, const hfst::StringPairSet &new_symbol_pair_set) { self->substitute_symbol_pair_with_set(old_symbol_pair, new_symbol_pair_set); }
-    void substitute_symbol_pair_with_transducer(const StringPair &symbol_pair, HfstBasicTransducer &transducer) { self->substitute_symbol_pair_with_transducer(symbol_pair, transducer); }
-    void substitute_symbols(const hfst::HfstSymbolSubstitutions &substitutions) { self->substitute_symbols(substitutions); } // alias for the previous function which is shadowed
-    void substitute_symbol_pairs(const hfst::HfstSymbolPairSubstitutions &substitutions) { self->substitute_symbol_pairs(substitutions); } // alias for the previous function which is shadowed
+    void _substitute_symbol(const std::string &old_symbol, const std::string &new_symbol, bool input_side=true, bool output_side=true) { self->substitute_symbol(old_symbol, new_symbol, input_side, output_side); }
+    void _substitute_symbol_pair(const StringPair &old_symbol_pair, const StringPair &new_symbol_pair) { self->substitute_symbol_pair(old_symbol_pair, new_symbol_pair); }
+    void _substitute_symbol_pair_with_set(const StringPair &old_symbol_pair, const hfst::StringPairSet &new_symbol_pair_set) { self->substitute_symbol_pair_with_set(old_symbol_pair, new_symbol_pair_set); }
+    void _substitute_symbol_pair_with_transducer(const StringPair &symbol_pair, HfstBasicTransducer &transducer) { self->substitute_symbol_pair_with_transducer(symbol_pair, transducer); }
+    void _substitute_symbols(const hfst::HfstSymbolSubstitutions &substitutions) { self->substitute_symbols(substitutions); } // alias for the previous function which is shadowed
+    void _substitute_symbol_pairs(const hfst::HfstSymbolPairSubstitutions &substitutions) { self->substitute_symbol_pairs(substitutions); } // alias for the previous function which is shadowed
     void insert_freely(const StringPair &symbol_pair, float weight) { self->insert_freely(symbol_pair, weight); }
     void insert_freely(const HfstBasicTransducer &tr) { self->insert_freely(tr); }
     void sort_arcs() { self->sort_arcs(); }
     void disjunct(const StringPairVector &spv, float weight) { self->disjunct(spv, weight); }
     void harmonize(HfstBasicTransducer &another) { self->harmonize(another); }
 
-  HfstTwoLevelPaths lookup_fd_(const StringVector &lookup_path, size_t * infinite_cutoff, float * max_weight)
+  HfstTwoLevelPaths _lookup_fd(const StringVector &lookup_path, size_t * infinite_cutoff, float * max_weight)
   {
     hfst::HfstTwoLevelPaths results;
     $self->lookup_fd(lookup_path, results, infinite_cutoff, max_weight);
@@ -924,12 +922,12 @@ class HfstBasicTransducer {
           else:
              print('Warning: ignoring unknown argument %s.' % (k))
 
-      retval = self.lookup_fd_(lookup_path, infinite_cutoff, max_weight)
+      retval = self._lookup_fd(lookup_path, infinite_cutoff, max_weight)
 
       if output == 'text':
          return two_level_paths_to_string(retval)
       elif output == 'dict':
-         return two_level_paths_to_dict(retval)
+         return _two_level_paths_to_dict(retval)
       else:
          return retval
 
@@ -942,30 +940,30 @@ class HfstBasicTransducer {
          subst_type=""
 
          for k, v in s.items():
-             if is_string(k):
+             if _is_string(k):
                 if subst_type == "":
                    subst_type="string"
                 elif subst_type == "string pair":
                    raise RuntimeError('')
-                if not is_string(v):
+                if not _is_string(v):
                    raise RuntimeError('')
-             elif is_string_pair(k):
+             elif _is_string_pair(k):
                 if subst_type == "":
                    subst_type="string pair"
                 elif subst_type == "string":
                    raise RuntimeError('')
-                if not is_string_pair(v):
+                if not _is_string_pair(v):
                    raise RuntimeError('')
              else:
                 raise RuntimeError('')
 
          if subst_type == "string":
-            return self.substitute_symbols(s)
+            return self._substitute_symbols(s)
          else:
-            return self.substitute_symbol_pairs(s)
+            return self._substitute_symbol_pairs(s)
 
-      if is_string(s):
-         if is_string(S):
+      if _is_string(s):
+         if _is_string(S):
             input=True
             output=True
             for k,v in kvargs.items():
@@ -977,16 +975,16 @@ class HfstBasicTransducer {
                       output=False
                 else:
                    raise RuntimeError('Free argument not recognized.')
-            return self.substitute_symbol(s, S, input, output)
+            return self._substitute_symbol(s, S, input, output)
          else:
             raise RuntimeError('...')
-      elif is_string_pair(s):
-         if is_string_pair(S):
-            return self.substitute_symbol_pair(s, S)
-         elif is_string_pair_vector(S):
-            return self.substitute_symbol_pair_with_set(s, S)
+      elif _is_string_pair(s):
+         if _is_string_pair(S):
+            return self._substitute_symbol_pair(s, S)
+         elif _is_string_pair_vector(S):
+            return self._substitute_symbol_pair_with_set(s, S)
          elif isinstance(S, HfstBasicTransducer):
-            return self.substitute_symbol_pair_with_transducer(s, S)
+            return self._substitute_symbol_pair_with_transducer(s, S)
          else:
             raise RuntimeError('...')
       else:
@@ -1221,8 +1219,7 @@ def regex(re, **kvargs):
        err.write(_libhfst.get_hfst_regex_error_message())
        return retval
 
-# internal function
-def replace_symbols(symbol, epsilonstr=EPSILON):
+def _replace_symbols(symbol, epsilonstr=EPSILON):
     if symbol == epsilonstr:
        return EPSILON
     if symbol == "@0@":
@@ -1232,8 +1229,7 @@ def replace_symbols(symbol, epsilonstr=EPSILON):
     symbol = symbol.replace("@_COLON_@", ":")
     return symbol
 
-# internal function
-def parse_att_line(line, fsm, epsilonstr=EPSILON):
+def _parse_att_line(line, fsm, epsilonstr=EPSILON):
     # get rid of extra whitespace
     line = line.replace('\t',' ')
     line = " ".join(line.split())
@@ -1248,9 +1244,9 @@ def parse_att_line(line, fsm, epsilonstr=EPSILON):
            fsm.add_state(int(fields[0]))
            fsm.set_final_weight(int(fields[0]), float(fields[1]))
         elif len(fields) == 4:
-           fsm.add_transition(int(fields[0]), int(fields[1]), replace_symbols(fields[2]), replace_symbols(fields[3]), 0)
+           fsm.add_transition(int(fields[0]), int(fields[1]), _replace_symbols(fields[2]), _replace_symbols(fields[3]), 0)
         elif len(fields) == 5:
-           fsm.add_transition(int(fields[0]), int(fields[1]), replace_symbols(fields[2]), replace_symbols(fields[3]), float(fields[4]))
+           fsm.add_transition(int(fields[0]), int(fields[1]), _replace_symbols(fields[2]), _replace_symbols(fields[3]), float(fields[4]))
         else:
            return False
     except ValueError as e:
@@ -1263,7 +1259,7 @@ def read_att_string(att):
     lines = att.split('\n')
     for line in lines:
         linecount = linecount + 1
-        if not parse_att_line(line, fsm):
+        if not _parse_att_line(line, fsm):
            raise NotValidAttFormatException(line, "", linecount)
     return HfstTransducer(fsm, _libhfst.get_default_fst_type())
 
@@ -1275,7 +1271,7 @@ def read_att_input():
         if line == "":
            break
         linecount = linecount + 1
-        if not parse_att_line(line, fsm):
+        if not _parse_att_line(line, fsm):
            raise NotValidAttFormatException(line, "", linecount)
     return HfstTransducer(fsm, _libhfst.get_default_fst_type())
 
@@ -1293,7 +1289,7 @@ def read_att_transducer(f, epsilonstr=EPSILON, linecount=[0]):
         linecount_ = linecount_ + 1
         if line[0] == '-':
            break
-        if not parse_att_line(line, fsm, epsilonstr):
+        if not _parse_att_line(line, fsm, epsilonstr):
            raise NotValidAttFormatException(line, "", linecount[0] + linecount_)
     linecount[0] = linecount[0] + linecount_
     return HfstTransducer(fsm, _libhfst.get_default_fst_type())
@@ -1310,14 +1306,12 @@ class AttReader:
       def __iter__(self):
           return self
 
-      # Python 2
       def next(self):
           try:
              return self.read()
           except EndOfStreamException as e:
              raise StopIteration
 
-      # Python 3
       def __next__(self):
           return self.next()
 
@@ -1376,14 +1370,12 @@ class PrologReader:
       def __iter__(self):
           return self
 
-      # Python 2
       def next(self):
           try:
              return self.read()
           except EndOfStreamException as e:
              raise StopIteration
 
-      # Python 3
       def __next__(self):
           return self.next()
 
@@ -1555,14 +1547,12 @@ def compile_lexc_file(filename, **kvargs):
 
     return retval
 
-# internal function
-def is_weighted_word(arg):
+def _is_weighted_word(arg):
     if isinstance(arg, tuple) and len(arg) == 2 and isinstance(arg[0], str) and isinstance(arg[1], (int, float)):
        return True
     return False
 
-# internal function
-def check_word(arg):
+def _check_word(arg):
     if len(arg) == 0:
        raise RuntimeError('Empty word.')
     return arg
@@ -1571,15 +1561,15 @@ def fsa(arg):
     deftok = HfstTokenizer()
     retval = HfstBasicTransducer()
     if isinstance(arg, str):
-       retval.disjunct(deftok.tokenize(check_word(arg)), 0)
-    elif is_weighted_word(arg):
-       retval.disjunct(deftok.tokenize(check_word(arg[0])), arg[1])
+       retval.disjunct(deftok.tokenize(_check_word(arg)), 0)
+    elif _is_weighted_word(arg):
+       retval.disjunct(deftok.tokenize(_check_word(arg[0])), arg[1])
     elif isinstance(arg, tuple) or isinstance(arg, list):
        for word in arg:
-           if is_weighted_word(word):
-              retval.disjunct(deftok.tokenize(check_word(word[0])), word[1])
+           if _is_weighted_word(word):
+              retval.disjunct(deftok.tokenize(_check_word(word[0])), word[1])
            elif isinstance(word, str):
-              retval.disjunct(deftok.tokenize(check_word(word)), 0)
+              retval.disjunct(deftok.tokenize(_check_word(word)), 0)
            else:
               raise RuntimeError('Tuple/list element not a string or tuple of string and weight.')           
     else:

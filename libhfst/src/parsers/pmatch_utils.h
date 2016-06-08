@@ -68,6 +68,13 @@ const std::string BOUNDARY_SYMBOL = "@BOUNDARY@";
 const std::string ENTRY_SYMBOL = "@PMATCH_ENTRY@";
 const std::string EXIT_SYMBOL = "@PMATCH_EXIT@";
 
+// These are used as arguments for casing functions
+enum Side {
+    Both,
+    Upper,
+    Lower
+};
+
 void add_to_pmatch_symbols(StringSet symbols);
 void warn(std::string warning);
 PmatchUtilityTransducers* get_utils();
@@ -266,7 +273,6 @@ template<typename T, size_t N>
 #endif
     };
 
-
 struct PmatchUtilityTransducers
 {
     PmatchUtilityTransducers();
@@ -325,12 +331,12 @@ struct PmatchUtilityTransducers
     HfstTransducer * make_capify(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
     
-    HfstTransducer * cap(HfstTransducer & t);
-    HfstTransducer * optcap(HfstTransducer & t);
-    HfstTransducer * tolower(HfstTransducer & t);
-    HfstTransducer * toupper(HfstTransducer & t);
-    HfstTransducer * opt_tolower(HfstTransducer & t);
-    HfstTransducer * opt_toupper(HfstTransducer & t);
+    HfstTransducer * cap(HfstTransducer & t, Side side = Both);
+    HfstTransducer * optcap(HfstTransducer & t, Side side = Both);
+    HfstTransducer * tolower(HfstTransducer & t, Side side = Both);
+    HfstTransducer * toupper(HfstTransducer & t, Side side = Both );
+    HfstTransducer * opt_tolower(HfstTransducer & t, Side side = Both);
+    HfstTransducer * opt_toupper(HfstTransducer & t, Side side = Both);
 };
 
 struct PmatchObject;
@@ -417,6 +423,20 @@ enum PmatchUnaryOp {
     OptToLower,
     OptToUpper,
     AnyCase,
+    CapUpper,
+    OptCapUpper,
+    ToLowerUpper,
+    ToUpperUpper,
+    OptToLowerUpper,
+    OptToUpperUpper,
+    AnyCaseUpper,
+    CapLower,
+    OptCapLower,
+    ToLowerLower,
+    ToUpperLower,
+    OptToLowerLower,
+    OptToUpperLower,
+    AnyCaseLower,
     MakeSigma,
     MakeList,
     MakeExcList

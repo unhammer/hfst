@@ -837,13 +837,14 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
         begins_and_ends_with_non_whitespace.compose(*(retval["TOP"]));
         HfstTransducer empty(format);
         if (begins_and_ends_with_non_whitespace.compare(empty) == false) {
-            HfstTransducer whitespace_context(*(get_utils()->latin1_whitespace_acceptor));
-            whitespace_context.disjunct(HfstTransducer("@BOUNDARY@", format));
+            HfstTransducer whitespace_punct_context(*(get_utils()->latin1_whitespace_acceptor));
+            whitespace_punct_context.disjunct(*(get_utils()->latin1_punct_acceptor));
+            whitespace_punct_context.disjunct(HfstTransducer("@BOUNDARY@", format));
             HfstTransducer * top_with_boundaries = new HfstTransducer(hfst::internal_epsilon, LC_ENTRY_SYMBOL, format);
-            top_with_boundaries->concatenate(whitespace_context);
+            top_with_boundaries->concatenate(whitespace_punct_context);
             top_with_boundaries->concatenate(HfstTransducer(hfst::internal_epsilon, LC_EXIT_SYMBOL, format));
             HfstTransducer RC(hfst::internal_epsilon, RC_ENTRY_SYMBOL, format);
-            RC.concatenate(whitespace_context);
+            RC.concatenate(whitespace_punct_context);
             RC.concatenate(HfstTransducer(hfst::internal_epsilon, RC_EXIT_SYMBOL, format));
             top_with_boundaries->concatenate(*(retval["TOP"]));
             top_with_boundaries->concatenate(RC);
@@ -1061,7 +1062,7 @@ HfstTransducer * PmatchUtilityTransducers::make_lowerfy(ImplementationType type)
     return retval;
 }
 
-HfstTransducer * PmatchUtilityTransducers::cap(HfstTransducer & t)
+HfstTransducer * PmatchUtilityTransducers::cap(HfstTransducer & t, Side side)
 {
     HfstTokenizer tok;
     HfstTransducer cap(*capify);
@@ -1079,12 +1080,18 @@ HfstTransducer * PmatchUtilityTransducers::cap(HfstTransducer & t)
     more_words.repeat_star();
     HfstTransducer * retval = new HfstTransducer(t);
     retval->compose(cap_one_word.concatenate(more_words));
-    retval->output_project();
+    if (side == Both) {
+        retval->output_project();
+    } else if (side == Lower) {
+        // do nothing
+    } else if (side == Upper) {
+        retval->invert();
+    }
     retval->minimize();
     return retval;
 }
 
-HfstTransducer * PmatchUtilityTransducers::optcap(HfstTransducer & t)
+HfstTransducer * PmatchUtilityTransducers::optcap(HfstTransducer & t, Side side)
 {
     HfstTokenizer tok;
     HfstTransducer optcap(*capify);
@@ -1100,12 +1107,18 @@ HfstTransducer * PmatchUtilityTransducers::optcap(HfstTransducer & t)
     more_words.repeat_star();
     HfstTransducer * retval = new HfstTransducer(t);
     retval->compose(optcap_one_word.concatenate(more_words));
-    retval->output_project();
+    if (side == Both) {
+        retval->output_project();
+    } else if (side == Lower) {
+        // do nothing
+    } else if (side == Upper) {
+        retval->invert();
+    }
     retval->minimize();
     return retval;
 }
 
-HfstTransducer * PmatchUtilityTransducers::tolower(HfstTransducer & t)
+HfstTransducer * PmatchUtilityTransducers::tolower(HfstTransducer & t, Side side)
 {
     HfstTokenizer tok;
     HfstTransducer lowercase(*lowerfy);
@@ -1114,12 +1127,18 @@ HfstTransducer * PmatchUtilityTransducers::tolower(HfstTransducer & t)
     lowercase.disjunct(any_but_upper);
     HfstTransducer * retval = new HfstTransducer(t);
     retval->compose(lowercase.repeat_star());
-    retval->output_project();
+    if (side == Both) {
+        retval->output_project();
+    } else if (side == Lower) {
+        // do nothing
+    } else if (side == Upper) {
+        retval->invert();
+    }
     retval->minimize();
     return retval;
 }
 
-HfstTransducer * PmatchUtilityTransducers::toupper(HfstTransducer & t)
+HfstTransducer * PmatchUtilityTransducers::toupper(HfstTransducer & t, Side side)
 {
     HfstTokenizer tok;
     HfstTransducer uppercase(*capify);
@@ -1128,12 +1147,18 @@ HfstTransducer * PmatchUtilityTransducers::toupper(HfstTransducer & t)
     uppercase.disjunct(any_but_lower);
     HfstTransducer * retval = new HfstTransducer(t);
     retval->compose(uppercase.repeat_star());
-    retval->output_project();
+        if (side == Both) {
+        retval->output_project();
+    } else if (side == Lower) {
+        // do nothing
+    } else if (side == Upper) {
+        retval->invert();
+    }
     retval->minimize();
     return retval;
 }
 
-HfstTransducer * PmatchUtilityTransducers::opt_tolower(HfstTransducer & t)
+HfstTransducer * PmatchUtilityTransducers::opt_tolower(HfstTransducer & t, Side side)
 {
     HfstTokenizer tok;
     HfstTransducer lowercase(*lowerfy);
@@ -1141,12 +1166,18 @@ HfstTransducer * PmatchUtilityTransducers::opt_tolower(HfstTransducer & t)
     lowercase.disjunct(anything);
     HfstTransducer * retval = new HfstTransducer(t);
     retval->compose(lowercase.repeat_star());
-    retval->output_project();
+    if (side == Both) {
+        retval->output_project();
+    } else if (side == Lower) {
+        // do nothing
+    } else if (side == Upper) {
+        retval->invert();
+    }
     retval->minimize();
     return retval;
 }
 
-HfstTransducer * PmatchUtilityTransducers::opt_toupper(HfstTransducer & t)
+HfstTransducer * PmatchUtilityTransducers::opt_toupper(HfstTransducer & t, Side side)
 {
     HfstTokenizer tok;
     HfstTransducer uppercase(*capify);
@@ -1154,7 +1185,13 @@ HfstTransducer * PmatchUtilityTransducers::opt_toupper(HfstTransducer & t)
     uppercase.disjunct(anything);
     HfstTransducer * retval = new HfstTransducer(t);
     retval->compose(uppercase.repeat_star());
-    retval->output_project();
+    if (side == Both) {
+        retval->output_project();
+    } else if (side == Lower) {
+        // do nothing
+    } else if (side == Upper) {
+        retval->invert();
+    }
     retval->minimize();
     return retval;
 }
@@ -1427,6 +1464,68 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
     } else if (op == AnyCase) {
         HfstTransducer * toupper = get_utils()->opt_toupper(*retval);
         HfstTransducer * tolower = get_utils()->opt_tolower(*retval);
+        retval->disjunct(*toupper);
+        retval->disjunct(*tolower);
+        delete toupper; delete tolower;
+    } else if (op == CapUpper) {
+        HfstTransducer * tmp = get_utils()->cap(*retval, Upper);
+        delete retval;
+        retval = tmp;
+    } else if (op == OptCapUpper) {
+        HfstTransducer * tmp = get_utils()->optcap(*retval, Upper);
+        delete retval;
+        retval = tmp;
+    } else if (op == ToLowerUpper) {
+        HfstTransducer * tmp = get_utils()->tolower(*retval, Upper);
+        delete retval;
+        retval = tmp;
+    } else if (op == ToUpperUpper) {
+        HfstTransducer * tmp = get_utils()->toupper(*retval, Upper);
+        delete retval;
+        retval = tmp;
+    } else if (op == OptToLowerUpper) {
+        HfstTransducer * tmp = get_utils()->opt_tolower(*retval, Upper);
+        tmp->disjunct(*retval);
+        delete retval;
+        retval = tmp;
+    } else if (op == OptToUpperUpper) {
+        HfstTransducer * tmp = get_utils()->opt_toupper(*retval, Upper);
+        delete retval;
+        retval = tmp;
+    } else if (op == AnyCaseUpper) {
+        HfstTransducer * toupper = get_utils()->opt_toupper(*retval, Upper);
+        HfstTransducer * tolower = get_utils()->opt_tolower(*retval, Upper);
+        retval->disjunct(*toupper);
+        retval->disjunct(*tolower);
+        delete toupper; delete tolower;
+    } else if (op == CapLower) {
+        HfstTransducer * tmp = get_utils()->cap(*retval, Lower);
+        delete retval;
+        retval = tmp;
+    } else if (op == OptCapLower) {
+        HfstTransducer * tmp = get_utils()->optcap(*retval, Lower);
+        delete retval;
+        retval = tmp;
+    } else if (op == ToLowerLower) {
+        HfstTransducer * tmp = get_utils()->tolower(*retval, Lower);
+        delete retval;
+        retval = tmp;
+    } else if (op == ToUpperLower) {
+        HfstTransducer * tmp = get_utils()->toupper(*retval, Lower);
+        delete retval;
+        retval = tmp;
+    } else if (op == OptToLowerLower) {
+        HfstTransducer * tmp = get_utils()->opt_tolower(*retval, Lower);
+        tmp->disjunct(*retval);
+        delete retval;
+        retval = tmp;
+    } else if (op == OptToUpperLower) {
+        HfstTransducer * tmp = get_utils()->opt_toupper(*retval, Lower);
+        delete retval;
+        retval = tmp;
+    } else if (op == AnyCaseLower) {
+        HfstTransducer * toupper = get_utils()->opt_toupper(*retval, Lower);
+        HfstTransducer * tolower = get_utils()->opt_tolower(*retval, Lower);
         retval->disjunct(*toupper);
         retval->disjunct(*tolower);
         delete toupper; delete tolower;

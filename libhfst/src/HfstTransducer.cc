@@ -549,7 +549,7 @@ HfstTransducer * HfstTransducer::harmonize_(const HfstTransducer &another)
     In the case of foma transducers, does nothing because foma's own functions
     take care of harmonizing. If harmonization is needed, 
     FomaTransducer::harmonize can be used instead. */
-void HfstTransducer::harmonize(HfstTransducer &another)
+  void HfstTransducer::harmonize(HfstTransducer &another, bool force/*=false*/)
 {
   using namespace implementations;
     if (this->type != another.type) {
@@ -588,7 +588,8 @@ void HfstTransducer::harmonize(HfstTransducer &another)
 #if HAVE_FOMA
     case (FOMA_TYPE):
         // no need to harmonize as foma's functions take care of harmonizing
-        break;
+      if (!force)
+        return;
 #endif // HAVE_FOMA
 #if HAVE_XFSM
     case (XFSM_TYPE):
@@ -617,12 +618,6 @@ void HfstTransducer::harmonize(HfstTransducer &another)
     default:
         HFST_THROW(TransducerHasWrongTypeException);
     }
-
-    if (false)
-      {
-    this->write_in_att_format(stderr);
-    another.write_in_att_format(stderr);
-      }
 }
 
 // test function
@@ -1783,89 +1778,74 @@ static void substitute_escaped_flags(HfstTransducer * filter)
 
 static int flag_build
 (int ftype, char *fname, char *fvalue, int fftype, char *ffname, char *ffvalue) {
-  int eq, selfnull;
 
-    selfnull = 0; /* If current flag has no value, e.g. @R.A@ */
     if (strcmp(fname,ffname) != 0)
         return FLAG_NONE;
-    
-    bool fvalue_allocated = false; // make scan-build happy..
-    bool ffvalue_allocated = false;
 
-    if (fvalue == NULL) {
-        fvalue = strdup("");
-        fvalue_allocated = true;
-        selfnull = 1;
-    }
-    
-    if (ffvalue == NULL) {
-        ffvalue = strdup("");
-        ffvalue_allocated = true;
-    }
+    bool selfnull = false; /* If current flag has no value, e.g. @R.A@ */    
+    if (strcmp(fvalue, "") == 0)
+      selfnull = true;
 
-    eq = strcmp(fvalue, ffvalue);
-
-    if (fvalue_allocated) { free(fvalue); }  // make scan-build happy..
-    if (ffvalue_allocated) { free(ffvalue); }
+    int eq = strcmp(fvalue, ffvalue);
 
     /* U flags */
-    if (ftype == FLAG_UNIFY && fftype == FLAG_POSITIVE && eq == 0)
+    if ((ftype == FLAG_UNIFY) && (fftype == FLAG_POSITIVE) && (eq == 0))
         return FLAG_SUCCEED;
-    if (ftype == FLAG_UNIFY && fftype == FLAG_CLEAR)
+    if ((ftype == FLAG_UNIFY) && (fftype == FLAG_CLEAR))
         return FLAG_SUCCEED;
-    if (ftype == FLAG_UNIFY && fftype == FLAG_UNIFY && eq != 0)
+    if ((ftype == FLAG_UNIFY) && (fftype == FLAG_UNIFY) && (eq != 0))
         return FLAG_FAIL;
-    if (ftype == FLAG_UNIFY && fftype == FLAG_POSITIVE && eq != 0)
+    if ((ftype == FLAG_UNIFY) && (fftype == FLAG_POSITIVE) && (eq != 0))
         return FLAG_FAIL;
-    if (ftype == FLAG_UNIFY && fftype == FLAG_NEGATIVE && eq == 0)
+    if ((ftype == FLAG_UNIFY) && (fftype == FLAG_NEGATIVE) && (eq == 0))
         return FLAG_FAIL;
 
     /* R flag with value = 0 */
-    if (ftype == FLAG_REQUIRE && fftype == FLAG_UNIFY && selfnull)
+    if ((ftype == FLAG_REQUIRE) && (fftype == FLAG_UNIFY) && selfnull)
         return FLAG_SUCCEED;
-    if (ftype == FLAG_REQUIRE && fftype == FLAG_POSITIVE && selfnull)
+    if ((ftype == FLAG_REQUIRE) && (fftype == FLAG_POSITIVE) && selfnull)
         return FLAG_SUCCEED;
-    if (ftype == FLAG_REQUIRE && fftype == FLAG_NEGATIVE && selfnull)
+    if ((ftype == FLAG_REQUIRE) && (fftype == FLAG_NEGATIVE) && selfnull)
         return FLAG_SUCCEED;
-    if (ftype == FLAG_REQUIRE && fftype == FLAG_CLEAR && selfnull)
+    if ((ftype == FLAG_REQUIRE) && (fftype == FLAG_CLEAR) && selfnull)
         return FLAG_FAIL;
 
     /* R flag with value */
-    if (ftype == FLAG_REQUIRE && fftype == FLAG_POSITIVE && eq == 0 && !selfnull)
+    if ((ftype == FLAG_REQUIRE) && (fftype == FLAG_POSITIVE) && (eq == 0) && !selfnull)
         return FLAG_SUCCEED;
-    if (ftype == FLAG_REQUIRE && fftype == FLAG_UNIFY && eq == 0 && !selfnull)
+    if ((ftype == FLAG_REQUIRE) && (fftype == FLAG_UNIFY) && (eq == 0) && !selfnull)
         return FLAG_SUCCEED;
-    if (ftype == FLAG_REQUIRE && fftype == FLAG_POSITIVE && eq != 0 && !selfnull)
+    if ((ftype == FLAG_REQUIRE) && (fftype == FLAG_POSITIVE) && (eq != 0) && !selfnull)
         return FLAG_FAIL;
-    if (ftype == FLAG_REQUIRE && fftype == FLAG_UNIFY && eq != 0 && !selfnull)
+    if ((ftype == FLAG_REQUIRE) && (fftype == FLAG_UNIFY) && (eq != 0) && !selfnull)
         return FLAG_FAIL;
-    if (ftype == FLAG_REQUIRE && fftype == FLAG_NEGATIVE && !selfnull)
+    if ((ftype == FLAG_REQUIRE) && (fftype == FLAG_NEGATIVE) && !selfnull)
         return FLAG_FAIL;
-    if (ftype == FLAG_REQUIRE && fftype == FLAG_CLEAR && !selfnull)
+    if ((ftype == FLAG_REQUIRE) && (fftype == FLAG_CLEAR) && !selfnull)
         return FLAG_FAIL;
 
     /* D flag with value = 0 */
-    if (ftype == FLAG_DISALLOW && fftype == FLAG_CLEAR && selfnull)
-        return FLAG_SUCCEED;
-    if (ftype == FLAG_DISALLOW && fftype == FLAG_POSITIVE && selfnull)
-        return FLAG_FAIL;
-    if (ftype == FLAG_DISALLOW && fftype == FLAG_UNIFY && selfnull)
-        return FLAG_FAIL;
-    if (ftype == FLAG_DISALLOW && fftype == FLAG_NEGATIVE && selfnull)
-        return FLAG_FAIL;
+    if ((ftype == FLAG_DISALLOW) && (fftype == FLAG_CLEAR) && selfnull)
+      return FLAG_SUCCEED;
+    if ((ftype == FLAG_DISALLOW) && (fftype == FLAG_POSITIVE) && selfnull)
+      return FLAG_FAIL;
+    if ((ftype == FLAG_DISALLOW) && (fftype == FLAG_UNIFY) && selfnull)
+      return FLAG_FAIL;
+    if ((ftype == FLAG_DISALLOW) && (fftype == FLAG_NEGATIVE) && selfnull)
+      return FLAG_FAIL;
 
     /* D flag with value */
-    if (ftype == FLAG_DISALLOW && fftype == FLAG_POSITIVE && eq != 0 && !selfnull)
+    if ((ftype == FLAG_DISALLOW) && (fftype == FLAG_POSITIVE) && (eq != 0) && !selfnull)
         return FLAG_SUCCEED;
-    if (ftype == FLAG_DISALLOW && fftype == FLAG_CLEAR && !selfnull)
+    if ((ftype == FLAG_DISALLOW) && (fftype == FLAG_CLEAR) && !selfnull)
         return FLAG_SUCCEED;
-    if (ftype == FLAG_DISALLOW && fftype == FLAG_NEGATIVE  && eq == 0 && !selfnull)
+    if ((ftype == FLAG_DISALLOW) && (fftype == FLAG_NEGATIVE ) && (eq == 0) && !selfnull)
         return FLAG_SUCCEED;
-    if (ftype == FLAG_DISALLOW && fftype == FLAG_POSITIVE && eq == 0 && !selfnull)
+    if ((ftype == FLAG_DISALLOW) && (fftype == FLAG_POSITIVE) && (eq == 0) && !selfnull)
         return FLAG_FAIL;
-    if (ftype == FLAG_DISALLOW && fftype == FLAG_UNIFY && eq == 0 && !selfnull)
+    if ((ftype == FLAG_DISALLOW) && (fftype == FLAG_UNIFY) && (eq == 0) && !selfnull)
         return FLAG_FAIL;
-    if (ftype == FLAG_DISALLOW && fftype == FLAG_NEGATIVE  && eq != 0 && !selfnull)
+    if ((ftype == FLAG_DISALLOW) && (fftype == FLAG_NEGATIVE ) && (eq != 0) && !selfnull)
         return FLAG_FAIL;
 
     return FLAG_NONE;

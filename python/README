@@ -8,26 +8,19 @@ BUILDING THE BINDINGS
 =====================
 
 Building and installation is done using the standard Python module distutils.
-Once you've successfully built HFST library (located in the parent directory,
-if you are compiling from source), use the script setup.py to build the Python
-extension eg. like so:
+Once you've successfully built and installed HFST library (located in the
+parent directory, if you are compiling from source), use the script setup.py
+to build the Python extension eg. like so:
 
     python setup.py build_ext --inplace
 
-
-If you already have HFST installed, it is possible that SWIG will use 
-the installed version of HFST library instead of the one located in
-"../libhfst/src/.libs/". To avoid this, either add the full path to HFST
-library to LD_LIBRARY_PATH before building the Python extension, e.g. by
-executing
-
-    LD_LIBRARY_PATH="path/to/hfst-top-dir/libhfst/src/.libs/:"$LD_LIBRARY_PATH
-
-or edit extra_link_arguments as commented in setup.py:
+If you have only built HFST library but not installed it (or have an earlier
+version of HFST library installed) and want to build the bindings, you either
+have to add full path to ../libhfst/src/.libs to LD_LIBRARY_PATH or hard-code
+the library path by modifying setup.py:
 
   extra_link_arguments = []
-  # if you wish to link to the local hfst library created in the folder '../libhfst/src',
-  # replace the above with:
+  # If you wish to link to the local HFST library, replace the above with:
   # extra_link_arguments = ["-Wl,-rpath=" + absolute_libhfst_src_path + "/.libs"]
 
 
@@ -46,6 +39,9 @@ INSTALLING THE BINDINGS
 If you wish to install the extension, run
 
     python setup.py install
+
+The same that was said about linking to HFST C++ library in 'Building the
+bindings' above, applies also to installing.
 
 
 For further information, consult
@@ -87,10 +83,12 @@ structure of the package is
  * hfst
     * hfst.exceptions
     * hfst.rules
+    * hfst.types
 
 The module hfst.exceptions contains HfstException and its subclasses and the
 module hfst.rules functions that create transducers implementing two-level
-rules. All other functions and classes are in module hfst.
+rules. The module hfst.types contains transducer implementation types. All
+other functions and classes are in module hfst.
 
 For documentation and examples, see <https://hfst.github.io/python/index.html>.
 
