@@ -438,19 +438,19 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
                 std::ostringstream ssform;
                 std::copy(in_beg, in_end, std::ostream_iterator<std::string>(ssform, ""));
                 std::string form = ssform.str();
-                LocationVectorVector locations = container.locate(form, time_cutoff);
-                if(locations.size() != 1) {
+                LocationVectorVector bt_locs = container.locate(form, time_cutoff);
+                if(bt_locs.size() != 1) {
                     std::cerr << "Backtrack-subform '"<<form<<"' only had split tokenisations, skipping."<<std::endl; // DEBUG
                 }
-                for(LocationVectorVector::const_iterator it = locations.begin();
-                    it != locations.end(); ++it) {
-                    if (it->empty()
-                        || (it->size() == 1 && it->at(0).output.compare("@_NONMATCHING_@") == 0)
+                for(LocationVectorVector::const_iterator bt_it = bt_locs.begin();
+                    bt_it != bt_locs.end(); ++bt_it) {
+                    if (bt_it->empty()
+                        || (bt_it->size() == 1 && bt_it->at(0).output.compare("@_NONMATCHING_@") == 0)
                         // keep only those that cover the full form
-                        || it->at(0).input.length() != form.length()) {
+                        || bt_it->at(0).input.length() != form.length()) {
                         continue;
                     }
-                    LocationVector loc = keep_n_best_weight(max_weight_classes, *it);
+                    LocationVector loc = keep_n_best_weight(max_weight_classes, *bt_it);
                     for (LocationVector::const_iterator loc_it = loc.begin();
                          loc_it != loc.end(); ++loc_it) {
                         if(!loc_it->output.empty()
