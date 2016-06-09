@@ -12,6 +12,11 @@ compiler:
     - clang
     - gcc
 
+matrix:
+    exclude:
+    - os: osx
+        compiler: gcc
+
 before_install:
     - echo "$TRAVIS_OS_NAME"
     - if [[ "$TRAVIS_OS_NAME" = "linux" ]];then wget http://apertium.projectjj.com/apt/install-nightly.sh -O - | sudo bash; fi
@@ -26,7 +31,7 @@ before_install:
 
 script:
     - ./autogen.sh
-    - ./configure --enable-xfst --enable-proc --without-foma --enable-lexc --enable-all-tools
+    - ./configure --enable-xfst --enable-proc --without-foma --enable-lexc --enable-all-tools --enable-silent-rules
     - if [[ $CXX = g++ ]]; then make -j2; else make -j; fi
     - make check
 
@@ -42,4 +47,3 @@ notifications:
 # Encrypt with:
 # $ gem install --user-install travis
 # $ ~/.gem/ruby/*/bin/travis encrypt -r hfst/hfst 'chat.freenode.net#hfst'
-

@@ -9,6 +9,8 @@
 
 #include "HfstLookupFlagDiacritics.h"
 
+using hfst::StringVector;
+
 DiacriticOperators FlagDiacriticTable::diacritic_operators;
 DiacriticFeatures FlagDiacriticTable::diacritic_features;
 DiacriticValues FlagDiacriticTable::diacritic_values;

@@ -1,3 +1,4 @@
+set need-separators off
 define CapWord UppercaseAlpha Alpha* ;
 define StreetWordFr [{avenue} | {boulevard} | {rue}] ;
 define DeFr [ [{de} | {du} | {des} | {de la}] Whitespace ] | [{d'} | {l'}] ;

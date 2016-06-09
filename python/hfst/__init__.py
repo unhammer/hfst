@@ -1,3 +1,7 @@
+"""
+python bindings for HFST finite-state transducer library written in C++
+"""
+
 import hfst.exceptions
 import hfst.rules
 import hfst.types

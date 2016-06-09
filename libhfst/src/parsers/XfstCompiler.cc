@@ -664,37 +664,41 @@ namespace xfst {
         StringVector lookup_path = tok.tokenize_one_level(std::string(token));
 
         size_t cutoff = -1;
-        if (t->is_lookup_infinitely_ambiguous(lookup_path))
+        if (t->is_lookup_infinitely_ambiguous(lookup_path, variables_["obey-flags"] == "ON"))
           {
             cutoff = string_to_size_t(variables_["lookup-cycle-cutoff"]);
             if (verbose_)
               {
                 error() << "warning: lookup is infinitely ambiguous, limiting the number of cycles to " << cutoff << std::endl;
                 flush(&error());
-            //hfst_fprintf(warnstream_, 
-            //                "warning: lookup is infinitely ambiguous, limiting the number of cycles to " SIZE_T_SPECIFIER "\n", cutoff);
               }
           }
 
         HfstTwoLevelPaths results;
 
-        // todo: variables_["obey-flags"] == ["ON"|"OFF"]
-
         if (variables_["maximum-weight"] == "OFF")
-          t->lookup_fd(lookup_path, results, &cutoff, NULL);
+          t->lookup_fd(lookup_path, results, &cutoff, NULL, (variables_["obey-flags"] == "ON"));
         else
           {
             float max_weight = string_to_float(variables_["maximum-weight"]);
-            t->lookup_fd(lookup_path, results, &cutoff, &max_weight);
+            t->lookup_fd(lookup_path, results, &cutoff, &max_weight, (variables_["obey-flags"] == "ON"));
           }
 
-        HfstOneLevelPaths paths = extract_output_paths(results);
+        bool printed = false; // if anything was printed
 
-        bool printed = this->print_paths(paths);
+        if (variables_["print-pairs"] == "OFF")
+          {
+            HfstOneLevelPaths paths = extract_output_paths(results);
+            printed = this->print_paths(paths);
+          }
+        else
+          {
+            printed = this->print_paths(results);
+          }
+
         if (!printed)
           {
             output() << "???" << std::endl;
-            //hfst_fprintf(outstream_, "???\n");
           }
 
         flush(&output());
@@ -3482,9 +3486,13 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::print_net(std::ostream * oss_)
     {
-      std::ostream * oss = get_stream(oss_);
+      if (variables_["print-sigma"] == "ON")
+        {
+          this->print_sigma(oss_, false /*do not prompt*/);
+        }
       GET_TOP(tmp);
       HfstBasicTransducer basic(*tmp);
+      std::ostream * oss = get_stream(oss_);
       basic.write_in_xfst_format(*oss, variables_["print-weight"] == "ON");
       flush(oss);
       PROMPT_AND_RETURN_THIS;
@@ -3492,7 +3500,6 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::print_net(const char* name, std::ostream * oss_)
     {
-      std::ostream * oss = get_stream(oss_);
       //hfst_fprintf(outfile, "missing print net %s:%d\n", __FILE__, __LINE__);
       std::map<std::string,hfst::HfstTransducer*>::const_iterator it =
         definitions_.find(name);
@@ -3505,11 +3512,18 @@ namespace xfst {
         }
       else
         {
+          if (variables_["print-sigma"] == "ON")
+            {
+              stack_.push(it->second);
+              this->print_sigma(oss_, false /*do not prompt*/);
+              stack_.pop();
+            }
           HfstBasicTransducer basic(*(it->second));
+          std::ostream * oss = get_stream(oss_);
           basic.write_in_xfst_format(*oss, variables_["print-weight"] == "ON");
+          flush(oss);
+          PROMPT_AND_RETURN_THIS;
         }
-      flush(oss);
-      PROMPT_AND_RETURN_THIS;
     }
 
   static bool is_special_symbol(const std::string &s)

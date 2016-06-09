@@ -30,7 +30,10 @@ typedef std::map<std::string,std::string> DiacriticValues;
 typedef std::map<std::string,bool> DiacriticSettingMap;
 typedef std::map<std::string,std::string> FeatureValues;
 typedef std::map<std::string,bool> FeaturePolarities;
-typedef std::vector<std::string> StringVector;
+
+namespace hfst {
+  typedef std::vector<std::string> StringVector; }
+
 class  FlagDiacriticTable
 {
   static DiacriticOperators diacritic_operators;
@@ -65,8 +68,8 @@ class  FlagDiacriticTable
   void reset(void);
   bool fails(void);
   static bool is_diacritic(const std::string &symbol);
-  bool is_valid_string(const StringVector & input_string);
-  StringVector filter_diacritics(const StringVector & input_string);
+  bool is_valid_string(const hfst::StringVector & input_string);
+  hfst::StringVector filter_diacritics(const hfst::StringVector & input_string);
 #ifdef DEBUG
   static void display(short diacritic); 
 #endif

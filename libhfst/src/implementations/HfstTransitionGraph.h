@@ -26,6 +26,7 @@
  #include "../HfstDataTypes.h"
  #include "../HarmonizeUnknownAndIdentitySymbols.h"
  #include "../HfstFlagDiacritics.h"
+ #include "../HfstLookupFlagDiacritics.h"
  #include "../HfstEpsilonHandler.h"
  #include "ConvertTransducerFormat.h"
  #include "HfstTransition.h"
@@ -3625,11 +3626,28 @@
            return false;
          }
 
+         bool is_possible_flag(std::string symbol, StringVector & fds, bool obey_flags)
+         {
+           if (FdOperation::is_diacritic(symbol))
+             {
+               FlagDiacriticTable FdT;
+               fds.push_back(symbol);
+               if ((!obey_flags) || FdT.is_valid_string(fds))
+                 { return true; }
+               else
+                 { 
+                   fds.pop_back();
+                   return false;
+                 }
+             }
+           return false;
+         }
+
          HFSTDLL bool is_lookup_infinitely_ambiguous
            (const HfstOneLevelPath& s,
             unsigned int& index, HfstState state,
-            std::set<HfstState> &epsilon_path_states
-            )
+            std::set<HfstState> &epsilon_path_states,
+            StringVector & fds, bool obey_flags)
          {
            // Whether the end of the lookup path s has been reached                    
            bool only_epsilons=false;
@@ -3649,9 +3667,10 @@
                //         so they can be added freely.                                 
                // (Diacritics are also treated as epsilons, although it might cause false                                                   
                //  positive results, because loops with diacritics can be invalidated by                                                    
-               //  other diacritics.)                                                  
+               //  other diacritics.)
+               bool possible_flag = is_possible_flag(it->get_input_symbol(), fds, obey_flags);
                if ( is_epsilon(it->get_input_symbol()) ||
-                    FdOperation::is_diacritic(it->get_input_symbol()) )
+                    possible_flag )
                  {
                    epsilon_path_states.insert(state);
                    if (epsilon_path_states.find(it->get_target_state())
@@ -3660,11 +3679,13 @@
                        return true;
                      }
                    if (is_lookup_infinitely_ambiguous
-                       (s, index, it->get_target_state(), epsilon_path_states))
+                       (s, index, it->get_target_state(), epsilon_path_states, fds, obey_flags))
                      {
                        return true;
                      }
                    epsilon_path_states.erase(state);
+                   if (possible_flag)
+                     { fds.pop_back(); }
                  }
                
                /* CASE 2: Other input symbols consume a symbol in the lookup path s,   
@@ -3688,7 +3709,7 @@
                        index++; // consume an input symbol in the lookup path s            
                        std::set<HfstState> empty_set;
                        if (is_lookup_infinitely_ambiguous
-                           (s, index, it->get_target_state(), empty_set))
+                           (s, index, it->get_target_state(), empty_set, fds, obey_flags))
                          {
                            return true;
                          }
@@ -3699,25 +3720,27 @@
            return false;
          }
 
-         HFSTDLL bool is_lookup_infinitely_ambiguous(const HfstOneLevelPath & s)
+         HFSTDLL bool is_lookup_infinitely_ambiguous(const HfstOneLevelPath & s, bool obey_flags=false)
          {
            std::set<HfstState> epsilon_path_states;
            epsilon_path_states.insert(0);
            unsigned int index=0;
+           StringVector fds;
 
            return is_lookup_infinitely_ambiguous(s, index, INITIAL_STATE,
-                                                 epsilon_path_states);
+                                                 epsilon_path_states, fds, obey_flags);
          }
 
-         HFSTDLL bool is_lookup_infinitely_ambiguous(const StringVector & s)
+         HFSTDLL bool is_lookup_infinitely_ambiguous(const StringVector & s, bool obey_flags=false)
          {
            std::set<HfstState> epsilon_path_states;
            epsilon_path_states.insert(0);
            unsigned int index=0;
            HfstOneLevelPath path((float)0, s);
+           StringVector fds;
 
            return is_lookup_infinitely_ambiguous(path, index, INITIAL_STATE,
-                                                 epsilon_path_states);
+                                                 epsilon_path_states, fds, obey_flags);
          }
 
 
@@ -3725,16 +3748,29 @@
          HFSTDLL static void push_back_to_two_level_path
            (HfstTwoLevelPath &path,
             const StringPair &sp,
-            const float &weight)
+            const float &weight,
+            StringVector * fds_so_far = NULL)
          {
            path.second.push_back(sp);
            path.first = path.first + weight;
+           if (fds_so_far != NULL)
+             {
+               if (FdOperation::is_diacritic(sp.first))
+                 { fds_so_far->push_back(sp.first); }
+             }
          }
          
          HFSTDLL static void pop_back_from_two_level_path
            (HfstTwoLevelPath &path,
-            const float &weight)
+            const float &weight,
+            StringVector * fds_so_far = NULL)
          {
+           if (fds_so_far != NULL)
+             {
+               StringPair sp = path.second.back();
+               if (FdOperation::is_diacritic(sp.first))
+                 { fds_so_far->pop_back(); }
+             }
            path.second.pop_back();
            path.first = path.first - weight;
          }
@@ -3767,7 +3803,8 @@
             const StringVector &lookup_path,
             const unsigned int &lookup_index,
             const StringSet &alphabet,
-            bool &input_symbol_consumed)
+            bool &input_symbol_consumed,
+            StringVector * fds_so_far = NULL)
          {
            std::string isymbol = transition.get_input_symbol();
            
@@ -3793,11 +3830,30 @@
            // Whether there are more symbols in lookup_path or not,
            // we can always go further if the input symbol of the transition
            // is an epsilon or a flag diacritic.
-           if ( is_epsilon(isymbol) || 
-                FdOperation::is_diacritic(isymbol) )
+           if ( is_epsilon(isymbol) )
              {
                input_symbol_consumed=false;
                return true;
+             }
+           if ( FdOperation::is_diacritic(isymbol) )
+             {
+               if (fds_so_far == NULL)
+                 {
+                   input_symbol_consumed=false;
+                   return true;
+                 }
+               else
+                 {
+                   FlagDiacriticTable FdT;
+                   fds_so_far->push_back(isymbol);
+                   bool valid = FdT.is_valid_string(*fds_so_far);
+                   fds_so_far->pop_back();
+                   if (valid)
+                     {
+                       input_symbol_consumed=false;
+                       return true;
+                     }
+                 }
              }
            
            // No matches.
@@ -3813,7 +3869,8 @@
             StringSet &alphabet,
             HfstEpsilonHandler Eh,
             size_t infinite_cutoff,
-            float * max_weight = NULL)
+            float * max_weight = NULL,
+            StringVector * fds_so_far = NULL)
          {
            // Check whether the number of input epsilon cycles is exceeded
            if (! Eh.can_continue(state)) {
@@ -3847,7 +3904,7 @@
                bool input_symbol_consumed=false;
                if ( is_possible_transition
                     (*it, lookup_path, lookup_index, alphabet, 
-                     input_symbol_consumed) )
+                     input_symbol_consumed, fds_so_far) )
                  {
                    // update path_so_far and lookup_index
                    std::string istr;
@@ -3875,8 +3932,8 @@
                    push_back_to_two_level_path
                      (path_so_far,
                       StringPair(istr, ostr),
-                      it->get_weight());
-                                      
+                      it->get_weight(), fds_so_far);
+
                    HfstEpsilonHandler * Ehp = NULL;
                    if (input_symbol_consumed) {
                      lookup_index++;
@@ -3889,7 +3946,7 @@
                    
                    // call lookup for the target state of the transition
                    lookup_fd(lookup_path, results, it->get_target_state(),
-                             lookup_index, path_so_far, alphabet, *Ehp, infinite_cutoff, max_weight);
+                             lookup_index, path_so_far, alphabet, *Ehp, infinite_cutoff, max_weight, fds_so_far);
                    
                    // return to the original values of path_so_far 
                    // and lookup_index
@@ -3902,7 +3959,7 @@
                      // of Eh is automatically called next
                    }
                    
-                   pop_back_from_two_level_path(path_so_far, it->get_weight());
+                   pop_back_from_two_level_path(path_so_far, it->get_weight(), fds_so_far);
                  }
              }
            
@@ -3912,24 +3969,30 @@
            (const StringVector &lookup_path,
             HfstTwoLevelPaths &results,
             size_t * infinite_cutoff = NULL,
-            float * max_weight = NULL)
+            float * max_weight = NULL,
+            bool obey_flags = false)
          {
            HfstState state = 0;
            unsigned int lookup_index = 0;
            HfstTwoLevelPath path_so_far;
            StringSet alphabet = this->get_alphabet();
+           StringVector * fds_so_far = (obey_flags)? new StringVector() : NULL;
+
            if (infinite_cutoff != NULL)
              {
                HfstEpsilonHandler Eh(*infinite_cutoff);
                lookup_fd(lookup_path, results, state, lookup_index, path_so_far, 
-                     alphabet, Eh, *infinite_cutoff, max_weight);
+                         alphabet, Eh, *infinite_cutoff, max_weight, fds_so_far);
              }
            else
              {
                HfstEpsilonHandler Eh(100000);
                lookup_fd(lookup_path, results, state, lookup_index, path_so_far, 
-                     alphabet, Eh, 100000, max_weight);
+                         alphabet, Eh, 100000, max_weight, fds_so_far);
              }
+           
+           if (fds_so_far != NULL)
+             delete fds_so_far;
          }
 
 
