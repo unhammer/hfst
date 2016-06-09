@@ -288,6 +288,7 @@ process_stream(HfstOutputStream& outstream)
         std::cerr << program_name << ": Empty ruleset, nothing to write\n";
         return EXIT_FAILURE;
     }
+    outstream.close();
     return EXIT_SUCCESS;
 }
 
