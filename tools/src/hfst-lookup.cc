@@ -1226,7 +1226,7 @@ static unsigned int transducer_number=0;
 
 void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results, 
                          const HfstOneLevelPath& s, size_t * limit = NULL, bool print_pairs_at_this_point = false,
-                         bool print_fail = false)
+                         bool print_fail = false, const HfstOneLevelPath * input_to_print = NULL)
 {
   /* If we want a StringPairVector representation */
   HfstTwoLevelPaths results_spv;
@@ -1271,7 +1271,10 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
           if (beam < 0 || it->first <= (lowest_weight + beam))
             {
               /* print the lookup string */
-              print_lookup_string(s.second);
+              if (input_to_print != NULL)
+                print_lookup_string(input_to_print->second);
+              else
+                print_lookup_string(s.second);
               fprintf(outfile, "\t");
               /* and the path that yielded the result string */
               bool first_pair=true;
@@ -1317,7 +1320,7 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
 
 
 HfstOneLevelPaths*
-lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity, bool print_pairs_at_this_point=false, bool print_fail=false)
+lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity, bool print_pairs_at_this_point=false, bool print_fail=false, const HfstOneLevelPath * input_to_print = NULL)
 {
   HfstOneLevelPaths* results = new HfstOneLevelPaths;
 
@@ -1331,12 +1334,12 @@ lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity,
     warning(0, 0, "Got infinite results, number of cycles limited to " SIZE_T_SPECIFIER "",
         infinite_cutoff);
       }
-      lookup_fd_and_print(t, *results, s, &infinite_cutoff, print_pairs_at_this_point, print_fail);
+      lookup_fd_and_print(t, *results, s, &infinite_cutoff, print_pairs_at_this_point, print_fail, input_to_print);
       *infinity = true;
     }
   else
     {
-      lookup_fd_and_print(t, *results, s, NULL, print_pairs_at_this_point, print_fail);
+      lookup_fd_and_print(t, *results, s, NULL, print_pairs_at_this_point, print_fail, input_to_print);
     }
 
   if (results->size() == 0)
@@ -1399,7 +1402,8 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstBasicTransducer> cascade,
           for (HfstOneLevelPaths::const_iterator it = results->begin();
                it != results->end(); it++)
             {
-              HfstOneLevelPaths * one_result = lookup_simple(*it, cascade[i], infinity);
+              // if last transducer in cascade, print results if --print-pairs is requested
+              HfstOneLevelPaths * one_result = lookup_simple(*it, cascade[i], infinity, ((i+1) == cascade.size()), false, &s);
               for (HfstOneLevelPaths::const_iterator IT = one_result->begin();
                    IT != one_result->end(); IT++)
                 {
@@ -1411,10 +1415,21 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstBasicTransducer> cascade,
           // zero 'results'
           delete results;
           results = new HfstOneLevelPaths();
+
+          // no results from cascading composition
+          if ((result->size() == 0) && ((i+1) == cascade.size()))
+            {
+              std::string input;
+              for (StringVector::const_iterator it = s.second.begin(); it != s.second.end(); it++)
+                {
+                  input += *it;
+                }
+              fprintf(outfile, "%s\t%s+?\tinf\n\n", input.c_str(), input.c_str());
+            }
         }
       else
         {
-          result = lookup_simple(s, cascade[i], infinity, true, false);
+          result = lookup_simple(s, cascade[i], infinity, (cascade_ != CASCADE_COMPOSITION), false);
         }
 
       if (infinity)
@@ -1631,10 +1646,10 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
 
     inputstream.close();
 
-    if (print_pairs && (cascade_ == CASCADE_COMPOSITION)) {
+    /*if (print_pairs && (cascade_ == CASCADE_COMPOSITION)) {
       error(EXIT_FAILURE, 0, "pair printing not supported if "
               "--cascade=composition is requested");
-    }
+              }*/
 
     if ((cascade_ == CASCADE_COMPOSITION || cascade_ == CASCADE_PRIORITY_UNION) && 
         (inputstream.get_type() == HFST_OL_TYPE || 
