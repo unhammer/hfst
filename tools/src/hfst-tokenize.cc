@@ -64,6 +64,7 @@ static string tag_separator = "+"; // + and # are hardcoded in cg-conv at least
 static string subreading_separator = "#";
 static string wtag = "W"; // TODO: cg-conv has an argument --wtag, allow changing here as well?
 static double time_cutoff = 0.0;
+static int token_number = 1;
 static int max_weight_classes = std::numeric_limits<int>::max();
 std::string tokenizer_filename;
 static hfst::ImplementationType default_format = hfst::TROPICAL_OPENFST_TYPE;
@@ -72,7 +73,8 @@ enum OutputFormat {
     xerox,
     cg,
     finnpos,
-    gtd
+    gtd,
+    conllu
 };
 OutputFormat output_format = tokenize;
 
@@ -102,6 +104,7 @@ print_usage()
             "  -x, --xerox              Xerox output\n"
             "  -c, --cg                 Constraint Grammar output\n"
             "  -g, --gtd                Giellatekno/Divvun CG output (implies -l2)\n"
+            "  -C  --conllu             CoNLL-U format\n"
             "  -f, --finnpos            FinnPos output\n");
     fprintf(message_out,
             "Use standard streams for input and output (for now).\n"
@@ -149,6 +152,8 @@ void print_nonmatching_sequence(std::string const & str, std::ostream & outstrea
     } else if (output_format == gtd) {
         outstream << ":";
         print_escaping_newlines(str, outstream);
+    } else if (output_format == conllu) {
+        outstream << str;
     } else if (output_format == finnpos) {
         outstream << str << "\t_\t_\t_\t_";
     }
@@ -302,6 +307,71 @@ void print_cg_subreading(std::string const & indent,
     outstream << std::endl;
 }
 
+// Omorfi-specific at this time
+std::string fetch_and_kill_between(std::string left, std::string right, std::string & analysis)
+{
+    size_t start = analysis.find(left);
+    size_t stop = analysis.find(right, start + 1);
+    if (start == std::string::npos || stop == std::string::npos) {
+        return "";
+    }
+    std::string retval = analysis.substr(start + left.size(), stop - start - left.size());
+    analysis.erase(start, stop - start + right.size());
+    return retval;
+}
+
+std::string fetch_and_kill_feats(std::string & analysis)
+{
+    std::string retval;
+    std::string tmp;
+    tmp = fetch_and_kill_between("[ANIMACY=", "]", analysis);
+    retval += (tmp != "" ? ("Animacy=" + tmp + "|") : "");
+    tmp = fetch_and_kill_between("[ASPECT=", "]", analysis);
+    retval += (tmp != "" ? ("Aspect=" + tmp + "|") : "");
+    tmp = fetch_and_kill_between("[CASE=", "]", analysis);
+    retval += (tmp != "" ? ("Case=" + tmp + "|") : "");
+    tmp = fetch_and_kill_between("[DEFINITE=", "]", analysis);
+    retval += (tmp != "" ? ("Definite=" + tmp + "|") : "");
+    tmp = fetch_and_kill_between("[CMP=", "]", analysis);
+    retval += (tmp != "" ? ("Degree=" + tmp + "|") : "");
+    tmp = fetch_and_kill_between("[GENDER=", "]", analysis);
+    retval += (tmp != "" ? ("Gender=" + tmp + "|") : "");
+    tmp = fetch_and_kill_between("[MOOD=", "]", analysis);
+    retval += (tmp != "" ? ("Mood=" + tmp + "|") : "");
+    tmp = fetch_and_kill_between("[NEGATIVE=", "]", analysis);
+    retval += (tmp != "" ? ("Negative=" + tmp + "|") : "");
+    tmp = fetch_and_kill_between("[NUMTYPE=", "]", analysis);
+    retval += (tmp != "" ? ("Numtype=" + tmp + "|") : "");
+    tmp = fetch_and_kill_between("[NUM=", "]", analysis);
+    retval += (tmp != "" ? ("Number=" + tmp + "|") : "");
+    tmp = fetch_and_kill_between("[PERS=", "]", analysis);
+    retval += (tmp != "" ? ("Person=" + tmp + "|") : "");
+    tmp = fetch_and_kill_between("[POSS=", "]", analysis);
+    retval += (tmp != "" ? ("Poss=" + tmp + "|") : "");
+    tmp = fetch_and_kill_between("[PRONTYPE=", "]", analysis);
+    retval += (tmp != "" ? ("PronType=" + tmp + "|") : "");
+    tmp = fetch_and_kill_between("[REFLEX=", "]", analysis);
+    retval += (tmp != "" ? ("Reflex=" + tmp + "|") : "");
+    tmp = fetch_and_kill_between("[TENSE=", "]", analysis);
+    retval += (tmp != "" ? ("Tense=" + tmp + "|") : "");
+    tmp = fetch_and_kill_between("[VERBFORM=", "]", analysis);
+    retval += (tmp != "" ? ("VerbForm=" + tmp + "|") : "");
+    tmp = fetch_and_kill_between("[VOICE=", "]", analysis);
+    retval += (tmp != "" ? ("Voice=" + tmp + "|") : "");
+    if (retval.size() != 0) {
+        retval.erase(retval.size() - 1);
+    }
+    return retval;
+}
+
+std::string empty_to_underscore(std::string to_test)
+{
+    if (to_test.size() == 0) {
+        return "_";
+    }
+    return to_test;
+}
+
 void print_location_vector_gtd(LocationVector const & locations, std::ostream & outstream)
 {
     outstream << "\"<" << locations.at(0).input << ">\"" << std::endl;
@@ -416,6 +486,32 @@ void print_location_vector(LocationVector const & locations, std::ostream & outs
             outstream << std::endl;
         }
         outstream << std::endl;
+    } else if (output_format == conllu) {
+        hfst_ol::Weight lowest_weight = hfst_ol::INFINITE_WEIGHT;
+        hfst_ol::Location best_location;
+        for (LocationVector::const_iterator loc_it = locations.begin();
+             loc_it != locations.end(); ++loc_it) {
+            if (loc_it->weight < lowest_weight) {
+                best_location = *loc_it;
+                lowest_weight = loc_it->weight;
+            }
+//            if (loc_it->tag == "@MULTIWORD@"
+//            outstream << loc_it->input << "\t" << loc_it->output;
+        }
+        outstream << token_number
+                  << "\t" << best_location.input;
+        outstream << "\t" << empty_to_underscore(fetch_and_kill_between("[WORD_ID=", "]", best_location.output));
+        outstream << "\t" << empty_to_underscore(fetch_and_kill_between("[UPOS=", "]", best_location.output));
+        outstream << "\t" << empty_to_underscore(fetch_and_kill_between("[XPOS=", "]", best_location.output));
+        outstream << "\t" << empty_to_underscore(fetch_and_kill_feats(best_location.output))
+                  << "\t" << "_" // HEAD
+                  << "\t" << "_" // DEPREL
+                  << "\t" << "_"; // DEPS
+        outstream << "\t" << empty_to_underscore(best_location.output); // MISC
+                    if (print_weights) {
+                outstream << "\t" << best_location.weight;
+            }
+        outstream << std::endl;
     } else if (output_format == finnpos) {
         std::set<std::string> tags;
         std::set<std::string> lemmas;
@@ -510,6 +606,7 @@ void match_and_print(hfst_ol::PmatchContainer & container,
     if (locations.size() == 0 && print_all) {
         print_no_output(input_text, outstream);
     }
+    token_number = 1;
     for(LocationVectorVector::const_iterator it = locations.begin();
         it != locations.end(); ++it) {
         if ((it->size() == 1 && it->at(0).output.compare("@_NONMATCHING_@") == 0)) {
@@ -526,6 +623,7 @@ void match_and_print(hfst_ol::PmatchContainer & container,
         else {
             print_location_vector(*it, outstream);
         }
+        ++token_number;
     }
     if (output_format == finnpos) {
         outstream << std::endl;
@@ -590,11 +688,12 @@ int parse_options(int argc, char** argv)
                 {"xerox", no_argument, 0, 'x'},
                 {"cg", no_argument, 0, 'c'},
                 {"gtd", no_argument, 0, 'g'},
+                {"conllu", no_argument, 0, 'C'},
                 {"finnpos", no_argument, 0, 'f'},
                 {0,0,0,0}
             };
         int option_index = 0;
-        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nkawmt:l:zxcgf",
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nkawmt:l:zxcgCf",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -645,6 +744,9 @@ int parse_options(int argc, char** argv)
             break;
         case 'c':
             output_format = cg;
+            break;
+        case 'C':
+            output_format = conllu;
             break;
         case 'g':
             output_format = gtd;
@@ -734,8 +836,10 @@ int main(int argc, char ** argv)
             return process_input(container, std::cout);
         }
     } catch(HfstException & e) {
-        std::cerr << "The archive in " << tokenizer_filename << " doesn't look right."
-            "\nDid you make it with hfst-pmatch2fst or make sure it's in weighted optimized-lookup format?\n";
+        std::cerr << "The archive in " << tokenizer_filename <<
+            " doesn't look right.\nDid you make it with hfst-pmatch2fst"
+            " or make sure it's in weighted optimized-lookup format?\n"
+            "Exception thrown:\n" << e.what() << std::endl;
         return 1;
     }
 
