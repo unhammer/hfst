@@ -1314,28 +1314,6 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
       HfstOneLevelPath path(it->first, sv);
       results.insert(path);
     }
- 
-  HfstOneLevelPaths filtered;
-  for (HfstOneLevelPaths::iterator res = results.begin();
-       res != results.end();
-       ++res)
-    {
-      if (is_valid_flag_diacritic_path(res->second) || !obey_flags)
-        {
-          StringVector unflagged;
-          for (StringVector::const_iterator arc = res->second.begin();
-               arc != res->second.end();
-               arc++)
-            {
-              if (show_flags || ! FdOperation::is_diacritic(*arc))
-                {
-                  unflagged.push_back(*arc);
-                }
-            }
-          filtered.insert(HfstOneLevelPath(res->first, unflagged));
-        }
-    }
-  results = filtered;
 }
 
 
