@@ -557,27 +557,6 @@ static void print_prompt()
 
 static std::string get_print_format(const std::string &s) ;
 
-bool
-is_valid_flag_diacritic_path(StringVector arcs)
-  {
-    //if (not print_pairs)
-    //  fprintf(stderr, "Allowing all flag paths!\n");
-    FlagDiacriticTable FdT;
-    bool res = FdT.is_valid_string(arcs);
-    if (!res)
-      {
-        verbose_printf("blocked by flags: ");
-        for (StringVector::const_iterator s = arcs.begin();
-             s != arcs.end();
-             ++s)
-          {
-            verbose_printf("%s ", s->c_str());
-          }
-      }
-    return res;
-  }
-
-
 int
 lookup_printf(const char* format, const HfstOneLevelPath* input,
               const HfstOneLevelPath* result, const char* markup,
@@ -1264,8 +1243,6 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
             sv.push_back(spv_it->second);
           }
 
-        if (is_valid_flag_diacritic_path(sv) || !obey_flags)
-        {
           if (it == results_spv.begin())
             lowest_weight = it->first;
           if (beam < 0 || it->first <= (lowest_weight + beam))
@@ -1294,7 +1271,6 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
               /* and the weight of that path (add the weight of input). */
               fprintf(outfile, "\t%f\n", it->first + s.first);
             }
-        }
 
       }
       fprintf(outfile, "\n");
