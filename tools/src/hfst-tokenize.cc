@@ -445,6 +445,7 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
                     std::copy(in_beg, in_end, std::ostream_iterator<std::string>(ssform, ""));
                     std::string form = ssform.str();
                     LocationVectorVector bt_locs = container.locate(form, time_cutoff);
+                    // std::cerr << "Backtrack from subform '"<<form<<"'"<<std::endl; // DEBUG
                     if(bt_locs.size() != 1) {
                         std::cerr << "Backtrack-subform '"<<form<<"' only had split tokenisations, skipping."<<std::endl; // DEBUG
                     }
@@ -471,11 +472,14 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
                 std::reverse(locs_rebuilt.begin(), locs_rebuilt.end());
                 size_t depth = 0;
                 std::vector<std::ostringstream> out(locs_rebuilt.size());
-                LocationVectorVector todo = (LocationVectorVector){locs_rebuilt.at(depth)};
-                while(!todo.empty() && !todo.back().empty()) {
-                    std::string indent = std::string(depth+1, '\t');
-                    Location cur = todo.back().back();
-                    todo.back().pop_back();
+                std::vector<std::pair<LocationVector, size_t > > todo;
+                todo.push_back(std::make_pair(locs_rebuilt.at(depth), 1));
+                // std::cerr<<"todo.size()"<<todo.size()<<std::endl;
+                while(!todo.empty() && !todo.back().first.empty()) {
+                    // std::cerr<<"todo.size()"<<todo.size()<<std::endl;
+                    Location cur = todo.back().first.back();
+                    todo.back().first.pop_back();
+                    std::string indent = std::string(depth+todo.back().second, '\t');
                     PartIt
                         out_beg = cur.output_symbol_strings.begin(),
                         out_end = cur.output_symbol_strings.end(),
@@ -540,11 +544,16 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
                     }
                     if(depth < locs_rebuilt.size()-1) {
                         ++depth;
-                        todo.push_back(locs_rebuilt.at(depth));
+                        if(depth > 0) {
+                            // std::cerr<<"push_back"<<std::endl;
+                            todo.push_back(std::make_pair(locs_rebuilt.at(depth), indent.length()));
+                        }
+                        // std::cerr<<"depth increased to "<<depth<<",         todo.size="<<todo.size()<<std::endl;
                     }
-                    else if(todo.back().empty()){
+                    else if(todo.back().first.empty()){
                         depth--;
                         todo.pop_back();
+                        // std::cerr<<"depth decreased to "<<depth<<", popped, todo.size="<<todo.size()<<std::endl;
                     }
                 }
             }
