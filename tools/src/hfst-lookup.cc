@@ -1362,7 +1362,44 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstTransducer> cascade,
   // go through all transducers in the cascade
   for (unsigned int i = 0; i < cascade.size(); i++)
     {
-      HfstOneLevelPaths* result = lookup_simple(s, cascade[i], infinity);
+      HfstOneLevelPaths* result = NULL;
+
+      if ((cascade_ == CASCADE_COMPOSITION) && (i != 0))
+        {
+          result = new HfstOneLevelPaths;
+          // use previous value of 'results' as input to composition
+          for (HfstOneLevelPaths::const_iterator it = results->begin();
+               it != results->end(); it++)
+            {
+              HfstOneLevelPaths * one_result = lookup_simple(*it, cascade[i], infinity);
+              for (HfstOneLevelPaths::const_iterator IT = one_result->begin();
+                   IT != one_result->end(); IT++)
+                {
+                  // add the weights
+                  result->insert(HfstOneLevelPath(IT->first + it->first, IT->second));
+                }
+              delete one_result;
+            }
+          // zero 'results'
+          delete results;
+          results = new HfstOneLevelPaths();
+
+          // no results from cascading composition
+          if ((result->size() == 0) && ((i+1) == cascade.size()))
+            {
+              std::string input;
+              for (StringVector::const_iterator it = s.second.begin(); it != s.second.end(); it++)
+                {
+                  input += *it;
+                }
+              fprintf(outfile, "%s\t%s+?\tinf\n\n", input.c_str(), input.c_str());
+            }
+        }
+      else
+        {
+          result = lookup_simple(s, cascade[i], infinity);
+        }
+
       if (infinity)
         {
           verbose_printf("Inf results @ level %u\n", i);
@@ -1375,6 +1412,13 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstTransducer> cascade,
            it != result->end(); it++)
         {
           results->insert(*it);
+        }
+      delete result;
+      
+      if ( (cascade_ == CASCADE_PRIORITY_UNION) && (results->size() != 0) )
+        {
+          verbose_printf("results found @ level %u, skipping rest of transducers (--cascade=priority-union)\n", i);
+          break;
         }
     }
   // all transducers gone through
@@ -1646,17 +1690,13 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
 
     inputstream.close();
 
-    /*if (print_pairs && (cascade_ == CASCADE_COMPOSITION)) {
-      error(EXIT_FAILURE, 0, "pair printing not supported if "
-              "--cascade=composition is requested");
-              }*/
-
+    /*
     if ((cascade_ == CASCADE_COMPOSITION || cascade_ == CASCADE_PRIORITY_UNION) && 
         (inputstream.get_type() == HFST_OL_TYPE || 
          inputstream.get_type() == HFST_OLW_TYPE) ) {
       error(EXIT_FAILURE, 0, "option --cascade not supported on "
               "optimized lookup transducers");
-    }
+              }*/
 
     if (print_pairs && 
         (inputstream.get_type() == HFST_OL_TYPE || 
