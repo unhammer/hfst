@@ -1279,7 +1279,7 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
   }
 
   // Convert HfstTwoLevelPaths into HfstOneLevelPaths
-  for (HfstTwoLevelPaths::const_iterator it = results_spv.begin();
+    for (HfstTwoLevelPaths::const_iterator it = results_spv.begin();
        it != results_spv.end(); it++)
     {
       StringVector sv;
@@ -1304,7 +1304,7 @@ lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity,
     (s, cascade_symbols_seen[transducer_number], 
      cascade_unknown_or_identity_seen[transducer_number]);
 
-  if (possible && t.is_lookup_infinitely_ambiguous(s, obey_flags))
+  if (possible && time_cutoff == 0.0 && t.is_lookup_infinitely_ambiguous(s, obey_flags))
     {
       if (!silent && infinite_cutoff > 0) {
     warning(0, 0, "Got infinite results, number of cycles limited to " SIZE_T_SPECIFIER "",
