@@ -572,6 +572,9 @@ const LocationVector keep_n_best_weight(const int N, LocationVector const & loca
     LocationVector goodweight;
     for (LocationVector::const_iterator it = locations.begin();
          it != locations.end(); ++it) {
+        if(it->output.empty()) {
+            continue;
+        }
         hfst_ol::Weight current_weight = it->weight;
         if (classes_found == -1) // we're just starting
         {
