@@ -15,7 +15,7 @@ compiler:
 matrix:
     exclude:
     - os: osx
-        compiler: gcc
+      compiler: gcc
 
 before_install:
     - echo "$TRAVIS_OS_NAME"
