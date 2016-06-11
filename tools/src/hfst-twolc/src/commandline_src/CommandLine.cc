@@ -113,7 +113,7 @@ int CommandLine::parse_options(int argc, char** argv)
         };
       int option_index = 0;
       // add tool-specific options here 
-      char c = getopt_long(argc, argv, 
+      int c = getopt_long(argc, argv, 
                ":hVvqsu" "i:o:" "RDi:d:f:",
                long_options, &option_index);
       if (-1 == c)

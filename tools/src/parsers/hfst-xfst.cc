@@ -126,7 +126,7 @@ parse_options(int argc, char** argv)
           };
         int option_index = 0;
         // add tool-specific options here
-        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "f:F:e:l:p::rwk",
+        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "f:F:e:l:p::rwk",
                              long_options, &option_index);
         if (-1 == c)
           {

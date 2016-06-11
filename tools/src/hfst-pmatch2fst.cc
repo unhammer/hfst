@@ -132,7 +132,7 @@ parse_options(int argc, char** argv)
                 {0,0,0,0}
             };
         int option_index = 0;
-        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
+        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
                              HFST_GETOPT_UNARY_SHORT "e:1:",
                              long_options, &option_index);
         if (-1 == c)
@@ -288,6 +288,7 @@ process_stream(HfstOutputStream& outstream)
         std::cerr << program_name << ": Empty ruleset, nothing to write\n";
         return EXIT_FAILURE;
     }
+    outstream.close();
     return EXIT_SUCCESS;
 }
 

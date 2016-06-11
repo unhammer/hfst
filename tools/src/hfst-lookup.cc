@@ -101,6 +101,11 @@ static bool lookup_given = false;
 static size_t infinite_cutoff = 5;
 static float beam=-1;
 
+#define CASCADE_UNION 1 
+#define CASCADE_PRIORITY_UNION 2
+#define CASCADE_COMPOSITION 3
+static int cascade_ = CASCADE_UNION;
+
 // symbols actually seen in (non-ol) transducers
 static std::vector<std::set<std::string> > cascade_symbols_seen;
 static std::vector<bool> cascade_unknown_or_identity_seen;
@@ -254,6 +259,7 @@ print_usage()
             "                                   the best analysis\n"
             "  -t, --time-cutoff=S              Limit search after having used S seconds per input\n"
             "                                   (currently only works in optimized-lookup mode\n"
+            "  -C, --cascade=CASCADE            How multiple transducers in input are handled\n"
             "  -P, --progress                   Show neat progress bar if possible\n");
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
@@ -271,6 +277,10 @@ print_usage()
             "results from all transducers is printed for each input string.\n");
     fprintf(message_out, "\n");
 
+    fprintf(message_out, "CASCADE must be one of { union, priority-union, composition }.\n"
+            "If not specified, defaults to {union}.\n");
+    fprintf(message_out, "\n");
+
     fprintf(message_out, "STREAM can be { input, output, both }. If not given, defaults to {both}.\n"
 #ifdef _MSC_VER
           "If input file is not specified with -I, input is read interactively via the\n"
@@ -286,10 +296,7 @@ print_usage()
 
     fprintf(message_out, 
             "Todo:\n"
-            "  For optimized lookup format, only strings that pass "
-            "flag diacritic checks\n"
-            "  are printed and flag diacritic symbols are not printed.\n"
-            "  Support VARIABLE 'print-space' for optimized lookup format\n");
+            "  Support --xfst=obey-flags for optimized lookup format.\n");
     fprintf(message_out,
             "\n"
             "Known bugs:\n"
@@ -325,12 +332,13 @@ parse_options(int argc, char** argv)
             {"time-cutoff", required_argument, 0, 't'},
             {"pipe-mode", optional_argument, 0, 'p'},
             {"progress", no_argument, 0, 'P'},
+            {"cascade", required_argument, 0, 'C'},
             {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
-        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "I:O:F:xc:X:e:E:b:t:p::P",
+        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
+                             HFST_GETOPT_UNARY_SHORT "I:O:F:xc:X:e:E:b:t:p::PC:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -463,6 +471,18 @@ parse_options(int argc, char** argv)
         case 'P':
             show_progress_bar = true;
             break;
+
+        case 'C':
+            if (strcmp(optarg, "union") == 0)
+              { cascade_ = CASCADE_UNION; }
+            else if (strcmp(optarg, "priority-union") == 0)
+              { cascade_ = CASCADE_PRIORITY_UNION; }
+            else if (strcmp(optarg, "composition") == 0)
+              { cascade_ = CASCADE_COMPOSITION; }
+            else
+              { error(EXIT_FAILURE, 0, "--cascade argument %s unrecognised, possible values are\n"
+                      "{ union, priority-union, composition }", optarg); }
+            break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -536,27 +556,6 @@ static void print_prompt()
 }
 
 static std::string get_print_format(const std::string &s) ;
-
-bool
-is_valid_flag_diacritic_path(StringVector arcs)
-  {
-    //if (not print_pairs)
-    //  fprintf(stderr, "Allowing all flag paths!\n");
-    FlagDiacriticTable FdT;
-    bool res = FdT.is_valid_string(arcs);
-    if (!res)
-      {
-        verbose_printf("blocked by flags: ");
-        for (StringVector::const_iterator s = arcs.begin();
-             s != arcs.end();
-             ++s)
-          {
-            verbose_printf("%s ", s->c_str());
-          }
-      }
-    return res;
-  }
-
 
 int
 lookup_printf(const char* format, const HfstOneLevelPath* input,
@@ -1205,10 +1204,9 @@ static unsigned int transducer_number=0;
 
 
 void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results, 
-                         const HfstOneLevelPath& s, ssize_t limit = -1)
+                         const HfstOneLevelPath& s, size_t * limit = NULL, bool print_pairs_at_this_point = false,
+                         bool print_fail = false, const HfstOneLevelPath * input_to_print = NULL)
 {
-  (void)limit; // FIX ???
-
   /* If we want a StringPairVector representation */
   HfstTwoLevelPaths results_spv;
   StringPairVector path_spv;
@@ -1216,17 +1214,20 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
   if (is_possible_to_get_result(s, cascade_symbols_seen[transducer_number], 
                                 cascade_unknown_or_identity_seen[transducer_number]))
     {
-      t.lookup_fd(s.second, results_spv, &infinite_cutoff, 
+      t.lookup_fd(s.second, results_spv, limit,
         NULL /*no weight limit, variable 'beam' defines which paths are printed */,
         obey_flags);
     }
 
-  if (print_pairs) {
+  if (print_pairs_at_this_point && print_pairs) {
     
     /* No results, print just the lookup string. */
     if (results_spv.size() == 0) {
-      print_lookup_string(s.second);
-      fprintf(outfile, "\n");
+      if (print_fail)
+        {
+          print_lookup_string(s.second);
+          fprintf(outfile, "\n");
+        }
     }
     else {
       float lowest_weight = -1;
@@ -1242,14 +1243,15 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
             sv.push_back(spv_it->second);
           }
 
-        if (is_valid_flag_diacritic_path(sv) || !obey_flags)
-        {
           if (it == results_spv.begin())
             lowest_weight = it->first;
           if (beam < 0 || it->first <= (lowest_weight + beam))
             {
               /* print the lookup string */
-              print_lookup_string(s.second);
+              if (input_to_print != NULL)
+                print_lookup_string(input_to_print->second);
+              else
+                print_lookup_string(s.second);
               fprintf(outfile, "\t");
               /* and the path that yielded the result string */
               bool first_pair=true;
@@ -1266,10 +1268,9 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
                     first_pair=false;
                   }
               }
-              /* and the weight of that path. */
-              fprintf(outfile, "\t%f\n", it->first);
+              /* and the weight of that path (add the weight of input). */
+              fprintf(outfile, "\t%f\n", it->first + s.first);
             }
-        }
 
       }
       fprintf(outfile, "\n");
@@ -1278,7 +1279,7 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
   }
 
   // Convert HfstTwoLevelPaths into HfstOneLevelPaths
-  for (HfstTwoLevelPaths::const_iterator it = results_spv.begin();
+    for (HfstTwoLevelPaths::const_iterator it = results_spv.begin();
        it != results_spv.end(); it++)
     {
       StringVector sv;
@@ -1290,34 +1291,12 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
       HfstOneLevelPath path(it->first, sv);
       results.insert(path);
     }
- 
-  HfstOneLevelPaths filtered;
-  for (HfstOneLevelPaths::iterator res = results.begin();
-       res != results.end();
-       ++res)
-    {
-      if (is_valid_flag_diacritic_path(res->second) || !obey_flags)
-        {
-          StringVector unflagged;
-          for (StringVector::const_iterator arc = res->second.begin();
-               arc != res->second.end();
-               arc++)
-            {
-              if (show_flags || ! FdOperation::is_diacritic(*arc))
-                {
-                  unflagged.push_back(*arc);
-                }
-            }
-          filtered.insert(HfstOneLevelPath(res->first, unflagged));
-        }
-    }
-  results = filtered;
 }
 
 
 
 HfstOneLevelPaths*
-lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity)
+lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity, bool print_pairs_at_this_point=false, bool print_fail=false, const HfstOneLevelPath * input_to_print = NULL)
 {
   HfstOneLevelPaths* results = new HfstOneLevelPaths;
 
@@ -1325,18 +1304,18 @@ lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity)
     (s, cascade_symbols_seen[transducer_number], 
      cascade_unknown_or_identity_seen[transducer_number]);
 
-  if (possible && t.is_lookup_infinitely_ambiguous(s, obey_flags))
+  if (possible && time_cutoff == 0.0 && t.is_lookup_infinitely_ambiguous(s, obey_flags))
     {
       if (!silent && infinite_cutoff > 0) {
     warning(0, 0, "Got infinite results, number of cycles limited to " SIZE_T_SPECIFIER "",
         infinite_cutoff);
       }
-      lookup_fd_and_print(t, *results, s, infinite_cutoff);
+      lookup_fd_and_print(t, *results, s, &infinite_cutoff, print_pairs_at_this_point, print_fail, input_to_print);
       *infinity = true;
     }
   else
     {
-        lookup_fd_and_print(t, *results, s);
+      lookup_fd_and_print(t, *results, s, NULL, print_pairs_at_this_point, print_fail, input_to_print);
     }
 
   if (results->size() == 0)
@@ -1359,7 +1338,44 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstTransducer> cascade,
   // go through all transducers in the cascade
   for (unsigned int i = 0; i < cascade.size(); i++)
     {
-      HfstOneLevelPaths* result = lookup_simple(s, cascade[i], infinity);
+      HfstOneLevelPaths* result = NULL;
+
+      if ((cascade_ == CASCADE_COMPOSITION) && (i != 0))
+        {
+          result = new HfstOneLevelPaths;
+          // use previous value of 'results' as input to composition
+          for (HfstOneLevelPaths::const_iterator it = results->begin();
+               it != results->end(); it++)
+            {
+              HfstOneLevelPaths * one_result = lookup_simple(*it, cascade[i], infinity);
+              for (HfstOneLevelPaths::const_iterator IT = one_result->begin();
+                   IT != one_result->end(); IT++)
+                {
+                  // add the weights
+                  result->insert(HfstOneLevelPath(IT->first + it->first, IT->second));
+                }
+              delete one_result;
+            }
+          // zero 'results'
+          delete results;
+          results = new HfstOneLevelPaths();
+
+          // no results from cascading composition
+          if ((result->size() == 0) && ((i+1) == cascade.size()))
+            {
+              std::string input;
+              for (StringVector::const_iterator it = s.second.begin(); it != s.second.end(); it++)
+                {
+                  input += *it;
+                }
+              fprintf(outfile, "%s\t%s+?\tinf\n\n", input.c_str(), input.c_str());
+            }
+        }
+      else
+        {
+          result = lookup_simple(s, cascade[i], infinity);
+        }
+
       if (infinity)
         {
           verbose_printf("Inf results @ level %u\n", i);
@@ -1372,6 +1388,13 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstTransducer> cascade,
            it != result->end(); it++)
         {
           results->insert(*it);
+        }
+      delete result;
+      
+      if ( (cascade_ == CASCADE_PRIORITY_UNION) && (results->size() != 0) )
+        {
+          verbose_printf("results found @ level %u, skipping rest of transducers (--cascade=priority-union)\n", i);
+          break;
         }
     }
   // all transducers gone through
@@ -1390,7 +1413,45 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstBasicTransducer> cascade,
   for (unsigned int i = 0; i < cascade.size(); i++)
     {
       transducer_number=i; // needed for lookup_simple
-      HfstOneLevelPaths* result = lookup_simple(s, cascade[i], infinity);
+
+      HfstOneLevelPaths* result = NULL;
+      if ((cascade_ == CASCADE_COMPOSITION) && (i != 0))
+        {
+          result = new HfstOneLevelPaths;
+          // use previous value of 'results' as input to composition
+          for (HfstOneLevelPaths::const_iterator it = results->begin();
+               it != results->end(); it++)
+            {
+              // if last transducer in cascade, print results if --print-pairs is requested
+              HfstOneLevelPaths * one_result = lookup_simple(*it, cascade[i], infinity, ((i+1) == cascade.size()), false, &s);
+              for (HfstOneLevelPaths::const_iterator IT = one_result->begin();
+                   IT != one_result->end(); IT++)
+                {
+                  // add the weights
+                  result->insert(HfstOneLevelPath(IT->first + it->first, IT->second));
+                }
+              delete one_result;
+            }
+          // zero 'results'
+          delete results;
+          results = new HfstOneLevelPaths();
+
+          // no results from cascading composition
+          if ((result->size() == 0) && ((i+1) == cascade.size()))
+            {
+              std::string input;
+              for (StringVector::const_iterator it = s.second.begin(); it != s.second.end(); it++)
+                {
+                  input += *it;
+                }
+              fprintf(outfile, "%s\t%s+?\tinf\n\n", input.c_str(), input.c_str());
+            }
+        }
+      else
+        {
+          result = lookup_simple(s, cascade[i], infinity, (cascade_ != CASCADE_COMPOSITION), false);
+        }
+
       if (infinity)
         {
           verbose_printf("Inf results @ level %u\n", i);
@@ -1399,12 +1460,19 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstBasicTransducer> cascade,
         {
           verbose_printf("" SIZE_T_SPECIFIER " results @ level %u\n", result->size(), i);
         }
+
       for (HfstOneLevelPaths::const_iterator it = result->begin();
            it != result->end(); it++)
         {
-          results->insert(*it);
+          results->insert(*it); 
         }
       delete result;
+
+      if ( (cascade_ == CASCADE_PRIORITY_UNION) && (results->size() != 0) )
+        {
+          verbose_printf("results found @ level %u, skipping rest of transducers (--cascade=priority-union)\n", i);
+          break;
+        }
     }
   // all transducers gone through
 
@@ -1509,7 +1577,7 @@ perform_lookups(HfstOneLevelPath& origin, std::vector<HfstBasicTransducer>& casc
       {
         if (cascade.size() == 1)
           {
-            kvs = lookup_simple(origin, cascade[0], infinite);
+            kvs = lookup_simple(origin, cascade[0], infinite, true, true);
           }
         else
          {
@@ -1598,10 +1666,25 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
 
     inputstream.close();
 
+    /*
+    if ((cascade_ == CASCADE_COMPOSITION || cascade_ == CASCADE_PRIORITY_UNION) && 
+        (inputstream.get_type() == HFST_OL_TYPE || 
+         inputstream.get_type() == HFST_OLW_TYPE) ) {
+      error(EXIT_FAILURE, 0, "option --cascade not supported on "
+              "optimized lookup transducers");
+              }*/
+
     if (print_pairs && 
         (inputstream.get_type() == HFST_OL_TYPE || 
          inputstream.get_type() == HFST_OLW_TYPE) ) {
       error(EXIT_FAILURE, 0, "pair printing not supported on "
+              "optimized lookup transducers");
+    }
+
+    if ((!obey_flags) &&
+        (inputstream.get_type() == HFST_OL_TYPE ||
+         inputstream.get_type() == HFST_OLW_TYPE) ) {
+      error(EXIT_FAILURE, 0, "not obeying flags not supported on "
               "optimized lookup transducers");
     }
 

@@ -664,28 +664,24 @@ namespace xfst {
         StringVector lookup_path = tok.tokenize_one_level(std::string(token));
 
         size_t cutoff = -1;
-        if (t->is_lookup_infinitely_ambiguous(lookup_path))
+        if (t->is_lookup_infinitely_ambiguous(lookup_path, variables_["obey-flags"] == "ON"))
           {
             cutoff = string_to_size_t(variables_["lookup-cycle-cutoff"]);
             if (verbose_)
               {
                 error() << "warning: lookup is infinitely ambiguous, limiting the number of cycles to " << cutoff << std::endl;
                 flush(&error());
-            //hfst_fprintf(warnstream_, 
-            //                "warning: lookup is infinitely ambiguous, limiting the number of cycles to " SIZE_T_SPECIFIER "\n", cutoff);
               }
           }
 
         HfstTwoLevelPaths results;
 
-        // todo: variables_["obey-flags"] == ["ON"|"OFF"]
-
         if (variables_["maximum-weight"] == "OFF")
-          t->lookup_fd(lookup_path, results, &cutoff, NULL);
+          t->lookup_fd(lookup_path, results, &cutoff, NULL, (variables_["obey-flags"] == "ON"));
         else
           {
             float max_weight = string_to_float(variables_["maximum-weight"]);
-            t->lookup_fd(lookup_path, results, &cutoff, &max_weight);
+            t->lookup_fd(lookup_path, results, &cutoff, &max_weight, (variables_["obey-flags"] == "ON"));
           }
 
         bool printed = false; // if anything was printed
