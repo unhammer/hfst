@@ -239,6 +239,42 @@ hfst_ol::PmatchContainer make_naive_tokenizer(HfstTransducer & dictionary)
 }
 
 /**
+ * Keep only the N best weight classes
+ */
+const LocationVector keep_n_best_weight(const int N, LocationVector const & locations)
+{
+    int classes_found = -1;
+    hfst_ol::Weight last_weight_class = 0.0;
+    LocationVector goodweight;
+    for (LocationVector::const_iterator it = locations.begin();
+         it != locations.end(); ++it) {
+        if(it->output.empty()) {
+            goodweight.push_back(*it);
+            continue;
+        }
+        hfst_ol::Weight current_weight = it->weight;
+        if (classes_found == -1) // we're just starting
+        {
+            classes_found = 1;
+            last_weight_class = current_weight;
+        }
+        else if (last_weight_class != current_weight)
+        {
+            last_weight_class = current_weight;
+            ++classes_found;
+        }
+        if (classes_found > N)
+        {
+            break;
+        }
+        else {
+            goodweight.push_back(*it);
+        }
+    }
+    return goodweight;
+}
+
+/**
  * Return empty string if it wasn't a tag, otherwise the tag without the initial/final +
  */
 const std::string as_cg_tag(const std::string & str) {
@@ -560,41 +596,6 @@ void print_location_vector(LocationVector const & locations, std::ostream & outs
         outstream << "\t_" << std::endl;
     }
 //    std::cerr << "from print_location_vector\n";
-}
-
-/**
- * Keep only the N best weight classes
- */
-const LocationVector keep_n_best_weight(const int N, LocationVector const & locations)
-{
-    int classes_found = -1;
-    hfst_ol::Weight last_weight_class = 0.0;
-    LocationVector goodweight;
-    for (LocationVector::const_iterator it = locations.begin();
-         it != locations.end(); ++it) {
-        if(it->output.empty()) {
-            continue;
-        }
-        hfst_ol::Weight current_weight = it->weight;
-        if (classes_found == -1) // we're just starting
-        {
-            classes_found = 1;
-            last_weight_class = current_weight;
-        }
-        else if (last_weight_class != current_weight)
-        {
-            last_weight_class = current_weight;
-            ++classes_found;
-        }
-        if (classes_found > N)
-        {
-            break;
-        }
-        else {
-            goodweight.push_back(*it);
-        }
-    }
-    return goodweight;
 }
 
 void match_and_print(hfst_ol::PmatchContainer & container,
