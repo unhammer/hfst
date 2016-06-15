@@ -1522,30 +1522,72 @@ def read_prolog_transducer(f, linecount=[0]):
 
 class PrologReader:
       """
-      Documentation for PrologReader
+      A class for reading input in prolog text format and converting it into
+      transducer(s).
+
+      An example that reads prolog input from file 'testfile.prolog' and creates the
+      corresponding transducers and prints them. If the input cannot be parsed, a
+      message showing the invalid line in prolog input is printed and reading is
+      stopped.
+
+          with open('testfile.prolog', 'r') as f:
+              try:
+                 r = hfst.PrologReader(f)
+                 for tr in r:
+                     print(tr)
+              except hfst.exceptions.NotValidPrologFormatException as e:
+                  print(e.what())
       """
       def __init__(self, f):
           """
-          Documentation for PrologReader.__init__
+          Create a PrologReader that reads input from file *f*.
+
+          Parameters
+          ----------
+          * `f` :
+              A python file.
           """
           self.file = f
           self.linecount = [0]
 
       def read(self):
           """
-          Documentation for PrologReader.read
+
+          Read next transducer.
+
+          Read next transducer description in prolog format and return a corresponding
+          transducer.
+
+          Exceptions
+          ----------
+          * `hfst.exceptions.NotValidPrologFormatException` :
+          * `hfst.exceptions.EndOfStreamException` :
           """
           return read_prolog_transducer(self.file, self.linecount)
 
       def __iter__(self):
           """
-          Documentation for PrologReader.__iter__
+          An iterator to the reader.
+
+          Needed for 'for ... in' statement.
+
+          for transducer in prolog_reader:
+              print(transducer)
           """
           return self
 
       def next(self):
           """
-          Documentation for PrologReader.next
+          Return next element (for python version 2).
+
+          Needed for 'for ... in' statement.
+
+          for transducer in prolog_reader:
+              print(transducer)
+
+          Exceptions
+          ----------
+          * `StopIteration` :
           """
           try:
              return self.read()
@@ -1554,13 +1596,32 @@ class PrologReader:
 
       def __next__(self):
           """
-          Documentation for PrologReader.__next__
+          Return next element (for python version 2).
+
+          Needed for 'for ... in' statement.
+
+          for transducer in prolog_reader:
+              print(transducer)
+
+          Exceptions
+          ----------
+          * `StopIteration` :
           """
           return self.next()
 
 def start_xfst(**kvargs):
     """
-    Documentation for start_xfst
+    Start interactive xfst compiler.
+
+    Parameters
+    ----------
+    * `kvargs` :
+        Arguments recognized are: type, quit_on_fail.
+    * `quit_on_fail` :
+        Whether the compiler exits on any error, defaults to False.
+    * `type` :
+        Implementation type of the compiler, defaults to
+        hfst.get_default_fst_type().
     """
     import sys
     idle = 'idlelib' in sys.modules
@@ -1615,7 +1676,25 @@ def start_xfst(**kvargs):
 
 def compile_xfst_file(filename, **kvargs):
     """
-    Documentation for compile_xfst_file
+    Compile (run) xfst file *filename*.
+
+    Parameters
+    ----------
+    * `filename` :
+        The name of the xfst file.
+    * `kvargs` :
+        Arguments recognized are: verbosity, quit_on_fail, output, type.
+    * `verbosity` :
+        The verbosity of the compiler, defaults to 0 (silent). Possible values are:
+        0, 1, 2.
+    * `quit_on_fail` :
+        Whether the script is exited on any error, defaults to True.
+    * `output` :
+        Where output is printed. Possible values are sys.stdout, sys.stderr, a
+        StringIO, sys.stderr being the default?
+    * `type` :
+        Implementation type of the compiler, defaults to
+        hfst.get_default_fst_type().
     """
     verbosity=0
     quit_on_fail='ON'
@@ -1686,7 +1765,24 @@ def compile_xfst_file(filename, **kvargs):
 
 def compile_pmatch_file(filename):
     """
-    Documentation for compile_pmatch_file
+    Compile pmatch expressions as defined in *filename* and return a tuple of
+    transducers.
+
+    An example:
+
+    If we have a file named streets.txt that contains:
+
+    define CapWord UppercaseAlpha Alpha* ; define StreetWordFr [{avenue} |
+    {boulevard} | {rue}] ; define DeFr [ [{de} | {du} | {des} | {de la}] Whitespace
+    ] | [{d'} | {l'}] ; define StreetFr StreetWordFr (Whitespace DeFr) CapWord+ ;
+    regex StreetFr EndTag(FrenchStreetName) ;
+
+    we can run:
+
+    defs = hfst.compile_pmatch_file('streets.txt')
+    const = hfst.PmatchContainer(defs)
+    assert cont.match("Je marche seul dans l'avenue desTernes.") ==
+      "Je marche seul dans l'<FrenchStreetName>avenue des Ternes</FrenchStreetName>."
     """
     with open(filename, 'r') as myfile:
       data=myfile.read()
@@ -1696,7 +1792,22 @@ def compile_pmatch_file(filename):
 
 def compile_lexc_file(filename, **kvargs):
     """
-    Documentation for compile_lexc_file
+    Compile lexc file *filename* into a transducer.
+
+    Parameters
+    ----------
+    * `filename` :
+        The name of the lexc file.
+    * `kvargs` :
+        Arguments recognized are: verbosity, with_flags, output.
+    * `verbosity` :
+        The verbosity of the compiler, defaults to 0 (silent). Possible values are:
+        0, 1, 2.
+    * `with_flags` :
+        Whether lexc flags are used when compiling, defaults to False.
+    * `output` :
+        Where output is printed. Possible values are sys.stdout, sys.stderr, a
+        StringIO, sys.stderr being the default
     """
     verbosity=0
     withflags=False
