@@ -106,10 +106,10 @@ AS_IF([test "x$with_xfsm" != xno], [AC_DEFINE([HAVE_XFSM], [1],
                                               [Define to compile xfsm support in HFST])])
 AM_CONDITIONAL([WANT_XFSM], [test x$with_xfsm != xno])
 
-AS_IF([test "x$with_xfsm" != "xno"], 
+AS_IF([test "x$with_xfsm" != "xno"],
 [AC_CHECK_LIB([xfsm], [main], [], AC_MSG_ERROR([xfsm back-end requested but libxfsm not found]))])
 
-AS_IF([test "x$with_xfsm" != "xno"], 
+AS_IF([test "x$with_xfsm" != "xno"],
 [AC_CHECK_HEADER([xfsm/xfsm_api.h], [xfsmheader_exists=yes], AC_MSG_ERROR([xfsm back-end requested but libxfsm header not found]))])
 
 ### Add here your library ###
@@ -512,7 +512,7 @@ AM_CONDITIONAL([WANT_XFST], [test x$enable_xfst != xno])
 
 # Check if zlib is available
 AC_CHECK_LIB([z], [main], [zlib_exists=yes], [zlib_exists=no])
-# Check if foma and lexc wrappers are wanted and possible to generate 
+# Check if foma and lexc wrappers are wanted and possible to generate
 AM_CONDITIONAL([GENERATE_FOMA_WRAPPER], [test "x$enable_foma_wrapper" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" != "xno"])
 AM_CONDITIONAL([GENERATE_LEXC_WRAPPER], [test "x$enable_lexc_wrapper" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" != "xno"])
 # The same as variables..
@@ -598,10 +598,10 @@ AM_CONDITIONAL([CAN_DOXYGEN], [test x$DOXYGEN != xno])
 # Checks for libraries
 
 AC_LANG_PUSH([C++])
-AS_IF([test "x$with_openfst" != "xno" -a "x$enable_mingw" == "xno"], 
+AS_IF([test "x$with_openfst" != "xno" -a "x$enable_mingw" == "xno"],
       [AC_CHECK_LIB([dl], [main])])
 
-AS_IF([test "x$with_openfst" != "xno"], 
+AS_IF([test "x$with_openfst" != "xno"],
       [AC_CHECK_LIB([pthread], [main])]
       [AC_CHECK_LIB([m], [main])])
 
@@ -633,8 +633,8 @@ AS_IF([test "x$with_unicode_handler" = "xglib"],
 AS_IF([test "x$with_unicode_handler" = "xicu"],
       [AC_MSG_FAILURE([ICU not yet implemented (--with-unicode-handler=hfst to disable)])])
 AS_IF([test "x$with_readline" = "xyes"],
-      [AC_SEARCH_LIBS([readline], [readline editline], 
-                      [AC_DEFINE([HAVE_READLINE], 1, [if readline can be used])], 
+      [AC_SEARCH_LIBS([readline], [readline editline],
+                      [AC_DEFINE([HAVE_READLINE], 1, [if readline can be used])],
                       [AC_MSG_FAILURE([readline test failed (--without-readline to disable)])])])
 
 ### Add here your library ###
@@ -648,7 +648,18 @@ AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h locale.h langinfo.h]
 AC_LANG_PUSH([C++])
 
 # Always use c++11 (flag 'c++0x' is understood also by older compilers)
-AS_IF([echo "$CXXFLAGS" | grep '\-std' | grep -E '((gnu\+\+)|(c\+\+))((11)|(0x)|(14)|(1y)|(17)|(1z))' > /dev/null 2> /dev/null], [], [CXXFLAGS="$CXXFLAGS -std=c++0x"])
+# Checks for highest supported C++ standard
+AX_CHECK_COMPILE_FLAG([-std=c++17], [CXXFLAGS="$CXXFLAGS -std=c++17"], [
+ AX_CHECK_COMPILE_FLAG([-std=c++1z], [CXXFLAGS="$CXXFLAGS -std=c++1z"], [
+  AX_CHECK_COMPILE_FLAG([-std=c++14], [CXXFLAGS="$CXXFLAGS -std=c++14"], [
+   AX_CHECK_COMPILE_FLAG([-std=c++1y], [CXXFLAGS="$CXXFLAGS -std=c++1y"], [
+    AX_CHECK_COMPILE_FLAG([-std=c++11], [CXXFLAGS="$CXXFLAGS -std=c++11"], [
+     AS_IF([echo "$CXXFLAGS" | grep '\-std' | grep -E '((gnu\+\+)|(c\+\+))((11)|(0x)|(14)|(1y)|(17)|(1z))' > /dev/null 2> /dev/null], [], [CXXFLAGS="$CXXFLAGS -std=c++0x"])
+    ])
+   ])
+  ])
+ ])
+])
 
 AC_CHECK_HEADERS([unordered_map], [], [],
 [#ifdef HAVE_UNORDERED_MAP
@@ -685,7 +696,7 @@ AS_IF([test "x$with_unicode_handler" = "xglib"],
              [AC_SUBST([GLIB_CPPFLAGS], [`$PKG_CONFIG glib-2.0 --cflags`])
               AC_SUBST([GLIB_LIBS], [`$PKG_CONFIG glib-2.0 --libs`])
              ],
-             [AC_CHECK_HEADERS([glib.h], [], 
+             [AC_CHECK_HEADERS([glib.h], [],
                         [AC_MSG_ERROR([glib headers not found; set CPPFLAGS to -I glib install directiories or use other unicode handler instead])])])])
 # remove if not needed
 AS_IF([test "x$with_unicode_handler" != "xglib"],
@@ -710,8 +721,8 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
                  test/tools/fsmbook-tests/Makefile
                  libhfst/Makefile libhfst/src/Makefile
                  libhfst/src/implementations/Makefile
-		 libhfst/src/parsers/Makefile 
-                 libhfst/hfst.pc 
+		 libhfst/src/parsers/Makefile
+                 libhfst/hfst.pc
 		 tools/Makefile tools/src/Makefile tools/src/hfst-proc/Makefile
 		 tools/src/hfst-twolc/Makefile
 		 tools/src/hfst-twolc/src/Makefile
@@ -805,7 +816,7 @@ EOF
 dnl stick important warnings to bottom
 dnl important licensing information
 dnl according to GNU GPLv2 strict (not plus) is incompatible with Apache
-dnl hope end users never disable ofst 
+dnl hope end users never disable ofst
 AS_IF([test "x$with_openfst" == "xno"],
       [AC_MSG_WARN([Disabling openfst backend will severely cripple libhfst])])
 dnl HFST's case mapping in corpus tools is mainly MES-2 set with other characters
