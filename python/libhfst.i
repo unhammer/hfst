@@ -394,7 +394,11 @@ public:
 
   def copy(self):
       """
-      Documentation for HfstTransducer.copy
+      Return a deep copy of the transducer.
+
+          tr = hfst.regex('[foo:bar::0.3]*')
+          TR = tr.copy()
+          assert(tr.compare(TR))
       """
       return HfstTransducer(self)
 
@@ -417,7 +421,17 @@ public:
 
   def write_prolog(self, f, write_weights=True):
       """
-      Documentation for HfstTransducer.write_prolog
+      Write the transducer in prolog format with name *name* to file *f*,
+      *write_weights* defined whether weights are written.
+
+      Parameters
+      ----------
+      * `f` :
+          A python file where the transducer is written.
+      * `name` :
+          The name of the transducer that must be given in a prolog file.
+      * `write_weights` :
+          Whether weights are written.
       """
       fsm = HfstBasicTransducer(self)
       fsm.name = self.get_name()
@@ -435,7 +449,16 @@ public:
 
   def write_att(self, f, write_weights=True):
       """
-      Documentation for HfstTransducer.write_att
+
+      Write the transducer in AT&T format to file *f*, *write_weights* defined whether
+      weights are written.
+
+      Parameters
+      ----------
+      * `f` :
+          A python file where transducer is written.
+      * `write_weights` :
+          Whether weights are written.
       """
       fsm = HfstBasicTransducer(self)
       fsm.name = self.get_name()
@@ -444,9 +467,31 @@ public:
 
   def lookup(self, input, **kvargs):
       """
-      Documentation for HfstTransducer.lookup
+      Lookup string *input*.
+
+      Parameters
+      ----------
+      * `input` :
+          The input.
+      * `kvargs` :
+          Possible parameters and their default values are: obey_flags=True,
+          max_number=-1, time_cutoff=0.0, output='tuple'
+      * `obey_flags` :
+          Whether flag diacritics are obeyed. Currently always True.
+      * `max_number` :
+          Maximum number of results returned, defaults to -1, i.e. infinity.
+      * `time_cutoff` :
+          How long the function can search for results before returning, expressed in
+          seconds. Defaults to 0.0, i.e. infinitely.
+      * `output` :
+          Possible values are 'tuple', 'text' and 'raw', 'tuple' being the default.
+
+      note: This function is implemented only for optimized lookup format
+      (hfst.types.HFST_OL_TYPE or hfst.types.HFST_OLW_TYPE). Either convert to
+      optimized lookup format or to HfstBasicTransducer if you wish to perform
+      lookup. Conversion to OL might take a while but it lookup is fast.
+      Conversion to HfstBasicTransducer is quick but lookup is slower.
       """
-      
       obey_flags=True
       max_number=-1
       time_cutoff=0.0
@@ -735,7 +780,42 @@ HfstOutputStream() { return new hfst::HfstOutputStream(hfst::get_default_fst_typ
 
 def __init__(self, **kvargs):
     """
-    Documentation for HfstOutputStream.__init__
+    Open a stream for writing binary transducers. Note: hfst.HfstTransducer.write_to_file
+    is probably the easiest way to write a single binary transducer to a file.
+
+    Parameters
+    ----------
+    * `kvargs` :
+        Arguments recognized are filename, hfst_format, type.
+    * `filename` :
+        The name of the file where transducers are written. If the file exists, it
+        is overwritten. If *filename* is not given, transducers are written to
+        standard output.
+    * `hfst_format` :
+        Whether transducers are written in hfst format (default is True) or as such
+        in their backend format.
+    * `type` :
+        The type of the transducers that will be written to the stream. Default is
+        hfst.get_default_fst_type().
+
+    Examples:
+
+        # a stream for writing default type transducers in hfst format to standard output
+        ostr = hfst.HfstOutputStream()
+        transducer = hfst.regex('foo:bar::0.5')
+        ostr.write(transducer)
+        ostr.flush()
+
+        # a stream for writing native sfst type transducers to a file
+        ostr = hfst.HfstOutputStream(filename='transducer.sfst', hfst_format=False, type=hfst.types.SFST_TYPE)
+        transducer1 = hfst.regex('foo:bar')
+        transducer1.convert(hfst.types.SFST_TYPE)  # if not set as the default type
+        transducer2 = hfst.regex('bar:baz')
+        transducer2.convert(hfst.types.SFST_TYPE)  # if not set as the default type
+        ostr.write(transducer1)
+        ostr.write(transducer2)
+        ostr.flush()
+        ostr.close()
     """
     filename = ""
     hfst_format = True
