@@ -111,7 +111,7 @@ namespace hfst_ol {
         SymbolNumberVector exclusionary_lists;
         std::vector<SymbolNumberVector> symbol_lists;
         std::vector<SymbolNumberVector> symbol_list_members;
-        std::vector<unsigned long int> counters;
+        std::vector<unsigned long> counters;
         SymbolNumberVector guards;
         std::vector<bool> printable_vector;
         bool is_end_tag(const SymbolNumber symbol) const;

@@ -34,7 +34,7 @@ extern int g_lexc_align;
 
 struct multichar_symbols {
     char *symbol;
-    short int sigma_number;
+    short sigma_number;
     struct multichar_symbols *next;
 };
 
@@ -48,8 +48,8 @@ struct lexstates {             /* Separate list of LEXICON states */
 
 struct states {
     struct trans {
-        short int in;
-        short int out;
+        short in;
+        short out;
         struct states *target;
         struct trans *next;
     } *trans;
@@ -58,7 +58,7 @@ struct states {
     unsigned int hashval;       /* Hash for remaining symbols until next lexstate */
     unsigned char mergeable;    /* Can this state be merged with other suffix */
                                 /* 0 = NO, 1 = YES, 2 = DELETED/MERGED */
-    unsigned short int distance;      /* Number of remaining symbols until lexstate */
+    unsigned short distance;      /* Number of remaining symbols until lexstate */
     struct states *merge_with;
 };
 
