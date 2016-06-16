@@ -130,11 +130,6 @@ bool symbol_in_local_context(std::string & sym)
     return call_stack.back().count(sym) != 0;
 }
 
-bool should_use_cache(void)
-{
-    return call_stack.size() == 0;
-}
-
 PmatchObject * symbol_from_global_context(std::string & sym)
 {
     if (symbol_in_global_context(sym)) {
@@ -793,6 +788,7 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
             if (defs_it->first.compare("TOP") == 0 ||
                 inserted_names.count(defs_it->first) != 0) {
                 HfstTransducer * tmp = defs_it->second->evaluate();
+                tmp->minimize();
                 dummy.harmonize(*tmp);
                 retval[defs_it->first] = tmp;
             }
@@ -813,6 +809,7 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
             std::cerr << "Pmatch compilation warning: regex or TOP was undefined, using ";
             std::cerr << definitions.begin()->first << " as root\n";
             hfst::HfstTransducer * tmp = definitions.begin()->second->evaluate();
+            tmp->minimize();
             retval.insert(std::pair<std::string, hfst::HfstTransducer*>("TOP", tmp));
         } else {
             hfst::HfstTransducer * tmp = definitions["TOP"]->evaluate();
@@ -1217,8 +1214,9 @@ HfstTransducer * PmatchObject::evaluate(std::vector<PmatchObject *> args)
         } else {
             start_timing();
             HfstTransducer * retval = evaluate();
+            retval->minimize();
             report_time();
-            return new HfstTransducer(*retval);
+            return retval;
         }
     } else {
         std::stringstream errstring;
@@ -1248,6 +1246,7 @@ HfstTransducer * PmatchSymbol::evaluate(PmatchEvalType eval_type)
         retval = new HfstTransducer(sym, format);
     }
     retval->set_final_weights(weight, true);
+    retval->minimize();
     report_time();
     return retval;
 }
@@ -1267,9 +1266,11 @@ HfstTransducer * PmatchString::evaluate(PmatchEvalType eval_type) {
     tmp->set_final_weights(weight, true);
     if (cache == NULL && should_use_cache()) {
         cache = tmp;
+        cache->minimize();
+        return new HfstTransducer(*cache);
     }
     report_time();
-    return new HfstTransducer(*tmp);
+    return tmp;
 }
 
 HfstTransducer * PmatchFunction::evaluate(std::vector<PmatchObject *> funargs)
@@ -1355,8 +1356,10 @@ HfstTransducer * PmatchNumericOperation::evaluate(PmatchEvalType eval_type)
     report_time();
     if (cache == NULL && should_use_cache()) {
         cache = tmp;
+        cache->minimize();
+        return new HfstTransducer(*cache);
     }
-    return new HfstTransducer(*tmp);
+    return tmp;
 }
 
 HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
@@ -1550,6 +1553,7 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
     report_time();
     if (cache == NULL && should_use_cache()) {
         cache = retval;
+        cache->minimize();
     }
     return new HfstTransducer(*retval);
 }
@@ -1635,8 +1639,10 @@ HfstTransducer * PmatchBinaryOperation::evaluate(PmatchEvalType eval_type)
     retval = lhs;
     if (cache == NULL && should_use_cache()) {
         cache = retval;
+        cache->minimize();
+        return new HfstTransducer(*cache);
     }
-    return new HfstTransducer(*retval);
+    return retval;
 }
 
 StringPair PmatchBinaryOperation::as_string_pair(void)
@@ -1672,8 +1678,10 @@ HfstTransducer * PmatchTernaryOperation::evaluate(PmatchEvalType eval_type)
     report_time();
     if (cache == NULL && should_use_cache()) {
         cache = retval;
+        cache->minimize();
+        return new HfstTransducer(*cache);
     }
-    return new HfstTransducer(*retval);
+    return retval;
 }
 
 HfstTransducer * PmatchAcceptor::evaluate(PmatchEvalType eval_type)
@@ -1745,8 +1753,10 @@ HfstTransducer * PmatchParallelRulesContainer::evaluate(PmatchEvalType eval_type
     report_time();
     if (cache == NULL && should_use_cache()) {
         cache = retval;
+        cache->minimize();
+        return new HfstTransducer(*cache);
     }
-    return new HfstTransducer(*retval);
+    return retval;
 }
 
 std::vector<hfst::xeroxRules::Rule> PmatchParallelRulesContainer::make_mappings(void)
@@ -1801,8 +1811,10 @@ HfstTransducer * PmatchReplaceRuleContainer::evaluate(PmatchEvalType eval_type)
     report_time();
     if (cache == NULL && should_use_cache()) {
         cache = retval;
+        cache->minimize();
+        return new HfstTransducer(*cache);
     }
-    return new HfstTransducer(*retval);
+    return retval;
 }
 
 hfst::xeroxRules::Rule PmatchReplaceRuleContainer::make_mapping(void)
@@ -1868,8 +1880,10 @@ HfstTransducer * PmatchRestrictionContainer::evaluate(PmatchEvalType eval_type)
     report_time();
     if (cache == NULL && should_use_cache()) {
         cache = retval;
+        cache->minimize();
+        return new HfstTransducer(*cache);
     }
-    return new HfstTransducer(*retval);
+    return retval;
 }
 
 HfstTransducer * PmatchMarkupContainer::evaluate(PmatchEvalType eval_type) { pmatcherror("Should never happen\n"); throw 1; }

@@ -81,7 +81,6 @@ PmatchUtilityTransducers* get_utils();
 void zero_minimization_guard(void);
 bool symbol_in_global_context(std::string & sym);
 bool symbol_in_local_context(std::string & sym);
-bool should_use_cache(void);
 PmatchObject * symbol_from_global_context(std::string & sym);
 PmatchObject * symbol_from_local_context(std::string & sym);
 
@@ -367,6 +366,11 @@ struct PmatchObject {
                 std::cerr << name << " compiled in " << duration << " seconds\n";
             }
         }
+    bool should_use_cache(void)
+        {
+            return name != "" && call_stack.size() == 0;
+        }
+    
     virtual HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer) = 0;
     virtual HfstTransducer * evaluate(std::vector<PmatchObject *> args);
     virtual std::string as_string(void) { return ""; }
