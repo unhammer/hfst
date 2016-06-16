@@ -58,6 +58,7 @@ rm lexc-compiler-flags-functionality.sh
 rm test.sh
 rm xfst-att-to-hfst-att.sh
 rm xfst-prolog-to-hfst-att.sh
+rm check-flag-results.sh
 
 # These tests are not included in basic check
 cp ../test-hfst-xfst.sh .
