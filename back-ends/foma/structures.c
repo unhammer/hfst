@@ -154,7 +154,7 @@ struct fsm *fsm_sigma_pairs_net(struct fsm *net) {
     /* Create FSM of attested pairs */
     struct fsm_state *fsm;
     char *pairs;
-    short int in, out;
+    short in, out;
     int i, pathcount, smax;
     
     smax = sigma_max(net->sigma)+1;
@@ -425,15 +425,15 @@ int fsm_isidentity(struct fsm *net) {
     /* e) we encounter ? anywhere.                                              */
     
     struct discrepancy {
-        short int *string;
-        short int length;
+        short *string;
+        short length;
         _Bool visited;
     };
 
     struct state_array *state_array;
     struct fsm_state *curr_ptr;
     int i, j, v, vp, num_states, factor = 0, newlength = 1, startfrom;
-    short int in, out, *newstring;
+    short in, out, *newstring;
     struct discrepancy *discrepancy, *currd, *targetd;
 
     fsm_minimize(net);
@@ -647,8 +647,8 @@ struct fsm *fsm_extract_nonidentity(struct fsm *net) {
     /* Experimental. */
 
     struct discrepancy {
-        short int *string;
-        short int length;
+        short *string;
+        short length;
         _Bool visited;
     };
 
@@ -656,7 +656,7 @@ struct fsm *fsm_extract_nonidentity(struct fsm *net) {
     struct fsm_state *curr_ptr;
     struct fsm *net2;
     int i, j, v, vp, num_states, factor = 0, newlength = 1, startfrom, killnum;
-    short int in, out, *newstring;
+    short in, out, *newstring;
     struct discrepancy *discrepancy, *currd, *targetd;
 
     fsm_minimize(net);

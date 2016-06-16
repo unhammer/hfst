@@ -100,7 +100,7 @@ parse_options(int argc, char** argv)
         };
         int option_index = 0;
         // add tool-specific options here 
-        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
+        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
                              HFST_GETOPT_UNARY_SHORT "S::",
                              long_options, &option_index);
         if (-1 == c)
@@ -421,7 +421,7 @@ process_stream(HfstInputStream& instream)
               "# of ... connected states: ???\n"
               "# of ... strongly conn components: ???\n",
               states, arcs, 
-              static_cast<long int>(initial_state),
+              static_cast<long>(initial_state),
               final_states, io_epsilons,
               input_epsilons, output_epsilons);
       // other names from properties...

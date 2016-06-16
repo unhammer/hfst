@@ -202,8 +202,8 @@ int parse_options(int argc, char** argv)
                 {0,0,0,0}
             };
         int option_index = 0;
-        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT HFST_GETOPT_UNARY_SHORT "nxlcdmq:r:t:p",
-                             long_options, &option_index);
+        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT HFST_GETOPT_UNARY_SHORT "nxlcdmq:r:t:p",
+                            long_options, &option_index);
         if (-1 == c)
         {
             break;

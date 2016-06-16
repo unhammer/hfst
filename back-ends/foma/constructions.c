@@ -533,8 +533,8 @@ struct fsm *fsm_compose(struct fsm *net1, struct fsm *net2) {
     /* The global variable g_compose_tristate is set to OFF by default                  */
 
     struct outarray {
-        short int symin;
-        short int symout;
+        short symin;
+        short symout;
         int target;
         int mainloop;
     } *outarray, *iptr, *currtail;

@@ -409,19 +409,19 @@ typedef YYTYPE_INT8 yytype_int8;
      || defined __cplusplus || defined _MSC_VER)
 typedef signed char yytype_int8;
 #else
-typedef short int yytype_int8;
+typedef short yytype_int8;
 #endif
 
 #ifdef YYTYPE_UINT16
 typedef YYTYPE_UINT16 yytype_uint16;
 #else
-typedef unsigned short int yytype_uint16;
+typedef unsigned short yytype_uint16;
 #endif
 
 #ifdef YYTYPE_INT16
 typedef YYTYPE_INT16 yytype_int16;
 #else
-typedef short int yytype_int16;
+typedef short yytype_int16;
 #endif
 
 #ifndef YYSIZE_T
@@ -1492,7 +1492,7 @@ yy_reduce_print (yyvsp, yylsp, yyrule, scanner, defined_nets, defined_funcs)
 {
   int yynrhs = yyr2[yyrule];
   int yyi;
-  unsigned long int yylno = yyrline[yyrule];
+  unsigned long yylno = yyrline[yyrule];
   YYFPRINTF (stderr, "Reducing stack by rule %d (line %lu):\n",
 	     yyrule - 1, yylno);
   /* The symbols being reduced.  */
@@ -2045,7 +2045,7 @@ YYLTYPE yylloc;
       yylsp = yyls + yysize - 1;
 
       YYDPRINTF ((stderr, "Stack size increased to %lu\n",
-		  (unsigned long int) yystacksize));
+		  (unsigned long) yystacksize));
 
       if (yyss + yystacksize - 1 <= yyssp)
 	YYABORT;

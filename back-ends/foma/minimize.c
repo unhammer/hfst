@@ -31,7 +31,7 @@ static _Bool *finals;
 
 struct statesym {
     int target;
-    unsigned short int symbol;
+    unsigned short symbol;
     struct state_list *states;
     struct statesym *next;
 };

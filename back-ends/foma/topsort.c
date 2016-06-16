@@ -36,7 +36,7 @@ struct fsm *fsm_topsort (struct fsm *net) {
     /* Of course we also count the number of paths in the network.       */
 
     int i, j, curr_state, *statemap, treatcount, *order, lc, *newnum, newtarget, newstate;
-    unsigned short int *invcount;
+    unsigned short *invcount;
     unsigned char *treated, overflow;
     long long grand_pathcount, *pathcount;
     struct fsm_state *fsm, *curr_fsm, *new_fsm;
@@ -49,7 +49,7 @@ struct fsm *fsm_topsort (struct fsm *net) {
     order = xxmalloc(sizeof(int)*net->statecount);
     pathcount = xxmalloc(sizeof(long long)*net->statecount);
     newnum = xxmalloc(sizeof(int)*net->statecount);
-    invcount = xxmalloc(sizeof(unsigned short int)*net->statecount);
+    invcount = xxmalloc(sizeof(unsigned short)*net->statecount);
     treated =  xxmalloc(sizeof(unsigned char)*net->statecount);
    
     for (i=0; i < net->statecount; i++) {

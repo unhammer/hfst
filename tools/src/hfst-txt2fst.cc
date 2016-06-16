@@ -118,7 +118,7 @@ parse_options(int argc, char** argv)
         };
         int option_index = 0;
         // add tool-specific options here 
-        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
+        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
                              HFST_GETOPT_UNARY_SHORT "e:nf:pC",
                              long_options, &option_index);
         if (-1 == c)
