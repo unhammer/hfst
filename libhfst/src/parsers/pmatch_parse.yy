@@ -496,7 +496,13 @@ INTERPOLATE_LEFT FUNCALL_ARGLIST RIGHT_PARENTHESIS { $$ = new PmatchBuiltinFunct
 SIGMA_LEFT EXPRESSION2 RIGHT_PARENTHESIS { $$ = new PmatchUnaryOperation(MakeSigma, $2); } |
 COUNTER_LEFT SYMBOL RIGHT_PARENTHESIS { $$ = hfst::pmatch::make_counter($2); free($2); } |
 ENDTAG { $$ = $1; hfst::pmatch::need_delimiters = true; } |
-CONTEXT_CONDITION { $$ = $1; hfst::pmatch::need_delimiters = true; } |
+CONTEXT_CONDITION {
+    $$ = $1;
+    // We will wrap the current definition with entry and exit guards
+    hfst::pmatch::need_delimiters = true;
+    // Switch off the automatic separator-seeking context condition
+    hfst::pmatch::variables["need-separators"] = "off";
+} |
 SYMBOL {
     std::string sym($1);
     free($1);
