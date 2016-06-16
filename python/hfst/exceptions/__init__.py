@@ -1,5 +1,38 @@
 """
 class HfstException and its subclasses
+
+CLASSES:
+
+    ContextTransducersAreNotAutomataException
+    EmptySetOfContextsException
+    EmptyStringException
+    EndOfStreamException
+    FlagDiacriticsAreNotIdentitiesException
+    FunctionNotImplementedException
+    HfstException
+    HfstFatalException
+    HfstTransducerTypeMismatchException
+    ImplementationTypeNotAvailableException
+    IncorrectUtf8CodingException
+    MetadataException
+    MissingOpenFstInputSymbolTableException
+    NotTransducerStreamException
+    NotValidAttFormatException
+    NotValidLexcFormatException
+    NotValidPrologFormatException
+    SpecifiedTypeRequiredException
+    StateIndexOutOfBoundsException
+    StateIsNotFinalException
+    StreamCannotBeWrittenException
+    StreamIsClosedException
+    StreamNotReadableException
+    SymbolNotFoundException
+    TransducerHasWrongTypeException
+    TransducerHeaderException
+    TransducerIsCyclicException
+    TransducersAreNotAutomataException
+    TransducerTypeMismatchException
+
 """
 
 from libhfst import HfstException,\

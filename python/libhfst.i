@@ -21,7 +21,7 @@
 %include "std_map.i"
 %include "exception.i"
 
-%feature("autodoc", "3");
+// %feature("autodoc", "3");
 
 // We want warnings to be printed to standard error.
 %init %{
@@ -92,6 +92,8 @@ namespace std {
 %template(HfstTransducerPairVector) vector<pair<hfst::HfstTransducer, hfst::HfstTransducer> >;
 }
 
+
+%include "docstrings.i"
 
 // ****************************************************** //
 // ********** WHAT IS MADE AVAILABLE ON PYTHON ********** //
