@@ -1555,7 +1555,7 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
         cache = retval;
         cache->minimize();
     }
-    return new HfstTransducer(*retval);
+    return retval;
 }
 
 HfstTransducer * PmatchBinaryOperation::evaluate(PmatchEvalType eval_type)
