@@ -1,4 +1,182 @@
-97c1285 (HEAD -> master, origin/master, origin/HEAD) Swap implementations of commands 'apply up' and 'apply down' in hfst-xfst, making them work as they do in foma and xfst.
+fe37aa0 (HEAD -> master, origin/master, origin/HEAD) Update morphology checks.
+8d3f162 Update EXTRA_DIST.
+6dac246 Do not use binary transducers in tests.
+ee62c44 Add missing doc file.
+a367645 Mention that python tests are no longer available.
+da2678d Skip Python tests as they can now be performed in the folder python/test.
+ea47f0b One more stray memory leaking cache
+95e3480 Memory conservation: only cache named objects and always minimize them.
+6b113b2 Merge branch 'master' of https://github.com/hfst/hfst
+974d240 Turn off automatic delimiter-contexts ("set need-separators off") in the presence of user-defined contexts
+01fccfd Use docstrings.i instead of swig's autodoc. Document the contents of hfst and hfst.exceptions modules.
+4322ca7 Add a docstrings file created semiautomatically from doxygen documentation.
+816ce6c Add at least a simple docstring for all functions.
+82c8f6a Merge branch 'master' of https://github.com/hfst/hfst
+1b11fbf Obey -i option for giving the pmatch archive filename
+4620b1b std=c++ works on OS X but not Linux, so disable Linux+Clang
+d245a74 Test if gnu++ appeases Travis' clang
+3d9c66b Include needed m4
+5e73db3 Copy hfst-ospell's C++11+ detection
+9af66d0 short int -> short; long int -> long
+daa457e Yet more documentation..
+e1b01ff More docstrings.
+711a089 Add docstrings.
+acf5696 tokenise: don't skip output-empties
+b5b4434 tokenise: don't let empty analyses affect weight classes
+18f5a2b travis: fix indentation
+62d216a getopt_long() returns an int, not char; this is important because char is unsigned on many platforms which means char(-1) is 255
+39d28d1 Do not check if lookup is infinitely ambiguous if --time-cutoff is defined.
+c42af37 Remove redundant flag diacritic check. It was once removed, but got pushed there again.
+b7b5882 Add support for --cascade also for optimized-lookup transducers.
+9169e38 Support combination --cascade=composition --xfst=print-pairs.
+51a0b61 Merge branch 'master' of https://github.com/hfst/hfst
+ef6ed81 Fix the way cycle limit argument is passed.
+9ad0950 Merge branch 'master' of https://github.com/hfst/hfst
+6d94c90 Add a preliminary omorfi-friendly conll-u mode
+45a0bf2 Remove redundant filtering of paths containing flag diacritics. Flags are handled already in function HfstBasicTransducer::lookup_fd.
+5c7135a Implement option --cascade.
+18d5e66 Tentatively add option --cascade to hfst-lookup.
+1dcad09 Print error message if --xfst=obey-flags is used with optimized-lookup transducers. They always obey flag diacritics.
+670ee39 Merge branch 'master' of https://github.com/hfst/hfst
+f903d9c When doing apply up or down in hfst-xfst's, check if 'obey-flags' is ON or OFF.
+8e9c6e6 travis: --enable-silent-rules
+a253b8d Add an argument obey_flags=false to is_lookup_infinitely_ambiguous functions.
+14bdd9c Make is_lookup_infinitely_ambiguous aware of flags. Use typedef hfst::StringVector in HfstLookupFlagDiacritics to prevent conflicting definitions in hfst-twolc which defines a class StringVector.
+349fb73 Add option obey_flags=false to lookup_fd.
+fdf912a Add tentative script for converting from doxygen documentation to docstrings.
+7618907 Modify function visibility.
+bc01c0b Control visibility of functions in HfstTransducer.
+b535aa6 Follow foma and xfst convention for operator ignore '/', i.e. expand any identities and unknowns before inserting the strings to be ignored.
+c1b4341 Add an argument 'force' to HfstTransducer::harmonize which makes the function harmonize also FOMA_TYPE transducers.
+724b4e9 Obey variable 'print-sigma' when print_net is called.
+6bec507 Add brief descriptions for hfst packages.
+ca892d1 Document the implementation types.
+98764da Fix bugs in options --xfst=show-flags and --xfst=obey-flags when non-optimized lookup is performed.
+93b9fe2 Close the outstream when done. Not doing this was causing a bug where some buffered data never got written to the output file.
+7d97106 Obey variable 'print-pairs' when performing apply down in non-optimized format.
+ac2fc3a Add parentheses in conditionals of function 'flag_build' to ensure correct interpretation. Also remove redundant code.
+28867c1 Allow punctuation as context in the "need-separators on" mode
+0cd05ee Add "need-separators no" to test script to reflect changed default in pmatch
+2597799 exclude gcc from osx builds
+7dfa8ec Track used symbol names
+81128c2 Allow lowercase define()
+52a4ca4 Merge branch 'master' of https://github.com/hfst/hfst
+af71662 Add side arguments to casing functions
+7c1b388 Revert back to the original extra_link_args in python bindings.
+2d5c670 Rename examples.py to test_examples.py. Perform tests in a more logical order.
+4c8a1e3 Update documentation about linking to the HFST C++ library.
+9f8ca0f If --enable-no-tools is used, skip tests in test/tools/.
+41dc9a2 Mention module hfst.types.
+a8c3e56 Remember to apply modifications to weight pushing to tests and hfst package.
+835f0ef Get rid of TO_FINAL_STATE and TO_INITIAL_STATE and replace function 'push_weights' with 'push_weights_to_start' and 'push_weights_to_end'.
+d05b9db Wrap HfstTransducer implementation types in package 'hfst.types'.
+5e1a245 Add missing files to dist.
+58d4602 Update README. Handle linking to extension library better.
+de888b6 Update README. Handle cases where an implementation type is not available. Add missing files to dist.
+1a68126 Fix a typo in URL.
+7a2296b Update link in README.
+861baf6 tokeniser: --weight-classes=N opt, as in hfst-proc
+151f1fa Add functions lookup_optimize, remove_optimization and copy to HfstTransducer.
+4efc9af Make HfstTransducer() create the empty transducer.
+0f237c1 Comment out hfst_ol::set_extract_tags_mode(bool). Improve error messages in att and prolog readers.
+57426ca Remove unnecessary commented file.
+b7139cd Fix HfstException documentation.
+3b13bf5 Merge branch 'master' of https://github.com/hfst/hfst
+7e6d27c Fix a typo.
+9f4ceb7 Merge branch 'master' of https://github.com/hfst/hfst
+829c9e2 Implement remaining variables in the library and support them in hfst-pmatch, with the exception of need-separators which has to be specified during rule compilation, at least for now.
+457c5de Document AttReader and PrologReader.
+8695c47 Add HfstException::what() to python api.
+2cffffa Add an alias what() for operator() to HfstException.
+5fdf61a Add class PrologReader and tests for it.
+77eda55 Add a new class AttReader and tests for it.
+18edac5 Add package hfst to setup. The package is essentially a wrapper around libhfst module which is still available as before.
+e41f131 travis: re-encrypt channel to #hfst
+6329bb8 Use all implementation formats in tests.
+5a5018c Do not use default_fst_type as pmatch transducers are always in ol format.
+b38f87b Add stream tests.
+ccaea0e Represent empty transducers as empty lines so that read_att_transducer will work correctly.
+fe66b18 Remove unnecessary files.
+bf5511d Forgot to do git add before committing...
+3710f91 Update test examples.py and add it to test.sh. Remove extra files.
+7d5064d Add directory tree for package 'hfst' and its subpackages 'exceptions' and 'rules'. This package encapsulates module libhfst.
+7818c1e Delete unnecessary file.
+91b86a0 Rewrite part of tests. Document the interface file.
+657013d Add new tests.
+3b4c186 Merge pull request #323 from unhammer/tokenise--gtd-tags-are-multichars
+67125ab rm unneeded import
+d927d79 pmatch: store input/output_symbol_strings, _parts refer to them
+c665f8a Add missing endverbatim tag.
+884d1dc Add missing file.
+bc87fc5 Get rid of HfstFile wrapper.
+30cde02 Try to preserve the names of transducers when converting.
+90b3328 Expand prolog tests. Fix a small bug in naming transducers.
+8e61537 Forgot to update testfile.
+63a0456 Add a new function for reading prolog input and improve the way att input is handled.
+9ef38f7 Split part of code related to reading att input into a separate function. Change the way transducer name is set when reading prolog input.
+6d12e0d erge branch 'master' of https://github.com/hfst/hfst
+22f1c47 Modify documentation, update tests, add new functions.
+d14bc2f link to travis; bug tracker link sf→github
+e8c7fd6 README is now symlink to README.rst; for more readable github
+2258354 travis: no irc notes on success
+1d8a1f4 travis: encrypt IRC channel for hfst/hfst
+38c9544 Add HfstTokenizer examples as tests.
+c635cd4 More documentation to HfstTokenizer.
+c1ca3b6 Add more examples for HfstTokenizer.
+0dc0cf4 Reorganize doxygen documentation to represent the new module structure of hfst python api.
+95d658c Remove hfst.py, a directory structure is needed instead for doxygen.
+5025aab Add new documentation for hfst python package.
+4749745 Add more tests.
+8f8b345 Split python tests to several files.
+45aeb38 Skip one more failing pmatch test.
+83dee76 Add missing files to dist.
+a44b99e erge branch 'master' of https://github.com/hfst/hfst
+b5ca1ec Add more documentation and modify functions.
+579ee71 Merge branch 'master' of https://github.com/hfst/hfst
+8050575 A PmatchContainer constructor taking a std::vector<HfstTransducer>. This should leave the passed vector untouched.
+88aa682 Add more documentation.
+ab82047 Add a simple test for XreCompiler.
+a25eb2b A new test.
+caf1ca8 XreCompiler::setOutputToConsole is needed, uncomment it.
+f6acf2a Split c++ code to multiple files from libhfst.i. Update URL in setup.py.
+780374a Merge branch 'master' of https://github.com/hfst/hfst
+4c9ca19 Settle on a way to handle variable names with dashes (which look like minus signs)
+967cc78 actually run the tokenize tests
+5df87b6 Add more failing tests.
+775a499 Fix some typos.
+2e77e2d Add missing files to dist.
+11ebca0 Merge branch 'master' of https://github.com/hfst/hfst
+067e637 Merging master
+4c9d43a Variable setting and reading
+881b81c Use -Wno-deprecated also for tests.
+85cb277 Modify messages that get printed during make check.
+0761730 Skip tests that do not exist. Make prints more informative.
+573324e Skip failing pmatch tests.
+164e621 Add missing tests for ConvertTransducerFormat. Compile them with -Wno-deprecated.
+f945e17 travis: irc notifications on build failure
+0229baa Merge branch 'master' of https://github.com/hfst/hfst
+93ed0db Remove const declarations from openfst back-end that cause compiler warnings.
+5df2a2b Run g++ with -j2 (not -j) on travis; o/w runs out of memory
+54b8f45 Comment out a function that is not defined.
+48c91b8 Specify -Wno-deprecated also for tests in folders hfst-tagger and hfst-twolc.
+810c330 https://travis-ci.org test rules
+708171e doh, define multichar-symbols (for 2eb6888)
+2eb6888 test for #320 / bf26db9
+3aecdbc Merge branch 'master' of github.com:hfst/hfst
+bf26db9 only change case if sf and lm case differ (#320)
+b3782de Remove a rule that cannot be matched since a rule has already been defined for "DownCase(" earlier.
+5ad3487 Add the keyword const to arrays used to store xfst commands.
+79c7dfe Make compiler happy by using strdup instead of plain const char *.
+f6d9953 Handle return values of fread in foma and sfst back-ends to prevent warnings during compilation.
+214b7b6 Fix a typo.
+862e858 Replace foma binary files that are used for testing results from lexc with equivalent files in prolog format. Then the tests will not depend on the foma back-end.
+680389b tokenize tests
+2b7cf7e tokenize: new --gtd Giellatekno/Divvun mode
+adb37d4 tokenise: fix #318, header parsing for TOP
+76e9069 Fix a bug in flag elimination involving multiple flags. Fixes bug #315.
+f653780 Evaluate transducers (as opposed to argumentless functions) where declared
+e6c6e82 (tag: v3.10.0) Ready for release 3.10.0.
+97c1285 Swap implementations of commands 'apply up' and 'apply down' in hfst-xfst, making them work as they do in foma and xfst.
 85ef34c Forgot to add before latest commit...
 13280ea Edit warning about converting native foma transducers.
 b31a6c1 Fix typo: swap left and right.
