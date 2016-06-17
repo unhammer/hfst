@@ -1,5 +1,5 @@
 EXTRA_DIST = README test.sh \
-	test_fail.xfst testfile.att testfile_fail.att test_pass.xfst test.lexc foobar.hfst \
+	test_fail.xfst testfile.att testfile_fail.att test_pass.xfst test.lexc \
 	cats_and_dogs.prolog cats_and_dogs_fail.prolog \
 	test_pmatch.py test_prolog.py test_exceptions.py test_dir_hfst.py \
 	test_dir_hfst_exceptions.py test_dir_hfst_rules.py test_tokenizer.py \
