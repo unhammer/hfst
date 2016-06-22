@@ -231,7 +231,7 @@ for type in types:
 
 
     fsm = hfst.HfstBasicTransducer(tr)
-    print(fsm.lookup_fd((('foo'))), file=f)
+    print(fsm.lookup((('foo'))), file=f)
 
     print(tr.extract_paths(obey_flags='True', filter_flags='False', max_number=3, output='dict'), file=f)
 

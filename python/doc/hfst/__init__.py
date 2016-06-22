@@ -562,12 +562,12 @@ class HfstBasicTransducer:
     def is_lookup_infinitely_ambiguous(self, str):
         pass
 
-    ## Lookup tokenized input \a input in the transducer minding flag diacritics.
     # @param str A list/tuple of strings to look up.
-    # @param kvargs infinite_cutoff=-1, max_weight=None
-    # @param infinite_cutoff Defaults to -1, i.e. infinite.
-    # @param max_weight Defaults to None, i.e. infinity. 
-    def lookup_fd(self, input, **kvargs):
+    # @param kvargs infinite_cutoff=-1, max_weight=None, obey_flags=False
+    # @param infinite_cutoff How many times epsilon input loops are followed. Defaults to -1, i.e. infinitely.
+    # @param max_weight What is the maximum weight of a result allowed. Defaults to None, i.e. infinity.
+    # @param obey_flags Whether flag diacritic constraints are obeyed. Defaults to False.
+    def lookup(self, input, **kvargs):
         pass
 
     ## Add a new state to this transducer and return its number.      

@@ -490,7 +490,8 @@ public:
           Possible values are 'tuple', 'text' and 'raw', 'tuple' being the default.
 
       note: This function is implemented only for optimized lookup format
-      (hfst.types.HFST_OL_TYPE or hfst.types.HFST_OLW_TYPE). Either convert to
+      (hfst.types.HFST_OL_TYPE or hfst.types.HFST_OLW_TYPE). Other formats 
+      Either convert to
       optimized lookup format or to HfstBasicTransducer if you wish to perform
       lookup. Conversion to OL might take a while but it lookup is fast.
       Conversion to HfstBasicTransducer is quick but lookup is slower.
@@ -1077,10 +1078,10 @@ class HfstBasicTransducer {
     void disjunct(const StringPairVector &spv, float weight) { self->disjunct(spv, weight); }
     void harmonize(HfstBasicTransducer &another) { self->harmonize(another); }
 
-  HfstTwoLevelPaths _lookup_fd(const StringVector &lookup_path, size_t * infinite_cutoff, float * max_weight)
+  HfstTwoLevelPaths _lookup(const StringVector &lookup_path, size_t * infinite_cutoff, float * max_weight, bool obey_flags)
   {
     hfst::HfstTwoLevelPaths results;
-    $self->lookup(lookup_path, results, infinite_cutoff, max_weight);
+    $self->lookup(lookup_path, results, infinite_cutoff, max_weight, obey_flags);
     return results;
   }
 
@@ -1178,23 +1179,26 @@ class HfstBasicTransducer {
       attstr = self.get_att_string(write_weights)
       f.write(attstr)
 
-  def lookup_fd(self, lookup_path, **kvargs):
+  def lookup(self, lookup_path, **kvargs):
       """
-      Lookup tokenized input *input* in the transducer minding flag diacritics.
+      Lookup tokenized input *input* in the transducer.
 
       Parameters
       ----------
       * `str` :
           A list/tuple of strings to look up.
       * `kvargs` :
-          infinite_cutoff=-1, max_weight=None
+          infinite_cutoff=-1, max_weight=None, obey_flags=False
       * `infinite_cutoff` :
-          Defaults to -1, i.e. infinite.
+          How many times epsilon input loops are followed. Defaults to -1, i.e. infinitely.
       * `max_weight` :
-          Defaults to None, i.e. infinity.
+          What is the maximum weight of a result allowed. Defaults to None, i.e. infinity.
+      * `obey_flags` :
+          Whether flag diacritic constraints are obeyed. Defaults to False.
       """
       max_weight = None
       infinite_cutoff = None
+      obey_flags = False
       output='dict' # 'dict' (default), 'text', 'raw'
 
       for k,v in kvargs.items():
@@ -1202,6 +1206,8 @@ class HfstBasicTransducer {
              max_weight=v
           elif k == 'infinite_cutoff' :
              infinite_cutoff=v
+          elif k == 'obey_flags' :
+             obey_flags=v
           elif k == 'output':
              if v == 'text':
                 output == 'text'
@@ -1215,10 +1221,10 @@ class HfstBasicTransducer {
           else:
              print('Warning: ignoring unknown argument %s.' % (k))
 
-      retval = self._lookup_fd(lookup_path, infinite_cutoff, max_weight)
+      retval = self._lookup(lookup_path, infinite_cutoff, max_weight, obey_flags)
 
       if output == 'text':
-         return two_level_paths_to_string(retval)
+         return _two_level_paths_to_string(retval)
       elif output == 'dict':
          return _two_level_paths_to_dict(retval)
       else:
