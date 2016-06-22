@@ -3860,7 +3860,7 @@
            return false;
          }
          
-         HFSTDLL void lookup_fd
+         HFSTDLL void lookup
            (const StringVector &lookup_path,
             HfstTwoLevelPaths &results,
             HfstState state,
@@ -3868,9 +3868,9 @@
             HfstTwoLevelPath &path_so_far,
             StringSet &alphabet,
             HfstEpsilonHandler Eh,
-            size_t infinite_cutoff,
+            size_t max_epsilon_cycles,
             float * max_weight = NULL,
-            StringVector * fds_so_far = NULL)
+            StringVector * flag_diacritic_path = NULL)
          {
            // Check whether the number of input epsilon cycles is exceeded
            if (! Eh.can_continue(state)) {
@@ -3904,7 +3904,7 @@
                bool input_symbol_consumed=false;
                if ( is_possible_transition
                     (*it, lookup_path, lookup_index, alphabet, 
-                     input_symbol_consumed, fds_so_far) )
+                     input_symbol_consumed, flag_diacritic_path) )
                  {
                    // update path_so_far and lookup_index
                    std::string istr;
@@ -3932,12 +3932,12 @@
                    push_back_to_two_level_path
                      (path_so_far,
                       StringPair(istr, ostr),
-                      it->get_weight(), fds_so_far);
+                      it->get_weight(), flag_diacritic_path);
 
                    HfstEpsilonHandler * Ehp = NULL;
                    if (input_symbol_consumed) {
                      lookup_index++;
-                     Ehp = new HfstEpsilonHandler(infinite_cutoff);
+                     Ehp = new HfstEpsilonHandler(max_epsilon_cycles);
                    }
                    else {
                      Eh.push_back(state);
@@ -3945,8 +3945,8 @@
                    }
                    
                    // call lookup for the target state of the transition
-                   lookup_fd(lookup_path, results, it->get_target_state(),
-                             lookup_index, path_so_far, alphabet, *Ehp, infinite_cutoff, max_weight, fds_so_far);
+                   lookup(lookup_path, results, it->get_target_state(),
+                             lookup_index, path_so_far, alphabet, *Ehp, max_epsilon_cycles, max_weight, flag_diacritic_path);
                    
                    // return to the original values of path_so_far 
                    // and lookup_index
@@ -3959,16 +3959,16 @@
                      // of Eh is automatically called next
                    }
                    
-                   pop_back_from_two_level_path(path_so_far, it->get_weight(), fds_so_far);
+                   pop_back_from_two_level_path(path_so_far, it->get_weight(), flag_diacritic_path);
                  }
              }
            
          }
          
-         HFSTDLL void lookup_fd
+         HFSTDLL void lookup
            (const StringVector &lookup_path,
             HfstTwoLevelPaths &results,
-            size_t * infinite_cutoff = NULL,
+            size_t * max_epsilon_cycles = NULL,
             float * max_weight = NULL,
             bool obey_flags = false)
          {
@@ -3976,23 +3976,23 @@
            unsigned int lookup_index = 0;
            HfstTwoLevelPath path_so_far;
            StringSet alphabet = this->get_alphabet();
-           StringVector * fds_so_far = (obey_flags)? new StringVector() : NULL;
+           StringVector * flag_diacritic_path = (obey_flags)? new StringVector() : NULL;
 
-           if (infinite_cutoff != NULL)
+           if (max_epsilon_cycles != NULL)
              {
-               HfstEpsilonHandler Eh(*infinite_cutoff);
-               lookup_fd(lookup_path, results, state, lookup_index, path_so_far, 
-                         alphabet, Eh, *infinite_cutoff, max_weight, fds_so_far);
+               HfstEpsilonHandler Eh(*max_epsilon_cycles);
+               lookup(lookup_path, results, state, lookup_index, path_so_far, 
+                      alphabet, Eh, *max_epsilon_cycles, max_weight, flag_diacritic_path);
              }
            else
              {
                HfstEpsilonHandler Eh(100000);
-               lookup_fd(lookup_path, results, state, lookup_index, path_so_far, 
-                         alphabet, Eh, 100000, max_weight, fds_so_far);
+               lookup(lookup_path, results, state, lookup_index, path_so_far, 
+                      alphabet, Eh, 100000, max_weight, flag_diacritic_path);
              }
            
-           if (fds_so_far != NULL)
-             delete fds_so_far;
+           if (flag_diacritic_path != NULL)
+             delete flag_diacritic_path;
          }
 
 

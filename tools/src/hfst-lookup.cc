@@ -1214,7 +1214,7 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
   if (is_possible_to_get_result(s, cascade_symbols_seen[transducer_number], 
                                 cascade_unknown_or_identity_seen[transducer_number]))
     {
-      t.lookup_fd(s.second, results_spv, limit,
+      t.lookup(s.second, results_spv, limit,
         NULL /*no weight limit, variable 'beam' defines which paths are printed */,
         obey_flags);
     }

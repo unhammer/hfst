@@ -1080,7 +1080,7 @@ class HfstBasicTransducer {
   HfstTwoLevelPaths _lookup_fd(const StringVector &lookup_path, size_t * infinite_cutoff, float * max_weight)
   {
     hfst::HfstTwoLevelPaths results;
-    $self->lookup_fd(lookup_path, results, infinite_cutoff, max_weight);
+    $self->lookup(lookup_path, results, infinite_cutoff, max_weight);
     return results;
   }
 
