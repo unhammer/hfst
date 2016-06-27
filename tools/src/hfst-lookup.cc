@@ -1205,7 +1205,8 @@ static unsigned int transducer_number=0;
 
 void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results, 
                          const HfstOneLevelPath& s, size_t * limit = NULL, bool print_pairs_at_this_point = false,
-                         bool print_fail = false, const HfstOneLevelPath * input_to_print = NULL)
+                         bool print_fail = false, const HfstOneLevelPath * input_to_print = NULL,
+                         bool no_newline = false)
 {
   /* If we want a StringPairVector representation */
   HfstTwoLevelPaths results_spv;
@@ -1273,7 +1274,8 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
             }
 
       }
-      fprintf(outfile, "\n");
+      if (!no_newline)
+        fprintf(outfile, "\n");
     }
     fflush(outfile);
   }
@@ -1296,7 +1298,7 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
 
 
 HfstOneLevelPaths*
-lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity, bool print_pairs_at_this_point=false, bool print_fail=false, const HfstOneLevelPath * input_to_print = NULL)
+lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity, bool print_pairs_at_this_point=false, bool print_fail=false, const HfstOneLevelPath * input_to_print = NULL, bool no_newline=false)
 {
   HfstOneLevelPaths* results = new HfstOneLevelPaths;
 
@@ -1310,12 +1312,12 @@ lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity,
     warning(0, 0, "Got infinite results, number of cycles limited to " SIZE_T_SPECIFIER "",
         infinite_cutoff);
       }
-      lookup_fd_and_print(t, *results, s, &infinite_cutoff, print_pairs_at_this_point, print_fail, input_to_print);
+      lookup_fd_and_print(t, *results, s, &infinite_cutoff, print_pairs_at_this_point, print_fail, input_to_print, no_newline);
       *infinity = true;
     }
   else
     {
-      lookup_fd_and_print(t, *results, s, NULL, print_pairs_at_this_point, print_fail, input_to_print);
+      lookup_fd_and_print(t, *results, s, NULL, print_pairs_at_this_point, print_fail, input_to_print, no_newline);
     }
 
   if (results->size() == 0)
@@ -1423,7 +1425,7 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstBasicTransducer> cascade,
                it != results->end(); it++)
             {
               // if last transducer in cascade, print results if --print-pairs is requested
-              HfstOneLevelPaths * one_result = lookup_simple(*it, cascade[i], infinity, ((i+1) == cascade.size()), false, &s);
+              HfstOneLevelPaths * one_result = lookup_simple(*it, cascade[i], infinity, ((i+1) == cascade.size()), false, &s, (it != (--(results->end()))));
               for (HfstOneLevelPaths::const_iterator IT = one_result->begin();
                    IT != one_result->end(); IT++)
                 {
