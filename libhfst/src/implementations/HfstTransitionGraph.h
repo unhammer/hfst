@@ -3696,8 +3696,8 @@
                    bool continu = false;
                    if (it->get_input_symbol().compare(s.second.at(index)) == 0)
                      continu = true;
-                   else if ((it->get_input_symbol().compare("@_UNKNOWN_SYMBOL_@") || 
-                             it->get_input_symbol().compare("@_IDENTITY_SYMBOL_@"))
+                   else if (((it->get_input_symbol().compare("@_UNKNOWN_SYMBOL_@") == 0) ||
+                             (it->get_input_symbol().compare("@_IDENTITY_SYMBOL_@") == 0))
                             &&
                             (alphabet.find(s.second.at(index)) == alphabet.end()))
                      {
