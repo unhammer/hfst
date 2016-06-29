@@ -5,7 +5,7 @@ import hfst.exceptions
 e = hfst.exceptions.HfstException()
 e = hfst.exceptions.HfstException('foo','bar', 10)
 e = hfst.exceptions.HfstTransducerTypeMismatchException('foo','bar', 10)
-e = hfst.exceptions.ImplementationTypeNotAvailableException('foo','bar', 10)
+e = hfst.exceptions.ImplementationTypeNotAvailableException('foo','bar', 10, 1)
 e = hfst.exceptions.FunctionNotImplementedException('foo','bar', 10)
 e = hfst.exceptions.StreamNotReadableException('foo','bar', 10)
 e = hfst.exceptions.StreamCannotBeWrittenException('foo','bar', 10)
