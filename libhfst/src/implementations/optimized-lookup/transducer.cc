@@ -310,6 +310,12 @@ HfstOneLevelPaths * Transducer::lookup_fd(const std::string & s, ssize_t limit,
     return lookup_fd(s.c_str(), limit, time_cutoff);
 }
 
+HfstTwoLevelPaths * Transducer::lookup_fd_pairs(const std::string & s, ssize_t limit,
+                                                double time_cutoff)
+{
+    return lookup_fd_pairs(s.c_str(), limit, time_cutoff);
+}
+
 bool Transducer::is_lookup_infinitely_ambiguous(const std::string & s)
 {
     if (!initialize_input(s.c_str())) {
@@ -346,6 +352,39 @@ HfstOneLevelPaths * Transducer::lookup_fd(const char * s, ssize_t limit,
         start_clock = clock();
     }
     HfstOneLevelPaths * results = new HfstOneLevelPaths;
+    if (!initialize_input(s)) {
+        return results;
+    }
+    lookup_paths = new HfstTwoLevelPaths;
+    traversal_states.clear();
+    //current_weight += s.second;
+    get_analyses(0, 0, 0);
+    //current_weight -= s.second;
+    for (HfstTwoLevelPaths::iterator it = lookup_paths->begin();
+         it != lookup_paths->end(); ++it) {
+        HfstOneLevelPath output_path;
+        output_path.first = it->first;
+        for (StringPairVector::const_iterator v_it = (it->second).begin();
+             v_it != (it->second).end(); ++v_it) {
+            output_path.second.push_back(v_it->second);
+        }
+        results->insert(output_path);
+    }
+    delete lookup_paths;
+    lookup_paths = NULL;
+    return results;
+}
+
+HfstTwoLevelPaths * Transducer::lookup_fd_pairs(const char * s, ssize_t limit,
+                                                double time_cutoff)
+{
+    max_lookups = limit;
+    max_time = 0.0;
+    if (time_cutoff > 0.0) {
+        max_time = time_cutoff;
+        start_clock = clock();
+    }
+    HfstTwoLevelPaths * results = new HfstTwoLevelPaths;
     lookup_paths = results;
     if (!initialize_input(s)) {
         lookup_paths = NULL;
@@ -359,7 +398,6 @@ HfstOneLevelPaths * Transducer::lookup_fd(const char * s, ssize_t limit,
     return results;
 }
 
-
 void Transducer::try_epsilon_transitions(unsigned int input_pos,
                                          unsigned int output_pos,
                                          TransitionTableIndex i)
@@ -372,7 +410,7 @@ void Transducer::try_epsilon_transitions(unsigned int input_pos,
         Weight weight = tables->get_weight(i);
         if (input == 0) // epsilon
         {
-            output_tape.write(output_pos, output);
+            output_tape.write(output_pos, input, output);
             current_weight += weight;
             get_analyses(input_pos, output_pos + 1, target);
             found_transition = true;
@@ -392,7 +430,7 @@ void Transducer::try_epsilon_transitions(unsigned int input_pos,
                 }
 
                 traversal_states.insert(flag_reachable);
-                output_tape.write(output_pos, output);
+                output_tape.write(output_pos, input, output);
                 current_weight += weight;
                 get_analyses(input_pos, output_pos + 1, target);
                 found_transition = true;
@@ -441,7 +479,7 @@ void Transducer::find_transitions(SymbolNumber input,
                 // back in the input tape to find the symbol we want to write
                 output = input_tape[input_pos - 1];
             }
-            output_tape.write(output_pos, output);
+            output_tape.write(output_pos, input, output);
             current_weight += tables->get_weight(i);
             get_analyses(input_pos,
                          output_pos + 1,
@@ -504,7 +542,7 @@ void Transducer::get_analyses(unsigned int input_pos,
         // First we check for finality and collect the result
         if (input_tape[input_pos] == NO_SYMBOL_NUMBER) {
             if (max_lookups < 0 || lookup_paths->size() < max_lookups) {
-                output_tape.write(output_pos, NO_SYMBOL_NUMBER);
+                output_tape.write(output_pos, NO_SYMBOL_NUMBER, NO_SYMBOL_NUMBER);
                 if (tables->get_transition_finality(i)) {
                     current_weight += tables->get_weight(i);
                     note_analysis();
@@ -553,7 +591,7 @@ void Transducer::get_analyses(unsigned int input_pos,
     {
         if (input_tape[input_pos] == NO_SYMBOL_NUMBER) {
             if (max_lookups < 0 || lookup_paths->size() < max_lookups) {
-                output_tape.write(output_pos, NO_SYMBOL_NUMBER);
+                output_tape.write(output_pos, NO_SYMBOL_NUMBER, NO_SYMBOL_NUMBER);
                 if (tables->get_index_finality(i)) {
                     current_weight += tables->get_final_weight(i);
                     note_analysis();
@@ -594,22 +632,21 @@ void Transducer::get_analyses(unsigned int input_pos,
                        input_pos, output_pos, i+1);
         }
     }
-    output_tape.write(output_pos, NO_SYMBOL_NUMBER);
+    output_tape.write(output_pos, NO_SYMBOL_NUMBER, NO_SYMBOL_NUMBER);
     ++recursion_depth_left;
 }
 
 void Transducer::note_analysis(void)
 {
-    HfstOneLevelPath result;
-    for (SymbolNumberVector::const_iterator it = output_tape.begin();
-         *it != NO_SYMBOL_NUMBER; ++it) {
-        result.second.push_back(alphabet->string_from_symbol(*it));
+    HfstTwoLevelPath result;
+    for (DoubleTape::const_iterator it = output_tape.begin();
+         it->output != NO_SYMBOL_NUMBER; ++it) {
+        result.second.push_back(StringPair(alphabet->string_from_symbol(it->input),
+                                           alphabet->string_from_symbol(it->output)));
     }
     result.first = current_weight;
     lookup_paths->insert(result);
 }
-
-
 
 Transducer::Transducer():
     header(NULL), alphabet(NULL), tables(NULL),

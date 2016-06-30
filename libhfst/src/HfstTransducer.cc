@@ -669,6 +669,18 @@ HfstOneLevelPaths * HfstTransducer::lookup(const std::string & s,
     return lookup_fd(s, limit, time_cutoff);
 }
 
+HfstTwoLevelPaths * HfstTransducer::lookup_pairs(const std::string & s,
+                                                 ssize_t limit, double time_cutoff) const
+{
+    switch(this->type) {
+    case (HFST_OL_TYPE):
+    case (HFST_OLW_TYPE):
+        return this->implementation.hfst_ol->lookup_fd_pairs(s, limit, time_cutoff);
+    default:
+      HFST_THROW(FunctionNotImplementedException);
+    }
+}
+
 HfstOneLevelPaths * HfstTransducer::lookup_fd(const StringVector& s,
                           ssize_t limit, double time_cutoff) const
 {
