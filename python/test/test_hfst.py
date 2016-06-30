@@ -22,6 +22,17 @@ for type in types:
     tr2 = None
     tr3 = None
 
+    type_ = hfst.types.TROPICAL_OPENFST_TYPE
+    ostr = hfst.HfstOutputStream(filename='foobar.hfst', type=type_)
+
+    tr_ = hfst.regex('{foo}:{bar}::0.5')
+    tr_.convert(type_)
+
+    ostr.write(tr_)
+    ostr.write(tr_)
+    ostr.flush()
+    ostr.close()
+
     if not os.path.isfile('foobar.hfst'):
         raise RuntimeError('Missing file: foobar.hfst')
 
@@ -220,7 +231,7 @@ for type in types:
 
 
     fsm = hfst.HfstBasicTransducer(tr)
-    print(fsm.lookup_fd((('foo'))), file=f)
+    print(fsm.lookup((('foo'))), file=f)
 
     print(tr.extract_paths(obey_flags='True', filter_flags='False', max_number=3, output='dict'), file=f)
 

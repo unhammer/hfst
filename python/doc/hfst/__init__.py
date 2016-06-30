@@ -562,12 +562,12 @@ class HfstBasicTransducer:
     def is_lookup_infinitely_ambiguous(self, str):
         pass
 
-    ## Lookup tokenized input \a input in the transducer minding flag diacritics.
     # @param str A list/tuple of strings to look up.
-    # @param kvargs infinite_cutoff=-1, max_weight=None
-    # @param infinite_cutoff Defaults to -1, i.e. infinite.
-    # @param max_weight Defaults to None, i.e. infinity. 
-    def lookup_fd(self, input, **kvargs):
+    # @param kvargs max_epsilon_loops=-1, max_weight=None, obey_flags=False
+    # @param max_epsilon_loops How many times epsilon input loops are followed. Defaults to -1, i.e. infinitely.
+    # @param max_weight What is the maximum weight of a result allowed. Defaults to None, i.e. infinity.
+    # @param obey_flags Whether flag diacritic constraints are obeyed. Defaults to False.
+    def lookup(self, input, **kvargs):
         pass
 
     ## Add a new state to this transducer and return its number.      
@@ -1475,20 +1475,18 @@ class HfstTransducer:
         pass
 
     ## Lookup string \a input.
-    # @param input The input.
+    # @param input The input. A string or a pre-tokenized tuple of symbols (i.e. a tuple of strings).
     # @param kvargs Possible parameters and their default values are: obey_flags=True, max_number=-1, time_cutoff=0.0, output='tuple'
-    # @param obey_flags Whether flag diacritics are obeyed. Currently always True.
+    # @param obey_flags Whether flag diacritics are obeyed. Always True for HFST_OL(W)_TYPE transducers.
     # @param max_number Maximum number of results returned, defaults to -1, i.e. infinity.
-    # @param time_cutoff How long the function can search for results before returning, expressed in seconds. Defaults to 0.0, i.e. infinitely.
+    # @param time_cutoff How long the function can search for results before returning, expressed in seconds. Defaults to 0.0, i.e. infinitely. Always 0.0 for transducers that are not of HFST_OL(W)_TYPE.
     # @param output Possible values are 'tuple', 'text' and 'raw', 'tuple' being the default.
     #
-    # @note This function is implemented only for optimized lookup format (#hfst.types.HFST_OL_TYPE or #hfst.types.HFST_OLW_TYPE). 
-    #       Either convert to optimized lookup format or to HfstBasicTransducer if you wish to perform lookup.
-    #       Conversion to OL might take a while but it lookup is fast.
-    #       Conversion to HfstBasicTransducer is quick but lookup is slower.
-    #
-    def lookup(self, input, **kvargs):
-        pass
+    # @note This function has an efficient implementation only for optimized lookup format
+    #       (hfst.types.HFST_OL_TYPE or hfst.types.HFST_OLW_TYPE). Other formats perform the
+    #       lookup via composition. Consider converting the transducer to optimized lookup format
+    #       or to a HfstBasicTransducer. Conversion to HFST_OL(W)_TYPE might take a while but the
+    #       lookup is fast. Conversion to HfstBasicTransducer is quick but lookup is slower.
 
     ## Optimize the transducer for lookup.
     # This effectively converts the transducer into #hfst.types.HFST_OL_TYPE.

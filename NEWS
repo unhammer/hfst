@@ -5,6 +5,16 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.11.0
+----------------------------
+
+* Add docstrings to Python API
+
+* Changes and improvements to pmatch tools, hfst-tokenize, hfst-optimized-lookup, hfst-lookup and hfst-xfst
+
+* Fix bugs in flag elimination
+
+
 Noteworthy changes in 3.10.0
 ----------------------------
 

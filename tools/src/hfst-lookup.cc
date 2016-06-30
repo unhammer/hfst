@@ -1180,7 +1180,12 @@ static std::string get_print_format(const std::string &s)
 static void print_lookup_string(const StringVector &s) {
   for (StringVector::const_iterator it = s.begin(); 
        it != s.end(); it++) {
-    fprintf(stderr, "%s", get_print_format(*it).c_str());
+#ifdef WINDOWS
+    if (!pipe_output)
+      hfst_fprintf_console(outfile, "%s", get_print_format(*it).c_str());
+    else
+#endif
+      fprintf(outfile, "%s", get_print_format(*it).c_str());
   }
 }
 
@@ -1205,7 +1210,8 @@ static unsigned int transducer_number=0;
 
 void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results, 
                          const HfstOneLevelPath& s, size_t * limit = NULL, bool print_pairs_at_this_point = false,
-                         bool print_fail = false, const HfstOneLevelPath * input_to_print = NULL)
+                         bool print_fail = false, const HfstOneLevelPath * input_to_print = NULL,
+                         bool no_newline = false)
 {
   /* If we want a StringPairVector representation */
   HfstTwoLevelPaths results_spv;
@@ -1214,7 +1220,7 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
   if (is_possible_to_get_result(s, cascade_symbols_seen[transducer_number], 
                                 cascade_unknown_or_identity_seen[transducer_number]))
     {
-      t.lookup_fd(s.second, results_spv, limit,
+      t.lookup(s.second, results_spv, limit,
         NULL /*no weight limit, variable 'beam' defines which paths are printed */,
         obey_flags);
     }
@@ -1226,7 +1232,12 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
       if (print_fail)
         {
           print_lookup_string(s.second);
-          fprintf(outfile, "\n");
+#ifdef WINDOWS
+          if (!pipe_output)
+            hfst_fprintf_console(outfile, "\n");
+          else
+#endif
+            fprintf(outfile, "\n");
         }
     }
     else {
@@ -1252,28 +1263,64 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
                 print_lookup_string(input_to_print->second);
               else
                 print_lookup_string(s.second);
-              fprintf(outfile, "\t");
+
+#ifdef WINDOWS
+              if (!pipe_output)
+                hfst_fprintf_console(outfile, "\t");
+              else
+#endif
+                fprintf(outfile, "\t");
+
               /* and the path that yielded the result string */
               bool first_pair=true;
               for (StringPairVector::const_iterator IT = it->second.begin();
                    IT != it->second.end(); IT++) {
                 if (show_flags || ! FdOperation::is_diacritic(IT->second))
                   {
-                    if (print_space && ! first_pair) {
-                      fprintf(outfile, " ");
+#ifdef WINDOWS
+                    if (!pipe_output)
+                      {
+                        if (print_space && ! first_pair) {
+                          hfst_fprintf_console(outfile, " ");
+                        }
+                        hfst_fprintf_console(outfile, "%s:%s",
+                          get_print_format(IT->first).c_str(),
+                          get_print_format(IT->second).c_str());
+                        first_pair=false;
+                      }
+                    else
+#endif
+                    {
+                      if (print_space && ! first_pair) {
+                        fprintf(outfile, " ");
+                      }
+                      fprintf(outfile, "%s:%s",
+                              get_print_format(IT->first).c_str(),
+                              get_print_format(IT->second).c_str());
+                      first_pair=false;
                     }
-                    fprintf(outfile, "%s:%s", 
-                            get_print_format(IT->first).c_str(),
-                            get_print_format(IT->second).c_str());
-                    first_pair=false;
                   }
               }
               /* and the weight of that path (add the weight of input). */
-              fprintf(outfile, "\t%f\n", it->first + s.first);
+#ifdef WINDOWS
+              if (!pipe_output)
+                hfst_fprintf_console(outfile, "\t%f\n", it->first + s.first);
+              else
+#endif
+                fprintf(outfile, "\t%f\n", it->first + s.first);
             }
 
       }
-      fprintf(outfile, "\n");
+      if (!no_newline)
+        {
+#ifdef WINDOWS
+          if (!pipe_output)
+            hfst_fprintf_console(outfile, "\n");
+          else
+#endif
+          fprintf(outfile, "\n");
+        }
+
     }
     fflush(outfile);
   }
@@ -1296,7 +1343,7 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
 
 
 HfstOneLevelPaths*
-lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity, bool print_pairs_at_this_point=false, bool print_fail=false, const HfstOneLevelPath * input_to_print = NULL)
+lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity, bool print_pairs_at_this_point=false, bool print_fail=false, const HfstOneLevelPath * input_to_print = NULL, bool no_newline=false)
 {
   HfstOneLevelPaths* results = new HfstOneLevelPaths;
 
@@ -1310,12 +1357,12 @@ lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity,
     warning(0, 0, "Got infinite results, number of cycles limited to " SIZE_T_SPECIFIER "",
         infinite_cutoff);
       }
-      lookup_fd_and_print(t, *results, s, &infinite_cutoff, print_pairs_at_this_point, print_fail, input_to_print);
+      lookup_fd_and_print(t, *results, s, &infinite_cutoff, print_pairs_at_this_point, print_fail, input_to_print, no_newline);
       *infinity = true;
     }
   else
     {
-      lookup_fd_and_print(t, *results, s, NULL, print_pairs_at_this_point, print_fail, input_to_print);
+      lookup_fd_and_print(t, *results, s, NULL, print_pairs_at_this_point, print_fail, input_to_print, no_newline);
     }
 
   if (results->size() == 0)
@@ -1368,7 +1415,12 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstTransducer> cascade,
                 {
                   input += *it;
                 }
-              fprintf(outfile, "%s\t%s+?\tinf\n\n", input.c_str(), input.c_str());
+#ifdef WINDOWS
+              if (!pipe_output)
+                hfst_fprintf_console(outfile, "%s\t%s+?\tinf\n\n", input.c_str(), input.c_str());
+              else
+#endif
+                fprintf(outfile, "%s\t%s+?\tinf\n\n", input.c_str(), input.c_str());
             }
         }
       else
@@ -1423,7 +1475,7 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstBasicTransducer> cascade,
                it != results->end(); it++)
             {
               // if last transducer in cascade, print results if --print-pairs is requested
-              HfstOneLevelPaths * one_result = lookup_simple(*it, cascade[i], infinity, ((i+1) == cascade.size()), false, &s);
+              HfstOneLevelPaths * one_result = lookup_simple(*it, cascade[i], infinity, ((i+1) == cascade.size()), false, &s, (it != (--(results->end()))));
               for (HfstOneLevelPaths::const_iterator IT = one_result->begin();
                    IT != one_result->end(); IT++)
                 {
@@ -1444,7 +1496,12 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstBasicTransducer> cascade,
                 {
                   input += *it;
                 }
-              fprintf(outfile, "%s\t%s+?\tinf\n\n", input.c_str(), input.c_str());
+#ifdef WINDOWS
+              if (!pipe_output)
+                hfst_fprintf_console(outfile, "%s\t%s+?\tinf\n\n", input.c_str(), input.c_str());
+              else
+#endif
+                fprintf(outfile, "%s\t%s+?\tinf\n\n", input.c_str(), input.c_str());
             }
         }
       else

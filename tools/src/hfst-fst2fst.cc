@@ -131,6 +131,11 @@ parse_options(int argc, char** argv)
           // add tool-specific cases here
                 case 'f':
           output_type = hfst_parse_format_name(optarg);
+#ifndef HAVE_XFSM
+          if (output_type == hfst::XFSM_TYPE)
+            error(EXIT_FAILURE, 0, 
+                  "xfsm back-end is not available");
+#endif
           break;
         case 'b':
           hfst_format=false;
@@ -142,7 +147,12 @@ parse_options(int argc, char** argv)
           output_type = hfst::FOMA_TYPE;
           break;
         case 'x':
+#ifdef HAVE_XFSM
           output_type = hfst::XFSM_TYPE;
+#else
+          error(EXIT_FAILURE, 0, 
+                "xfsm back-end is not available");
+#endif
           break;
         case 't':
           output_type = hfst::TROPICAL_OPENFST_TYPE;
@@ -272,6 +282,12 @@ int main( int argc, char **argv ) {
       {
         error(EXIT_FAILURE, 0, "%s seems to be a gzipped native foma file, you must first unzip it",
               inputfilename);
+        return EXIT_FAILURE;
+      }
+    catch(const ImplementationTypeNotAvailableException e)
+      {
+        error(EXIT_FAILURE, 0, "%s is in %s format which is not available",
+              inputfilename, hfst::implementation_type_to_format(e.get_type()));
         return EXIT_FAILURE;
       }
     catch(const HfstException e)  {

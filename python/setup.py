@@ -16,6 +16,11 @@ extra_link_arguments = []
 
 # When making the debian package, replace extra_link_args
 # with ["-L/usr/lib/", "-Wl,-rpath=/usr/lib/"]
+
+# If you wish to link hfst c++ library statically, use:
+# library_dirs = []
+# libraries = []
+# extra_objects = absolute_libhfst_src_path + "/.libs/libhfst.a" 
 libhfst_module = Extension('_libhfst',
                            language = "c++",
                            sources = ["libhfst.i"],
@@ -30,7 +35,7 @@ libhfst_module = Extension('_libhfst',
 # ["libhfst-NN.dll", "libgcc_s_seh-1.dll"] or
 # ["libhfst-NN.dll", "libgcc_s_dw2-1.dll"] or
 setup(name = 'libhfst_swig',
-      version = '3.10.0_beta',
+      version = '3.11.0_beta',
       author = 'HFST team',
       author_email = 'hfst-bugs@helsinki.fi',
       url = 'http://hfst.github.io/',

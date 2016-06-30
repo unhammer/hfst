@@ -22,7 +22,7 @@ namespace hfst
     type(type), hfst_format(hfst_format), is_open(false)
   { 
     if (! HfstTransducer::is_implementation_type_available(type)) {
-      HFST_THROW(ImplementationTypeNotAvailableException);
+      throw ImplementationTypeNotAvailableException("ImplementationTypeNotAvailableException", __FILE__, __LINE__, type);
     }
 
     switch(type)
@@ -85,7 +85,7 @@ namespace hfst
     type(type), hfst_format(hfst_format_), is_open(false)
   { 
     if (! HfstTransducer::is_implementation_type_available(type)) {
-      HFST_THROW(ImplementationTypeNotAvailableException);
+      throw ImplementationTypeNotAvailableException("ImplementationTypeNotAvailableException", __FILE__, __LINE__, type);
     }
 
     switch(type)

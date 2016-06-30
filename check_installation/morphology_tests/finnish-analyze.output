@@ -1,103 +1,77 @@
-Kaikki	
 Kaikki	Kaikki Pron Qnt Nom Sg
 
-ihmiset	
 ihmiset	ihminen N Nom Pl
 
-syntyvät	
+syntyvät	syntyä V Prs Act Pl3
 syntyvät	syntyä PrsPrc Act Pl
 syntyvät	syntyä PrsPrc Act Pos Nom Pl
-syntyvät	syntyä V Prs Act Pl3
 
-vapaina	
 vapaina	vapaa A Pos Ess Pl
 vapaina	vapaa N Ess Pl
 
-ja	
 ja	ja Adv
 ja	ja CC
 
-tasavertaisina	
 tasavertaisina	tasa#vertainen A Pos Ess Pl
 tasavertaisina	tasa#vertainen N Ess Pl
 
-arvoltaan	
 arvoltaan	arvo N Abl Sg Px3
 
-ja	
 ja	ja Adv
 ja	ja CC
 
-oikeuksiltaan	
 oikeuksiltaan	oikeus N Abl Pl Px3
 
-.	
 .	. Abbr Nom Sg
 .	. Punct
 
-Heille	
 Heille	He N Prop All Pl
 Heille	He Pron Pers All Pl
 
-on	
 on	olla V Prs Act Sg3
 
-annettu	
 annettu	annettu A Pos Nom Sg
+annettu	antaa V Pst Pass Pe4 ConNeg
 annettu	antaa PrfPrc Pass Pos Nom Sg
 annettu	antaa PrfPrc Pass Sg
-annettu	antaa V Pst Pass Pe4 ConNeg
 
-järki	
 järki	järki N Nom Sg
 
-ja	
 ja	ja Adv
 ja	ja CC
 
-omatunto	
 omatunto	omatunto N Nom Sg
 
-,	
 ,	, Abbr Nom Sg
 ,	, Punct
 
-ja	
 ja	ja Adv
 ja	ja CC
 
-heidän	
 heidän	he Pron Pers Gen Pl
 
-on	
 on	olla V Prs Act Sg3
 
-toimittava	
 toimittava	toimia PrsPrc Pass Pos Nom Sg
 toimittava	toimia PrsPrc Pass Sg
 toimittava	toimittaa PrsPrc Act Pos Nom Sg
 toimittava	toimittaa PrsPrc Act Sg
 
-toisiaan	
 toisiaan	toinen N Par Pl Px3
 toisiaan	toinen Num Ord Par Pl Px3
 toisiaan	toinen Pron Par Pl Px3
 toisiaan	toinen Pron Qnt Par Pl Px3
 
-kohtaan	
 kohtaan	kohdata V Prs Act Sg1
 kohtaan	kohta N Ill Sg
-kohtaan	kohtaan Adp Po
-kohtaan	kohtaan Adp Pr
 kohtaan	kohtaan Adv
+kohtaan	kohtaan Adp Pr
+kohtaan	kohtaan Adp Po
 
-veljeyden	
 veljeyden	veljeys N Gen Sg
 
-hengessä	
 hengessä	henki N Ine Sg
 
-.	
 .	. Abbr Nom Sg
 .	. Punct
 
