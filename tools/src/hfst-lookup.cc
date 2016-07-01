@@ -1421,6 +1421,7 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstTransducer> cascade,
               else
 #endif
                 fprintf(outfile, "%s\t%s+?\tinf\n\n", input.c_str(), input.c_str());
+              fflush(outfile);
             }
         }
       else
@@ -1502,6 +1503,7 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstBasicTransducer> cascade,
               else
 #endif
                 fprintf(outfile, "%s\t%s+?\tinf\n\n", input.c_str(), input.c_str());
+              fflush(outfile);
             }
         }
       else
