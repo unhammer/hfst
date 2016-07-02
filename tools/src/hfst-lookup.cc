@@ -440,15 +440,16 @@ parse_options(int argc, char** argv)
               {
                 quote_special = true;
               }
-        else if (strcmp(optarg, "obey-flags") == 0)
-          {
-        obey_flags = false;
-          }
+            else if (strcmp(optarg, "obey-flags") == 0)
+              {
+                obey_flags = false;
+              }
             else 
               {
                 error(EXIT_FAILURE, 0, "Xfst variable %s unrecognised",
                       optarg);
               }
+            break;
         case 'c':
             infinite_cutoff = (size_t)atoi(hfst_strdup(optarg));
             break;
@@ -1131,7 +1132,7 @@ lookup_simple(const HfstOneLevelPath& s, HfstTransducer& t, bool* infinity, bool
       if (print_pairs)
         lookup_fd_and_print(NULL, &t, *results, s, &infinite_cutoff, print_pairs_at_this_point, print_fail, input_to_print, no_newline);
       else
-        results = t.lookup_fd(s.second, 5/*infinite_cutoff*/, time_cutoff);
+        results = t.lookup_fd(s.second, infinite_cutoff, time_cutoff);
       *infinity = true;
     }
   else
@@ -1258,7 +1259,7 @@ void lookup_fd_and_print(HfstBasicTransducer * tr, HfstTransducer * TR, HfstOneL
           lookup_str += *it;
         }
       //std::cerr << "infinite_cutoff: " << infinite_cutoff << ", time_cutoff: " << time_cutoff << std::endl;
-      HfstTwoLevelPaths * htlp = TR->lookup_pairs(lookup_str, 5/*infinite_cutoff*/, time_cutoff);
+      HfstTwoLevelPaths * htlp = TR->lookup_pairs(lookup_str, infinite_cutoff, time_cutoff);
       results_spv = HfstTwoLevelPaths(*htlp);
       delete htlp;
     }
