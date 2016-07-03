@@ -1,6 +1,6 @@
 
 This folder contains source code for SWIG bindings for using HFST library with
-Python. The bindings work with Python versions 2 and 3.
+Python. The bindings work with Python version 3.
 
 
 =====================
@@ -12,7 +12,7 @@ Once you've successfully built and installed HFST library (located in the
 parent directory, if you are compiling from source), use the script setup.py
 to build the Python extension eg. like so:
 
-    python setup.py build_ext --inplace
+    python3 setup.py build_ext --inplace
 
 If you have only built HFST library but not installed it (or have an earlier
 version of HFST library installed) and want to build the bindings, you either
@@ -38,7 +38,7 @@ INSTALLING THE BINDINGS
 
 If you wish to install the extension, run
 
-    python setup.py install
+    python3 setup.py install
 
 The same that was said about linking to HFST C++ library in 'Building the
 bindings' above, applies also to installing.
@@ -46,8 +46,8 @@ bindings' above, applies also to installing.
 
 For further information, consult
 
-    python setup.py --help
-    python setup.py --help-commands
+    python3 setup.py --help
+    python3 setup.py --help-commands
 
 and the distutils documentation.
 
