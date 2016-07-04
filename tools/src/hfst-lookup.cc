@@ -99,6 +99,8 @@ static bool pipe_output = false;
 static size_t linen = 0;
 static bool lookup_given = false;
 static size_t infinite_cutoff=5;
+static size_t max_number=-1;
+static size_t MAX_NUMBER=5;
 static float beam=-1;
 
 #define CASCADE_UNION 1 
@@ -255,10 +257,13 @@ print_usage()
             "  -x, --statistics                 Print statistics\n"
             "  -X, --xfst=VARIABLE              Toggle xfst VARIABLE\n"
             "  -c, --cycles=INT                 How many times to follow input epsilon cycles\n"
+            "                                   (only for non-lookup-optimized transducers)\n"
+            "  -n, --max-number=INT             Maximum number of results printed for each input\n"
+            "                                   (only for lookup-optimized transducers)\n"
             "  -b, --beam=B                     Output only analyses whose weight is within B from\n"
             "                                   the best analysis\n"
             "  -t, --time-cutoff=S              Limit search after having used S seconds per input\n"
-            "                                   (currently only works in optimized-lookup mode\n"
+            "                                   (only for lookup-optimized transducers)\n"
             "  -C, --cascade=CASCADE            How multiple transducers in input are handled\n"
             "  -P, --progress                   Show neat progress bar if possible\n");
     fprintf(message_out, "\n");
@@ -296,7 +301,9 @@ print_usage()
 
     fprintf(message_out, 
             "Todo:\n"
-            "  Support --xfst=obey-flags for optimized lookup format.\n");
+            "  Support --xfst=obey-flags for optimized lookup format.\n"
+            "  Support --cycles for optimized lookup format.\n");
+
     fprintf(message_out,
             "\n"
             "Known bugs:\n"
@@ -325,6 +332,7 @@ parse_options(int argc, char** argv)
             {"input-format", required_argument, 0, 'F'},
             {"statistics", no_argument, 0, 'x'},
             {"cycles", required_argument, 0, 'c'},
+            {"max-number", required_argument, 0, 'n'},
             {"xfst", required_argument, 0, 'X'},
             {"epsilon-format", required_argument, 0, 'e'},
             {"epsilon-format2", required_argument, 0, 'E'},
@@ -338,7 +346,7 @@ parse_options(int argc, char** argv)
         int option_index = 0;
         // add tool-specific options here 
         int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "I:O:F:xc:X:e:E:b:t:p::PC:",
+                             HFST_GETOPT_UNARY_SHORT "I:O:F:xc:n:X:e:E:b:t:p::PC:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -453,7 +461,9 @@ parse_options(int argc, char** argv)
         case 'c':
             infinite_cutoff = (size_t)atoi(hfst_strdup(optarg));
             break;
-
+        case 'n':
+            max_number = (size_t)atoi(hfst_strdup(optarg));
+            break;
         case 'p':
           if (optarg == NULL)
             { pipe_input = true; pipe_output = true; }
@@ -1125,22 +1135,28 @@ lookup_simple(const HfstOneLevelPath& s, HfstTransducer& t, bool* infinity, bool
   HfstOneLevelPaths* results = new HfstOneLevelPaths;
   if (time_cutoff == 0.0 && t.is_lookup_infinitely_ambiguous(s.second))
     {
-      if (!silent && infinite_cutoff > 0) {
-    warning(0, 0, "Got infinite results, number of cycles limited to " SIZE_T_SPECIFIER "",
-        infinite_cutoff);
+      size_t maxnum = (max_number == -1)? MAX_NUMBER : max_number;
+      if (!silent) {
+        if (max_number == -1)
+          warning(0, 0, "Got infinite results, number of results limited to " SIZE_T_SPECIFIER "\n"
+                  "(can be controlled with --max-number=N)",
+                  maxnum);
+        else
+          warning(0, 0, "Got infinite results, number of results limited to " SIZE_T_SPECIFIER "",
+                  maxnum);
       }
       if (print_pairs)
-        lookup_fd_and_print(NULL, &t, *results, s, &infinite_cutoff, print_pairs_at_this_point, print_fail, input_to_print, no_newline);
+        lookup_fd_and_print(NULL, &t, *results, s, &maxnum, print_pairs_at_this_point, print_fail, input_to_print, no_newline);
       else
-        results = t.lookup_fd(s.second, infinite_cutoff, time_cutoff);
+        results = t.lookup_fd(s.second, maxnum, time_cutoff);
       *infinity = true;
     }
   else
     {
       if (print_pairs)
-        lookup_fd_and_print(NULL, &t, *results, s, NULL, print_pairs_at_this_point, print_fail, input_to_print, no_newline);
+        lookup_fd_and_print(NULL, &t, *results, s, &max_number, print_pairs_at_this_point, print_fail, input_to_print, no_newline);
       else
-        results = t.lookup_fd(s.second, -1, time_cutoff);
+        results = t.lookup_fd(s.second, max_number, time_cutoff);
     }
 
   if (results->size() == 0)
@@ -1258,8 +1274,7 @@ void lookup_fd_and_print(HfstBasicTransducer * tr, HfstTransducer * TR, HfstOneL
         {
           lookup_str += *it;
         }
-      //std::cerr << "infinite_cutoff: " << infinite_cutoff << ", time_cutoff: " << time_cutoff << std::endl;
-      HfstTwoLevelPaths * htlp = TR->lookup_pairs(lookup_str, infinite_cutoff, time_cutoff);
+      HfstTwoLevelPaths * htlp = TR->lookup_pairs(lookup_str, *limit, time_cutoff);
       results_spv = HfstTwoLevelPaths(*htlp);
       delete htlp;
     }
