@@ -1285,14 +1285,6 @@ void lookup_fd_and_print(HfstBasicTransducer * tr, HfstTransducer * TR, HfstOneL
     if (results_spv.size() == 0) {
       if (print_fail)
         {
-          //print_lookup_string(s.second);
-          //#ifdef WINDOWS
-          //if (!pipe_output)
-          //  hfst_fprintf_console(outfile, "\n");
-          //else
-          //#endif
-          //  fprintf(outfile, "\n");
-
           std::string input = get_lookup_string(s.second);
 #ifdef WINDOWS
           if (!pipe_output)
@@ -1457,7 +1449,7 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstTransducer> cascade,
           for (HfstOneLevelPaths::const_iterator it = results->begin();
                it != results->end(); it++)
             {
-              HfstOneLevelPaths * one_result = lookup_simple(*it, cascade[i], infinity, ((i+1) == cascade.size()), false, &s, (it != (--(results->end()))));
+              HfstOneLevelPaths * one_result = lookup_simple(*it, cascade[i], infinity, ((i+1) == cascade.size()), false, &s, true);
               //HfstOneLevelPaths * one_result = lookup_simple(*it, cascade[i], infinity);
               for (HfstOneLevelPaths::const_iterator IT = one_result->begin();
                    IT != one_result->end(); IT++)
@@ -1471,20 +1463,34 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstTransducer> cascade,
           delete results;
           results = new HfstOneLevelPaths();
 
-          // no results from cascading composition
-          if ((result->size() == 0) && ((i+1) == cascade.size()) && print_pairs)
+          // cascading composition done
+          if ( ((i+1) == cascade.size()) && print_pairs )
             {
-              std::string input;
-              for (StringVector::const_iterator it = s.second.begin(); it != s.second.end(); it++)
+              // no results from cascading composition
+              if (result->size() == 0)
                 {
-                  input += *it;
-                }
+                  std::string input;
+                  for (StringVector::const_iterator it = s.second.begin(); it != s.second.end(); it++)
+                    {
+                      input += *it;
+                    }
 #ifdef WINDOWS
-              if (!pipe_output)
-                hfst_fprintf_console(outfile, "%s\t%s+?\tinf\n\n", input.c_str(), input.c_str());
-              else
+                  if (!pipe_output)
+                    hfst_fprintf_console(outfile, "%s\t%s+?\tinf\n\n", input.c_str(), input.c_str());
+                  else
 #endif
-                fprintf(outfile, "%s\t%s+?\tinf\n\n", input.c_str(), input.c_str());
+                    fprintf(outfile, "%s\t%s+?\tinf\n\n", input.c_str(), input.c_str());
+                }
+              // results printed
+              else
+                {
+#ifdef WINDOWS
+                  if (!pipe_output)
+                    hfst_fprintf_console(outfile, "\n");
+                  else
+#endif
+                    fprintf(outfile, "\n");
+                }
               fflush(outfile);
             }
         }
@@ -1539,8 +1545,9 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstBasicTransducer> cascade,
           for (HfstOneLevelPaths::const_iterator it = results->begin();
                it != results->end(); it++)
             {
+              //std::cerr << "using previous value of results as input to composition..." << std::endl;
               // if last transducer in cascade, print results if --print-pairs is requested
-              HfstOneLevelPaths * one_result = lookup_simple(*it, cascade[i], infinity, ((i+1) == cascade.size()), false, &s, (it != (--(results->end()))));
+              HfstOneLevelPaths * one_result = lookup_simple(*it, cascade[i], infinity, ((i+1) == cascade.size()), false, &s, true);
               for (HfstOneLevelPaths::const_iterator IT = one_result->begin();
                    IT != one_result->end(); IT++)
                 {
@@ -1553,20 +1560,34 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstBasicTransducer> cascade,
           delete results;
           results = new HfstOneLevelPaths();
 
-          // no results from cascading composition
-          if ((result->size() == 0) && ((i+1) == cascade.size()) && print_pairs)
+          // cascading composition done
+          if ( ((i+1) == cascade.size()) && print_pairs)
             {
-              std::string input;
-              for (StringVector::const_iterator it = s.second.begin(); it != s.second.end(); it++)
+              // no results from cascading composition
+              if (result->size() == 0)
                 {
-                  input += *it;
-                }
+                  std::string input;
+                  for (StringVector::const_iterator it = s.second.begin(); it != s.second.end(); it++)
+                    {
+                      input += *it;
+                    }
 #ifdef WINDOWS
-              if (!pipe_output)
-                hfst_fprintf_console(outfile, "%s\t%s+?\tinf\n\n", input.c_str(), input.c_str());
-              else
+                  if (!pipe_output)
+                    hfst_fprintf_console(outfile, "%s\t%s+?\tinf\n\n", input.c_str(), input.c_str());
+                  else
 #endif
-                fprintf(outfile, "%s\t%s+?\tinf\n\n", input.c_str(), input.c_str());
+                    fprintf(outfile, "%s\t%s+?\tinf\n\n", input.c_str(), input.c_str());
+                }
+              // results printed
+              else
+                {
+#ifdef WINDOWS
+                  if (!pipe_output)
+                    hfst_fprintf_console(outfile, "\n");
+                  else
+#endif
+                    fprintf(outfile, "\n");
+                }
               fflush(outfile);
             }
         }
@@ -1598,7 +1619,6 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstBasicTransducer> cascade,
         }
     }
   // all transducers gone through
-
   return results;
 }
 
