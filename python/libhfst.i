@@ -21,7 +21,7 @@
 %include "std_map.i"
 %include "exception.i"
 
-%feature("autodoc", "3");
+// %feature("autodoc", "3");
 
 // We want warnings to be printed to standard error.
 %init %{
@@ -93,6 +93,8 @@ namespace std {
 }
 
 
+%include "docstrings.i"
+
 // ****************************************************** //
 // ********** WHAT IS MADE AVAILABLE ON PYTHON ********** //
 // ****************************************************** //
@@ -109,7 +111,7 @@ class HfstException
 };
 
 class HfstTransducerTypeMismatchException : public HfstException { public: HfstTransducerTypeMismatchException(const std::string&, const std::string&, size_t); ~HfstTransducerTypeMismatchException(); std::string what() const; };
-class ImplementationTypeNotAvailableException : public HfstException { public: ImplementationTypeNotAvailableException(const std::string&, const std::string&, size_t); ~ImplementationTypeNotAvailableException(); std::string what() const; };
+class ImplementationTypeNotAvailableException : public HfstException { public: ImplementationTypeNotAvailableException(const std::string&, const std::string&, size_t, hfst::ImplementationType type); ~ImplementationTypeNotAvailableException(); std::string what() const; hfst::ImplementationType get_type() const; };
 class FunctionNotImplementedException : public HfstException { public: FunctionNotImplementedException(const std::string&, const std::string&, size_t); ~FunctionNotImplementedException(); std::string what() const; };
 class StreamNotReadableException : public HfstException { public: StreamNotReadableException(const std::string&, const std::string&, size_t); ~StreamNotReadableException(); std::string what() const; };
 class StreamCannotBeWrittenException : public HfstException { public: StreamCannotBeWrittenException(const std::string&, const std::string&, size_t); ~StreamCannotBeWrittenException(); std::string what() const; };
@@ -393,39 +395,107 @@ public:
 %pythoncode %{
 
   def copy(self):
+      """
+      Return a deep copy of the transducer.
+      """
       return HfstTransducer(self)
 
   def write_to_file(self, filename_):
+      """
+      Write the transducer in binary format to file *filename_*.
+      """
       ostr = HfstOutputStream(filename=filename_, type=self.get_type(), hfst_format=True)
       ostr.write(self)
       ostr.close()
 
   def read_from_file(filename_):
+      """
+      Read a binary transducer from file *filename_*.
+      """
       istr = HfstInputStream(filename_)
       tr = istr.read()
       istr.close()
       return tr
 
   def write_prolog(self, f, write_weights=True):
+      """
+      Write the transducer in prolog format with name *name* to file *f*,
+      *write_weights* defined whether weights are written.
+
+      Parameters
+      ----------
+      * `f` :
+          A python file where the transducer is written.
+      * `write_weights` :
+          Whether weights are written.
+      """
       fsm = HfstBasicTransducer(self)
       fsm.name = self.get_name()
       prologstr = fsm.get_prolog_string(write_weights)
       f.write(prologstr)
 
   def write_xfst(self, f, write_weights=True):
+      """
+      Write the transducer in xfst format to file *f*, *write_weights* defined whether
+      weights are written.
+
+      Parameters
+      ----------
+      * `f` :
+          A python file where transducer is written.
+      * `write_weights` :
+          Whether weights are written.
+      """
       fsm = HfstBasicTransducer(self)
       fsm.name = self.get_name()
       xfststr = fsm.get_xfst_string(write_weights)
       f.write(xfst)
 
   def write_att(self, f, write_weights=True):
+      """
+      Write the transducer in AT&T format to file *f*, *write_weights* defined whether
+      weights are written.
+
+      Parameters
+      ----------
+      * `f` :
+          A python file where transducer is written.
+      * `write_weights` :
+          Whether weights are written.
+      """
       fsm = HfstBasicTransducer(self)
       fsm.name = self.get_name()
       attstr = fsm.get_att_string(write_weights)
       f.write(attstr)
 
   def lookup(self, input, **kvargs):
-      
+      """
+      Lookup string *input*.
+
+      Parameters
+      ----------
+      * `input` :
+          The input. A string or a pre-tokenized tuple of symbols (i.e. a tuple of strings).
+      * `kvargs` :
+          Possible parameters and their default values are: obey_flags=True,
+          max_number=-1, time_cutoff=0.0, output='tuple'
+      * `obey_flags` :
+          Whether flag diacritics are obeyed. Always True for HFST_OL(W)_TYPE transducers.
+      * `max_number` :
+          Maximum number of results returned, defaults to -1, i.e. infinity.
+      * `time_cutoff` :
+          How long the function can search for results before returning, expressed in
+          seconds. Defaults to 0.0, i.e. infinitely. Always 0.0 for transducers that are
+          not of HFST_OL(W)_TYPE.
+      * `output` :
+          Possible values are 'tuple', 'text' and 'raw', 'tuple' being the default.
+
+      Note: This function has an efficient implementation only for optimized lookup format
+      (hfst.types.HFST_OL_TYPE or hfst.types.HFST_OLW_TYPE). Other formats perform the
+      lookup via composition. Consider converting the transducer to optimized lookup format
+      or to a HfstBasicTransducer. Conversion to HFST_OL(W)_TYPE might take a while but the
+      lookup is fast. Conversion to HfstBasicTransducer is quick but lookup is slower.
+      """
       obey_flags=True
       max_number=-1
       time_cutoff=0.0
@@ -486,6 +556,20 @@ public:
          return retval
 
   def extract_longest_paths(self, **kvargs):
+      """
+      Extract longest paths of the transducer.
+
+      Parameters
+      ----------
+      * `kvargs` :
+          Possible parameters and their default values are: obey_flags=True,
+          output='dict'
+      * `obey_flags` :
+          Whether flag diacritics are obeyed. The default is True.
+      * `output` :
+          Possible values are 'dict', 'text' and 'raw', 'dict' being the default.
+
+      """
       obey_flags=True
       output='dict' # 'dict' (default), 'text', 'raw'
 
@@ -521,6 +605,17 @@ public:
          return retval
 
   def extract_shortest_paths(self, **kvargs):
+      """
+      Extract shortest paths of the transducer.
+
+      Parameters
+      ----------
+      * `kvargs` :
+          Possible parameters and their default values are: obey_flags=True.
+      * `output` :
+          Possible values are 'dict', 'text' and 'raw', 'dict' being the default.
+
+      """
       output='dict' # 'dict' (default), 'text', 'raw'
 
       for k,v in kvargs.items():
@@ -547,7 +642,79 @@ public:
          return retval
 
   def extract_paths(self, **kvargs):
+      """
 
+      Extract paths that are recognized by the transducer.
+
+      Parameters
+      ----------
+      * `kvargs` :
+          Arguments recognized are filter_flags, max_cycles, max_number, obey_flags,
+          output, random.
+      * `filter_flags` :
+          Whether flags diacritics are filtered out from the result (default True).
+      * `max_cycles` :
+          Indicates how many times a cycle will be followed, with negative numbers
+          indicating unlimited (default -1 i.e. unlimited).
+      * `max_number` :
+          The total number of resulting strings is capped at this value, with 0 or
+          negative indicating unlimited (default -1 i.e. unlimited).
+      * `obey_flags` :
+          Whether flag diacritics are validated (default True).
+      * `output` :
+          Output format. Values recognized: 'text' (as a string, separated by
+          newlines), 'raw' (a dictionary that maps each input string into a list of
+          tuples of an output string and a weight), 'dict' (a dictionary that maps
+          each input string into a tuple of tuples of an output string and a weight,
+          the default).
+      * `random` :
+          Whether result strings are fetched randomly (default False).
+
+      Returns
+      -------
+      The extracted strings. *output* controls how they are represented.
+
+      pre: The transducer must be acyclic, if both *max_number* and *max_cycles* have
+      unlimited values. Else a hfst.exceptions.TransducerIsCyclicException will be
+      thrown.
+
+      An example:
+
+      >>> tr = hfst.regex('a:b+ (a:c+)')
+      >>> print(tr)
+      0       1       a       b       0.000000
+      1       1       a       b       0.000000
+      1       2       a       c       0.000000
+      1       0.000000
+      2       2       a       c       0.000000
+      2       0.000000
+
+      >>> print(tr.extract_paths(max_cycles=1, output='text'))
+      a:b     0
+      aa:bb   0
+      aaa:bbc 0
+      aaaa:bbcc       0
+      aa:bc   0
+      aaa:bcc 0
+
+      >>> print(tr.extract_paths(max_number=4, output='text'))
+      a:b     0
+      aa:bc   0
+      aaa:bcc 0
+      aaaa:bccc       0
+
+      >>> print(tr.extract_paths(max_cycles=1, max_number=4, output='text'))
+      a:b     0
+      aa:bb   0
+      aa:bc   0
+      aaa:bcc 0
+
+      Exceptions
+      ----------
+      * `TransducerIsCyclicException` :
+
+      See also: hfst.HfstTransducer.n_best
+      """
       obey_flags=True
       filter_flags=True
       max_cycles=-1
@@ -618,7 +785,34 @@ public:
          return retval
 
   def substitute(self, s, S=None, **kvargs):
+      """
+      Substitute symbols or transitions in the transducer.
 
+      Parameters
+      ----------
+      * `s` :
+          The symbol or transition to be substituted. Can also be a dictionary of
+          substitutions, if S == None.
+      * `S` :
+          The symbol, transition, a tuple of transitions or a transducer
+          (hfst.HfstTransducer) that substitutes *s*.
+      * `kvargs` :
+          Arguments recognized are 'input' and 'output', their values can be False or
+          True, True being the default. These arguments are valid only if *s* and *S*
+          are strings, else they are ignored.
+      * `input` :
+          Whether substitution is performed on input side, defaults to True. Valid
+          only if *s* and *S* are strings.
+      * `output` :
+          Whether substitution is performed on output side, defaults to True. Valid
+          only if *s* and \\ S are strings.
+
+      For more information, see hfst.HfstBasicTransducer.substitute. The function
+      works similarly, with the exception of argument *S*, which must be
+      hfst.HfstTransducer instead of hfst.HfstBasicTransducer.
+
+      See also: hfst.HfstBasicTransducer.substitute
+      """
       if S == None:
          if not isinstance(s, dict):
             raise RuntimeError('Sole input argument must be a dictionary.')
@@ -701,6 +895,44 @@ HfstOutputStream() { return new hfst::HfstOutputStream(hfst::get_default_fst_typ
 %pythoncode %{
 
 def __init__(self, **kvargs):
+    """
+    Open a stream for writing binary transducers. Note: hfst.HfstTransducer.write_to_file
+    is probably the easiest way to write a single binary transducer to a file.
+
+    Parameters
+    ----------
+    * `kvargs` :
+        Arguments recognized are filename, hfst_format, type.
+    * `filename` :
+        The name of the file where transducers are written. If the file exists, it
+        is overwritten. If *filename* is not given, transducers are written to
+        standard output.
+    * `hfst_format` :
+        Whether transducers are written in hfst format (default is True) or as such
+        in their backend format.
+    * `type` :
+        The type of the transducers that will be written to the stream. Default is
+        hfst.get_default_fst_type().
+
+    Examples:
+
+        # a stream for writing default type transducers in hfst format to standard output
+        ostr = hfst.HfstOutputStream()
+        transducer = hfst.regex('foo:bar::0.5')
+        ostr.write(transducer)
+        ostr.flush()
+
+        # a stream for writing native sfst type transducers to a file
+        ostr = hfst.HfstOutputStream(filename='transducer.sfst', hfst_format=False, type=hfst.types.SFST_TYPE)
+        transducer1 = hfst.regex('foo:bar')
+        transducer1.convert(hfst.types.SFST_TYPE)  # if not set as the default type
+        transducer2 = hfst.regex('bar:baz')
+        transducer2.convert(hfst.types.SFST_TYPE)  # if not set as the default type
+        ostr.write(transducer1)
+        ostr.write(transducer2)
+        ostr.flush()
+        ostr.close()
+    """
     filename = ""
     hfst_format = True
     type = _libhfst.get_default_fst_type()
@@ -742,15 +974,24 @@ hfst::HfstTransducer * read() throw (EndOfStreamException) { return new hfst::Hf
 %pythoncode %{
 
 def __iter__(self):
+    """
+    Return *self*. Needed for 'for ... in' statement.
+    """
     return self
 
 def next(self):
+    """
+    Read next transducer from stream and return it. Needed for 'for ... in' statement.
+    """
     if self.is_eof():
         raise StopIteration
     else:
         return self.read();
 
 def __next__(self):
+    """
+    Read next transducer from stream and return it. Needed for 'for ... in' statement.
+    """
     return self.next()
 
 %}
@@ -837,10 +1078,10 @@ class HfstBasicTransducer {
     void disjunct(const StringPairVector &spv, float weight) { self->disjunct(spv, weight); }
     void harmonize(HfstBasicTransducer &another) { self->harmonize(another); }
 
-  HfstTwoLevelPaths _lookup_fd(const StringVector &lookup_path, size_t * infinite_cutoff, float * max_weight)
+  HfstTwoLevelPaths _lookup(const StringVector &lookup_path, size_t * infinite_cutoff, float * max_weight, bool obey_flags)
   {
     hfst::HfstTwoLevelPaths results;
-    $self->lookup_fd(lookup_path, results, infinite_cutoff, max_weight);
+    $self->lookup(lookup_path, results, infinite_cutoff, max_weight, obey_flags);
     return results;
   }
 
@@ -882,33 +1123,91 @@ class HfstBasicTransducer {
 
 %pythoncode %{
   def __iter__(self):
+      """
+      Return states and transitions of the transducer.
+      """
       return self.states_and_transitions().__iter__()
 
   def __enumerate__(self):
+      """
+      Return an enumeration of states and transitions of the transducer.
+      """
       return enumerate(self.states_and_transitions())
 
   def write_prolog(self, f, write_weights=True):
+      """
+      Write the transducer in prolog format with name *name* to file *f*,
+      *write_weights* defined whether weights are written.
+
+      Parameters
+      ----------
+      * `f` :
+          A python file where the transducer is written.
+      * `write_weights` :
+          Whether weights are written.
+      """
       prologstr = self.get_prolog_string(write_weights)
       f.write(prologstr)
 
   def write_xfst(self, f, write_weights=True):
+      """
+      Write the transducer in xfst format to file *f*, *write_weights* defined whether
+      weights are written.
+
+      Parameters
+      ----------
+      * `f` :
+          A python file where transducer is written.
+      * `write_weights` :
+          Whether weights are written.
+      """
       xfststr = self.get_xfst_string(write_weights)
       f.write(prologstr)
 
   def write_att(self, f, write_weights=True):
+      """
+      Write the transducer in AT&T format to file *f*, *write_weights* defined whether
+      weights are written.
+
+      Parameters
+      ----------
+      * `f` :
+          A python file where transducer is written.
+      * `write_weights` :
+          Whether weights are written.
+      """
       attstr = self.get_att_string(write_weights)
       f.write(attstr)
 
-  def lookup_fd(self, lookup_path, **kvargs):
+  def lookup(self, lookup_path, **kvargs):
+      """
+      Lookup tokenized input *input* in the transducer.
+
+      Parameters
+      ----------
+      * `str` :
+          A list/tuple of strings to look up.
+      * `kvargs` :
+          infinite_cutoff=-1, max_weight=None, obey_flags=False
+      * `max_epsilon_loops` :
+          How many times epsilon input loops are followed. Defaults to -1, i.e. infinitely.
+      * `max_weight` :
+          What is the maximum weight of a result allowed. Defaults to None, i.e. infinity.
+      * `obey_flags` :
+          Whether flag diacritic constraints are obeyed. Defaults to False.
+      """
       max_weight = None
-      infinite_cutoff = None
+      max_epsilon_loops = None
+      obey_flags = False
       output='dict' # 'dict' (default), 'text', 'raw'
 
       for k,v in kvargs.items():
           if k == 'max_weight' :
              max_weight=v
-          elif k == 'infinite_cutoff' :
+          elif k == 'max_epsilon_loops' :
              infinite_cutoff=v
+          elif k == 'obey_flags' :
+             obey_flags=v
           elif k == 'output':
              if v == 'text':
                 output == 'text'
@@ -922,17 +1221,70 @@ class HfstBasicTransducer {
           else:
              print('Warning: ignoring unknown argument %s.' % (k))
 
-      retval = self._lookup_fd(lookup_path, infinite_cutoff, max_weight)
+      retval = self._lookup(lookup_path, max_epsilon_loops, max_weight, obey_flags)
 
       if output == 'text':
-         return two_level_paths_to_string(retval)
+         return _two_level_paths_to_string(retval)
       elif output == 'dict':
          return _two_level_paths_to_dict(retval)
       else:
          return retval
 
   def substitute(self, s, S=None, **kvargs):
+      """
 
+      Substitute symbols or transitions in the transducer.
+
+      Parameters
+      ----------
+      * `s` :
+          The symbol or transition to be substituted. Can also be a dictionary of
+          substitutions, if S == None.
+      * `S` :
+          The symbol, transition, a tuple of transitions or a transducer
+          (hfst.HfstBasicTransducer) that substitutes *s*.
+      * `kvargs` :
+          Arguments recognized are 'input' and 'output', their values can be False or
+          True, True being the default. These arguments are valid only if *s* and *S*
+          are strings, else they are ignored.
+      * `input` :
+          Whether substitution is performed on input side, defaults to True. Valid
+          only if *s* and *S* are strings.
+      * `output` :
+          Whether substitution is performed on output side, defaults to True. Valid
+          only if *s* and *S* are strings.
+
+      Possible combinations of arguments and their types are:
+
+      (1) substitute(str, str, input=bool, output=bool): substitute symbol with symbol
+      on input, output or both sides of each transition in the transducer. (2)
+      substitute(strpair, strpair): substitute transition with transition (3)
+      substitute(strpair, strpairtuple): substitute transition with several
+      transitions (4) substitute(strpair, transducer): substitute transition with a
+      transducer (5) substitute(dict): perform several symbol-to-symbol substitutions
+      (6) substitute(dict): perform several transition-to-transition substitutions
+
+      Examples:
+
+      (1) tr.substitute('a', 'A', input=True, output=False): substitute lowercase a:s
+      with uppercase ones (2) tr.substitute(('a','b'),('A','B')): substitute
+      transitions that map lowercase a into lowercase b with transitions that map
+      uppercase a into uppercase b (3) tr.substitute(('a','b'),
+      (('A','B'),('a','B'),('A','b'))): change either or both sides of a transition
+      [a:b] to uppercase (4) tr.substitute(('a','b'), hfst.regex('[a:b]+')) change
+      [a:b] transition into one or more consecutive [a:b] transitions (5)
+      tr.substitute({'a':'A', 'b':'B', 'c':'C'}) change lowercase a, b and c into
+      their uppercase variants (6) tr.substitute( {('a','a'):('A','A'),
+      ('b','b'):('B','B'), ('c','c'):('C','C')} ): change lowercase a, b and c into
+      their uppercase variants
+
+      In case (4), epsilon transitions are used to attach copies of transducer *S*
+      between the SOURCE and TARGET state of each transition that is substituted. The
+      transition itself is deleted, but its weight is copied to the epsilon transition
+      leading from SOURCE to the initial state of *S*. Each final state of *S* is made
+      non-final and an epsilon transition leading to TARGET is attached to it. The
+      final weight is copied to the epsilon transition.
+      """
       if S == None:
          if not isinstance(s, dict):
             raise RuntimeError('First input argument must be a dictionary.')
@@ -1185,13 +1537,35 @@ IDENTITY='@_IDENTITY_SYMBOL_@'
 
 # Windows...
 OUTPUT_TO_CONSOLE=False
+
 def set_output_to_console(val):
+    """
+    (Windows-specific:) set whether output is printed to console instead of standard output.
+    """
     global OUTPUT_TO_CONSOLE
     OUTPUT_TO_CONSOLE=val
+
 def get_output_to_console():
+    """
+    (Windows-specific:) get whether output is printed to console instead of standard output.
+    """
     return OUTPUT_TO_CONSOLE
 
 def regex(re, **kvargs):
+    """
+    Get a transducer as defined by regular expression *re*.
+
+    Parameters
+    ----------
+    * `re` :
+        The regular expression defined with Xerox transducer notation.
+    * `kvargs` :
+        Arguments recognized are: 'error'.
+    * `error` :
+        Where warnings and errors are printed. Possible values are sys.stdout,
+        sys.stderr (the default), a StringIO or None, indicating a quiet mode.
+
+    """
     type = _libhfst.get_default_fst_type()
     to_console=get_output_to_console()
     import sys
@@ -1254,6 +1628,9 @@ def _parse_att_line(line, fsm, epsilonstr=EPSILON):
     return True
 
 def read_att_string(att):
+    """
+    Create a transducer as defined in AT&T format in *att*.
+    """
     linecount = 0
     fsm = HfstBasicTransducer()
     lines = att.split('\n')
@@ -1264,6 +1641,10 @@ def read_att_string(att):
     return HfstTransducer(fsm, _libhfst.get_default_fst_type())
 
 def read_att_input():
+    """
+    Create a transducer as defined in AT&T format in user input.
+    An empty line signals the end of input.
+    """
     linecount = 0
     fsm = HfstBasicTransducer()
     while True:
@@ -1276,6 +1657,11 @@ def read_att_input():
     return HfstTransducer(fsm, _libhfst.get_default_fst_type())
 
 def read_att_transducer(f, epsilonstr=EPSILON, linecount=[0]):
+    """
+    Create a transducer as defined in AT&T format in file *f*. *epsilonstr*
+    defines how epsilons are represented. *linecount* keeps track of the current
+    line in the file.
+    """
     linecount_ = 0
     fsm = HfstBasicTransducer()
     while True:
@@ -1295,27 +1681,103 @@ def read_att_transducer(f, epsilonstr=EPSILON, linecount=[0]):
     return HfstTransducer(fsm, _libhfst.get_default_fst_type())
 
 class AttReader:
+      """
+      A class for reading input in AT&T text format and converting it into
+      transducer(s).
+
+      An example that reads AT&T input from file 'testfile.att' where epsilon is
+      represented as \"<eps>\" and creates the corresponding transducers and prints
+      them. If the input cannot be parsed, a message showing the invalid line in AT&T
+      input is printed and reading is stopped.
+
+      with open('testfile.att', 'r') as f:
+           try:
+                r = hfst.AttReader(f, \"<eps>\")
+                for tr in r:
+                    print(tr)
+           except hfst.exceptions.NotValidAttFormatException as e:
+                print(e.what())
+      """
       def __init__(self, f, epsilonstr=EPSILON):
+          """
+          Create an AttReader that reads input from file *f* where the epsilon is
+          represented as *epsilonstr*.
+
+          Parameters
+          ----------
+          * `f` :
+              A python file.
+          * `epsilonstr` :
+              How epsilon is represented in the file. By default, \"@_EPSILON_SYMBOL_@\"
+              and \"@0@\" are both recognized.
+          """
           self.file = f
           self.epsilonstr = epsilonstr
           self.linecount = [0]
 
       def read(self):
+          """
+          Read next transducer.
+
+          Read next transducer description in AT&T format and return a corresponding
+          transducer.
+
+          Exceptions
+          ----------
+          * `hfst.exceptions.NotValidAttFormatException` :
+          * `hfst.exceptions.EndOfStreamException` :
+          """
           return read_att_transducer(self.file, self.epsilonstr, self.linecount)
 
       def __iter__(self):
+          """
+          An iterator to the reader.
+
+          Needed for 'for ... in' statement.
+
+          for transducer in att_reader:
+              print(transducer)
+          """
           return self
 
       def next(self):
+          """
+          Return next element (for python version 3).
+
+          Needed for 'for ... in' statement.
+
+          for transducer in att_reader:
+              print(transducer)
+
+          Exceptions
+          ----------
+          * `StopIteration` :
+          """
           try:
              return self.read()
           except EndOfStreamException as e:
              raise StopIteration
 
       def __next__(self):
+          """
+          Return next element (for python version 2).
+
+          Needed for 'for ... in' statement.
+
+          for transducer in att_reader:
+              print(transducer)
+
+          Exceptions
+          ----------
+          * `StopIteration` :
+          """
           return self.next()
 
 def read_prolog_transducer(f, linecount=[0]):
+    """
+    Create a transducer as defined in prolog format in file *f*. *linecount*
+    keeps track of the current line in the file.
+    """
     linecount_ = 0
     fsm = HfstBasicTransducer()
     
@@ -1360,26 +1822,108 @@ def read_prolog_transducer(f, linecount=[0]):
            raise NotValidPrologFormatException(line,"",linecount[0] + linecount_)
 
 class PrologReader:
+      """
+      A class for reading input in prolog text format and converting it into
+      transducer(s).
+
+      An example that reads prolog input from file 'testfile.prolog' and creates the
+      corresponding transducers and prints them. If the input cannot be parsed, a
+      message showing the invalid line in prolog input is printed and reading is
+      stopped.
+
+          with open('testfile.prolog', 'r') as f:
+              try:
+                 r = hfst.PrologReader(f)
+                 for tr in r:
+                     print(tr)
+              except hfst.exceptions.NotValidPrologFormatException as e:
+                  print(e.what())
+      """
       def __init__(self, f):
+          """
+          Create a PrologReader that reads input from file *f*.
+
+          Parameters
+          ----------
+          * `f` :
+              A python file.
+          """
           self.file = f
           self.linecount = [0]
 
       def read(self):
+          """
+
+          Read next transducer.
+
+          Read next transducer description in prolog format and return a corresponding
+          transducer.
+
+          Exceptions
+          ----------
+          * `hfst.exceptions.NotValidPrologFormatException` :
+          * `hfst.exceptions.EndOfStreamException` :
+          """
           return read_prolog_transducer(self.file, self.linecount)
 
       def __iter__(self):
+          """
+          An iterator to the reader.
+
+          Needed for 'for ... in' statement.
+
+          for transducer in prolog_reader:
+              print(transducer)
+          """
           return self
 
       def next(self):
+          """
+          Return next element (for python version 2).
+
+          Needed for 'for ... in' statement.
+
+          for transducer in prolog_reader:
+              print(transducer)
+
+          Exceptions
+          ----------
+          * `StopIteration` :
+          """
           try:
              return self.read()
           except EndOfStreamException as e:
              raise StopIteration
 
       def __next__(self):
+          """
+          Return next element (for python version 2).
+
+          Needed for 'for ... in' statement.
+
+          for transducer in prolog_reader:
+              print(transducer)
+
+          Exceptions
+          ----------
+          * `StopIteration` :
+          """
           return self.next()
 
 def start_xfst(**kvargs):
+    """
+    Start interactive xfst compiler.
+
+    Parameters
+    ----------
+    * `kvargs` :
+        Arguments recognized are: type, quit_on_fail.
+    * `quit_on_fail` :
+        Whether the compiler exits on any error, defaults to False.
+    * `type` :
+        Implementation type of the compiler, defaults to
+        hfst.get_default_fst_type().
+    """
     import sys
     idle = 'idlelib' in sys.modules
     if idle:
@@ -1432,6 +1976,27 @@ def start_xfst(**kvargs):
         expression = ""
 
 def compile_xfst_file(filename, **kvargs):
+    """
+    Compile (run) xfst file *filename*.
+
+    Parameters
+    ----------
+    * `filename` :
+        The name of the xfst file.
+    * `kvargs` :
+        Arguments recognized are: verbosity, quit_on_fail, output, type.
+    * `verbosity` :
+        The verbosity of the compiler, defaults to 0 (silent). Possible values are:
+        0, 1, 2.
+    * `quit_on_fail` :
+        Whether the script is exited on any error, defaults to True.
+    * `output` :
+        Where output is printed. Possible values are sys.stdout, sys.stderr, a
+        StringIO, sys.stderr being the default?
+    * `type` :
+        Implementation type of the compiler, defaults to
+        hfst.get_default_fst_type().
+    """
     verbosity=0
     quit_on_fail='ON'
     type = _libhfst.get_default_fst_type()
@@ -1500,6 +2065,26 @@ def compile_xfst_file(filename, **kvargs):
     return retval
 
 def compile_pmatch_file(filename):
+    """
+    Compile pmatch expressions as defined in *filename* and return a tuple of
+    transducers.
+
+    An example:
+
+    If we have a file named streets.txt that contains:
+
+    define CapWord UppercaseAlpha Alpha* ; define StreetWordFr [{avenue} |
+    {boulevard} | {rue}] ; define DeFr [ [{de} | {du} | {des} | {de la}] Whitespace
+    ] | [{d'} | {l'}] ; define StreetFr StreetWordFr (Whitespace DeFr) CapWord+ ;
+    regex StreetFr EndTag(FrenchStreetName) ;
+
+    we can run:
+
+    defs = hfst.compile_pmatch_file('streets.txt')
+    const = hfst.PmatchContainer(defs)
+    assert cont.match("Je marche seul dans l'avenue desTernes.") ==
+      "Je marche seul dans l'<FrenchStreetName>avenue des Ternes</FrenchStreetName>."
+    """
     with open(filename, 'r') as myfile:
       data=myfile.read()
       myfile.close()
@@ -1507,6 +2092,24 @@ def compile_pmatch_file(filename):
     return defs
 
 def compile_lexc_file(filename, **kvargs):
+    """
+    Compile lexc file *filename* into a transducer.
+
+    Parameters
+    ----------
+    * `filename` :
+        The name of the lexc file.
+    * `kvargs` :
+        Arguments recognized are: verbosity, with_flags, output.
+    * `verbosity` :
+        The verbosity of the compiler, defaults to 0 (silent). Possible values are:
+        0, 1, 2.
+    * `with_flags` :
+        Whether lexc flags are used when compiling, defaults to False.
+    * `output` :
+        Where output is printed. Possible values are sys.stdout, sys.stderr, a
+        StringIO, sys.stderr being the default
+    """
     verbosity=0
     withflags=False
     alignstrings=False
@@ -1558,6 +2161,31 @@ def _check_word(arg):
     return arg
 
 def fsa(arg):
+    """
+    Get a transducer (automaton in this case) that recognizes one or more paths.
+
+    Parameters
+    ----------
+    * `arg` :
+        See example below
+
+    Possible inputs:
+
+      One unweighted identity path:
+        'foo'  ->  [f o o]
+
+      Weighted path: a tuple of string and number, e.g.
+        ('foo',1.4)
+        ('bar',-3)
+        ('baz',0)
+
+      Several paths: a list or a tuple of paths and/or weighted paths, e.g.
+        ['foo', 'bar']
+        ('foo', ('bar',5.0))
+        ('foo', ('bar',5.0), 'baz', 'Foo', ('Bar',2.4))
+        [('foo',-1), ('bar',0), ('baz',3.5)]
+
+    """
     deftok = HfstTokenizer()
     retval = HfstBasicTransducer()
     if isinstance(arg, str):
@@ -1577,6 +2205,33 @@ def fsa(arg):
     return HfstTransducer(retval, _libhfst.get_default_fst_type())
 
 def fst(arg):
+    """
+    Get a transducer that recognizes one or more paths.
+
+    Parameters
+    ----------
+    * `arg` :
+        See example below
+
+    Possible inputs:
+
+      One unweighted identity path:
+        'foo'  ->  [f o o]
+
+      Weighted path: a tuple of string and number, e.g.
+        ('foo',1.4)
+        ('bar',-3)
+        ('baz',0)
+
+      Several paths: a list or a tuple of paths and/or weighted paths, e.g.
+        ['foo', 'bar']
+        ('foo', ('bar',5.0))
+        ('foo', ('bar',5.0), 'baz', 'Foo', ('Bar',2.4))
+        [('foo',-1), ('bar',0), ('baz',3.5)]
+
+      A dictionary mapping strings to any of the above cases:
+        {'foo':'foo', 'bar':('foo',1.4), 'baz':(('foo',-1),'BAZ')}
+    """
     if isinstance(arg, dict):
        retval = regex('[0-0]') # empty transducer
        for input, output in arg.items():
@@ -1596,6 +2251,25 @@ def fst(arg):
     return fsa(arg)
 
 def tokenized_fst(arg, weight=0):
+    """
+    Get a transducer that recognizes the concatenation of symbols or symbol pairs in
+    *arg*.
+
+    Parameters
+    ----------
+    * `arg` :
+        The symbols or symbol pairs that form the path to be recognized.
+
+    Example
+
+       import libhfst
+       tok = hfst.HfstTokenizer()
+       tok.add_multichar_symbol('foo')
+       tok.add_multichar_symbol('bar')
+       tr = hfst.tokenized_fst(tok.tokenize('foobar', 'foobaz'))
+
+    will create the transducer [foo:foo bar:b 0:a 0:z].
+    """
     retval = HfstBasicTransducer()
     state = 0 
     if isinstance(arg, list) or isinstance(arg, tuple):
@@ -1621,12 +2295,30 @@ def tokenized_fst(arg, weight=0):
        raise RuntimeError('Argument must be a list or a tuple')
 
 def empty_fst():
+    """
+    Get an empty transducer.
+
+    Empty transducer has one state that is not final, i.e. it does not recognize any
+    string.
+    """
     return regex('[0-0]')
 
 def epsilon_fst(weight=0):
+    """
+    Get an epsilon transducer.
+
+    Parameters
+    ----------
+    * `weight` :
+        The weight of the final state. Epsilon transducer has one state that is
+        final (with final weight *weight*), i.e. it recognizes the empty string.
+    """
     return regex('[0]::' + str(weight))
 
 def concatenate(transducers):
+    """
+    Return a concatenation of *transducers*.
+    """
     retval = epsilon_fst()
     for tr in transducers:
       retval.concatenate(tr)
@@ -1634,6 +2326,9 @@ def concatenate(transducers):
     return retval
 
 def disjunct(transducers):
+    """
+    Return a disjunction of *transducers*.
+    """
     retval = empty_fst()
     for tr in transducers:
       retval.disjunct(tr)
@@ -1641,6 +2336,9 @@ def disjunct(transducers):
     return retval
 
 def intersect(transducers):
+    """
+    Return an intersection of *transducers*.
+    """
     retval = None
     for tr in transducers:
       if retval == None:

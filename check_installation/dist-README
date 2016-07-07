@@ -3,21 +3,11 @@ To test that installed HFST functionalities work as they should, run one
 or more of the tests below:
 
   ./check-tools.sh             # Command line tools
-  ./check-python.sh            # Python bindings
   ./check-morphologies.sh      # Morphology scripts
   ./check-ospell.sh            # hfst-ospell tool
 
 The tool check-tools.sh accepts the option '--prefix PREFIX' which tells
 where the HFST tools to be tested are found. 
-
-The tool check-python.sh accepts the option '--python PYTHON' which defines
-the python program to be used (e.g. python2, python3) and the option
-'--pythonpath PATH' which tells where the swig-generated libhfst.py file
-can be found.
-
-If you use check-python.sh before installation, you need to add
-'/path/to/hfst/installation/lib/' (or '/path/to/hfst-top-dir/libhfst/src/.libs/'
-if you haven't yet installed hfst) to LD_LIBRARY_PATH.
 
 The tool check-morphologies.sh accepts the option '--script-prefix PREFIX'
 which tells where the morphology scripts can be found and the option
@@ -27,3 +17,5 @@ hfst-optimized-lookup) used in the morphology scripts can be found.
 The tool check-ospell.sh accepts the option '--prefix PREFIX' which tells
 where hfst-ospell tool is found.
 
+NOTE: python tests can be performed in the source directory of hfst, i.e.
+by running python/test/test.sh without any command line arguments.

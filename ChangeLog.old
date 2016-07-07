@@ -1,4 +1,52 @@
-dd7d0be (HEAD -> master, origin/master, origin/HEAD) Merge pull request #309 from unhammer/pmatch-input-marks
+97c1285 (HEAD -> master, origin/master, origin/HEAD) Swap implementations of commands 'apply up' and 'apply down' in hfst-xfst, making them work as they do in foma and xfst.
+85ef34c Forgot to add before latest commit...
+13280ea Edit warning about converting native foma transducers.
+b31a6c1 Fix typo: swap left and right.
+808d984 Add hfst-flookup to windows scripts.
+66db285 Update bug tracker url and copyright year.
+b127ab3 Git ignore hfst-flookup.
+1b40de6 Add tests for hfst-flookup.
+12e4cca Trandsducer operations no longer return a reference to the transducer, fix this in tests and interface operations.
+a128c7f Add a tool hfst-flookup which does lookup from right to left, i.e. in the same way as foma's flookup and xfst's lookup. hfst-lookup and hfst-optimized-lookup stay as they are, but mention in their help message that they do lookup in the opposite direction.
+cea21b4 Add a comment about the way gzipped input is handled.
+da7ebcc Make HfstInputStream constructor throw a FileIsInGZFormatException if input is in gzipped format. In hfst-fst2fst, issue an error message that asks user to unzip the transducer.
+5c2755b Merge commit frankier:add-gitignore manually and also add more files to be ignored by git.
+99b470d Merge pull request #313 from frankier/escape-dot-labels
+f6905a1 Improve handling of argumentless functions and funcalls
+d804d3d Remove some memory leaks in compilation
+ef740e0 Fix nested funcall issues
+61e1e0a Add optional versions of cap functions and AnyCase().
+68e078b Corrections and additions to casing functions, and add Implode() and Explode()
+2484633 Add a facility for detecting when hfst-tokenize is given a "bare" dictionary and generating a somewhat intelligent tokenizer when that happens. Due to awkward architectural reasons this involves changes and additions in many parts of the library, but they are not major.
+089f3ca Add .gitignore
+d1d81db Merge branch 'master' of https://github.com/hfst/hfst
+485f575 Fix bug that caused exclusionary lists to be missed much of the time.
+03ff992 Escape " in dot labels.
+9984096 Factor out replace_all into string-utils.cc.
+ca10d77 Revert swapping of hfst-xfst's 'apply up' and 'apply down' commands.
+7352cf7 Swap implementations of 'apply up' and 'apply down' in hfst-xfst, so that these commands work in the same way as in foma and xfst.
+db2d4dc Add an example for HfstTransducer constructor.
+f37b8d1 Tentatively implement lookup also for transducers that are not in optimized-lookup format using composition and path extraction.
+1cb2992 Add an HfstTransducer constructor that takes a StringVector as argument.
+f32c049 Support python 2 unicode strings in lookup.
+8d2c6b8 Fix a typo
+f442b91 Make HfstInputStream iterable by implementing functions __iter__, __next__ (for Python 3) and next (for Python 2).
+2c660ff Add functions in namespace hfst::rules to python API.
+947bb62 Add some information about Python interface in README and advise the users to see file python/README.
+067b0c2 Remove slashes from headers used when processing the file.
+c4b5ce8 Update documentation.
+0e4e8a7 Redefine functions which return a reference to themselves as void to avoid problems on the python side.
+5f97eac Tentatively add a C++ function 'std::vector<hfst::HfstTransducer> compile_pmatch_expression(const std::string & pmatch)', mostly copied from hfst-pmatch2fst.cc.
+21da500 Add a const declaration to string& argument of PmatchContainer::process and PmatchContainer::match.
+cd7f2f8 Tentatively add some pmatch functions. Add a missing typedef for HfstTransducerVector.
+a9fbd44 Add a function to HfstInputStream for finding out whether hfst headers are included in transducers. When reading native foma transducers in hfst-fst2fst, warn that inversion may be needed for lookup to work as expected.
+fa4565e (tag: v3.9.2) Release 3.9.2.
+3f7a57e Update hfst binary file used for tests.
+5cd8a71 Add option --pythonpath to python tests. Document the test tools better.
+927da9c Make fst2txt functionality test silent.
+ad8c82c Update installation check scripts.
+ddf749d Remove test.py from EXTRA_DIST, the tests have been rewritten.
+dd7d0be Merge pull request #309 from unhammer/pmatch-input-marks
 97b6e3f Merge pull request #308 from unhammer/tokenise-minor-cg-fix
 3781806 Make small modifications to documentation and typedefs used in function declarations/definitions, so that doxygen can generate documentation right.
 00d89ce Update Python and C++ API documentation files.

@@ -69,7 +69,6 @@ static int max_context = -1;
 
 static double time_cutoff = 0.0;
 static bool profile = false;
-std::string pmatch_filename;
 
 void
 print_usage()
@@ -79,6 +78,7 @@ print_usage()
             "perform matching/lookup on text streams\n"
             "\n", program_name);
     print_common_program_options(message_out);
+    print_common_unary_program_options(message_out);
     fprintf(message_out,
             "  -n  --newline           Newline as input separator (default is blank line)\n"
             "  -x  --extract-patterns  Only print tagged parts in output\n"
@@ -142,7 +142,7 @@ int process_input(hfst_ol::PmatchContainer & container,
     while (true) {
 
 #ifndef _MSC_VER
-      if (!(hfst_getline(&line, &len, inputfile) > 0))
+      if (!(hfst_getline(&line, &len, stdin) > 0))
         break;
 #else
       std::string linestr("");
@@ -151,7 +151,7 @@ int process_input(hfst_ol::PmatchContainer & container,
         break;
       line = strdup(linestr.c_str());
 #endif
-
+      
         if (!blankline_separated) {
             // newline separated
             input_text = line;
@@ -188,6 +188,7 @@ int parse_options(int argc, char** argv)
         static const struct option long_options[] =
             {
                 HFST_GETOPT_COMMON_LONG,
+                HFST_GETOPT_UNARY_LONG,
                 {"newline", no_argument, 0, 'n'},
                 {"extract-patterns", no_argument, 0, 'x'},
                 {"locate", no_argument, 0, 'l'},
@@ -201,8 +202,8 @@ int parse_options(int argc, char** argv)
                 {0,0,0,0}
             };
         int option_index = 0;
-        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nxlcdmq:r:t:p",
-                             long_options, &option_index);
+        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT HFST_GETOPT_UNARY_SHORT "nxlcdmq:r:t:p",
+                            long_options, &option_index);
         if (-1 == c)
         {
             break;
@@ -212,6 +213,7 @@ int parse_options(int argc, char** argv)
         switch (c)
         {
 #include "inc/getopt-cases-common.h"
+#include "inc/getopt-cases-unary.h"            
         case 'n':
             blankline_separated = false;
             break;
@@ -259,17 +261,10 @@ int parse_options(int argc, char** argv)
             break;
 #include "inc/getopt-cases-error.h"
         }
-
+        
         
         
     }
-
-//            if (!inputNamed)
-//        {
-//            inputfile = stdin;
-//            inputfilename = hfst_strdup("<stdin>");
-//        }
-        
         // no more options, we should now be at the input filename
         if ( (optind + 1) < argc)
         {
@@ -278,13 +273,27 @@ int parse_options(int argc, char** argv)
         }
         else if ( (optind + 1) == argc)
         {
-            pmatch_filename = argv[(optind)];
+            if (inputfilename != NULL) {
+                std::cerr << "More than one input file given\n";
+                return EXIT_FAILURE;
+            } else {
+                inputfilename = hfst_strdup(argv[optind]);
+                inputfile = hfst_fopen(inputfilename, "r");
+                if (inputfile == stdin)
+                {
+                    free(inputfilename);
+                    inputfilename = hfst_strdup("<stdin>");
+                }
+            }
             return EXIT_CONTINUE;
-        }
-        else
+        } else
         {
-            std::cerr << "No input file given\n";
-            return EXIT_FAILURE;
+            if (inputfilename == NULL) {
+                std::cerr << "No input file given\n";
+                return EXIT_FAILURE;
+            } else {
+                return EXIT_CONTINUE;
+            }
         }
 
 
@@ -303,10 +312,10 @@ int main(int argc, char ** argv)
     if (retval != EXIT_CONTINUE) {
         return retval;
     }
-    std::ifstream instream(pmatch_filename.c_str(),
+    std::ifstream instream(inputfilename,
                            std::ifstream::binary);
     if (!instream.good()) {
-        std::cerr << "Could not open file " << pmatch_filename << std::endl;
+        std::cerr << "Could not open file " << inputfilename << std::endl;
         return EXIT_FAILURE;
     }
     try {
@@ -332,7 +341,7 @@ int main(int argc, char ** argv)
 #endif
     return process_input(container, std::cout);
     } catch(HfstException & e) {
-        std::cerr << "The archive in " << pmatch_filename << " doesn't look right."
+        std::cerr << "The archive in " << inputfilename << " doesn't look right."
             "\nDid you make it with hfst-pmatch2fst or make sure it's in weighted optimized-lookup format?\n";
         return 1;
     }

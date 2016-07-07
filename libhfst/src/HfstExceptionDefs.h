@@ -17,6 +17,7 @@ void hfst_set_exception(std::string name);
 std::string hfst_get_exception();
 
 #include "hfstdll.h"
+#include "HfstDataTypes.h"
 
 //! @file HfstExceptionDefs.h
 //! @brief A file for exceptions
@@ -91,7 +92,17 @@ try {
 } 
 \endverbatim
 */
-HFST_EXCEPTION_CHILD_DECLARATION(ImplementationTypeNotAvailableException);
+//HFST_EXCEPTION_CHILD_DECLARATION(ImplementationTypeNotAvailableException);
+
+class ImplementationTypeNotAvailableException : public HfstException
+{ 
+ private:
+  hfst::ImplementationType type;
+ public:
+  ImplementationTypeNotAvailableException(const std::string &name,const std::string &file,size_t line, hfst::ImplementationType type);
+  hfst::ImplementationType get_type() const;
+};
+
 
 /** \brief Function has not been implemented (yet). */
 HFST_EXCEPTION_CHILD_DECLARATION(FunctionNotImplementedException);

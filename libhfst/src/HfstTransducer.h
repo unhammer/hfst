@@ -1061,6 +1061,13 @@ ccc : ddd
                                        ssize_t limit = -1,
                                        double time_cutoff = 0.0) const;
 
+    //! @brief Lookup or apply a single string \a s and
+    //! return a maximum of \a limit results in string pair format.
+    //! 
+    HFSTDLL HfstTwoLevelPaths * lookup_pairs(const std::string & s,
+                                             ssize_t limit = -1,
+                                             double time_cutoff = 0.0) const;
+
     //! @brief Lookup or apply a single string \a s minding flag diacritics
     //! properly and store a maximum of \a limit results to \a results.
     //!

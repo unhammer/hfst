@@ -46,37 +46,6 @@ namespace hfst_ol {
                        Pmatch_input_mark,
                        SPECIALSYMBOL_NR_ITEMS};
 
-    struct SymbolPair
-    {
-        SymbolNumber input;
-        SymbolNumber output;
-    SymbolPair(void): input(0), output(0) {}
-    SymbolPair(SymbolNumber i, SymbolNumber o): input(i), output(o) {}
-    };
-
-    class DoubleTape: public std::vector<SymbolPair>
-    {
-    public:
-
-        void write(unsigned int pos, SymbolNumber in, SymbolNumber out)
-        {
-            while (pos >= this->size()) {
-                this->push_back(SymbolPair());
-            }
-            this->operator[](pos) = SymbolPair(in, out);
-        }
-
-        DoubleTape extract_slice(unsigned int start, unsigned int stop)
-        {
-            DoubleTape retval;
-            while(start < stop) {
-                retval.push_back(this->at(start));
-                ++start;
-            }
-            return retval;
-        }
-
-    };
 
     class PositionStack: public std::vector<unsigned int>
     {
@@ -86,13 +55,6 @@ namespace hfst_ol {
         void pop(void) { tmp = back(); pop_back(); }
         void unpop(void) { push_back(tmp); }
         unsigned int top(void) { return back(); }
-    };
-
-    class WeightedDoubleTape: public DoubleTape
-    {
-    public:
-        Weight weight;
-    WeightedDoubleTape(DoubleTape dt, Weight w): DoubleTape(dt), weight(w) {}
     };
 
     class PmatchAlphabet: public TransducerAlphabet {
@@ -111,7 +73,7 @@ namespace hfst_ol {
         SymbolNumberVector exclusionary_lists;
         std::vector<SymbolNumberVector> symbol_lists;
         std::vector<SymbolNumberVector> symbol_list_members;
-        std::vector<unsigned long int> counters;
+        std::vector<unsigned long> counters;
         SymbolNumberVector guards;
         std::vector<bool> printable_vector;
         bool is_end_tag(const SymbolNumber symbol) const;

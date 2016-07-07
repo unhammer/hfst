@@ -1,5 +1,49 @@
 """
-python bindings for HFST finite-state transducer library written in C++
+
+Python bindings for HFST finite-state transducer library written in C++.
+
+FUNCTIONS:
+
+    compile_lexc_file
+    compile_pmatch_expression
+    compile_pmatch_file
+    compile_xfst_file
+    concatenate
+    disjunct
+    empty_fst
+    epsilon_fst
+    fsa
+    fst
+    fst_type_to_string
+    get_default_fst_type
+    get_output_to_console
+    intersect
+    is_diacritic
+    read_att_input
+    read_att_string
+    read_att_transducer
+    read_prolog_transducer
+    regex
+    set_default_fst_type
+    set_output_to_console
+    start_xfst
+    tokenized_fst
+
+CLASSES:
+
+    AttReader
+    HfstBasicTransducer
+    HfstBasicTransition
+    HfstInputStream
+    HfstOutputStream
+    HfstTokenizer
+    HfstTransducer
+    LexcCompiler
+    PmatchContainer
+    PrologReader
+    XfstCompiler
+    XreCompiler
+
 """
 
 import hfst.exceptions

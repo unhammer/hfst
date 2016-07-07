@@ -54,7 +54,18 @@ std::string HfstException::what() const
 
 HFST_EXCEPTION_CHILD_DEFINITION(HfstTransducerTypeMismatchException);
 
-HFST_EXCEPTION_CHILD_DEFINITION(ImplementationTypeNotAvailableException);
+//HFST_EXCEPTION_CHILD_DEFINITION(ImplementationTypeNotAvailableException);
+
+ImplementationTypeNotAvailableException::ImplementationTypeNotAvailableException(const std::string &name,const std::string &file,size_t line, hfst::ImplementationType type):
+  HfstException(name, file, line),
+  type(type)
+{};
+
+hfst::ImplementationType ImplementationTypeNotAvailableException::get_type() const
+{
+  return type;
+}
+
 
 HFST_EXCEPTION_CHILD_DEFINITION(FileIsInGZFormatException);
 

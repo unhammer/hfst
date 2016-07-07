@@ -647,13 +647,13 @@ namespace hfst
             return ERROR_TYPE_;
           break;
         }
+      case (char)0:
+        {
+          return XFSM_;
+          break;
+        }
       default:
-#ifdef HAVE_XFSM
-        return XFSM_;
-#else
         return ERROR_TYPE_;
-#endif
-
       }
     return ERROR_TYPE_;
   }
@@ -949,7 +949,7 @@ namespace hfst
     type = stream_fst_type();
 
     if ( ! HfstTransducer::is_implementation_type_available(type)) {
-      HFST_THROW(ImplementationTypeNotAvailableException);
+      throw ImplementationTypeNotAvailableException("ImplementationTypeNotAvailableException", __FILE__, __LINE__, type);
     }
 
     switch (type)
@@ -1027,7 +1027,7 @@ namespace hfst
     }
     
     if ( ! HfstTransducer::is_implementation_type_available(type)) {
-      HFST_THROW(ImplementationTypeNotAvailableException);
+      throw ImplementationTypeNotAvailableException("ImplementationTypeNotAvailableException", __FILE__, __LINE__, type);
     }
     
     switch (type)

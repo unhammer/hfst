@@ -20,8 +20,8 @@ struct state_array {
 };
 
 struct fsm_trans_list {
-    short int in;
-    short int out;
+    short in;
+    short out;
     int target;
     struct fsm_trans_list *next;
 };
@@ -41,7 +41,7 @@ struct fsm_state_list {
     _Bool used;
     _Bool is_final;
     _Bool is_initial;
-    short int num_trans;
+    short num_trans;
     int state_number;
     struct fsm_trans_list *fsm_trans_list;
 };
@@ -52,7 +52,7 @@ struct fsm_sigma_list {
 
 struct fsm_sigma_hash {
     char *symbol;
-    short int sym;
+    short sym;
     struct fsm_sigma_hash *next;
 };
 
@@ -74,11 +74,11 @@ struct fsm_construct_handle {
 
 struct apply_med_handle {
     struct astarnode {
-        short int wordpos;
+        short wordpos;
         int fsmstate;
-        short int f;
-        short int g;
-        short int h;
+        short f;
+        short g;
+        short h;
         int in;
         int out;
         int parent;

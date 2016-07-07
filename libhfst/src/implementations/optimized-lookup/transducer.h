@@ -34,6 +34,7 @@
 #include "../../HfstExceptionDefs.h"
 #include "../../HfstFlagDiacritics.h"
 #include "../../HfstSymbolDefs.h"
+#include "../../HfstDataTypes.h"
 
 #ifdef _MSC_VER
  #include <BaseTsd.h>
@@ -46,9 +47,12 @@ namespace hfst_ol {
 using hfst::FdOperation;
 using hfst::FdState;
 using hfst::FdTable;
-
-//    using namespace hfst;
-
+using hfst::HfstTwoLevelPath;
+using hfst::HfstOneLevelPath;
+using hfst::HfstTwoLevelPaths;
+using hfst::HfstOneLevelPaths;
+using hfst::StringVector;
+using hfst::StringPairVector;
 
 typedef unsigned short SymbolNumber;
 typedef unsigned int TransitionTableIndex;
@@ -62,9 +66,7 @@ typedef std::set<TransitionTableIndex> TransitionTableIndexSet;
 typedef std::vector<std::string> SymbolTable;
 
 // for lookup
-typedef std::pair<Weight, std::vector<std::string> > HfstOneLevelPath;
-typedef std::set<HfstOneLevelPath> HfstOneLevelPaths;
-typedef std::vector<std::string> StringVector;
+typedef std::pair<std::string, std::string> StringPair;
 
 // for ospell
 typedef std::vector<short> FlagDiacriticState;
@@ -811,8 +813,43 @@ public:
     friend class PmatchContainer;
 };
 
+struct SymbolPair
+{
+    SymbolNumber input;
+    SymbolNumber output;
+    SymbolPair(void): input(0), output(0) {}
+    SymbolPair(SymbolNumber i, SymbolNumber o): input(i), output(o) {}
+};
+
 // A vector that can be written to at any position, so that it
 // adds new elements if the desired element isn't already present.
+struct DoubleTape: public std::vector<SymbolPair>
+{
+    void write(unsigned int pos, SymbolNumber in, SymbolNumber out)
+        {
+            while (pos >= this->size()) {
+                this->push_back(SymbolPair());
+            }
+            this->operator[](pos) = SymbolPair(in, out);
+        }
+
+    DoubleTape extract_slice(unsigned int start, unsigned int stop)
+        {
+            DoubleTape retval;
+            while(start < stop) {
+                retval.push_back(this->at(start));
+                ++start;
+            }
+            return retval;
+        }
+};
+
+struct WeightedDoubleTape: public DoubleTape
+{
+    Weight weight;
+    WeightedDoubleTape(DoubleTape dt, Weight w): DoubleTape(dt), weight(w) {}
+};
+
 class Tape: public SymbolNumberVector
 {
 public:
@@ -841,10 +878,10 @@ protected:
 
     // for lookup
     Weight current_weight;
-    HfstOneLevelPaths * lookup_paths;
+    HfstTwoLevelPaths * lookup_paths;
     Encoder * encoder;
     Tape input_tape;
-    Tape output_tape;
+    DoubleTape output_tape;
     hfst::FdState<SymbolNumber> flag_state;
     // This is to keep track of whether we're going to take a default transition
     bool found_transition;
@@ -971,6 +1008,10 @@ public:
                                   double time_cutoff = 0.0);
     HfstOneLevelPaths * lookup_fd(const char * s, ssize_t limit = -1,
                                   double time_cutoff = 0.0);
+    HfstTwoLevelPaths * lookup_fd_pairs(const std::string & s, ssize_t limit = -1,
+                                        double time_cutoff = 0.0);
+    HfstTwoLevelPaths * lookup_fd_pairs(const char * s, ssize_t limit = -1,
+                                        double time_cutoff = 0.0);
     void note_analysis(void);
 
     // Methods for supporting ospell

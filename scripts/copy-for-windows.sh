@@ -75,7 +75,8 @@ HfstExtractStrings.h HfstFlagDiacritics.h \
 HfstInputStream.h HfstLookupFlagDiacritics.h HfstOutputStream.h \
 HfstSymbolDefs.h HfstTokenizer.h HfstTransducer.h HfstXeroxRules.h \
 HfstStrings2FstTokenizer.h hfst.h hfst.hpp.in hfst_apply_schemas.h hfstdll.h \
-hfst-string-conversions.h HfstPrintDot.h HfstPrintPCKimmo.h;
+hfst-string-conversions.h HfstPrintDot.h HfstPrintPCKimmo.h \
+string-utils.h;
 do
     cp libhfst/src/$file $1/libhfst/src/
 done
@@ -86,7 +87,8 @@ HfstEpsilonHandler HfstExceptionDefs HfstFlagDiacritics \
 HfstInputStream HfstLookupFlagDiacritics HfstOutputStream HfstRules \
 HfstSymbolDefs HfstTokenizer HfstTransducer HfstXeroxRules \
 hfst-string-conversions \
-HfstStrings2FstTokenizer HfstXeroxRulesTest HfstPrintDot HfstPrintPCKimmo;
+HfstStrings2FstTokenizer HfstXeroxRulesTest HfstPrintDot HfstPrintPCKimmo \
+string-utils;
 do
     cp libhfst/src/$file.cc $1/libhfst/src/$file.cpp
 done
@@ -166,10 +168,27 @@ sed -i 's/hxfstwrap( )/hxfstwrap(void)/' $1/libhfst/src/parsers/xfst-lexer.cpp
 
 
 cp scripts/windows/make-python-bindings.bat $1/libhfst/src/
-cp python/test/test_hfst.py $1/libhfst/src/
-cp python/test/examples.py $1/libhfst/src/
-cp python/test/foobar.hfst $1/libhfst/src/
-cp python/libhfst.i $1/libhfst/src/
+
+for file in libhfst.i docstrings.i hfst_extensions.cc \
+hfst_file_extensions.cc hfst_lexc_extensions.cc hfst_lookup_extensions.cc \
+hfst_pmatch_extensions.cc hfst_prolog_extensions.cc hfst_regex_extensions.cc \
+hfst_rules_extensions.cc hfst_xfst_extensions.cc
+do
+    cp python/$file $1/libhfst/src/
+done
+
+mkdir $1/libhfst/src/hfst
+mkdir $1/libhfst/src/hfst/exceptions
+mkdir $1/libhfst/src/hfst/rules
+mkdir $1/libhfst/src/hfst/types
+
+cp python/hfst/__init__.py $1/libhfst/src/hfst/
+cp python/hfst/exceptions/__init__.py $1/libhfst/src/hfst/exceptions/
+cp python/hfst/rules/__init__.py $1/libhfst/src/hfst/rules/
+cp python/hfst/types/__init__.py $1/libhfst/src/hfst/types/
+
+# todo: python/test/
+
 cp scripts/windows/make-hfst-xfst.bat $1/libhfst/src/
 cp scripts/windows/make-hfst-proc.bat $1/libhfst/src/
 cp scripts/windows/make-hfst-lexc.bat $1/libhfst/src/

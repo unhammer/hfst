@@ -421,7 +421,7 @@ process_stream(HfstInputStream& instream)
               "# of ... connected states: ???\n"
               "# of ... strongly conn components: ???\n",
               states, arcs, 
-              static_cast<long int>(initial_state),
+              static_cast<long>(initial_state),
               final_states, io_epsilons,
               input_epsilons, output_epsilons);
       // other names from properties...

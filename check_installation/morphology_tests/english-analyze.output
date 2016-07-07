@@ -1,159 +1,127 @@
-All	
-All	All[ADJ]+ADJ
-All	All[ADV]+ADV
 All	All[DET]
+All	All[ADV]+ADV
+All	All[ADJ]+ADJ
 
-human	
-human	hum[N]+AN[N/N]+N
 human	human[ADJ]+ADJ
 human	human[N]+N
 human	hume[N]+AN[N/N]+N
+human	hum[N]+AN[N/N]+N
 
-beings	
-beings	be[N]+ING[N/N]+N+PL
 beings	being[N]+N+PL
 beings	bey[N]+ING[N/N]+N+PL
+beings	be[N]+ING[N/N]+N+PL
 
-are	
-are	A+re[N]+N
-are	are[N]+N
 are	be[V]+V+PRES
+are	are[N]+N
+are	A+re[N]+N
 
-born	
-born	bear+V+PPART
 born	bear[V]+V+PPART
 born	born[ADJ]+ADJ
-born	born[N]+N
 born	born[V]+V+PAST
+born	bear+V+PPART
+born	born[N]+N
 
-free	
 free	free[ADJ]+ADJ
+free	free[V]+V+INF
+free	free[V]+V
 free	free[ADV]+ADV
 free	free[N]+N
-free	free[V]+V
-free	free[V]+V+INF
 
-and	
-and	A+nd[N]+N
-and	and[ADV]+ADV
 and	and[CNJ]+COORD
+and	and[ADV]+ADV
+and	A+nd[N]+N
 
-equal	
 equal	equal[ADJ]+ADJ
 equal	equal[N]+N
-equal	equal[V]+V
 equal	equal[V]+V+INF
+equal	equal[V]+V
 
-in	
-in	in[ADJ]+ADJ
-in	in[ADV]+ADV
-in	in[N]+N
 in	in[PRP]
+in	in[ADV]+ADV
 in	in[V]+V+3sg+PRES
+in	in[N]+N
+in	in[ADJ]+ADJ
 
-dignity	
 dignity	dignity[N]+N
 
-and	
-and	A+nd[N]+N
-and	and[ADV]+ADV
 and	and[CNJ]+COORD
+and	and[ADV]+ADV
+and	A+nd[N]+N
 
-rights	
 rights	right[N]+N+PL
 rights	right[V]+V+3sg+PRES
 
-.	
 .	.[PUN]
 
-They	
 They	They[PN]+PERS
 
-are	
-are	A+re[N]+N
-are	are[N]+N
 are	be[V]+V+PRES
+are	are[N]+N
+are	A+re[N]+N
 
-endowed	
+endowed	endowed[ADJ]+ADJ
 endowed	endow[V]+V+PAST
 endowed	endow[V]+V+PPART
-endowed	endowed[ADJ]+ADJ
 
-with	
-with	with[CNJ]+COORD
 with	with[PRP]
+with	with[CNJ]+COORD
 
-reason	
 reason	reason[N]+N
-reason	reason[V]+V
 reason	reason[V]+V+INF
+reason	reason[V]+V
 
-and	
-and	A+nd[N]+N
-and	and[ADV]+ADV
 and	and[CNJ]+COORD
+and	and[ADV]+ADV
+and	A+nd[N]+N
 
-conscience	
 conscience	conscience[N]+N
 
-and	
-and	A+nd[N]+N
-and	and[ADV]+ADV
 and	and[CNJ]+COORD
+and	and[ADV]+ADV
+and	A+nd[N]+N
 
-should	
 should	should[V]+V+INF
 
-act	
-act	A+ct[N]+N
 act	act[N]+N
-act	act[V]+V
 act	act[V]+V+INF
+act	act[V]+V
+act	A+ct[N]+N
 
-towards	
 towards	towards[PRP]
 
-one	
 one	one[ADJ]
+one	one[PN]+INDEF
+one	one[V]+V+INF
 one	one[ADJ]+ADJ
 one	one[N]+N
 one	one[PN]
-one	one[PN]+INDEF
-one	one[V]+V+INF
 
-another	
-another	another[ADJ]+ADJ
 another	another[DET]
+another	another[ADJ]+ADJ
 
-in	
-in	in[ADJ]+ADJ
-in	in[ADV]+ADV
-in	in[N]+N
 in	in[PRP]
+in	in[ADV]+ADV
 in	in[V]+V+3sg+PRES
+in	in[N]+N
+in	in[ADJ]+ADJ
 
-a	
-a	a[ADV]+ADV
 a	a[ART]
 a	a[N]+N
 a	a[PART]+INF
-a	a[PN]+PERS
 a	a[PRP]
+a	a[ADV]+ADV
+a	a[PN]+PERS
 
-spirit	
 spirit	spirit[N]+N
-spirit	spirit[V]+V
 spirit	spirit[V]+V+INF
+spirit	spirit[V]+V
 
-of	
+of	of[PRP]
 of	have[V]+V+INF
 of	of[ADV]+ADV
-of	of[PRP]
 
-brotherhood	
-brotherhood	brother[N]+HOOD[N/N]+N
 brotherhood	brotherhood[N]+N
+brotherhood	brother[N]+HOOD[N/N]+N
 
-.	
 .	.[PUN]
 
