@@ -1,0 +1,36 @@
+Multichar_Symbols
+
++N
++V
++Acr
++PUNCT
+@PMATCH_INPUT_MARK@
+@PMATCH_BACKTRACK@
++ErrSpace
+%#
+
+LEXICON Root
+
+skuvla+N:skuvla ENDLEX;
+busse+N:busse ENDLEX;
+busset+V:busse ENDLEX;
+< {skuvla} "@PMATCH_BACKTRACK@":0 "@PMATCH_INPUT_MARK@":" " {busse} "+N":0 "+ErrSpace":0 > ENDLEX ;
+
+jan+Foo+N:jan ENDLEX;
+.+PUNCT:. ENDLEX;
+! This one should create a new backtrack-point before the dot, but *no* sub-reading:
+< {jan} "@PMATCH_BACKTRACK@":0 "@PMATCH_INPUT_MARK@":0 {.}   "+N":0 "+Acr":0 > ENDLEX ;
+! This one should create a new backtrack-point before the dot, *as well as* a sub-reading:
+a+@PMATCH_INPUT_MARK@:aa ENDLEX;
+< {jan} "@PMATCH_BACKTRACK@":0 "@PMATCH_INPUT_MARK@":0 {.}:0 "+N":0 "+Acr":0 "@PMATCH_INPUT_MARK@":0 {.} "+PUNCT":0 > ENDLEX ;
+
+! Want:
+!"<jan.>"
+!	"." PUNCT "<.>"
+!		"jan." N Acr "<jan>"
+!	"jan." N Acr
+!	"." PUNCT "<.>"
+!		"jan" N "<jan>"
+
+LEXICON ENDLEX
+#;
