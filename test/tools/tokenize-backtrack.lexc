@@ -1,8 +1,9 @@
 Multichar_Symbols
 
 +N
++Prop
 +V
-+Acr
++Abbr
 +PUNCT
 @PMATCH_INPUT_MARK@
 @PMATCH_BACKTRACK@
@@ -16,21 +17,23 @@ busse+N:busse ENDLEX;
 busset+V:busse ENDLEX;
 < {skuvla} "@PMATCH_BACKTRACK@":0 "@PMATCH_INPUT_MARK@":" " {busse} "+N":0 "+ErrSpace":0 > ENDLEX ;
 
-jan+Foo+N:jan ENDLEX;
+Jan+N+Prop:Jan ENDLEX;
 .+PUNCT:. ENDLEX;
+Jan DOTABBR;
+
+LEXICON DOTABBR
 ! This one should create a new backtrack-point before the dot, but *no* sub-reading:
-< {jan} "@PMATCH_BACKTRACK@":0 "@PMATCH_INPUT_MARK@":0 {.}   "+N":0 "+Acr":0 > ENDLEX ;
+< "@PMATCH_BACKTRACK@":0 "@PMATCH_INPUT_MARK@":0 {.}   "+N":0 "+Abbr":0 > ENDLEX ;
 ! This one should create a new backtrack-point before the dot, *as well as* a sub-reading:
-a+@PMATCH_INPUT_MARK@:aa ENDLEX;
-< {jan} "@PMATCH_BACKTRACK@":0 "@PMATCH_INPUT_MARK@":0 {.}:0 "+N":0 "+Acr":0 "@PMATCH_INPUT_MARK@":0 {.} "+PUNCT":0 > ENDLEX ;
+< "@PMATCH_BACKTRACK@":0 "@PMATCH_INPUT_MARK@":0 {.}:0 "+N":0 "+Abbr":0 "@PMATCH_INPUT_MARK@":0 {.} "+PUNCT":0 > ENDLEX ;
 
 ! Want:
-!"<jan.>"
+!"<Jan.>"
 !	"." PUNCT "<.>"
-!		"jan." N Acr "<jan>"
-!	"jan." N Acr
+!		"Jan." N Abbr "<Jan>"
+!	"Jan." N Abbr
 !	"." PUNCT "<.>"
-!		"jan" N "<jan>"
+!		"Jan" N Prop "<Jan>"
 
 LEXICON ENDLEX
 #;

@@ -12,10 +12,10 @@
 	"busse" N <W:0> "<busse>"
 		"skuvla" N <W:0> "<skuvla>"
 : 
-"<jan.>"
+"<Jan.>"
 	"." PUNCT <W:0> "<.>"
-		"jan." N Acr <W:0> "<jan>"
-	"jan." N Acr <W:0>
+		"Jan." N Abbr <W:0> "<Jan>"
+	"Jan." N Abbr <W:0>
 	"." PUNCT <W:0> "<.>"
-		"jan+Foo" N <W:0> "<jan>"
+		"Jan" N Prop <W:0> "<Jan>"
 :\n

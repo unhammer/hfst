@@ -21,7 +21,7 @@ if ! $TOOLDIR/hfst-pmatch2fst < $srcdir/tokenize-backtrack.pmscript > $srcdir/to
 fi
 
 # Only --gtd supports this:
-if ! echo "busse skuvla skuvla busse jan." | $TOOLDIR/hfst-tokenize --gtd $srcdir/tokenize-backtrack.pmhfst > test.strings ; then
+if ! echo "busse skuvla skuvla busse Jan." | $TOOLDIR/hfst-tokenize --gtd $srcdir/tokenize-backtrack.pmhfst > test.strings ; then
     echo tokenize --gtd fail:
     cat test.strings
     exit 1
