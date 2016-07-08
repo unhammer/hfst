@@ -78,7 +78,6 @@ size_t len;
 bool verbose;
 bool flatten;
 clock_t timer;
-clock_t tmp_timer;
 int minimization_guard_count;
 bool need_delimiters;
 
@@ -1061,28 +1060,68 @@ HfstTransducer * PmatchUtilityTransducers::make_lowerfy(ImplementationType type)
 
 HfstTransducer * PmatchUtilityTransducers::cap(HfstTransducer & t, Side side)
 {
-    HfstTokenizer tok;
+    HfstTransducer * retval;
     HfstTransducer cap(*capify);
+    HfstTransducer decap(cap);
+    decap.invert();
     HfstTransducer anything(HfstTransducer::identity_pair(t.get_type()));
-    HfstTransducer anything_but_whitespace(anything);
-    anything_but_whitespace.subtract(*latin1_whitespace_acceptor);
-    HfstTransducer anything_but_lowercase(anything);
-    anything_but_lowercase.subtract(*latin1_lowercase_acceptor);
-    cap.disjunct(anything_but_lowercase);
-    HfstTransducer cap_one_word(cap);
-    cap_one_word.concatenate(anything_but_whitespace.repeat_star());
-    /* If we consider to cross the word boundary */ 
-    HfstTransducer more_words(*latin1_whitespace_acceptor);
-    more_words.concatenate(cap_one_word);
-    more_words.repeat_star();
-    HfstTransducer * retval = new HfstTransducer(t);
-    retval->compose(cap_one_word.concatenate(more_words));
-    if (side == Both) {
-        retval->output_project();
-    } else if (side == Lower) {
-        // do nothing
+    HfstTransducer anything_but_whitespace_star(anything);
+    anything_but_whitespace_star.subtract(*latin1_whitespace_acceptor);
+    anything_but_whitespace_star.repeat_star();
+    // As in the regexp
+    // [[[["A":"a" [[\" "]* (" " "A":"a")]* ] .o. [{ab ad}:{ef eh}].u]] .o.
+    //   [{ab ad}:{ef eh}] ] .o. [[{ab ad}:{ef eh}].l] .o.
+    //   ["e":"E" [[\" "]+ (" " "e":"E")]*]
+    if (side == Lower) {
+        HfstTransducer lower_t(t);
+        lower_t.output_project();
+        retval = new HfstTransducer(t);
+        HfstTransducer continuation(anything_but_whitespace_star);
+        HfstTransducer more_caps(*latin1_whitespace_acceptor);
+        more_caps.concatenate(cap);
+        more_caps.optionalize();
+        continuation.concatenate(more_caps);
+        continuation.repeat_star();
+        cap.concatenate(continuation);
+        lower_t.compose(cap);
+        retval->compose(lower_t);
     } else if (side == Upper) {
-        retval->invert();
+        HfstTransducer upper_t(t);
+        upper_t.input_project();
+        retval = new HfstTransducer(decap);
+        HfstTransducer continuation(anything_but_whitespace_star);
+        HfstTransducer more_decaps(*latin1_whitespace_acceptor);
+        more_decaps.concatenate(decap);
+        more_decaps.optionalize();
+        continuation.concatenate(more_decaps);
+        continuation.repeat_star();
+        retval->concatenate(continuation);
+        retval->compose(upper_t);
+        retval->compose(t);
+    } else { // both
+        HfstTransducer upper_t(t);
+        HfstTransducer lower_t(t);
+        upper_t.input_project();
+        lower_t.output_project();
+        retval = new HfstTransducer(decap);
+        HfstTransducer continuation(anything_but_whitespace_star);
+        HfstTransducer more_decaps(*latin1_whitespace_acceptor);
+        more_decaps.concatenate(decap);
+        more_decaps.optionalize();
+        continuation.concatenate(more_decaps);
+        continuation.repeat_star();
+        retval->concatenate(continuation);
+        retval->compose(upper_t);
+        retval->compose(t);
+        HfstTransducer continuation2(anything_but_whitespace_star);
+        HfstTransducer more_caps(*latin1_whitespace_acceptor);
+        more_caps.concatenate(cap);
+        more_caps.optionalize();
+        continuation2.concatenate(more_caps);
+        continuation2.repeat_star();
+        cap.concatenate(continuation2);
+        lower_t.compose(cap);
+        retval->compose(lower_t);
     }
     retval->minimize();
     return retval;
@@ -1264,19 +1303,20 @@ HfstTransducer * PmatchString::evaluate(PmatchEvalType eval_type) {
         tmp = new HfstTransducer(string, format);
     }
     tmp->set_final_weights(weight, true);
-    if (cache == NULL && should_use_cache()) {
+    if (cache == NULL && should_use_cache() == true) {
         cache = tmp;
         cache->minimize();
+        report_time();
         return new HfstTransducer(*cache);
     }
-    report_time();
+        report_time();
     return tmp;
 }
 
 HfstTransducer * PmatchFunction::evaluate(std::vector<PmatchObject *> funargs)
 {
     if (verbose) {
-        tmp_timer = clock();
+        my_timer = clock();
     }
     if (funargs.size() != args.size()) {
         std::stringstream errstring;
@@ -1295,7 +1335,7 @@ HfstTransducer * PmatchFunction::evaluate(std::vector<PmatchObject *> funargs)
     retval->set_final_weights(weight, true);
     call_stack.pop_back();
     if (verbose) {
-        double duration = (clock() - tmp_timer) /
+        double duration = (clock() - my_timer) /
             (double) CLOCKS_PER_SEC;
         std::cerr << "Call to " << name << " evaluated in " << duration << " seconds\n";
     }
@@ -1353,12 +1393,13 @@ HfstTransducer * PmatchNumericOperation::evaluate(PmatchEvalType eval_type)
         tmp->repeat_n_to_k(values[0], values[1]);
     }
     tmp->set_final_weights(weight, true);
-    report_time();
-    if (cache == NULL && should_use_cache()) {
+    if (cache == NULL && should_use_cache() == true) {
         cache = tmp;
         cache->minimize();
+        report_time();
         return new HfstTransducer(*cache);
     }
+    report_time();
     return tmp;
 }
 
@@ -1550,11 +1591,14 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
         }
     }
     retval->set_final_weights(weight, true);
-    report_time();
-    if (cache == NULL && should_use_cache()) {
+    if (cache == NULL && should_use_cache() == true) {
         cache = retval;
         cache->minimize();
+        report_time();
+        print_size_info(cache);
+        return new HfstTransducer(*cache);
     }
+    report_time();
     return retval;
 }
 
@@ -1635,13 +1679,15 @@ HfstTransducer * PmatchBinaryOperation::evaluate(PmatchEvalType eval_type)
     }
     delete rhs;
     lhs->set_final_weights(weight, true);
-    report_time();
     retval = lhs;
-    if (cache == NULL && should_use_cache()) {
+    if (cache == NULL && should_use_cache() == true) {
         cache = retval;
         cache->minimize();
+        print_size_info(cache);
+        report_time();
         return new HfstTransducer(*cache);
     }
+    report_time();
     return retval;
 }
 
@@ -1675,12 +1721,13 @@ HfstTransducer * PmatchTernaryOperation::evaluate(PmatchEvalType eval_type)
         }
     }
     retval->set_final_weights(weight, true);
-    report_time();
-    if (cache == NULL && should_use_cache()) {
+    if (cache == NULL && should_use_cache() == true) {
         cache = retval;
         cache->minimize();
+        report_time();
         return new HfstTransducer(*cache);
     }
+    report_time();
     return retval;
 }
 
@@ -1751,7 +1798,7 @@ HfstTransducer * PmatchParallelRulesContainer::evaluate(PmatchEvalType eval_type
     }
     retval->set_final_weights(weight, true);
     report_time();
-    if (cache == NULL && should_use_cache()) {
+    if (cache == NULL && should_use_cache() == true) {
         cache = retval;
         cache->minimize();
         return new HfstTransducer(*cache);
@@ -1809,7 +1856,7 @@ HfstTransducer * PmatchReplaceRuleContainer::evaluate(PmatchEvalType eval_type)
     }
     retval->set_final_weights(weight, true);
     report_time();
-    if (cache == NULL && should_use_cache()) {
+    if (cache == NULL && should_use_cache() == true) {
         cache = retval;
         cache->minimize();
         return new HfstTransducer(*cache);
@@ -1878,7 +1925,7 @@ HfstTransducer * PmatchRestrictionContainer::evaluate(PmatchEvalType eval_type)
     delete l;
     retval->set_final_weights(weight, true);
     report_time();
-    if (cache == NULL && should_use_cache()) {
+    if (cache == NULL && should_use_cache() == true) {
         cache = retval;
         cache->minimize();
         return new HfstTransducer(*cache);

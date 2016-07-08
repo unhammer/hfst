@@ -50,7 +50,6 @@ extern ImplementationType format;
 extern bool verbose;
 extern bool flatten;
 extern clock_t timer;
-extern clock_t tmp_timer;
 extern int minimization_guard_count;
 extern bool need_delimiters;
 
@@ -350,20 +349,22 @@ struct PmatchObject {
     std::string name; // optional, given if the object appears as a definition
     double weight;
     int line_defined;
+    clock_t my_timer;
     HfstTransducer * cache;
     PmatchObject(void);
     void start_timing(void)
         {
             if (verbose && name != "") {
-                tmp_timer = clock();
+                my_timer = clock();
             }
         }
     void report_time(void)
         {
             if (verbose && name != "") {
-                double duration = (clock() - tmp_timer) /
+                double duration = (clock() - my_timer) /
                     (double) CLOCKS_PER_SEC;
                 std::cerr << name << " compiled in " << duration << " seconds\n";
+                
             }
         }
     bool should_use_cache(void)
