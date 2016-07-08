@@ -1221,17 +1221,7 @@ HfstTransducer * PmatchUtilityTransducers::tolower(HfstTransducer & t, Side side
     lowercase.disjunct(any_but_upper);
     lowercase.repeat_star();
     HfstTransducer * retval;
-    if (side == Both) {
-        HfstTransducer lower_t(t);
-        lower_t.input_project();
-        retval = new HfstTransducer(t);
-        retval->input_project();
-        lower_t.compose(lowercase);
-        retval->compose(lowercase);
-        retval->invert();
-        retval->compose(t);
-        retval->compose(lower_t);
-    } else if (side == Lower) {
+    if (side == Lower) {
         HfstTransducer lower_t(t);
         // to only operate on the lower side
         lower_t.output_project();
@@ -1244,6 +1234,16 @@ HfstTransducer * PmatchUtilityTransducers::tolower(HfstTransducer & t, Side side
         retval->compose(lowercase);
         retval->invert();
         retval->compose(t);
+    } else { // both
+        HfstTransducer lower_t(t);
+        lower_t.input_project();
+        retval = new HfstTransducer(t);
+        retval->input_project();
+        lower_t.compose(lowercase);
+        retval->compose(lowercase);
+        retval->invert();
+        retval->compose(t);
+        retval->compose(lower_t);
     }
     retval->minimize();
     return retval;
@@ -1257,17 +1257,7 @@ HfstTransducer * PmatchUtilityTransducers::toupper(HfstTransducer & t, Side side
     uppercase.disjunct(any_but_lower);
     uppercase.repeat_star();
     HfstTransducer * retval;
-    if (side == Both) {
-        HfstTransducer lower_t(t);
-        lower_t.input_project();
-        retval = new HfstTransducer(t);
-        retval->input_project();
-        lower_t.compose(uppercase);
-        retval->compose(uppercase);
-        retval->invert();
-        retval->compose(t);
-        retval->compose(lower_t);
-    } else if (side == Lower) {
+    if (side == Lower) {
         HfstTransducer lower_t(t);
         // to only operate on the lower side
         lower_t.output_project();
@@ -1280,6 +1270,16 @@ HfstTransducer * PmatchUtilityTransducers::toupper(HfstTransducer & t, Side side
         retval->compose(uppercase);
         retval->invert();
         retval->compose(t);
+    } else { // both
+        HfstTransducer lower_t(t);
+        lower_t.input_project();
+        retval = new HfstTransducer(t);
+        retval->input_project();
+        lower_t.compose(uppercase);
+        retval->compose(uppercase);
+        retval->invert();
+        retval->compose(t);
+        retval->compose(lower_t);
     }
     retval->minimize();
     return retval;
@@ -1292,17 +1292,7 @@ HfstTransducer * PmatchUtilityTransducers::opt_tolower(HfstTransducer & t, Side 
     lowercase.disjunct(anything);
     lowercase.repeat_star();
     HfstTransducer * retval;
-    if (side == Both) {
-        HfstTransducer lower_t(t);
-        lower_t.input_project();
-        retval = new HfstTransducer(t);
-        retval->input_project();
-        lower_t.compose(lowercase);
-        retval->compose(lowercase);
-        retval->invert();
-        retval->compose(t);
-        retval->compose(lower_t);
-    } else if (side == Lower) {
+    if (side == Lower) {
         HfstTransducer lower_t(t);
         // to only operate on the lower side
         lower_t.output_project();
@@ -1315,6 +1305,16 @@ HfstTransducer * PmatchUtilityTransducers::opt_tolower(HfstTransducer & t, Side 
         retval->compose(lowercase);
         retval->invert();
         retval->compose(t);
+    } else { // both
+        HfstTransducer lower_t(t);
+        lower_t.input_project();
+        retval = new HfstTransducer(t);
+        retval->input_project();
+        lower_t.compose(lowercase);
+        retval->compose(lowercase);
+        retval->invert();
+        retval->compose(t);
+        retval->compose(lower_t);
     }
     retval->minimize();
     return retval;
@@ -1327,17 +1327,7 @@ HfstTransducer * PmatchUtilityTransducers::opt_toupper(HfstTransducer & t, Side 
     uppercase.disjunct(anything);
     uppercase.repeat_star();
     HfstTransducer * retval;
-    if (side == Both) {
-        HfstTransducer lower_t(t);
-        lower_t.input_project();
-        retval = new HfstTransducer(t);
-        retval->input_project();
-        lower_t.compose(uppercase);
-        retval->compose(uppercase);
-        retval->invert();
-        retval->compose(t);
-        retval->compose(lower_t);
-    } else if (side == Lower) {
+    if (side == Lower) {
         HfstTransducer lower_t(t);
         // to only operate on the lower side
         lower_t.output_project();
@@ -1350,6 +1340,16 @@ HfstTransducer * PmatchUtilityTransducers::opt_toupper(HfstTransducer & t, Side 
         retval->compose(uppercase);
         retval->invert();
         retval->compose(t);
+    } else { // both
+        HfstTransducer lower_t(t);
+        lower_t.input_project();
+        retval = new HfstTransducer(t);
+        retval->input_project();
+        lower_t.compose(uppercase);
+        retval->compose(uppercase);
+        retval->invert();
+        retval->compose(t);
+        retval->compose(lower_t);
     }
     retval->minimize();
     return retval;
