@@ -1068,33 +1068,43 @@ HfstTransducer * PmatchUtilityTransducers::cap(HfstTransducer & t, Side side)
     HfstTransducer anything_but_whitespace_star(anything);
     anything_but_whitespace_star.subtract(*latin1_whitespace_acceptor);
     anything_but_whitespace_star.repeat_star();
+    HfstTransducer anything_but_lower(anything);
+    anything_but_lower.subtract(*latin1_lowercase_acceptor);
     // As in the regexp
     // [[[["A":"a" [[\" "]* (" " "A":"a")]* ] .o. [{ab ad}:{ef eh}].u]] .o.
     //   [{ab ad}:{ef eh}] ] .o. [[{ab ad}:{ef eh}].l] .o.
     //   ["e":"E" [[\" "]+ (" " "e":"E")]*]
     if (side == Lower) {
         HfstTransducer lower_t(t);
+        // to only operate on the lower side
         lower_t.output_project();
         retval = new HfstTransducer(t);
+        // Cap is the first letter to either capitalize or accept if it's not a
+        // lowercase letter
+        cap.disjunct(anything_but_lower);
         HfstTransducer continuation(anything_but_whitespace_star);
+        // continuation is the rest of the first word
         HfstTransducer more_caps(*latin1_whitespace_acceptor);
+        // more_caps is more words to capitalize
         more_caps.concatenate(cap);
         more_caps.optionalize();
         continuation.concatenate(more_caps);
         continuation.repeat_star();
         cap.concatenate(continuation);
         lower_t.compose(cap);
+        // we combine what we've done with the upper side again
         retval->compose(lower_t);
     } else if (side == Upper) {
         HfstTransducer upper_t(t);
         upper_t.input_project();
-        retval = new HfstTransducer(decap);
+        decap.disjunct(anything_but_lower);
         HfstTransducer continuation(anything_but_whitespace_star);
         HfstTransducer more_decaps(*latin1_whitespace_acceptor);
         more_decaps.concatenate(decap);
         more_decaps.optionalize();
         continuation.concatenate(more_decaps);
         continuation.repeat_star();
+        retval = new HfstTransducer(decap);
         retval->concatenate(continuation);
         retval->compose(upper_t);
         retval->compose(t);
@@ -1103,18 +1113,20 @@ HfstTransducer * PmatchUtilityTransducers::cap(HfstTransducer & t, Side side)
         HfstTransducer lower_t(t);
         upper_t.input_project();
         lower_t.output_project();
-        retval = new HfstTransducer(decap);
+        decap.disjunct(anything_but_lower);
         HfstTransducer continuation(anything_but_whitespace_star);
         HfstTransducer more_decaps(*latin1_whitespace_acceptor);
         more_decaps.concatenate(decap);
         more_decaps.optionalize();
         continuation.concatenate(more_decaps);
         continuation.repeat_star();
+        retval = new HfstTransducer(decap);
         retval->concatenate(continuation);
         retval->compose(upper_t);
         retval->compose(t);
         HfstTransducer continuation2(anything_but_whitespace_star);
         HfstTransducer more_caps(*latin1_whitespace_acceptor);
+        cap.disjunct(anything_but_lower);
         more_caps.concatenate(cap);
         more_caps.optionalize();
         continuation2.concatenate(more_caps);
