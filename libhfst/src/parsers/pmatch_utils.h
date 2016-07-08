@@ -329,12 +329,12 @@ struct PmatchUtilityTransducers
     HfstTransducer * make_capify(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
     
-    HfstTransducer * cap(HfstTransducer & t, Side side = Both);
-    HfstTransducer * optcap(HfstTransducer & t, Side side = Both);
-    HfstTransducer * tolower(HfstTransducer & t, Side side = Both);
-    HfstTransducer * toupper(HfstTransducer & t, Side side = Both );
-    HfstTransducer * opt_tolower(HfstTransducer & t, Side side = Both);
-    HfstTransducer * opt_toupper(HfstTransducer & t, Side side = Both);
+    HfstTransducer * cap(HfstTransducer & t, Side side = Both,
+                         bool optional = false);
+    HfstTransducer * tolower(HfstTransducer & t, Side side = Both,
+                             bool optional = false);
+    HfstTransducer * toupper(HfstTransducer & t, Side side = Both,
+                             bool optional = false );
 };
 
 struct PmatchObject;

@@ -1058,7 +1058,7 @@ HfstTransducer * PmatchUtilityTransducers::make_lowerfy(ImplementationType type)
     return retval;
 }
 
-HfstTransducer * PmatchUtilityTransducers::cap(HfstTransducer & t, Side side)
+HfstTransducer * PmatchUtilityTransducers::cap(HfstTransducer & t, Side side, bool optional)
 {
     HfstTransducer * retval;
     HfstTransducer cap(*capify);
@@ -1068,8 +1068,10 @@ HfstTransducer * PmatchUtilityTransducers::cap(HfstTransducer & t, Side side)
     HfstTransducer anything_but_whitespace_star(anything);
     anything_but_whitespace_star.subtract(*latin1_whitespace_acceptor);
     anything_but_whitespace_star.repeat_star();
-    HfstTransducer anything_but_lower(anything);
-    anything_but_lower.subtract(*latin1_lowercase_acceptor);
+    if (optional == false) {
+        // don't let lowercased first letters through
+        anything.subtract(*latin1_lowercase_acceptor);
+    }
     // As in the regexp
     // [[[["A":"a" [[\" "]* (" " "A":"a")]* ] .o. [{ab ad}:{ef eh}].u]] .o.
     //   [{ab ad}:{ef eh}] ] .o. [[{ab ad}:{ef eh}].l] .o.
@@ -1081,80 +1083,6 @@ HfstTransducer * PmatchUtilityTransducers::cap(HfstTransducer & t, Side side)
         retval = new HfstTransducer(t);
         // Cap is the first letter to either capitalize or accept if it's not a
         // lowercase letter
-        cap.disjunct(anything_but_lower);
-        HfstTransducer continuation(anything_but_whitespace_star);
-        // continuation is the rest of the first word
-        HfstTransducer more_caps(*latin1_whitespace_acceptor);
-        // more_caps is more words to capitalize
-        more_caps.concatenate(cap);
-        more_caps.optionalize();
-        continuation.concatenate(more_caps);
-        continuation.repeat_star();
-        cap.concatenate(continuation);
-        lower_t.compose(cap);
-        // we combine what we've done with the upper side again
-        retval->compose(lower_t);
-    } else if (side == Upper) {
-        HfstTransducer upper_t(t);
-        upper_t.input_project();
-        decap.disjunct(anything_but_lower);
-        HfstTransducer continuation(anything_but_whitespace_star);
-        HfstTransducer more_decaps(*latin1_whitespace_acceptor);
-        more_decaps.concatenate(decap);
-        more_decaps.optionalize();
-        continuation.concatenate(more_decaps);
-        continuation.repeat_star();
-        retval = new HfstTransducer(decap);
-        retval->concatenate(continuation);
-        retval->compose(upper_t);
-        retval->compose(t);
-    } else { // both
-        HfstTransducer upper_t(t);
-        HfstTransducer lower_t(t);
-        upper_t.input_project();
-        lower_t.output_project();
-        decap.disjunct(anything_but_lower);
-        HfstTransducer continuation(anything_but_whitespace_star);
-        HfstTransducer more_decaps(*latin1_whitespace_acceptor);
-        more_decaps.concatenate(decap);
-        more_decaps.optionalize();
-        continuation.concatenate(more_decaps);
-        continuation.repeat_star();
-        retval = new HfstTransducer(decap);
-        retval->concatenate(continuation);
-        retval->compose(upper_t);
-        retval->compose(t);
-        HfstTransducer continuation2(anything_but_whitespace_star);
-        HfstTransducer more_caps(*latin1_whitespace_acceptor);
-        cap.disjunct(anything_but_lower);
-        more_caps.concatenate(cap);
-        more_caps.optionalize();
-        continuation2.concatenate(more_caps);
-        continuation2.repeat_star();
-        cap.concatenate(continuation2);
-        lower_t.compose(cap);
-        retval->compose(lower_t);
-    }
-    retval->minimize();
-    return retval;
-}
-
-HfstTransducer * PmatchUtilityTransducers::optcap(HfstTransducer & t, Side side)
-{
-    HfstTransducer * retval;
-    HfstTransducer cap(*capify);
-    HfstTransducer decap(cap);
-    decap.invert();
-    HfstTransducer anything(HfstTransducer::identity_pair(t.get_type()));
-    HfstTransducer anything_but_whitespace_star(anything);
-    anything_but_whitespace_star.subtract(*latin1_whitespace_acceptor);
-    anything_but_whitespace_star.repeat_star();
-    if (side == Lower) {
-        HfstTransducer lower_t(t);
-        // to only operate on the lower side
-        lower_t.output_project();
-        retval = new HfstTransducer(t);
-        // Cap is the first letter to either capitalize or accept
         cap.disjunct(anything);
         HfstTransducer continuation(anything_but_whitespace_star);
         // continuation is the rest of the first word
@@ -1213,82 +1141,13 @@ HfstTransducer * PmatchUtilityTransducers::optcap(HfstTransducer & t, Side side)
     return retval;
 }
 
-HfstTransducer * PmatchUtilityTransducers::tolower(HfstTransducer & t, Side side)
-{
-    HfstTransducer lowercase(*lowerfy);
-    HfstTransducer any_but_upper(hfst::internal_identity, hfst::pmatch::format);
-    any_but_upper.subtract(*latin1_uppercase_acceptor);
-    lowercase.disjunct(any_but_upper);
-    lowercase.repeat_star();
-    HfstTransducer * retval;
-    if (side == Lower) {
-        HfstTransducer lower_t(t);
-        // to only operate on the lower side
-        lower_t.output_project();
-        lower_t.compose(lowercase);
-        retval = new HfstTransducer(t);
-        retval->compose(lower_t);
-    } else if (side == Upper) {
-        retval = new HfstTransducer(t);
-        retval->input_project();
-        retval->compose(lowercase);
-        retval->invert();
-        retval->compose(t);
-    } else { // both
-        HfstTransducer lower_t(t);
-        lower_t.input_project();
-        retval = new HfstTransducer(t);
-        retval->input_project();
-        lower_t.compose(lowercase);
-        retval->compose(lowercase);
-        retval->invert();
-        retval->compose(t);
-        retval->compose(lower_t);
-    }
-    retval->minimize();
-    return retval;
-}
-
-HfstTransducer * PmatchUtilityTransducers::toupper(HfstTransducer & t, Side side)
-{
-    HfstTransducer uppercase(*capify);
-    HfstTransducer any_but_lower(hfst::internal_identity, hfst::pmatch::format);
-    any_but_lower.subtract(*latin1_lowercase_acceptor);
-    uppercase.disjunct(any_but_lower);
-    uppercase.repeat_star();
-    HfstTransducer * retval;
-    if (side == Lower) {
-        HfstTransducer lower_t(t);
-        // to only operate on the lower side
-        lower_t.output_project();
-        lower_t.compose(uppercase);
-        retval = new HfstTransducer(t);
-        retval->compose(lower_t);
-    } else if (side == Upper) {
-        retval = new HfstTransducer(t);
-        retval->input_project();
-        retval->compose(uppercase);
-        retval->invert();
-        retval->compose(t);
-    } else { // both
-        HfstTransducer lower_t(t);
-        lower_t.input_project();
-        retval = new HfstTransducer(t);
-        retval->input_project();
-        lower_t.compose(uppercase);
-        retval->compose(uppercase);
-        retval->invert();
-        retval->compose(t);
-        retval->compose(lower_t);
-    }
-    retval->minimize();
-    return retval;
-}
-
-HfstTransducer * PmatchUtilityTransducers::opt_tolower(HfstTransducer & t, Side side)
+HfstTransducer * PmatchUtilityTransducers::tolower(HfstTransducer & t, Side side, bool optional)
 {
     HfstTransducer lowercase(*lowerfy);
     HfstTransducer anything(hfst::internal_identity, hfst::pmatch::format);
+    if (optional == false) {
+        anything.subtract(*latin1_uppercase_acceptor);
+    }
     lowercase.disjunct(anything);
     lowercase.repeat_star();
     HfstTransducer * retval;
@@ -1320,10 +1179,13 @@ HfstTransducer * PmatchUtilityTransducers::opt_tolower(HfstTransducer & t, Side 
     return retval;
 }
 
-HfstTransducer * PmatchUtilityTransducers::opt_toupper(HfstTransducer & t, Side side)
+HfstTransducer * PmatchUtilityTransducers::toupper(HfstTransducer & t, Side side, bool optional)
 {
     HfstTransducer uppercase(*capify);
     HfstTransducer anything(hfst::internal_identity, hfst::pmatch::format);
+    if (optional == false) {
+        anything.subtract(*latin1_lowercase_acceptor);
+    }
     uppercase.disjunct(anything);
     uppercase.repeat_star();
     HfstTransducer * retval;
@@ -1608,7 +1470,7 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
         delete retval;
         retval = tmp;
     } else if (op == OptCap) {
-        HfstTransducer * tmp = get_utils()->optcap(*retval);
+        HfstTransducer * tmp = get_utils()->cap(*retval, Both, true);
         delete retval;
         retval = tmp;
     } else if (op == ToLower) {
@@ -1620,17 +1482,17 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
         delete retval;
         retval = tmp;
     } else if (op == OptToLower) {
-        HfstTransducer * tmp = get_utils()->opt_tolower(*retval);
+        HfstTransducer * tmp = get_utils()->tolower(*retval, Both, true);
         tmp->disjunct(*retval);
         delete retval;
         retval = tmp;
     } else if (op == OptToUpper) {
-        HfstTransducer * tmp = get_utils()->opt_toupper(*retval);
+        HfstTransducer * tmp = get_utils()->toupper(*retval, Both, true);
         delete retval;
         retval = tmp;
     } else if (op == AnyCase) {
-        HfstTransducer * toupper = get_utils()->opt_toupper(*retval);
-        HfstTransducer * tolower = get_utils()->opt_tolower(*retval);
+        HfstTransducer * toupper = get_utils()->toupper(*retval, Both, true);
+        HfstTransducer * tolower = get_utils()->tolower(*retval, Both, true);
         retval->disjunct(*toupper);
         retval->disjunct(*tolower);
         delete toupper; delete tolower;
@@ -1639,7 +1501,7 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
         delete retval;
         retval = tmp;
     } else if (op == OptCapUpper) {
-        HfstTransducer * tmp = get_utils()->optcap(*retval, Upper);
+        HfstTransducer * tmp = get_utils()->cap(*retval, Upper, true);
         delete retval;
         retval = tmp;
     } else if (op == ToLowerUpper) {
@@ -1651,17 +1513,17 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
         delete retval;
         retval = tmp;
     } else if (op == OptToLowerUpper) {
-        HfstTransducer * tmp = get_utils()->opt_tolower(*retval, Upper);
+        HfstTransducer * tmp = get_utils()->tolower(*retval, Upper, true);
         tmp->disjunct(*retval);
         delete retval;
         retval = tmp;
     } else if (op == OptToUpperUpper) {
-        HfstTransducer * tmp = get_utils()->opt_toupper(*retval, Upper);
+        HfstTransducer * tmp = get_utils()->toupper(*retval, Upper, true);
         delete retval;
         retval = tmp;
     } else if (op == AnyCaseUpper) {
-        HfstTransducer * toupper = get_utils()->opt_toupper(*retval, Upper);
-        HfstTransducer * tolower = get_utils()->opt_tolower(*retval, Upper);
+        HfstTransducer * toupper = get_utils()->toupper(*retval, Upper, true);
+        HfstTransducer * tolower = get_utils()->tolower(*retval, Upper, true);
         retval->disjunct(*toupper);
         retval->disjunct(*tolower);
         delete toupper; delete tolower;
@@ -1670,7 +1532,7 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
         delete retval;
         retval = tmp;
     } else if (op == OptCapLower) {
-        HfstTransducer * tmp = get_utils()->optcap(*retval, Lower);
+        HfstTransducer * tmp = get_utils()->cap(*retval, Lower, true);
         delete retval;
         retval = tmp;
     } else if (op == ToLowerLower) {
@@ -1682,17 +1544,17 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
         delete retval;
         retval = tmp;
     } else if (op == OptToLowerLower) {
-        HfstTransducer * tmp = get_utils()->opt_tolower(*retval, Lower);
+        HfstTransducer * tmp = get_utils()->tolower(*retval, Lower, true);
         tmp->disjunct(*retval);
         delete retval;
         retval = tmp;
     } else if (op == OptToUpperLower) {
-        HfstTransducer * tmp = get_utils()->opt_toupper(*retval, Lower);
+        HfstTransducer * tmp = get_utils()->toupper(*retval, Lower, true);
         delete retval;
         retval = tmp;
     } else if (op == AnyCaseLower) {
-        HfstTransducer * toupper = get_utils()->opt_toupper(*retval, Lower);
-        HfstTransducer * tolower = get_utils()->opt_tolower(*retval, Lower);
+        HfstTransducer * toupper = get_utils()->toupper(*retval, Lower, true);
+        HfstTransducer * tolower = get_utils()->tolower(*retval, Lower, true);
         retval->disjunct(*toupper);
         retval->disjunct(*tolower);
         delete toupper; delete tolower;
