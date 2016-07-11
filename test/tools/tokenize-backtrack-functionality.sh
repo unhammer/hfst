@@ -31,6 +31,16 @@ if ! diff test.strings $srcdir/tokenize-backtrack-out-gtd.strings ; then
     exit 1
 fi
 
+if ! echo "su. su" | $TOOLDIR/hfst-tokenize --gtd $srcdir/tokenize-backtrack.pmhfst > test.strings ; then
+    echo tokenize --gtd contiguous fail:
+    cat test.strings
+    exit 1
+fi
+if ! diff test.strings $srcdir/tokenize-backtrack-out-gtd-contiguous.strings ; then
+    echo diff test.strings $srcdir/tokenize-backtrack-out-gtd-contiguous.strings
+    exit 1
+fi
+
 
 rm test.strings tokenize-backtrack.pmhfst tokenize-backtrack.hfst tokenize-backtrack-gen.hfst
 exit 0

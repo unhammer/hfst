@@ -9,23 +9,29 @@ Multichar_Symbols
 @PMATCH_BACKTRACK@
 +ErrSpace
 %#
++Adv
++Prn
 
 LEXICON Root
 
-skuvla+N:skuvla ENDLEX;
-busse+N:busse ENDLEX;
-busset+V:busse ENDLEX;
-< {skuvla} "@PMATCH_BACKTRACK@":0 "@PMATCH_INPUT_MARK@":" " {busse} "+N":0 "+ErrSpace":0 > ENDLEX ;
+skuvla+N:skuvla #;
+busse+N:busse #;
+busset+V:busse #;
+< {skuvla} "@PMATCH_BACKTRACK@":0 "@PMATCH_INPUT_MARK@":" " {busse} "+N":0 "+ErrSpace":0 > # ;
 
-Jan+N+Prop:Jan ENDLEX;
-.+PUNCT:. ENDLEX;
+Jan+N+Prop:Jan #;
+.+PUNCT:. #;
 Jan DOTABBR;
+
+su+Prn:su #;
+su+Adv+Abbr:su DOTNOTAG;
+
 
 LEXICON DOTABBR
 ! This one should create a new backtrack-point before the dot, but *no* sub-reading:
-< "@PMATCH_BACKTRACK@":0 "@PMATCH_INPUT_MARK@":0 {.}   "+N":0 "+Abbr":0 > ENDLEX ;
+< "@PMATCH_BACKTRACK@":0 "@PMATCH_INPUT_MARK@":0 {.}   "+N":0 "+Abbr":0 > # ;
 ! This one should create a new backtrack-point before the dot, *as well as* a sub-reading:
-< "@PMATCH_BACKTRACK@":0 "@PMATCH_INPUT_MARK@":0 {.}:0 "+N":0 "+Abbr":0 "@PMATCH_INPUT_MARK@":0 {.} "+PUNCT":0 > ENDLEX ;
+< "@PMATCH_BACKTRACK@":0 "@PMATCH_INPUT_MARK@":0 {.}:0 "+N":0 "+Abbr":0 "@PMATCH_INPUT_MARK@":0 {.} "+PUNCT":0 > # ;
 
 ! Want:
 !"<Jan.>"
@@ -35,5 +41,8 @@ LEXICON DOTABBR
 !	"." PUNCT "<.>"
 !		"Jan" N Prop "<Jan>"
 
-LEXICON ENDLEX
-#;
+LEXICON DOTNOTAG
+! As the sub-reading-line of DOTABBR, but the two input-marks are right next to each other:
+< "@PMATCH_INPUT_MARK@":0 "@PMATCH_BACKTRACK@":0 "@PMATCH_INPUT_MARK@":0 {.} "+PUNCT":0 > # ;
+! TODO: This doesn't give the sub-reading, however; should it?
+!< "@PMATCH_BACKTRACK@":0 "@PMATCH_INPUT_MARK@":0 "@PMATCH_INPUT_MARK@":0 {.} "+PUNCT":0 > # ;
