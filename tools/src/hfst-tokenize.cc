@@ -67,6 +67,7 @@ static string wtag = "W"; // TODO: cg-conv has an argument --wtag, allow changin
 static double time_cutoff = 0.0;
 static int token_number = 1;
 static int max_weight_classes = std::numeric_limits<int>::max();
+static bool dedupe = false;
 std::string tokenizer_filename;
 static hfst::ImplementationType default_format = hfst::TROPICAL_OPENFST_TYPE;
 enum OutputFormat {
@@ -101,6 +102,7 @@ print_usage()
             "  -tS, --time-cutoff=S     Limit search after having used S seconds per input\n"
             "  -lN, --weight-classes=N  Output no more than N best weight classes\n"
             "                           (where analyses with equal weight constitute a class\n"
+            "  -u, --unique             Remove duplicate analyses\n"
             "  -z, --segment            Segmenting / tokenization mode (default)\n"
             "  -x, --xerox              Xerox output\n"
             "  -c, --cg                 Constraint Grammar output\n"
@@ -239,11 +241,52 @@ hfst_ol::PmatchContainer make_naive_tokenizer(HfstTransducer & dictionary)
     return retval;
 }
 
+bool location_compare(const Location& lhs, const Location& rhs) {
+    if (lhs.weight == rhs.weight) {
+        if(lhs.tag == rhs.tag) {
+            if(lhs.start == rhs.start){
+                if(lhs.length == rhs.length) {
+                    return lhs.output < rhs.output;
+                }
+                else {
+                    return lhs.length < rhs.length;
+                }
+            }
+            else {
+                return lhs.start < rhs.start;
+            }
+        }
+        else {
+            return lhs.tag < rhs.tag;
+        }
+    }
+    else {
+        return lhs.weight < rhs.weight;
+    }
+};
+
 /**
- * Keep only the N best weight classes
+ * Keep only the max_weight_classes best weight classes
  */
-const LocationVector keep_n_best_weight(const int N, LocationVector const & locations)
+const LocationVector dedupe_locations(LocationVector const & locations) {
+    if(!dedupe) {
+        return locations;
+    }
+    std::set<Location, bool(*)(const Location& lhs, const Location& rhs)> ls(&location_compare);
+    ls.insert(locations.begin(), locations.end());
+    LocationVector uniq;
+    std::copy(ls.begin(), ls.end(), std::back_inserter(uniq));
+    return uniq;
+}
+/**
+ * Keep only the max_weight_classes best weight classes
+ */
+const LocationVector keep_n_best_weight(LocationVector const & locations)
 {
+    if(locations.size() <= max_weight_classes) {
+        // We know we won't trim anything, no need to copy the vector:
+        return locations;
+    }
     int classes_found = -1;
     hfst_ol::Weight last_weight_class = 0.0;
     LocationVector goodweight;
@@ -264,7 +307,7 @@ const LocationVector keep_n_best_weight(const int N, LocationVector const & loca
             last_weight_class = current_weight;
             ++classes_found;
         }
-        if (classes_found > N)
+        if (classes_found > max_weight_classes)
         {
             break;
         }
@@ -531,7 +574,7 @@ void print_location_vector_gtd(hfst_ol::PmatchContainer & container,
                             || bt_it->at(0).input.length() != form.length()) {
                             continue;
                         }
-                        LocationVector loc = keep_n_best_weight(max_weight_classes, *bt_it);
+                        LocationVector loc = keep_n_best_weight(dedupe_locations(*bt_it));
                         for (LocationVector::const_iterator btloc_it = loc.begin();
                              btloc_it != loc.end(); ++btloc_it) {
                             if(!btloc_it->output.empty()
@@ -776,14 +819,9 @@ void match_and_print(hfst_ol::PmatchContainer & container,
             continue;
             // All nonmatching cases have been handled
         }
-        if(max_weight_classes < std::numeric_limits<int>::max()) {
-            print_location_vector(container,
-                                  keep_n_best_weight(max_weight_classes, *it),
-                                  outstream);
-        }
-        else {
-            print_location_vector(container, *it, outstream);
-        }
+        print_location_vector(container,
+                              keep_n_best_weight(dedupe_locations(*it)),
+                              outstream);
         ++token_number;
     }
     if (output_format == finnpos) {
@@ -845,6 +883,7 @@ int parse_options(int argc, char** argv)
                 {"tokenize-multichar", no_argument, 0, 'm'},
                 {"time-cutoff", required_argument, 0, 't'},
                 {"weight-classes", required_argument, 0, 'l'},
+                {"unique", required_argument, 0, 'u'},
                 {"segment", no_argument, 0, 'z'},
                 {"xerox", no_argument, 0, 'x'},
                 {"cg", no_argument, 0, 'c'},
@@ -854,7 +893,7 @@ int parse_options(int argc, char** argv)
                 {0,0,0,0}
             };
         int option_index = 0;
-        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nkawmt:l:zxcgCf",
+        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nkawmut:l:zxcgCf",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -889,6 +928,9 @@ int parse_options(int argc, char** argv)
                 return EXIT_FAILURE;
             }
             break;
+        case 'u':
+            dedupe = true;
+            break;
         case 'l':
             max_weight_classes = atoi(optarg);
             if (max_weight_classes < 1)
@@ -913,6 +955,7 @@ int parse_options(int argc, char** argv)
             output_format = gtd;
             print_weights = true;
             print_all = true;
+            dedupe = true;
             keep_newlines = true;
             blankline_separated = false;
             if(max_weight_classes == std::numeric_limits<int>::max()) {
