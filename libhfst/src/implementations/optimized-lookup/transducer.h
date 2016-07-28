@@ -771,8 +771,8 @@ private:
     
 public:
     OlLetterTrie():
-        letters(UCHAR_MAX, static_cast<OlLetterTrie*>(NULL)),
-        symbols(UCHAR_MAX,NO_SYMBOL_NUMBER)
+        letters(UCHAR_MAX+1, static_cast<OlLetterTrie*>(NULL)),
+        symbols(UCHAR_MAX+1,NO_SYMBOL_NUMBER)
         {}
 
     ~OlLetterTrie() {
