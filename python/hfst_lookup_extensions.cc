@@ -4,7 +4,7 @@ std::string one_level_paths_to_string(const hfst::HfstOneLevelPaths & paths)
 {
     std::ostringstream oss;
     for(hfst::HfstOneLevelPaths::const_iterator it = paths.begin(); it != paths.end(); it++)
-    {   
+    {
       for (hfst::StringVector::const_iterator svit = it->second.begin(); svit != it->second.end(); svit++)
       {
         oss << *svit;
@@ -18,8 +18,8 @@ hfst::HfstOneLevelPaths extract_output_side(const hfst::HfstTwoLevelPaths & path
 {
     hfst::HfstOneLevelPaths result;
     for(hfst::HfstTwoLevelPaths::const_iterator it = paths.begin(); it != paths.end(); it++)
-    {  
-      hfst::StringVector sv; 
+    {
+      hfst::StringVector sv;
       for (hfst::StringPairVector::const_iterator svit = it->second.begin(); svit != it->second.end(); svit++)
       {
         sv.push_back(svit->second);
@@ -33,7 +33,7 @@ std::string two_level_paths_to_string(const hfst::HfstTwoLevelPaths & paths)
 {
     std::ostringstream oss;
     for(hfst::HfstTwoLevelPaths::const_iterator it = paths.begin(); it != paths.end(); it++)
-    {   
+    {
       std::string input("");
       std::string output("");
       for (hfst::StringPairVector::const_iterator svit = it->second.begin(); svit != it->second.end(); svit++)
@@ -52,7 +52,7 @@ HfstOneLevelPaths lookup_vector(const hfst::HfstTransducer * tr, bool fd, const 
 {
   if (tr->get_type() == hfst::HFST_OL_TYPE || tr->get_type() == hfst::HFST_OLW_TYPE)
     {
-      if (fd) 
+      if (fd)
         { return *(tr->lookup_fd(s, limit, time_cutoff)); }
       else
         { return *(tr->lookup(s, limit, time_cutoff)); }
@@ -72,7 +72,7 @@ HfstOneLevelPaths lookup_string(const hfst::HfstTransducer * tr, bool fd, const 
 {
   if (tr->get_type() == hfst::HFST_OL_TYPE || tr->get_type() == hfst::HFST_OLW_TYPE)
     {
-      if (fd) 
+      if (fd)
         { return *(tr->lookup_fd(s, limit, time_cutoff)); }
       else
         { return *(tr->lookup(s, limit, time_cutoff)); }

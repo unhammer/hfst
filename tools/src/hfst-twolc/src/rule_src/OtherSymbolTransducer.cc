@@ -48,13 +48,13 @@ void OtherSymbolTransducer::define_diacritics
   OtherSymbolTransducer::diacritics.clear();
   OtherSymbolTransducer::diacritics.insert
     (diacritics.begin(),diacritics.end());
-  for (HandySet<std::string>::iterator it = 
+  for (HandySet<std::string>::iterator it =
      OtherSymbolTransducer::diacritics.begin();
        it != OtherSymbolTransducer::diacritics.end();
        ++it)
-    { 
-      symbol_pairs.erase(SymbolPair(*it,*it)); 
-      symbol_pairs.erase(SymbolPair(*it,TWOLC_EPSILON)); 
+    {
+      symbol_pairs.erase(SymbolPair(*it,*it));
+      symbol_pairs.erase(SymbolPair(*it,TWOLC_EPSILON));
       input_symbols.erase(*it);
       output_symbols.erase(*it);
     }
@@ -75,7 +75,7 @@ OtherSymbolTransducer OtherSymbolTransducer::get_universal(void)
       if (it->first == TWOLC_DIAMOND)
     { continue; }
       fst.add_transition(0,HfstBasicTransition
-             (target,it->first,it->second,0.0)); 
+             (target,it->first,it->second,0.0));
     }
   universal.transducer = HfstTransducer(fst,transducer_type);
   return universal;
@@ -94,14 +94,14 @@ OtherSymbolTransducer::OtherSymbolTransducer
 (const std::string &i_symbol,const std::string &o_symbol):
   is_broken(false),
   transducer(transducer_type)
-{ 
+{
   std::string input_symbol = i_symbol;
   std::string output_symbol = o_symbol;
 
   input_symbol = (input_symbol == TWOLC_UNKNOWN ? HFST_UNKNOWN : input_symbol);
   output_symbol = (output_symbol == TWOLC_UNKNOWN ? HFST_UNKNOWN : output_symbol);
 
-  check_pair(input_symbol,output_symbol); 
+  check_pair(input_symbol,output_symbol);
   if (is_broken)
     { return; }
   if (input_symbol == HFST_UNKNOWN && output_symbol == HFST_UNKNOWN)
@@ -114,7 +114,7 @@ OtherSymbolTransducer::OtherSymbolTransducer
       
       if (input_symbol == HFST_UNKNOWN)
     {
-      for (HandySet<std::string>::const_iterator it = 
+      for (HandySet<std::string>::const_iterator it =
          input_symbols.begin();
            it != input_symbols.end();
            ++it)
@@ -125,8 +125,8 @@ OtherSymbolTransducer::OtherSymbolTransducer
         }
     }
       else if (output_symbol == HFST_UNKNOWN)
-    { 
-      for (HandySet<std::string>::const_iterator it = 
+    {
+      for (HandySet<std::string>::const_iterator it =
          output_symbols.begin();
            it != output_symbols.end();
            ++it)
@@ -146,7 +146,7 @@ OtherSymbolTransducer::OtherSymbolTransducer
 OtherSymbolTransducer::OtherSymbolTransducer(const std::string &sym):
   is_broken(false),
   transducer(transducer_type)
-{ 
+{
   std::string symbol = sym;
 
   symbol = (symbol == TWOLC_UNKNOWN ? HFST_UNKNOWN : symbol);
@@ -178,11 +178,11 @@ OtherSymbolTransducer &OtherSymbolTransducer::harmonize_diacritics
 (OtherSymbolTransducer &t)
 {
   HfstBasicTransducer basic(transducer);
-  std::set<std::string> alphabet = 
+  std::set<std::string> alphabet =
     basic.get_alphabet();
 
   HfstBasicTransducer basic_t(t.transducer);
-  std::set<std::string> t_alphabet = 
+  std::set<std::string> t_alphabet =
     basic_t.get_alphabet();
 
   HandySet<std::string> missing_diacritics;
@@ -203,7 +203,7 @@ OtherSymbolTransducer &OtherSymbolTransducer::harmonize_diacritics
        it != basic.end();
        ++it)
     {
-     for (HfstBasicTransducer::HfstTransitions::const_iterator jt 
+     for (HfstBasicTransducer::HfstTransitions::const_iterator jt
         = it->begin();
       jt != it->end();
       ++jt)
@@ -212,7 +212,7 @@ OtherSymbolTransducer &OtherSymbolTransducer::harmonize_diacritics
         {
           HfstState target = jt->get_target_state();
           
-          for (HandySet<std::string>::iterator kt = 
+          for (HandySet<std::string>::iterator kt =
              missing_diacritics.begin();
            kt != missing_diacritics.end();
            ++kt)
@@ -290,12 +290,12 @@ void OtherSymbolTransducer::check_pair(const std::string &input_symbol,
     { is_broken = false; }
   // other:X is valid, iff X is an output symbol or 0.
   else if (input_symbol == HFST_UNKNOWN)
-    { is_broken = ! (output_symbol == TWOLC_EPSILON || 
-               output_symbols.has_element(output_symbol)); } 
+    { is_broken = ! (output_symbol == TWOLC_EPSILON ||
+               output_symbols.has_element(output_symbol)); }
   // X:other is valid, iff X is an input symbol or 0.
   else if (output_symbol == HFST_UNKNOWN)
-    { is_broken = ! (input_symbol == TWOLC_EPSILON || 
-               input_symbols.has_element(input_symbol)); } 
+    { is_broken = ! (input_symbol == TWOLC_EPSILON ||
+               input_symbols.has_element(input_symbol)); }
   // 0:X is valid, iff X is an output symbol.
   else if (input_symbol == TWOLC_EPSILON)
     { is_broken = ! output_symbols.has_element(output_symbol); }
@@ -303,12 +303,12 @@ void OtherSymbolTransducer::check_pair(const std::string &input_symbol,
   else if (output_symbol == TWOLC_EPSILON)
     { is_broken = ! input_symbols.has_element(input_symbol); }
   // X:X is valid if X is a diacritic.
-  else if (diacritics.has_element(input_symbol) /*and 
+  else if (diacritics.has_element(input_symbol) /*and
                           input_symbol == output_symbol*/)
     { is_broken = false; }
-  // X:Y is valid iff it has been declared in the alphabet.  
+  // X:Y is valid iff it has been declared in the alphabet.
   else
-    { is_broken = 
+    { is_broken =
     ! symbol_pairs.has_element(SymbolPair(input_symbol,output_symbol)); }
   if (is_broken)
     { std::cerr << "Unknown pair: "
@@ -317,29 +317,29 @@ void OtherSymbolTransducer::check_pair(const std::string &input_symbol,
 
 OtherSymbolTransducer &OtherSymbolTransducer::operator=
 (const OtherSymbolTransducer &another)
-{ 
+{
   if (&another == this)
     { return *this; }
   is_broken = another.is_broken;
-  transducer = another.transducer; 
+  transducer = another.transducer;
   return *this;
 }
 
 OtherSymbolTransducer &OtherSymbolTransducer::apply
 (HfstTransducerZeroArgMember p)
-{ 
+{
   if (symbol_pairs.empty())
     { throw EmptySymbolPairSet(); }
   if (is_broken)
     { throw UndefinedSymbolPairsFound(); }
-  transducer = CALL_MEMBER_FN(transducer,p)(); 
-  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)(); 
+  transducer = CALL_MEMBER_FN(transducer,p)();
+  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)();
   return *this;
 }
 
 OtherSymbolTransducer &OtherSymbolTransducer::apply
 (const HfstTransducerOneArgMember p,const OtherSymbolTransducer &another)
-{ 
+{
   if (symbol_pairs.empty())
     { throw EmptySymbolPairSet(); }
   if (is_broken)
@@ -352,14 +352,14 @@ OtherSymbolTransducer &OtherSymbolTransducer::apply
       harmonize_diacritics(another_copy);
       another_copy.harmonize_diacritics(*this);
     }
-  transducer = CALL_MEMBER_FN(transducer,p)(another_copy.transducer); 
-  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)(); 
+  transducer = CALL_MEMBER_FN(transducer,p)(another_copy.transducer);
+  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)();
   return *this;
 }
 
 OtherSymbolTransducer &OtherSymbolTransducer::apply
 (const HfstTransducerBoolArgMember p,const OtherSymbolTransducer &another)
-{ 
+{
   if (symbol_pairs.empty())
     { throw EmptySymbolPairSet(); }
   if (is_broken)
@@ -372,15 +372,15 @@ OtherSymbolTransducer &OtherSymbolTransducer::apply
       harmonize_diacritics(another_copy);
       another_copy.harmonize_diacritics(*this);
     }
-  transducer = CALL_MEMBER_FN(transducer,p)(another_copy.transducer, true); 
-  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)(); 
+  transducer = CALL_MEMBER_FN(transducer,p)(another_copy.transducer, true);
+  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)();
   return *this;
 }
 
 bool OtherSymbolTransducer::apply
 (const HfstTransducerOneArgMemberBool p,const OtherSymbolTransducer &another)
 const
-{ 
+{
   if (symbol_pairs.empty())
     { throw EmptySymbolPairSet(); }
   if (is_broken)
@@ -389,59 +389,59 @@ const
     { throw UndefinedSymbolPairsFound(); }
   OtherSymbolTransducer copy(*this);
   OtherSymbolTransducer another_copy(another);
-  return CALL_MEMBER_FN(copy.transducer,p)(another_copy.transducer); 
+  return CALL_MEMBER_FN(copy.transducer,p)(another_copy.transducer);
 }
 
 OtherSymbolTransducer &OtherSymbolTransducer::apply
 (const HfstTransducerOneNumArgMember p,unsigned int num)
-{ 
+{
   if (symbol_pairs.empty())
     { throw EmptySymbolPairSet(); }
   if (is_broken)
     { throw UndefinedSymbolPairsFound(); }
-  transducer = CALL_MEMBER_FN(transducer,p)(num); 
-  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)(); 
+  transducer = CALL_MEMBER_FN(transducer,p)(num);
+  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)();
   return *this;
 }
 
 OtherSymbolTransducer &OtherSymbolTransducer::apply
 (const HfstTransducerTwoNumArgMember p,unsigned int num1,unsigned int num2)
-{ 
+{
   if (symbol_pairs.empty())
     { throw EmptySymbolPairSet(); }
   if (is_broken)
     { throw UndefinedSymbolPairsFound(); }
-  transducer = CALL_MEMBER_FN(transducer,p)(num1,num2); 
-  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)(); 
+  transducer = CALL_MEMBER_FN(transducer,p)(num1,num2);
+  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)();
   return *this;
 }
 
 OtherSymbolTransducer &OtherSymbolTransducer::apply
 (const HfstTransducerOneSymbolPairArgMember p,const SymbolPair &pair)
-{ 
+{
   if (symbol_pairs.empty())
     { throw EmptySymbolPairSet(); }
   if (is_broken)
     { throw UndefinedSymbolPairsFound(); }
-  transducer = CALL_MEMBER_FN(transducer,p)(pair); 
-  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)(); 
+  transducer = CALL_MEMBER_FN(transducer,p)(pair);
+  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)();
   return *this;
 }
 
 OtherSymbolTransducer &OtherSymbolTransducer::apply
 (const HfstTransducerOneSymbolPairBoolArgMember p,const SymbolPair &pair, bool b)
-{ 
+{
   if (symbol_pairs.empty())
     { throw EmptySymbolPairSet(); }
   if (is_broken)
     { throw UndefinedSymbolPairsFound(); }
-  transducer = CALL_MEMBER_FN(transducer,p)(pair,b); 
-  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)(); 
+  transducer = CALL_MEMBER_FN(transducer,p)(pair,b);
+  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)();
   return *this;
 }
 
 OtherSymbolTransducer &OtherSymbolTransducer::apply
-(const HfstTransducerSubstMember p,const std::string &str1, 
+(const HfstTransducerSubstMember p,const std::string &str1,
  const std::string &str2, bool b1, bool b2)
 {
   if (symbol_pairs.empty())
@@ -449,12 +449,12 @@ OtherSymbolTransducer &OtherSymbolTransducer::apply
   if (is_broken)
     { throw UndefinedSymbolPairsFound(); }
   transducer = CALL_MEMBER_FN(transducer,p)(str1,str2,b1,b2);
-  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)(); 
+  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)();
   return *this;
 }
 
 OtherSymbolTransducer &OtherSymbolTransducer::apply
-(const HfstTransducerSubstPairMember p,const SymbolPair &p1, 
+(const HfstTransducerSubstPairMember p,const SymbolPair &p1,
  const SymbolPair &p2)
 {
   if (symbol_pairs.empty())
@@ -462,12 +462,12 @@ OtherSymbolTransducer &OtherSymbolTransducer::apply
   if (is_broken)
     { throw UndefinedSymbolPairsFound(); }
   transducer = CALL_MEMBER_FN(transducer,p)(p1,p2);
-  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)(); 
+  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)();
   return *this;
 }
 
 OtherSymbolTransducer &OtherSymbolTransducer::apply
-(const HfstTransducerSubstPairFstMember p,const SymbolPair &p1, 
+(const HfstTransducerSubstPairFstMember p,const SymbolPair &p1,
  const OtherSymbolTransducer &t, bool b)
 {
   if (symbol_pairs.empty())
@@ -477,7 +477,7 @@ OtherSymbolTransducer &OtherSymbolTransducer::apply
 
   OtherSymbolTransducer t_copy(t);
   transducer = CALL_MEMBER_FN(transducer,p)(p1,t_copy.transducer,b);
-  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)(); 
+  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)();
   return *this;
 }
 
@@ -489,9 +489,9 @@ void OtherSymbolTransducer::add_transition
 
 bool OtherSymbolTransducer::has_symbol
 (const HfstBasicTransducer &t,const std::string &sym)
-{ 
+{
   const std::set<std::string> &s = t.get_alphabet();
-  return s.find(sym) != s.end(); 
+  return s.find(sym) != s.end();
 }
 
 void OtherSymbolTransducer::set_final
@@ -520,49 +520,49 @@ OtherSymbolTransducer OtherSymbolTransducer::get_inverse_of_upper_projection
   HfstBasicTransducer new_fst;
 
   HfstState state=0;
-  for (HfstBasicTransducer::const_iterator it = fst.begin(); 
-       it != fst.end(); 
+  for (HfstBasicTransducer::const_iterator it = fst.begin();
+       it != fst.end();
        ++it)
     {
       new_fst.add_state(state);
       if (fst.is_final_state(state))
     { new_fst.set_final_weight(state,fst.get_final_weight(state)); }
-      for (HfstBasicTransducer::HfstTransitions::const_iterator jt 
+      for (HfstBasicTransducer::HfstTransitions::const_iterator jt
          = it->begin();
        jt != it->end();
        ++jt)
     {
       HfstBasicTransition arc = *jt;
       std::string input = arc.get_transition_data().get_input_symbol();
-      std::string output = arc.get_transition_data().get_output_symbol(); 
+      std::string output = arc.get_transition_data().get_output_symbol();
       HfstState target = arc.get_target_state();
       if (input == HFST_UNKNOWN)
         {
-          add_transition(new_fst,state,target,HFST_UNKNOWN,HFST_UNKNOWN);    
-          for (HandySet<std::string>::const_iterator kt = 
+          add_transition(new_fst,state,target,HFST_UNKNOWN,HFST_UNKNOWN);
+          for (HandySet<std::string>::const_iterator kt =
              output_symbols.begin();
            kt != output_symbols.end(); ++kt)
-        { 
+        {
           if (has_symbol(fst,*kt))
             { add_transition(new_fst,state,target,HFST_UNKNOWN,*kt); }
-        }     
+        }
         }
       else
         {
           HfstBasicTransition arc = *jt;
           add_transition
-        (new_fst,state,arc.get_target_state(),input,output);    
-          for (HandySet<SymbolPair>::const_iterator kt = 
+        (new_fst,state,arc.get_target_state(),input,output);
+          for (HandySet<SymbolPair>::const_iterator kt =
              symbol_pairs.begin();
            kt != symbol_pairs.end(); ++kt)
         {
           if (kt->first == input && has_symbol(fst,kt->second))
             { add_transition(new_fst,state,target,input,kt->second); }
-        }     
+        }
           if (input == TWOLC_EPSILON)
-        { 
-          add_transition(new_fst,state,target,HFST_EPSILON,HFST_EPSILON); 
-          add_transition(new_fst,state,target,TWOLC_EPSILON,HFST_UNKNOWN); 
+        {
+          add_transition(new_fst,state,target,HFST_EPSILON,HFST_EPSILON);
+          add_transition(new_fst,state,target,TWOLC_EPSILON,HFST_UNKNOWN);
         }
           else if (input != TWOLC_DIAMOND)
         { add_transition(new_fst,state,target,input,HFST_UNKNOWN); }
@@ -620,12 +620,12 @@ OtherSymbolTransducer &OtherSymbolTransducer::term_complemented(void)
 }
 
 HfstTransducer OtherSymbolTransducer::get_transducer(void) const
-{ 
-#ifndef TEST_OTHER_SYMBOL_TRANSDUCER  
+{
+#ifndef TEST_OTHER_SYMBOL_TRANSDUCER
   if (is_broken)
     { throw UndefinedSymbolPairsFound(); }
 #endif
-  return transducer; 
+  return transducer;
 }
 
 void OtherSymbolTransducer::get_initial_transition_pairs
@@ -636,13 +636,13 @@ void OtherSymbolTransducer::get_initial_transition_pairs
 
   HfstBasicTransducer fst(this->transducer);
   HfstBasicTransducer::const_iterator start_state_it = fst.begin();
-  for (HfstBasicTransducer::HfstTransitions::const_iterator jt 
+  for (HfstBasicTransducer::HfstTransitions::const_iterator jt
      = start_state_it->begin();
        jt != start_state_it->end();
        ++jt)
     {
       std::string input = jt->get_transition_data().get_input_symbol();
-      std::string output = jt->get_transition_data().get_output_symbol(); 
+      std::string output = jt->get_transition_data().get_output_symbol();
       pair_container.push_back(SymbolPair(input,output));
     }
 }
@@ -660,7 +660,7 @@ bool have_common_string(HfstState state1,HfstState state2,
   const HfstBasicTransducer::HfstTransitions &fst2_transitions = fst2[state2];
 
   HandyMap<SymbolPair,HfstState> fst1_transition_map;
-  for (HfstBasicTransducer::HfstTransitions::const_iterator it = 
+  for (HfstBasicTransducer::HfstTransitions::const_iterator it =
      fst1_transitions.begin();
        it != fst1_transitions.end();
        ++it)
@@ -668,7 +668,7 @@ bool have_common_string(HfstState state1,HfstState state2,
                      it->get_output_symbol())] =
     it->get_target_state(); }
 
-  for (HfstBasicTransducer::HfstTransitions::const_iterator it = 
+  for (HfstBasicTransducer::HfstTransitions::const_iterator it =
      fst2_transitions.begin();
        it != fst2_transitions.end();
        ++it)
@@ -716,10 +716,10 @@ bool OtherSymbolTransducer::is_subset(const OtherSymbolTransducer &another)
 bool OtherSymbolTransducer::empty(const HfstBasicTransducer &fsm)
 {
   HfstState state=0;
-  for (HfstBasicTransducer::const_iterator it = fsm.begin(); 
-       it != fsm.end(); 
+  for (HfstBasicTransducer::const_iterator it = fsm.begin();
+       it != fsm.end();
        ++it)
-    { 
+    {
       if (fsm.is_final_state(state))
     { return false; }
       state++;
@@ -741,24 +741,24 @@ int main(void)
 {
 bool have_openfst = false;
 #if HAVE_OPENFST
-  have_openfst = true; 
+  have_openfst = true;
 #endif // HAVE_OPENFST
 
 bool have_sfst = false;
 #if HAVE_SFST
-  have_sfst = true; 
+  have_sfst = true;
 #endif // HAVE_SFST
 
 bool have_foma = false;
 #if HAVE_FOMA
-  have_foma = true; 
+  have_foma = true;
 #endif // HAVE_FOMA
 
 
-ImplementationType transducer_type 
-= (have_openfst ? hfst::TROPICAL_OPENFST_TYPE : 
+ImplementationType transducer_type
+= (have_openfst ? hfst::TROPICAL_OPENFST_TYPE :
   have_sfst ? hfst::SFST_TYPE :
-  have_foma ? hfst::FOMA_TYPE : 
+  have_foma ? hfst::FOMA_TYPE :
    hfst::ERROR_TYPE);
 
  OtherSymbolTransducer::set_transducer_type(transducer_type);

@@ -2,13 +2,13 @@
 
 %{
 
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 #include <string.h>
@@ -29,7 +29,7 @@
 
 // These variablese are used when scanning a regex for a given SYMBOL
 // when performing variable substitution in function definition.
-namespace hfst { 
+namespace hfst {
   namespace xre {
     extern unsigned int cr; // number of characters read
     extern std::set<unsigned int> positions; // positions of a given SYMBOL
@@ -63,7 +63,7 @@ EC "%"{U8C}
 /* any ASCII */
 A7 [\x00-\x7e]
 /* special meaning in xre testing " */
-A7RESTRICTED [- |<>%!,^:";@0~\\&?$+*/_(){}\]\[-] 
+A7RESTRICTED [- |<>%!,^:";@0~\\&?$+*/_(){}\]\[-]
 /* non-restricted ASCII testing " */
 A7UNRESTRICTED [\x21-\x7e]{-}[- |<>%!,^:";@0~\\&?$+*/_(){}\]\[-]
 
@@ -148,7 +148,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 
 "\\\\\\" { CR; return LEFT_QUOTIENT; }
 
-"^"{WSP}*({UINTEGER}|"0")","({UINTEGER}|"0") { 
+"^"{WSP}*({UINTEGER}|"0")","({UINTEGER}|"0") {
     CR;
     yylval->values = hfst::xre::get_n_to_k(yytext);
     return CATENATE_N_TO_K;
@@ -160,19 +160,19 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     return CATENATE_N_TO_K;
 }
 
-"^>"{WSP}*({UINTEGER}|"0") { 
+"^>"{WSP}*({UINTEGER}|"0") {
     CR;
     yylval->value = strtol(yytext + 2, 0, 10);
-    return CATENATE_N_PLUS; 
+    return CATENATE_N_PLUS;
 }
 
-"^<"{WSP}*({UINTEGER}|"0") { 
+"^<"{WSP}*({UINTEGER}|"0") {
     CR;
     yylval->value = strtol(yytext + 2, 0, 10);
     return CATENATE_N_MINUS;
 }
 
-"^"{WSP}*({UINTEGER}|"0")                  { 
+"^"{WSP}*({UINTEGER}|"0")                  {
     CR;
     yylval->value = strtol(yytext + 1, 0, 10);
     return CATENATE_N;
@@ -183,7 +183,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 ".u" { CR; return XRE_UPPER; }
 ".l" { CR; return XRE_LOWER; }
 
-"@bin\""[^""]+"\""|"@\""[^""]+"\"" { 
+"@bin\""[^""]+"\""|"@\""[^""]+"\"" {
     CR;
     yylval->label = hfst::xre::get_quoted(yytext);
     return READ_BIN;
@@ -226,7 +226,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 ":" { CR; return PAIR_SEPARATOR; }
 
 "::"{WEIGHT} {
-    CR; 
+    CR;
     yylval->weight = hfst::xre::get_weight(yytext + 2);
     return WEIGHT;
 }
@@ -255,7 +255,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     yylval->label = hfst::xre::strip_percents(yytext);
     CR;
     return SYMBOL;
-}  
+}
 
 {NAME_CH}({NAME_CH}|"0")* {
     if (hfst::xre::position_symbol != NULL) {
@@ -266,7 +266,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     yylval->label = hfst::xre::strip_percents(yytext);
     CR;
     return SYMBOL;
-}  
+}
 
 {NAME_CH}({NAME_CH}|"0")*"(" {
     CR;
@@ -280,8 +280,8 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     return FUNCTION_NAME;
 }
 
-";" { 
-    CR; 
+";" {
+    CR;
     return END_OF_EXPRESSION;
 }
 
@@ -291,8 +291,8 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 
 ("!"|"#")[^\n]* { CR; /* fprintf(stderr, "ignoring comment '%s'..\n", yytext); */ /* ignore comments */ }
 
-. { 
-    CR; 
+. {
+    CR;
     return LEXER_ERROR;
 }
 

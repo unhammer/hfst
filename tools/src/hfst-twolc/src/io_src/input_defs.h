@@ -42,6 +42,6 @@ result = YY_NULL; \
 buf[0] = c; \
 result = 1; \
 } \
-} 
+}
 
 #endif // INPUT_DEFS_H

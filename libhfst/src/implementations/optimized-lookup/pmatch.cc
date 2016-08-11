@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 #include "pmatch.h"
 #include "hfst.h"
@@ -1230,7 +1230,7 @@ void PmatchTransducer::collect_first_epsilon_index(TransitionTableIndex i,
     if (index_table[i].get_input_symbol() == 0) {
         collect_first_epsilon(
             index_table[i].get_target() - TRANSITION_TARGET_TABLE_START,
-            input_symbols, seen_indices);                                
+            input_symbols, seen_indices);
     }
 }
 
@@ -1546,7 +1546,7 @@ void PmatchTransducer::note_analysis(unsigned int input_pos,
         std::cerr << "\n\tline " << container->line_number << ": conflicting equally weighted matches found, keeping:\n\t"
                   << alphabet.stringify(rtn_stack.top().best_result) << std::endl
                   << "\tdiscarding:\n\t"
-                  << alphabet.stringify(discarded) << std::endl << std::endl; 
+                  << alphabet.stringify(discarded) << std::endl << std::endl;
     }
 }
 

@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 #ifndef _CONVERT_TRANSDUCER_H_
@@ -22,7 +22,7 @@
 #if HAVE_OPENFST
 #ifdef _MSC_VER
 #include "back-ends/openfstwin/src/include/fst/fstlib.h"
-#else 
+#else
 #include "back-ends/openfst/src/include/fst/fstlib.h"
 #endif // _MSC_VER
 #endif // HAVE_OPENFST
@@ -59,10 +59,10 @@ struct fsm;
 #include "../HfstDataTypes.h"
 
 /** @file ConvertTransducerFormat.h
-    \brief Declarations of functions for converting between 
+    \brief Declarations of functions for converting between
     transducer backend formats. */
 
-namespace hfst { 
+namespace hfst {
 
 namespace implementations {
 
@@ -98,8 +98,8 @@ namespace implementations {
        If \a str is not found, add it to the next free index. */
     static unsigned int get_number(const std::string &str);
 
-    /* Get a vector that tells how a transducer that follows 
-       the number-to-symbol encoding of \a coding should be harmonized so that 
+    /* Get a vector that tells how a transducer that follows
+       the number-to-symbol encoding of \a coding should be harmonized so that
        it will follow the one of number_to_string_vector. */
     static NumberVector get_harmonization_vector
       (const StringVector &coding_vector);
@@ -109,7 +109,7 @@ namespace implementations {
 
 #if HAVE_SFST
   static void sfst_to_hfst_basic_transducer
-    ( SFST::Node *node, 
+    ( SFST::Node *node,
       HfstBasicTransducer *net,
       std::vector<unsigned int> &harmonization_vector);
 
@@ -120,7 +120,7 @@ namespace implementations {
     (const HfstBasicTransducer * t);
 
   /*  static void sfst_to_hfst_fast_transducer
-    ( SFST::Node *node, 
+    ( SFST::Node *node,
       HfstFastTransducer *net, NumberVector &harmonization_vector);
 
   static HfstFastTransducer * sfst_to_hfst_fast_transducer
@@ -130,7 +130,7 @@ namespace implementations {
     (const HfstFastTransducer * t);
 
   static void sfst_to_hfst_constant_transducer
-    ( SFST::Node *node, 
+    ( SFST::Node *node,
       HfstConstantTransducer *net);
 
   static HfstConstantTransducer * sfst_to_hfst_constant_transducer
@@ -170,7 +170,7 @@ namespace implementations {
     (fst::StdVectorFst * t, bool has_hfst_header=true);
   
   static StateId hfst_state_to_state_id
-    (HfstState s, std::map<HfstState, StateId> &state_map, 
+    (HfstState s, std::map<HfstState, StateId> &state_map,
      fst::StdVectorFst * t);
 
   static fst::StdVectorFst * hfst_basic_transducer_to_tropical_ofst
@@ -196,7 +196,7 @@ namespace implementations {
     (LogFst * t, bool had_hfst_header=true);
   
   static StateId hfst_state_to_state_id
-    (HfstState s, std::map<HfstState, StateId> &state_map, 
+    (HfstState s, std::map<HfstState, StateId> &state_map,
      LogFst * t);
 
   static LogFst * hfst_basic_transducer_to_log_ofst
@@ -218,7 +218,7 @@ namespace implementations {
 
 #endif
 
-#endif // HAVE_OPENFST 
+#endif // HAVE_OPENFST
   
   
   static HfstBasicTransducer * hfst_ol_to_hfst_basic_transducer
@@ -234,14 +234,14 @@ namespace implementations {
   // And the reverse
   static hfst_ol::Transducer * hfst_transducer_to_hfst_ol(HfstTransducer * t);
 
-  /* Define here the functions that convert between HfstBasicTransducer and 
+  /* Define here the functions that convert between HfstBasicTransducer and
      your transducer class. */
   //#if HAVE_MY_TRANSDUCER_LIBRARY
-  //static HfstBasicTransducer * 
+  //static HfstBasicTransducer *
   //  my_transducer_library_transducer_to_hfst_basic_transducer
   //    (my_namespace::MyFst * t);
   //
-  //static my_namespace::MyFst * 
+  //static my_namespace::MyFst *
   //  hfst_basic_transducer_to_my_transducer_library_transducer
   //    (const HfstBasicTransducer * t);
   //#endif // HAVE_MY_TRANSDUCER_LIBRARY
@@ -251,7 +251,7 @@ namespace implementations {
   
   };
 
-    // Initialization of static members in class 
+    // Initialization of static members in class
     // ConvertTransducerFormat..
     class StringVectorInitializer {
     public:

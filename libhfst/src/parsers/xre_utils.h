@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 /**
@@ -71,7 +71,7 @@ int* get_n_to_k(const char* s);
 
 double get_weight(const char* s);
  
-/** 
+/**
  * @brief If \a s is of form "<foo>", free \a s and return an escaped version
  * of it: "@_<foo>_@". Else, return \a s.
  */
@@ -103,7 +103,7 @@ HfstTransducer* compile_first(const std::string& xre,
                               hfst::ImplementationType type,
                               unsigned int & chars_read);
 
-/** 
+/**
  * @brief For a single-transition transducer, if the transition symbol is a name for
  * transducer definition, expand the transition into the corresponding transducer.
  */

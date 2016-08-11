@@ -72,7 +72,7 @@ int main(void)
   size_t counter = 1;
   InputReader ir1(counter);
   try
-    { 
+    {
       ir1.input();
       assert(false);
     }

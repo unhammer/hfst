@@ -1,4 +1,4 @@
-namespace hfst 
+namespace hfst
 {
 
   bool parse_prolog_network_line(const std::string & line, hfst::implementations::HfstBasicTransducer * graph)

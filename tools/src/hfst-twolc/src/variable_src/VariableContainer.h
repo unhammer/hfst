@@ -27,7 +27,7 @@
 #include "VariableContainerBase.h"
 
 //! @brief Generic container-type for subsets of rule variables.
-template<class T, class IT> class VariableContainer : 
+template<class T, class IT> class VariableContainer :
 public VariableContainerBase<T>
 {
  public:

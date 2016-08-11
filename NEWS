@@ -128,10 +128,10 @@ Noteworthy changes in 3.8.1
   * now hfst-lexc has options --withFlags, --minimizeFlags and --renameFlags to control
     hyperminimization
 
-  * hfst-xfst has corresponding variables --lexc-with-flags, --lexc-minimize-flags and 
+  * hfst-xfst has corresponding variables --lexc-with-flags, --lexc-minimize-flags and
     --lexc-rename-flags
 
-  * hfst-xfst has variable xerox-composition (default ON) and hfst-lexc option 
+  * hfst-xfst has variable xerox-composition (default ON) and hfst-lexc option
     --xerox-composition (default ON) to control if flags are matched with unknowns and
     identities in composition (as Xerox does)
  
@@ -158,7 +158,7 @@ Noteworthy changes in 3.8.1
 Noteworthy changes in 3.7.1
 ---------------------------
 
-* same mappings with different weights are now handled right in 
+* same mappings with different weights are now handled right in
   parallel replace rules.
 
 * improvements to optimized lookup format
@@ -175,7 +175,7 @@ Noteworthy changes in 3.7.0
 
 * bugfixes to handling of optimized lookup transducers
 
-* support for weighted containment operator 
+* support for weighted containment operator
 
 * tentatively added option and variable 'encode-weights' to regexp
   and xfst parsers to control determinization of weighted transducers,
@@ -243,7 +243,7 @@ Noteworthy changes in 3.5.0
 
 * changes to other tools
 
-  * added support for weights in prolog format, also added an option 
+  * added support for weights in prolog format, also added an option
     --prolog to hfst-fst2txt
 
   * added option --eliminate-flags to hfst-compare
@@ -325,7 +325,7 @@ Noteworthy changes in 3.4.2
 
 * A bug in including zlib in foma fixed.
 
-* Now ncurses library is used instead if termcap is not found when 
+* Now ncurses library is used instead if termcap is not found when
   building hfst-xfst.
 
 
@@ -358,13 +358,13 @@ Noteworthy changes in 3.4.0
 Noteworthy changes in 3.3.15
 ----------------------------
 
-* Small bugs fixed in function insert_freely, flag diacritic handling 
+* Small bugs fixed in function insert_freely, flag diacritic handling
   as well as lexc and pmatch tools
 
 * GNU and bash dependencies removed from scripts to make them more portable
 
 * The epsilon symbol argument in HfstTransducer(FILE*, ...) is made obligatory,
-  also a new obligatory argument added that keeps track of the line number 
+  also a new obligatory argument added that keeps track of the line number
   in the AT&T file
 
 
@@ -413,7 +413,7 @@ Noteworthy changes in 3.3.11
 
 * Containment and term negation added to regexp parser
 
-* Composing intersection supports identity symbols and 
+* Composing intersection supports identity symbols and
   inverting the composition
 
 * Introduction of semifunctional pmatch2fst parser
@@ -433,7 +433,7 @@ Noteworthy changes in 3.3.10
 * hfst-summarize prints at the end how many transducers it has
   read in total, making it easier to work with transducer archives
 
-* hfst-fst2strings bug fixed, now it prints weights with 
+* hfst-fst2strings bug fixed, now it prints weights with
   options --random -w
 
 Noteworthy changes in 3.3.9
@@ -443,7 +443,7 @@ Noteworthy changes in 3.3.9
 
 * Xfst rules tentatively supported in hfst-regexp2fst
 
-* hfst-fst2strings does not produce duplicate paths any more 
+* hfst-fst2strings does not produce duplicate paths any more
   when using foma as backend
 
 * hfst-lexc implementation format defaults to openfst-tropical
@@ -514,7 +514,7 @@ Noteworthy changes in 3.3.1
 
 * More examples in fsmbook-examples included in tests.
 
-* Extra files created during tests as well as generated autotools files 
+* Extra files created during tests as well as generated autotools files
   are now ignored by svn.
 
 Noteworthy changes in 3.3.0
@@ -608,7 +608,7 @@ Noteworthy changes in 3.0
 * optimized-lookup backend supported in library
 
   * dropped special tools for optimised handling since optimised lookup is
-    included in library: hfst-optimised-lookup -> hfst-lookup; 
+    included in library: hfst-optimised-lookup -> hfst-lookup;
     hfst-lookup-optimize -> hfst-fst2fst
 
 * hfst-proc tool to emulate lt-proc, cg-proc
@@ -675,7 +675,7 @@ Noteworthy changes in release 2.3
 Noteworthy changes in release 2.2
 ---------------------------------
 
-* Bug fixes in intersecting composition,  is_subset, negation, 
+* Bug fixes in intersecting composition,  is_subset, negation,
 
 * Handling of flag diacritics included in lookup
 

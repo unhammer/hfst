@@ -126,7 +126,7 @@ void escape_print(FILE *stream, char* string) {
     if (strchr(string, '"') != NULL) {
 	for (i = 0; *(string+i) != '\0'; i++) {
 	    if (*(string+i) == '"') {
-		fprintf(stream, "\\\""); 
+		fprintf(stream, "\\\"");
 	    } else {
 		fputc(*(string+i), stream);
 	    }
@@ -183,10 +183,10 @@ int foma_write_prolog (struct fsm *net, char *filename) {
       instring = sigma_string(i, net->sigma);
       if (strcmp(instring,"0") == 0) {
 	  instring = "%0";
-      } 
+      }
       fprintf(out, "symbol(%s, \"", identifier);
       escape_print(out, instring);
-      fprintf(out, "\").\n"); 
+      fprintf(out, "\").\n");
 
     }
   }
@@ -218,11 +218,11 @@ int foma_write_prolog (struct fsm *net, char *filename) {
 	escape_print(out, instring);
 	fprintf(out, "\").\n");
     }
-    else if (net->arity == 2) {	
+    else if (net->arity == 2) {
       fprintf(out, "\"");
       escape_print(out, instring);
       fprintf(out, "\":\"");
-      escape_print(out, outstring); 
+      escape_print(out, outstring);
       fprintf(out, "\").\n");
     }
     else if (net->arity == 1) {
@@ -348,7 +348,7 @@ struct fsm *fsm_read_prolog (char *filename) {
 	    
 	    if (fsm_construct_check_symbol(outh, temp) == -1) {
 		fsm_construct_add_symbol(outh, temp);
-	    }      
+	    }
 	    continue;
 	}
 	if (strstr(buf, "arc(") == buf) {
@@ -379,7 +379,7 @@ struct fsm *fsm_read_prolog (char *filename) {
 	    
 	    temp_ptr = strstr(temp_ptr2, "\"");
 	    temp_ptr++;
-	    if (arity == 2)  { 
+	    if (arity == 2)  {
 		temp_ptr2 = strstr(temp_ptr, "\":");
 	    } else {
 		temp_ptr2 = strstr(temp_ptr, "\").");
@@ -422,8 +422,8 @@ struct fsm *fsm_read_prolog (char *filename) {
 		strcpy(out,"?");
 	    }
 	    
-	    if (arity == 1) { 
-		fsm_construct_add_arc(outh, source, target, in, in);	    
+	    if (arity == 1) {
+		fsm_construct_add_arc(outh, source, target, in, in);
 	    } else {
 		fsm_construct_add_arc(outh, source, target, in, out);
 	    }
@@ -463,11 +463,11 @@ char *spacedtext_get_next_line(char **text) {
     ret = *text;
     if (**text == '\0')
 	return NULL;
-    for (t = *text; *t != '\0' && *t != '\n'; t++) {	
+    for (t = *text; *t != '\0' && *t != '\n'; t++) {
     }
     if (*t == '\0')
 	*text = t;
-    else 
+    else
 	*text = t+1;
     *t = '\0';
     return(ret);
@@ -690,7 +690,7 @@ static INLINE int explode_line(char *buf, int *values) {
 /* ##sigma## */
 /* ...SIGMA LINES... */
 /* ##states## */
-/* ...TRANSITION LINES... */ 
+/* ...TRANSITION LINES... */
 /* ##end## */
 
 /* Several networks may be concatenated in one file */
@@ -913,10 +913,10 @@ int foma_net_print(struct fsm *net, gzFile outfile) {
     extras = (net->is_completed) | (net->arcs_sorted_in << 2) | (net->arcs_sorted_out << 4);
  
 #ifdef ORIGINAL
-    gzprintf(outfile, 
+    gzprintf(outfile,
 	     "%i %i %i %i %i %lld %i %i %i %i %i %i %s\n", net->arity, net->arccount, net->statecount, net->linecount, net->finalcount, net->pathcount, net->is_deterministic, net->is_pruned, net->is_minimized, net->is_epsilon_free, net->is_loop_free, extras, net->name);
 #else
-    gzprintf(outfile, 
+    gzprintf(outfile,
 	     "%i %i %i %i %i "LONG_LONG_SPECIFIER" %i %i %i %i %i %i %s\n", net->arity, net->arccount, net->statecount, net->linecount, net->finalcount, net->pathcount, net->is_deterministic, net->is_pruned, net->is_minimized, net->is_epsilon_free, net->is_loop_free, extras, net->name);
 #endif
     
@@ -978,7 +978,7 @@ int net_print_att(struct fsm *net, FILE *outfile) {
     }
     for (i=0; (fsm+i)->state_no != -1; i++) {
         if ((fsm+i)->target != -1) {
-            fprintf(outfile, "%i\t%i\t%s\t%s\n",(fsm+i)->state_no,(fsm+i)->target, (sl+(fsm+i)->in)->symbol, (sl+(fsm+i)->out)->symbol);            
+            fprintf(outfile, "%i\t%i\t%s\t%s\n",(fsm+i)->state_no,(fsm+i)->target, (sl+(fsm+i)->in)->symbol, (sl+(fsm+i)->out)->symbol);
         }
     }
     prev = -1;

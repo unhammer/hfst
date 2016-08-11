@@ -1,11 +1,11 @@
 //! @file InputReader.h
 //!
 //! @author Miikka Silfverberg
-//! 
+//!
 //! @note This file is based on the tutorial "Better error handling using
 //! Flex and Bison", by Christian Hagen. The
 //! <a href=
-//! "http://www.ibm.com/developerworks/opensource/library/l-flexbison.html"> 
+//! "http://www.ibm.com/developerworks/opensource/library/l-flexbison.html">
 //! tutorial</a>.
 //!
 //! @brief Class for Flex and Bison input reading.
@@ -41,7 +41,7 @@ class InputNotSet
 //! @brief class For reading input from an @a std::istream one character at a
 //! time.
 //!
-//! The class is also used for displaying error messages and warnings that 
+//! The class is also used for displaying error messages and warnings that
 //! point to the position of the error on the input line.
 class InputReader
 {
@@ -55,7 +55,7 @@ private:
 public:
   //! @brief Initialize a reader with line counter @a counter.
   //!
-  //! @param counter would usually be a reference to @a yylineno which is 
+  //! @param counter would usually be a reference to @a yylineno which is
   //! maintained by Bison.
   InputReader(size_t &counter);
 

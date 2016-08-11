@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 #include "convert.h"
@@ -86,7 +86,7 @@ void add_transitions_with(SymbolNumber symbol,
     // target is simple (ie. should point directly to TA entry)
     unsigned int target;
     if (state_placeholders[it->target].is_simple()) {
-        target = state_placeholders[it->target].first_transition + 
+        target = state_placeholders[it->target].first_transition +
         TRANSITION_TARGET_TABLE_START - 1;
     } else {
         target = state_placeholders[it->target].start_index;
@@ -145,7 +145,7 @@ StateIdNumber ConvertIdNumberMap::get_node_id(StateId n) const
 {
   StateIdsToIdNumbers::const_iterator i = node_to_id.find(n);
   if(i == node_to_id.end())
-    return NO_ID_NUMBER;  
+    return NO_ID_NUMBER;
   return i->second;
 }
 
@@ -209,7 +209,7 @@ void ConvertTransducerAlphabet::populate_symbol_table(
     if(!FdOperation::is_diacritic(ofst_symbol_table->Find(it->first)))
       count_keys.insert(std::pair<unsigned int,int64>(it->second,it->first));
     else
-      count_keys.insert(std::pair<unsigned int,int64>(0,it->first)); 
+      count_keys.insert(std::pair<unsigned int,int64>(0,it->first));
   }
   
   symbol_table.push_back(ofst_symbol_table->Find((int64)0));
@@ -275,7 +275,7 @@ ConvertTransducerAlphabet::ConvertTransducerAlphabet(TransduceR* t):
   OfstSymbolCountMap symbol_count_map;
   SymbolSet all_symbol_set;
   
-  get_symbol_info(symbol_count_map, all_symbol_set);  
+  get_symbol_info(symbol_count_map, all_symbol_set);
   populate_symbol_table(symbol_count_map, all_symbol_set);
   set_maps();
   
@@ -583,7 +583,7 @@ void ConvertFstState::insert_transition_indices(
 
 template<class T>
 TransitionTableIndex ConvertFstState::append_transitions(
-    TransducerTable<T>& transition_table, 
+    TransducerTable<T>& transition_table,
     TransitionTableIndex place) const
 {
   while(place < get_first_transition_index())
@@ -638,7 +638,7 @@ bool ConvertTransitionTableIndices::state_fits(SymbolNumberSet * input_symbols,
   // The input symbols start after the finality indicator.
   PlaceHolderVector::size_type input_symbol_start = index+1;
   
-  // The node fits, if every one of its input symbols goes on 
+  // The node fits, if every one of its input symbols goes on
   // an EMPTY or EMPTY_START index.
   for(SymbolNumberSet::iterator it=input_symbols->begin();
       it!=input_symbols->end(); ++it)
@@ -711,7 +711,7 @@ PlaceHolderVector::size_type ConvertTransitionTableIndices::add_state(
 #endif
   bool final_state = state->is_final();
   
-  SymbolNumberSet * state_input_symbols = 
+  SymbolNumberSet * state_input_symbols =
     state->get_input_symbols();
   
   ++lower_bound_test_count;

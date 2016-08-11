@@ -58,8 +58,8 @@ OtherSymbolTransducer wbize(const OtherSymbolTransducer &t)
 
 bool ConflictResolvingLeftArrowRule::conflicts_this
 (const ConflictResolvingLeftArrowRule &another,StringVector &v)
-{ 
-  return ! context.is_empty_intersection(wbize(another.context),v); 
+{
+  return ! context.is_empty_intersection(wbize(another.context),v);
 }
 
 bool ConflictResolvingLeftArrowRule::resolvable_conflict

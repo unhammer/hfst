@@ -1,4 +1,4 @@
-//! @file hfst-guess.cc 
+//! @file hfst-guess.cc
 //!
 //! @brief Tool for compiling a guesser (and
 //! generator) for guessing analyses/paradigms of unknown words.
@@ -155,7 +155,7 @@ parse_options(int argc, char** argv)
             {0,0,0,0}
         };
         int option_index = 0;
-        // add tool-specific options here 
+        // add tool-specific options here
         int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
                              HFST_GETOPT_UNARY_SHORT "f:m:n:g:",
                              long_options, &option_index);
@@ -215,7 +215,7 @@ parse_options(int argc, char** argv)
     return EXIT_CONTINUE;
 }
 
-int main( int argc, char **argv ) 
+int main( int argc, char **argv )
 {
 #ifdef WINDOWS
   _setmode(0, _O_BINARY);
@@ -234,19 +234,19 @@ int main( int argc, char **argv )
         fclose(inputfile);
     }
     
-    verbose_printf("Reading from %s, writing to %s\n", 
+    verbose_printf("Reading from %s, writing to %s\n",
            inputfilename, outfilename);
     
     // here starts the buffer handling part
     HfstInputStream * instream = NULL;
 
-    try 
+    try
       {
     instream = (inputfile != stdin ?
-            new HfstInputStream(inputfilename) : 
+            new HfstInputStream(inputfilename) :
             new HfstInputStream());
-      } 
-    catch(const HfstException e)  
+      }
+    catch(const HfstException e)
       {
         error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
@@ -255,13 +255,13 @@ int main( int argc, char **argv )
 
     std::ostream * out;
 
-    try 
+    try
       {
     out = (outfile != stdout ?
            new std::ofstream(outfilename) :
            &std::cout);
-      } 
-    catch(...)  
+      }
+    catch(...)
       {
         error(EXIT_FAILURE, 0, "%s cannot be opened for writing.",
               outfilename);
@@ -366,7 +366,7 @@ int main( int argc, char **argv )
 
         (*out) << line << "\t" << *it << std::endl;
           }
-      } 
+      }
     (*out) << std::endl;
       }
 

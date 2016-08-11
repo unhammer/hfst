@@ -1,7 +1,7 @@
 #!/bin/sh
 TOOLSDIR=$1
 for f in $TOOLSDIR/hfst-* ; do
-    if ! (echo "$f" | grep "hfst-twolc-loc" > /dev/null); then 
+    if ! (echo "$f" | grep "hfst-twolc-loc" > /dev/null); then
 	if ! (echo "$f" | grep "tagger" > /dev/null); then
 	if ! (echo "$f" | grep "hfst-lexc-wrapper" > /dev/null); then
 	    if [ -x "$f" -a ! -d "$f" ] ; then

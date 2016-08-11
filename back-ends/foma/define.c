@@ -37,13 +37,13 @@ int remove_defined(struct defined_networks *def, char *string) {
     /* Undefine all */
     if (string == NULL) {
 	for (d = def; d != NULL; d = d_next) {
-	    d_next = d->next;	    
+	    d_next = d->next;
 	    fsm_destroy(d->net);
 	    xxfree(d->name);
 	}
 	return 0;
     }
-    d_prev = NULL; 
+    d_prev = NULL;
     for (d = def; d != NULL; d_prev = d, d = d->next) {
 	if (d->name != NULL && strcmp(d->name, string) == 0) {
 	    exists = 1;

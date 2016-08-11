@@ -105,7 +105,7 @@ for type in types:
         # One unweighted identity path:
         if not hfst.fst('foo').compare(hfst.regex('{foo}')):
             raise RuntimeError('')
-        # Weighted path: a tuple of string and number, e.g. 
+        # Weighted path: a tuple of string and number, e.g.
         if not hfst.fst(('foo',1.4)).compare(hfst.regex('{foo}::1.4')):
             raise RuntimeError('')
         if not hfst.fst(('bar',-3)).compare(hfst.regex('{bar}::-3')):
@@ -135,7 +135,7 @@ for type in types:
 
         # HfstBasicTransducer
         # Create an empty transducer
-        # The transducer has initially one start state (number zero) 
+        # The transducer has initially one start state (number zero)
         # that is not final
         fsm = hfst.HfstBasicTransducer()
         # Add two states to the transducer
@@ -145,7 +145,7 @@ for type in types:
         tr = hfst.HfstBasicTransition(1, 'foo', 'bar', 0.1)
         # and add it to state zero
         fsm.add_transition(0, tr)
-        # Add a transition [baz:baz] with weight 0 from state 1 to state 2 
+        # Add a transition [baz:baz] with weight 0 from state 1 to state 2
         fsm.add_transition(1, hfst.HfstBasicTransition(2, 'baz', 'baz', 0.0))
         # Set state 2 as final with weight 0.3
         fsm.set_final_weight(2, 0.3)

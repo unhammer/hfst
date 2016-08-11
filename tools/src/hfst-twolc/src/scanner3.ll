@@ -46,7 +46,7 @@
 %%
 
 __HFST_TWOLC_Alphabet { return ALPHABET_DECLARATION; }
-__HFST_TWOLC_Diacritics { return DIACRITICS_DECLARATION; } 
+__HFST_TWOLC_Diacritics { return DIACRITICS_DECLARATION; }
 __HFST_TWOLC_Definitions { return DEFINITION_DECLARATION; }
 __HFST_TWOLC_Sets { return SETS_DECLARATION; }
 __HFST_TWOLC_Rules { return RULES_DECLARATION; }
@@ -56,9 +56,9 @@ __HFST_TWOLC_DIE {
 }
 [ \t\n] { /* space: ignore */ }
 
-__HFST_TWOLC_RULE_NAME=\"[^\"]+\" { 
+__HFST_TWOLC_RULE_NAME=\"[^\"]+\" {
   yylval.value = string_copy(yytext);
-  return RULE_NAME; 
+  return RULE_NAME;
 }
 __HFST_TWOLC_except { return EXCEPT; }
 __HFST_TWOLC_[*] { return STAR; }
@@ -69,7 +69,7 @@ __HFST_TWOLC_[\\] { return TERM_COMPLEMENT; }
 __HFST_TWOLC_[$][.] { return CONTAINMENT_ONCE; }
 __HFST_TWOLC_[$] { return CONTAINMENT; }
 __HFST_TWOLC_[?] { return QUESTION_MARK; }
-__HFST_TWOLC_[0] { 
+__HFST_TWOLC_[0] {
   yylval.value = string_copy(yytext);
   return SYMBOL;
 }
@@ -77,13 +77,13 @@ __HFST_TWOLC_[|] { return UNION; }
 __HFST_TWOLC_[&] { return INTERSECTION; }
 __HFST_TWOLC_[\^] { return POWER; }
 __HFST_TWOLC_[\-] { return DIFFERENCE; }
-__HFST_TWOLC_NUMBER=[0-9]+ { 
+__HFST_TWOLC_NUMBER=[0-9]+ {
   yylval.value = string_copy(yytext);
-  return NUMBER; 
+  return NUMBER;
 }
-__HFST_TWOLC_NUMBER=[0-9]+,[0-9]+ { 
+__HFST_TWOLC_NUMBER=[0-9]+,[0-9]+ {
   yylval.value = string_copy(yytext);
-  return NUMBER_RANGE; 
+  return NUMBER_RANGE;
 }
 __HFST_TWOLC_\[ { return LEFT_SQUARE_BRACKET; }
 __HFST_TWOLC_\] { return RIGHT_SQUARE_BRACKET; }

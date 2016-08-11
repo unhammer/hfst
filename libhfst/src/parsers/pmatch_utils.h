@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 /**
@@ -183,7 +183,7 @@ HfstTransducer * read_text(char * filename,
 std::vector<std::vector<std::string> > read_args(char * filename, unsigned int argcount);
 
 /** @brief Return a transducer that accepts a single string from an array of
- *  char *. 
+ *  char *.
  */
 
 /* First some magic templates for compile-time length checking */
@@ -305,7 +305,7 @@ struct PmatchUtilityTransducers
     static HfstTransducer * make_combining_accent_acceptor(
         ImplementationType type = TROPICAL_OPENFST_TYPE);
     
-/** @brief Return a transducer that accepts one arabic numeral character. 
+/** @brief Return a transducer that accepts one arabic numeral character.
  */
     static HfstTransducer * make_latin1_numeral_acceptor(
         ImplementationType type = TROPICAL_OPENFST_TYPE);

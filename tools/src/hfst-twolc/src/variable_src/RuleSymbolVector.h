@@ -35,15 +35,15 @@ class RuleSymbolVector : public std::vector<std::string>
  protected:
   const VariableValueMap &vvm;
  public:
-  //! @brief Create empty instance whose variable values are read from 
+  //! @brief Create empty instance whose variable values are read from
   //! @a vvm.
   RuleSymbolVector(const VariableValueMap &vvm);
 
-  //! @brief Replace variables with their values given by 
+  //! @brief Replace variables with their values given by
   //! @a vvm and return a string representation of the result.
   std::string replace_variables(void);
 
-  //! @brief Replace variables with their values given by 
+  //! @brief Replace variables with their values given by
   //! @a vvm and return a string representation of the result.
   std::string replace_variables(const RuleCenter &center);
 

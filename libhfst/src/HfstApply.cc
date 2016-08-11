@@ -1,15 +1,15 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
-/* \file HfstApply.cc 
-   \brief HFST transducer functions that take several parameters are 
-   handled here. 
+/* \file HfstApply.cc
+   \brief HFST transducer functions that take several parameters are
+   handled here.
  */
 
 #include "HfstTransducer.h"
@@ -44,7 +44,7 @@ namespace hfst
     //#ifdef HAVE_MY_TRANSDUCER_LIBRARY
     //if (original == MY_TRANSDUCER_LIBRARY_TYPE) {
     //  // From my transducer to weighted transducer
-    //  if ( converted == TROPICAL_OPENFST_TYPE || 
+    //  if ( converted == TROPICAL_OPENFST_TYPE ||
     //       converted == LOG_OPENFST_TYPE) {
     //  return true;  // if your library supports weights
     //  return false; // if your library does not support weights
@@ -61,12 +61,12 @@ namespace hfst
 
   HfstTransducer &HfstTransducer::apply(
 #if HAVE_SFST
- SFST::Transducer * (*sfst_funct)(SFST::Transducer *), 
+ SFST::Transducer * (*sfst_funct)(SFST::Transducer *),
 #endif
 #if HAVE_OPENFST
  fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *),
 #if HAVE_OPENFST_LOG
- hfst::implementations::LogFst * 
+ hfst::implementations::LogFst *
  (*log_ofst_funct)(hfst::implementations::LogFst *),
 #endif
 #endif
@@ -88,7 +88,7 @@ namespace hfst
 #if HAVE_SFST
       case SFST_TYPE:
         {
-          SFST::Transducer * sfst_temp = 
+          SFST::Transducer * sfst_temp =
             sfst_funct(implementation.sfst);
           delete implementation.sfst;
           implementation.sfst = sfst_temp;
@@ -171,7 +171,7 @@ NETptr (*xfsm_funct)(NETptr, unsigned int n),
 #endif
 /* Add your library here. */
 //#if HAVE_MY_TRANSDUCER_LIBRARY
-//   my_namespace::MyFst * 
+//   my_namespace::MyFst *
 //     (*my_transducer_library_funct)(my_namespace::MyFst *,int n),
 //#endif
    unsigned int n )
@@ -181,7 +181,7 @@ NETptr (*xfsm_funct)(NETptr, unsigned int n),
 #if HAVE_SFST
       case SFST_TYPE:
         {
-          SFST::Transducer * sfst_temp = 
+          SFST::Transducer * sfst_temp =
             sfst_funct(implementation.sfst,n);
           delete implementation.sfst;
           implementation.sfst = sfst_temp;
@@ -211,7 +211,7 @@ NETptr (*xfsm_funct)(NETptr, unsigned int n),
 #if HAVE_FOMA
       case FOMA_TYPE:
         {
-      fsm * foma_temp = 
+      fsm * foma_temp =
             foma_funct(implementation.foma,n);
           this->foma_interface.delete_foma(implementation.foma);
           implementation.foma = foma_temp;
@@ -221,7 +221,7 @@ NETptr (*xfsm_funct)(NETptr, unsigned int n),
 #if HAVE_XFSM
       case XFSM_TYPE:
         {
-      NETptr xfsm_temp = 
+      NETptr xfsm_temp =
             xfsm_funct(implementation.xfsm,n);
       delete implementation.xfsm;
           implementation.xfsm = xfsm_temp;
@@ -232,7 +232,7 @@ NETptr (*xfsm_funct)(NETptr, unsigned int n),
         //#if HAVE_MY_TRANSDUCER_LIBRARY
         //case MY_TRANSDUCER_LIBRARY_TYPE:
         //{
-        //my_namespace::MyFst * my_fst_temp = 
+        //my_namespace::MyFst * my_fst_temp =
         //  my_transducer_library_funct(implementation.my_transducer_library,n);
         //delete (implementation.my_transducer_library);
         //implementation.my_transducer_library = my_fst_temp;
@@ -252,7 +252,7 @@ NETptr (*xfsm_funct)(NETptr, unsigned int n),
    SFST::Transducer * (*sfst_funct)(SFST::Transducer *, String, String),
 #endif
 #if HAVE_OPENFST
-   fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,String, 
+   fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,String,
                                               String),
 #if HAVE_OPENFST_LOG
    hfst::implementations::LogFst * (*log_ofst_funct)
@@ -267,7 +267,7 @@ NETptr (*xfsm_funct)(NETptr, unsigned int n),
 #endif
    /* Add your library here. */
    //#if HAVE_MY_TRANSDUCER_LIBRARY
-   //my_namespace::MyFst * 
+   //my_namespace::MyFst *
    // (*my_transducer_library_funct)(my_namespace::MyFst *, String, String),
    //#endif
    String s1, String s2)
@@ -277,7 +277,7 @@ NETptr (*xfsm_funct)(NETptr, unsigned int n),
 #if HAVE_SFST
       case SFST_TYPE:
         {
-          SFST::Transducer * sfst_temp = 
+          SFST::Transducer * sfst_temp =
             sfst_funct(implementation.sfst,s1,s2);
           delete implementation.sfst;
           implementation.sfst = sfst_temp;
@@ -307,7 +307,7 @@ NETptr (*xfsm_funct)(NETptr, unsigned int n),
 #if HAVE_FOMA
       case FOMA_TYPE:
         {
-      fsm * foma_temp = 
+      fsm * foma_temp =
             foma_funct(implementation.foma,s1,s2);
           this->foma_interface.delete_foma(implementation.foma);
           implementation.foma = foma_temp;
@@ -317,7 +317,7 @@ NETptr (*xfsm_funct)(NETptr, unsigned int n),
 #if HAVE_XFSM
       case XFSM_TYPE:
         {
-      NETptr xfsm_temp = 
+      NETptr xfsm_temp =
             xfsm_funct(implementation.xfsm,s1,s2);
           delete implementation.xfsm;
           implementation.xfsm = xfsm_temp;
@@ -328,7 +328,7 @@ NETptr (*xfsm_funct)(NETptr, unsigned int n),
         //#if HAVE_MY_TRANSDUCER_LIBRARY
         //case MY_TRANSDUCER_LIBRARY_TYPE:
         //{
-        //my_namespace::MyFst * my_fst_temp = 
+        //my_namespace::MyFst * my_fst_temp =
         //  my_transducer_library_funct
         //    (implementation.my_transducer_library,s1,s2);
         //delete(implementation.my_transducer_library);
@@ -387,7 +387,7 @@ NETptr (*xfsm_funct)(NETptr, unsigned int n),
     this->insert_missing_symbols_to_alphabet_from(another, true);
     another.insert_missing_symbols_to_alphabet_from(*this, true);
     HfstTransducer * another_ =
-      this->harmonize_(another);        
+      this->harmonize_(another);
     if (another_ == NULL) // foma
       { another_ = new HfstTransducer(another); }
 
@@ -396,7 +396,7 @@ NETptr (*xfsm_funct)(NETptr, unsigned int n),
 #if HAVE_SFST
       case SFST_TYPE:
         {
-          SFST::Transducer * sfst_temp = 
+          SFST::Transducer * sfst_temp =
             sfst_funct(implementation.sfst,
                another_->implementation.sfst);
           delete implementation.sfst;
@@ -429,7 +429,7 @@ NETptr (*xfsm_funct)(NETptr, unsigned int n),
 #if HAVE_FOMA
       case FOMA_TYPE:
         {
-          fsm * foma_temp = 
+          fsm * foma_temp =
             foma_funct(implementation.foma,another_->implementation.foma);
           delete implementation.foma;
           implementation.foma = foma_temp;
@@ -439,7 +439,7 @@ NETptr (*xfsm_funct)(NETptr, unsigned int n),
 #if HAVE_XFSM
       case XFSM_TYPE:
         {
-          NETptr xfsm_temp = 
+          NETptr xfsm_temp =
             xfsm_funct(implementation.xfsm,another_->implementation.xfsm);
           //delete implementation.xfsm;
           implementation.xfsm = xfsm_temp;
@@ -450,7 +450,7 @@ NETptr (*xfsm_funct)(NETptr, unsigned int n),
         //#if HAVE_MY_TRANSDUCER_LIBRARY
         //case MY_TRANSDUCER_LIBRARY_TYPE:
         //{
-        //  my_namespace::MyFst * my_fst_temp = 
+        //  my_namespace::MyFst * my_fst_temp =
         //    my_transducer_library_funct
         //      (implementation.my_transducer_library,
         //       another.implementation.my_transducer_library);

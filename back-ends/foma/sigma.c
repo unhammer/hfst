@@ -82,7 +82,7 @@ int sigma_add_special (int symbol, struct sigma *sigma) {
 	(sigma_previous)->next = sigma_splice;
 	sigma_splice->number = symbol;
 	sigma_splice->symbol = str;
-	(sigma_splice)->next = sigma; 
+	(sigma_splice)->next = sigma;
 	return(symbol);
       } else {
 	sigma_splice->symbol = sigma->symbol;
@@ -130,7 +130,7 @@ int sigma_add (char *symbol, struct sigma *sigma) {
       }
       sigma = sigma->next;
     }
-    sigma->next = NULL;  
+    sigma->next = NULL;
     sigma->symbol = xxstrdup(symbol);
     return(sigma->number);
   } else {
@@ -146,7 +146,7 @@ int sigma_add (char *symbol, struct sigma *sigma) {
 	sigma_splice->number = assert;
 	sigma_splice->symbol = xxmalloc(sizeof(char)*(strlen(symbol)+1));
 	strcpy(sigma_splice->symbol, symbol);
-	(sigma_splice)->next = sigma; 
+	(sigma_splice)->next = sigma;
 	return(assert);
       } else {
 	sigma_splice->symbol = sigma->symbol;
@@ -200,7 +200,7 @@ void sigma_cleanup (struct fsm *net, int force) {
             j++;
         }
     }
-    for (i=0; (fsm+i)->state_no != -1; i++) {        
+    for (i=0; (fsm+i)->state_no != -1; i++) {
         if ((fsm+i)->in > 2)
             (fsm+i)->in = *(attested+(fsm+i)->in);
         if ((fsm+i)->out > 2)

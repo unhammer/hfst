@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 /**
@@ -36,7 +36,7 @@ extern void xre_delete_buffer (YY_BUFFER_STATE, yyscan_t);
 extern int xrelex_destroy (yyscan_t);
 extern char * xreget_text(yyscan_t);
 
-namespace hfst { 
+namespace hfst {
   namespace xre {
     extern unsigned int cr; // number of characters read, defined in XreCompiler.cc
     bool allow_extra_text_at_end = false;
@@ -53,10 +53,10 @@ std::ostream * xreerrstr()
 void xreflush(std::ostream * os)
 {
   hfst::xre::XreCompiler::flush(os);
-} 
+}
 
 int xreerror(yyscan_t scanner, const char* msg)
-{ 
+{
   char buffer [1024];
 
   int n = sprintf(buffer, "*** xre parsing failed: %s\n", msg);
@@ -67,7 +67,7 @@ int xreerror(yyscan_t scanner, const char* msg)
     }
   else
     {
-      n = sprintf(buffer+n, "***    parsing %60s [near %s]...\n", 
+      n = sprintf(buffer+n, "***    parsing %60s [near %s]...\n",
                   hfst::xre::data, xreget_text(scanner));
     }
 
@@ -93,9 +93,9 @@ xreerror(const char *msg)
   return 0;
 }
 
-namespace hfst 
-{ 
-namespace xre 
+namespace hfst
+{
+namespace xre
 {
 
   char* data;
@@ -126,7 +126,7 @@ bool substitution_function(const hfst::StringPair &p, hfst::StringPairSet &sps)
   if (p.first == substitution_function_symbol ||
       p.second == substitution_function_symbol)
     {
-      sps.insert(hfst::StringPair(substitution_function_symbol, 
+      sps.insert(hfst::StringPair(substitution_function_symbol,
                                   substitution_function_symbol));
       return true;
     }
@@ -457,7 +457,7 @@ get_weight(const char *s)
 {
     double rv = -3.1415;
     const char* weightstart = s;
-    while ((*weightstart != '\0') && 
+    while ((*weightstart != '\0') &&
            ((*weightstart == ' ') || (*weightstart == '\t') ||
             (*weightstart == ';')))
     {
@@ -574,7 +574,7 @@ bool is_valid_function_call
   std::map<std::string, unsigned int >::const_iterator name2args
     = function_arguments.find(name);
 
-  if (name2xre == function_definitions.end() || 
+  if (name2xre == function_definitions.end() ||
       name2args == function_arguments.end())
     {
       std::ostream * err = xreerrstr();
@@ -589,10 +589,10 @@ bool is_valid_function_call
   if ( number_of_args != args->size())
     {
       std::ostream * err = xreerrstr();
-      *err << "Wrong number of arguments: function '" << name << "' expects " 
+      *err << "Wrong number of arguments: function '" << name << "' expects "
                            << (int)number_of_args << ", " << (int)args->size() << " given" << std::endl;
       xreflush(err);
-        //fprintf(stderr, "Wrong number of arguments: function '%s' expects %i, %i given\n", 
+        //fprintf(stderr, "Wrong number of arguments: function '%s' expects %i, %i given\n",
         //       name, (int)number_of_args, (int)args->size());
       return false;
     }
@@ -602,7 +602,7 @@ bool is_valid_function_call
 
 const char * get_function_xre(const char * name)
 {
-  std::map<std::string,std::string>::const_iterator it 
+  std::map<std::string,std::string>::const_iterator it
     = function_definitions.find(name);
   if (it == function_definitions.end())
     {
@@ -663,7 +663,7 @@ expand_definition(const char* symbol)
   if (expand_definitions)
     {
       for (std::map<std::string,hfst::HfstTransducer*>::const_iterator it
-             = definitions.begin(); it != definitions.end(); it++) 
+             = definitions.begin(); it != definitions.end(); it++)
         {
           if (strcmp(it->first.c_str(), symbol) == 0)
             {
@@ -681,7 +681,7 @@ expand_definition(HfstTransducer* tr, const char* symbol)
   if (expand_definitions)
     {
       for (std::map<std::string,hfst::HfstTransducer*>::const_iterator it
-             = definitions.begin(); it != definitions.end(); it++) 
+             = definitions.begin(); it != definitions.end(); it++)
         {
           if (strcmp(it->first.c_str(), symbol) == 0)
             {
@@ -733,7 +733,7 @@ xfst_curly_label_to_transducer(const char* input, const char* output)
         {
           HfstTransducer tmp(hfst::internal_epsilon, *it, hfst::xre::format);
           retval->concatenate(tmp, false);
-        }      
+        }
     }
   else if (strcmp(output, hfst::internal_unknown.c_str()) == 0)
     {
@@ -754,7 +754,7 @@ xfst_curly_label_to_transducer(const char* input, const char* output)
         {
           HfstTransducer tmp(*it, hfst::internal_epsilon, hfst::xre::format);
           retval->concatenate(tmp, false);
-        }      
+        }
     }
   else
     {
@@ -1055,17 +1055,17 @@ void warn_about_special_symbols_in_replace(HfstTransducer * t)
   if (!verbose_)
     return;
 
-  std::ostream * err = xreerrstr();  
+  std::ostream * err = xreerrstr();
 
   StringSet alphabet = t->get_alphabet();
-  for (StringSet::const_iterator it = alphabet.begin(); 
+  for (StringSet::const_iterator it = alphabet.begin();
        it != alphabet.end(); it++)
     {
-      if (HfstTransducer::is_special_symbol(*it) && 
+      if (HfstTransducer::is_special_symbol(*it) &&
           *it != hfst::internal_epsilon &&
           *it != hfst::internal_unknown &&
           *it != hfst::internal_identity)
-        {  
+        {
           *err << "warning: using special symbol '" << *it << "' in replace rule, use substitute instead" << std::endl;
         }
     }

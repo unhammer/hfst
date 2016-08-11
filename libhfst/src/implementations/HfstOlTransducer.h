@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 #ifndef _HFST_OL_TRANSDUCER_H_
@@ -18,7 +18,7 @@
 #include "optimized-lookup/transducer.h"
 
 /** @file HfstOlTransducer.h
-    \brief Declaration of classes for HFST's optimized lookup 
+    \brief Declaration of classes for HFST's optimized lookup
     transducer format. */
 
 namespace hfst { namespace implementations
@@ -63,7 +63,7 @@ namespace hfst { namespace implementations
     static int is_fst(istream &s);
   };
   
-  class HfstOlOutputStream 
+  class HfstOlOutputStream
   {
   private:
     std::string filename;
@@ -88,9 +88,9 @@ namespace hfst { namespace implementations
     
     static void extract_paths
       (hfst_ol::Transducer * t, hfst::ExtractStringsCb& callback,
-       int cycles=-1, const FdTable<hfst_ol::SymbolNumber>* fd=NULL, 
+       int cycles=-1, const FdTable<hfst_ol::SymbolNumber>* fd=NULL,
        bool filter_fd=false);
-    static const FdTable<hfst_ol::SymbolNumber>* 
+    static const FdTable<hfst_ol::SymbolNumber>*
       get_flag_diacritics(hfst_ol::Transducer* t);
     static StringSet get_alphabet(hfst_ol::Transducer * t);
 

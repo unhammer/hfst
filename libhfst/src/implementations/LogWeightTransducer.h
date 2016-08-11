@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 #ifndef _LOG_WEIGHT_TRANSDUCER_H_
@@ -35,7 +35,7 @@
     \brief Declarations of functions and datatypes that form a bridge between
     HFST API and OpenFst's transducers with logarithmic weights. */
 
-namespace hfst { 
+namespace hfst {
 namespace implementations
 {
   using namespace fst;
@@ -44,7 +44,7 @@ namespace implementations
   typedef VectorFst<LogArc> LogFst;
 
   typedef std::vector<LogArc> LogArcVector;
-  struct LogArcLessThan { 
+  struct LogArcLessThan {
     bool operator() (const LogArc &arc1,const LogArc &arc2) const; };
 
   using std::ostream;
@@ -53,7 +53,7 @@ namespace implementations
 
   void openfst_log_set_hopcroft(bool value);
 
-  class LogWeightInputStream 
+  class LogWeightInputStream
   {
   private:
     std::string filename;
@@ -81,7 +81,7 @@ namespace implementations
     static bool is_fst(istream &s);
   };
 
-  class LogWeightOutputStream 
+  class LogWeightOutputStream
   {
   private:
     std::string filename;
@@ -89,7 +89,7 @@ namespace implementations
     ostream &output_stream;
     //void write_3_0_library_header(std::ostream &out);
   public:
-    LogWeightOutputStream(void); 
+    LogWeightOutputStream(void);
     LogWeightOutputStream(const std::string &filename);
     void close(void);
     void write(const char &c);
@@ -100,7 +100,7 @@ namespace implementations
 
   typedef StateId LogWeightState;
 
-  class LogWeightStateIterator 
+  class LogWeightStateIterator
     {
     protected:
       StateIterator<LogFst> * iterator;
@@ -222,7 +222,7 @@ namespace implementations
       
       static bool are_equivalent(LogFst *one, LogFst *another);
       static bool is_cyclic(LogFst * t);
-      static bool is_automaton(LogFst * t);      
+      static bool is_automaton(LogFst * t);
 
       static FdTable<int64>* get_flag_diacritics(LogFst * t);
 
@@ -255,7 +255,7 @@ namespace implementations
       static void remove_from_alphabet
         (LogFst *t, const std::string &symbol);
       static StringSet get_alphabet(LogFst *t);
-      static unsigned int get_symbol_number(LogFst *t, 
+      static unsigned int get_symbol_number(LogFst *t,
                         const std::string &symbol);
 
       static NumberNumberMap create_mapping(LogFst * t1, LogFst * t2);
@@ -271,9 +271,9 @@ namespace implementations
     private:
       static fst::SymbolTable create_symbol_table(std::string name);
       static void initialize_symbol_tables(LogFst *t);
-      static void remove_symbol_table(LogFst *t);      
+      static void remove_symbol_table(LogFst *t);
       
-      /* Maps state numbers in AT&T text format to state ids used by 
+      /* Maps state numbers in AT&T text format to state ids used by
          OpenFst transducers. */
       typedef std::map<int, StateId> StateMap;
 
@@ -281,8 +281,8 @@ namespace implementations
         (LogFst *t, int state_number, StateMap &state_map);
 
       static int has_arc(LogFst &t,
-                  LogArc::StateId sourcestate,                          
-                  LogArc::Label ilabel, 
+                  LogArc::StateId sourcestate,
+                  LogArc::Label ilabel,
                   LogArc::Label olabel);
       static void disjunct_as_tries(LogFst &t1,
                              StateId t1_state,

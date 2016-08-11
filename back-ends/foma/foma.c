@@ -106,7 +106,7 @@ char *rl_gets(char *prompt) {
        save it on the history. */
     if (use_readline == 1) {
         if (line_read && *line_read)
-            add_history(line_read);        
+            add_history(line_read);
     }
 #endif
     return (line_read);
@@ -167,7 +167,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if (!pipe_mode && !quiet_mode) 
+    if (!pipe_mode && !quiet_mode)
       printf("%s%i.%i.%i%s (svn r%i)%s",disclaimer1,MAJOR_VERSION,MINOR_VERSION,BUILD_VERSION,STATUS_VERSION,SVN_REV,disclaimer2);
 #if defined(ORIGINAL) || defined(HAVE_READLINE)
     rl_basic_word_break_characters = " >";
@@ -226,7 +226,7 @@ static char **my_completion(const char *text, int start, int end) {
     smatch = start;
     matches = rl_completion_matches ((char*)text, &my_generator);
     
-    return (matches);    
+    return (matches);
 }
 
 char *my_generator(const char *text, int state) {
@@ -244,7 +244,7 @@ char *my_generator(const char *text, int state) {
         list_index++;
 
         if (strncmp (name, text, len) == 0) {
-            nummatches++;            
+            nummatches++;
             /* Can't use xxstrdup here */
             return(strdup(name+smatch));
         }
@@ -257,7 +257,7 @@ char *my_generator(const char *text, int state) {
             /* Can't use xxstrdup here */
             if (strncmp (name, text, len) == 0)
                 return(strdup(name+smatch));
-        }        
+        }
     }
     
     /* If no names matched, then return NULL. */

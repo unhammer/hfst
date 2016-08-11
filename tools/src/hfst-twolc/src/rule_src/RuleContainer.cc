@@ -40,9 +40,9 @@ void RuleContainer::compile(std::ostream &msg_out,bool be_verbose)
        ++it)
     {
       if (be_verbose)
-    { msg_out << "Compiling " << Rule::get_print_name((*it)->get_name()) 
-          << std::endl; } 
-      (*it)->compile(); 
+    { msg_out << "Compiling " << Rule::get_print_name((*it)->get_name())
+          << std::endl; }
+      (*it)->compile();
     }
 }
 
@@ -52,11 +52,11 @@ void RuleContainer::store
   for (RuleVector::iterator it = rule_vector.begin();
        it != rule_vector.end();
        ++it)
-    { 
+    {
       if (be_verbose)
-    { msg_out << "Storing " << Rule::get_print_name((*it)->get_name()) 
+    { msg_out << "Storing " << Rule::get_print_name((*it)->get_name())
           << std::endl; }
-      (*it)->store(out); 
+      (*it)->store(out);
     }
 }
 

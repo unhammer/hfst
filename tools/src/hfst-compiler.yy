@@ -3,7 +3,7 @@
 /*                                                                 */
 /*  FILE     hfst-compiler.yy                                       */
 /*  MODULE   hfst-compiler                                          */
-/*  PROGRAM  HFST                                                  */     
+/*  PROGRAM  HFST                                                  */
 /*                                                                 */
 /*******************************************************************/
 
@@ -132,7 +132,7 @@ RE:         RE ARROW CONTEXTS2      { $$ = compiler->restriction($1,$2,$3,0); }
 	  | RE SUBSTITUTE CODE ':' CODE  { $$ = compiler->substitute($1,$3,$5); }
 	  | RE SUBSTITUTE CODE ':' CODE ':' CODE ':' CODE { $$ = compiler->substitute($1,$3,$5,$7,$9); }
 	  | RE SUBSTITUTE CODE ':' CODE '(' RE ')' { $$ = compiler->substitute($1,$3,$5,$7); }
-          | RANGE ':' RANGE  { $$ = compiler->new_transducer($1,$3,output_format); } 
+          | RANGE ':' RANGE  { $$ = compiler->new_transducer($1,$3,output_format); }
           | RANGE            { $$ = compiler->new_transducer($1,$1,output_format); }
           | VAR              { if (DEBUG) { printf("calling transducer variable \"%s\"\n", $1); }; $$ = compiler->var_value($1); }
           | RVAR             { if (DEBUG) { printf("calling agreement transducer variable \"%s\"\n", $1); }; $$ = compiler->rvar_value($1,output_format); }
@@ -280,16 +280,16 @@ print_usage()
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s %s [OPTIONS...] [INFILE]\n"
         "Compile a file written with SFST programming language into a transducer.\n"
-        "\n", program_name, "(alias hfst-calculate)"); 
+        "\n", program_name, "(alias hfst-calculate)");
         print_common_program_options(message_out);
 	fprintf(message_out, "Input/Output options:\n"
                 "  -i, --input=INFILE     Read input from INFILE\n"
-                "  -o, --output=OUTFILE   Write output transducer to OUTFILE\n");	      
+                "  -o, --output=OUTFILE   Write output transducer to OUTFILE\n");
         fprintf(message_out, "String and format options:\n"
                 "  -f, --format=FMT       Write result in FMT format\n");
         fprintf(message_out, "\n");
 
-        fprintf(message_out, 
+        fprintf(message_out,
             "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
             "FMT must be one of the following: "
             "{foma, sfst, openfst-tropical, openfst-log}\n"
@@ -357,14 +357,14 @@ parse_options(int argc, char** argv)
 
 #include "inc/check-params-common.h"
 #include "inc/check-params-unary.h"
-    Verbose = verbose;	 
+    Verbose = verbose;
     if (output_format == hfst::ERROR_TYPE)
       {
         verbose_printf("Output format not specified, "
              "defaulting to openfst tropical\n");
         output_format = hfst::TROPICAL_OPENFST_TYPE;
       }
-    FileName = strdup(inputfilename);        
+    FileName = strdup(inputfilename);
 
     if (NULL != inputfilename && strcmp(inputfilename, "<stdin>") != 0)
     {
@@ -459,7 +459,7 @@ int main( int argc, char *argv[] )
   if (retval != EXIT_CONTINUE)
     return retval;
 
-  yyin = inputfile;  
+  yyin = inputfile;
   if (strcmp(outfilename,"<stdout>") != 0)
     fclose(outfile); // stream is used when writing the result
 

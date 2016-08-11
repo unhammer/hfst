@@ -95,8 +95,8 @@ template <class IT> class VariableValueIterator
   friend class VariableValues;
 };
 
-//! @brief Const version of  @a VariableValueIterator. 
-typedef VariableValueIterator<std::vector<std::string>::const_iterator> 
+//! @brief Const version of  @a VariableValueIterator.
+typedef VariableValueIterator<std::vector<std::string>::const_iterator>
 ConstVariableValueIterator;
 
 #endif // VARIABLE_VALUE_ITERATOR_H_

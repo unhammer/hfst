@@ -33,7 +33,7 @@ case 's':
 case 'o':
   outfilename = hfst_strdup(optarg);
   outfile = hfst_fopen(outfilename, "w");
-  if (outfile == stdout) 
+  if (outfile == stdout)
     {
       free(outfilename);
       outfilename = hfst_strdup("<stdout>");

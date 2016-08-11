@@ -1,5 +1,5 @@
 
-To test that installed HFST functionalities work as they should, run one 
+To test that installed HFST functionalities work as they should, run one
 or more of the tests below:
 
   ./check-tools.sh             # Command line tools
@@ -7,7 +7,7 @@ or more of the tests below:
   ./check-ospell.sh            # hfst-ospell tool
 
 The tool check-tools.sh accepts the option '--prefix PREFIX' which tells
-where the HFST tools to be tested are found. 
+where the HFST tools to be tested are found.
 
 The tool check-morphologies.sh accepts the option '--script-prefix PREFIX'
 which tells where the morphology scripts can be found and the option

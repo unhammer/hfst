@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 #include <string>
@@ -28,15 +28,15 @@ namespace hfst {
       }
     };
     
-    /** @brief One implementation of template class C in 
-        HfstTransition. 
+    /** @brief One implementation of template class C in
+        HfstTransition.
         
-        A HfstTropicalTransducerTransitionData has an input symbol and an 
-        output symbol of type SymbolType (string) and a weight of type 
+        A HfstTropicalTransducerTransitionData has an input symbol and an
+        output symbol of type SymbolType (string) and a weight of type
         WeightType (float).
 
-        \internal Actually a HfstTropicalTransducerTransitionData has an 
-        input and an output number of type unsigned int, but this 
+        \internal Actually a HfstTropicalTransducerTransitionData has an
+        input and an output number of type unsigned int, but this
         implementation is hidden from the user.
         The class has two static maps and functions that take care of conversion
         between strings and internal numbers.
@@ -51,9 +51,9 @@ namespace hfst {
       /** @brief A set of symbols. */
       typedef std::set<SymbolType> SymbolTypeSet;
       
-      typedef std::vector<SymbolType> 
+      typedef std::vector<SymbolType>
         Number2SymbolVector;
-      typedef std::map<SymbolType, unsigned int, string_comparison> 
+      typedef std::map<SymbolType, unsigned int, string_comparison>
         Symbol2NumberMap;
 
       HFSTDLL static SymbolType get_epsilon()
@@ -72,7 +72,7 @@ namespace hfst {
       }
       
     public: /* FIXME: Should be private. */
-      /* Maps that contain information of the mappings between strings 
+      /* Maps that contain information of the mappings between strings
          and numbers */
       HFSTDLL static Number2SymbolVector number2symbol_map;
       HFSTDLL static Symbol2NumberMap symbol2number_map;
@@ -84,14 +84,14 @@ namespace hfst {
         return max_number;
       }
 
-      /* 
+      /*
          Get a vector that defines how numbers of a transducer must
-         be changed, i.e. harmonized, so that it follows the same 
+         be changed, i.e. harmonized, so that it follows the same
          number-to-string encoding as all transducers that use the datatype
          HfstTropicalTransducerTransitionData.
 
          \a symbols defines how numbers are mapped to strings in the
-         original transducer so that each index in \a symbols 
+         original transducer so that each index in \a symbols
          is the number that corresponds to the string at that index.
          An empty string at an index means that the index is not
          used in the original transducer.
@@ -133,8 +133,8 @@ namespace hfst {
 
     protected:
       /* Get the symbol that is mapped as \a number */
-      static const std::string &get_symbol(unsigned int number) 
-      { 
+      static const std::string &get_symbol(unsigned int number)
+      {
         if (number >= number2symbol_map.size()) {
           std::string message("HfstTropicalTransducerTransitionData: "
                               "number ");
@@ -149,27 +149,27 @@ namespace hfst {
       }
 
       /* Get the number that is used to represent \a symbol */
-      static unsigned int get_number(const std::string &symbol) 
+      static unsigned int get_number(const std::string &symbol)
       {
         if(symbol == "") { // FAIL
           Symbol2NumberMap::iterator it = symbol2number_map.find(symbol);
           if (it == symbol2number_map.end()) {
-            std::cerr << "ERROR: No number for the empty symbol\n" 
+            std::cerr << "ERROR: No number for the empty symbol\n"
                       << std::endl;
           }
           else {
-            std::cerr << "ERROR: The empty symbol corresdponds to number " 
+            std::cerr << "ERROR: The empty symbol corresdponds to number "
                       << it->second << std::endl;
           }
           assert(false);
         }
         
         Symbol2NumberMap::iterator it = symbol2number_map.find(symbol);
-        if (it == symbol2number_map.end()) 
+        if (it == symbol2number_map.end())
           {
             max_number++;
             symbol2number_map[symbol] = max_number;
-            number2symbol_map.push_back(symbol);            
+            number2symbol_map.push_back(symbol);
             return max_number;
           }
         return it->second;
@@ -183,20 +183,20 @@ namespace hfst {
       WeightType weight;
 
     public:
-      HFSTDLL void print_transition_data() 
+      HFSTDLL void print_transition_data()
       {
-    fprintf(stderr, "%i:%i %f\n", 
+    fprintf(stderr, "%i:%i %f\n",
         input_number, output_number, weight);
       }
 
     public:
 
-      /** @brief Create a HfstTropicalTransducerTransitionData with 
+      /** @brief Create a HfstTropicalTransducerTransitionData with
           epsilon input and output strings and weight zero. */
-    HFSTDLL HfstTropicalTransducerTransitionData(): 
+    HFSTDLL HfstTropicalTransducerTransitionData():
       input_number(0), output_number(0), weight(0) {}
       
-      /** @brief Create a deep copy of HfstTropicalTransducerTransitionData 
+      /** @brief Create a deep copy of HfstTropicalTransducerTransitionData
           \a data. */
       HFSTDLL HfstTropicalTransducerTransitionData
         (const HfstTropicalTransducerTransitionData &data) {
@@ -205,8 +205,8 @@ namespace hfst {
         weight = data.weight;
       }
 
-      /** @brief Create a HfstTropicalTransducerTransitionData with 
-          input symbol \a isymbol, output symbol \a osymbol 
+      /** @brief Create a HfstTropicalTransducerTransitionData with
+          input symbol \a isymbol, output symbol \a osymbol
           and weight \a weight. */
       HFSTDLL HfstTropicalTransducerTransitionData(SymbolType isymbol,
                        SymbolType osymbol,
@@ -281,12 +281,12 @@ namespace hfst {
         return SymbolType("@_MARKER_SYMBOL_@");
       }
 
-      /** @brief Whether this transition is less than transition 
-          \a another. 
+      /** @brief Whether this transition is less than transition
+          \a another.
           
           /internal is it too slow if string comparison is used instead?
       */
-      HFSTDLL bool operator<(const HfstTropicalTransducerTransitionData &another) 
+      HFSTDLL bool operator<(const HfstTropicalTransducerTransitionData &another)
         const {
         if (input_number < another.input_number )
           return true;
@@ -300,7 +300,7 @@ namespace hfst {
       }
 
       // same as operator< but weight is ignored
-      HFSTDLL bool less_than_ignore_weight(const HfstTropicalTransducerTransitionData &another) 
+      HFSTDLL bool less_than_ignore_weight(const HfstTropicalTransducerTransitionData &another)
         const {
         if (input_number < another.input_number )
           return true;
@@ -331,7 +331,7 @@ namespace hfst {
 
     };
 
-    // Initialization of static members in class 
+    // Initialization of static members in class
     // HfstTropicalTransducerTransitionData..
     class Number2SymbolVectorInitializer {
     public:

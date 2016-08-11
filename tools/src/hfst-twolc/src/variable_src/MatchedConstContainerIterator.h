@@ -2,7 +2,7 @@
 //!
 //! @author Miikka Silfverberg
 //!
-//! @brief Specialization of @a ConstContainerIterator for "matched" variable 
+//! @brief Specialization of @a ConstContainerIterator for "matched" variable
 //! blocks.
 
 //   This program is free software: you can redistribute it and/or modify
@@ -27,28 +27,28 @@
 #include "ConstContainerIterator.h"
 
 //! @brief Iterator for a block of variables with matcher <tt>MATCHED</tt>.
-template <class T> class MatchedConstContainerIterator : 
+template <class T> class MatchedConstContainerIterator :
 public ConstContainerIterator<T>
 {
  public:
-  //! @brief Construct from super class instance. 
+  //! @brief Construct from super class instance.
   MatchedConstContainerIterator(const ConstContainerIterator<T> &another)
-    { 
-      ConstContainerIterator<T>::operator=(another); 
+    {
+      ConstContainerIterator<T>::operator=(another);
       
-      int set_sizes = 
-	ConstContainerIterator<T>::begin_iterator_vector.size() == 0 ? 
-	0 
-	: 
-	ConstContainerIterator<T>::end_iterator_vector[0] - 
+      int set_sizes =
+	ConstContainerIterator<T>::begin_iterator_vector.size() == 0 ?
+	0
+	:
+	ConstContainerIterator<T>::end_iterator_vector[0] -
 	ConstContainerIterator<T>::begin_iterator_vector[0];
 
-      for (size_t i = 0; 
-	   i < ConstContainerIterator<T>::begin_iterator_vector.size(); 
+      for (size_t i = 0;
+	   i < ConstContainerIterator<T>::begin_iterator_vector.size();
 	   ++i)
 	{
-	  if (ConstContainerIterator<T>::end_iterator_vector[i] - 
-	      ConstContainerIterator<T>::begin_iterator_vector[i] 
+	  if (ConstContainerIterator<T>::end_iterator_vector[i] -
+	      ConstContainerIterator<T>::begin_iterator_vector[i]
 	      != set_sizes)
 	    { throw UnequalSetSize(); }
 	}
@@ -57,14 +57,14 @@ public ConstContainerIterator<T>
   //! @brief Increment.
   int operator++(void)
    {
-     for (size_t i = 0; 
-      i < ConstContainerIterator<T>::iterator_vector.size(); 
+     for (size_t i = 0;
+      i < ConstContainerIterator<T>::iterator_vector.size();
       ++i)
        { ++ConstContainerIterator<T>::iterator_vector.at(i); }
      return 1;
-   };  
+   };
   MatchedConstContainerIterator operator+(size_t i) const
-  { 
+  {
     MatchedConstContainerIterator it(*this);
     for (size_t n = 0; n < i; ++n) { ++it; }
     return it;

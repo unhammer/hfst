@@ -10,7 +10,7 @@ std::string fst_type_to_string(hfst::ImplementationType t) { std::string retval 
 
 bool is_diacritic(const std::string & symbol) { return hfst::FdOperation::is_diacritic(symbol); }
 
-HfstTransducer * empty_transducer() 
+HfstTransducer * empty_transducer()
 {
   hfst::xre::XreCompiler comp(hfst::get_default_fst_type());
   return hfst::hfst_regex(comp, "[0 - 0]", "");

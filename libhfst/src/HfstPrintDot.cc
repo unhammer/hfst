@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 #include "HfstTransducer.h"
@@ -53,7 +53,7 @@ print_dot(FILE* out, HfstTransducer& t)
           }
         else
           {
-            fprintf(out, "q%d [label=\"q%d\"] \n", 
+            fprintf(out, "q%d [label=\"q%d\"] \n",
                     s, s);
           }
         ++s;
@@ -64,7 +64,7 @@ print_dot(FILE* out, HfstTransducer& t)
          ++state)
       {
         std::map<HfstState, std::string> target_labels;
-        for (HfstBasicTransducer::HfstTransitions::const_iterator arc = 
+        for (HfstBasicTransducer::HfstTransitions::const_iterator arc =
              state->begin();
              arc != state->end();
              ++arc)
@@ -81,7 +81,7 @@ print_dot(FILE* out, HfstTransducer& t)
                 first = std::string("??");
               }
             else if (first == hfst::internal_unknown)
-              { 
+              {
                 first = std::string("?1");
               }
             if (second == hfst::internal_epsilon)
@@ -97,7 +97,7 @@ print_dot(FILE* out, HfstTransducer& t)
                 second = std::string("?2");
               }
 #define DOT_MAX_LABEL_SIZE 64
-            char* l = static_cast<char*>(malloc(sizeof(char) * 
+            char* l = static_cast<char*>(malloc(sizeof(char) *
                                                 DOT_MAX_LABEL_SIZE));
             if (first == second)
               {
@@ -113,7 +113,7 @@ print_dot(FILE* out, HfstTransducer& t)
                             HFST_THROW_MESSAGE(HfstException, "sprinting dot arc label");
                           }
                       }
-                    else 
+                    else
                       {
                         if (snprintf(l, DOT_MAX_LABEL_SIZE,
                                      "%s/%.2f", first.c_str(),
@@ -134,7 +134,7 @@ print_dot(FILE* out, HfstTransducer& t)
                             HFST_THROW_MESSAGE(HfstException, "sprinting dot arc label");
                           }
                       }
-                    else 
+                    else
                       {
                         if (snprintf(l, DOT_MAX_LABEL_SIZE,
                                      "%s", first.c_str()) < 0)
@@ -143,7 +143,7 @@ print_dot(FILE* out, HfstTransducer& t)
                                                "sprinting dot arc label");
                           }
                       } // if old label empty
-                  } // if weighted 
+                  } // if weighted
               } // if id pair
             else
               {
@@ -156,7 +156,7 @@ print_dot(FILE* out, HfstTransducer& t)
                                     first.c_str(), second.c_str(),
                                     arc->get_weight()) < 0)
                           {
-                            HFST_THROW_MESSAGE(HfstException,                                                                                               
+                            HFST_THROW_MESSAGE(HfstException,
                                   "sprinting dot arc label");
                           }
                       }
@@ -241,7 +241,7 @@ print_dot(std::ostream & out, HfstTransducer& t)
           {
             if (mutt->get_final_weight(s) > 0)
               {
-                out << "q" << s << " [shape=doublecircle," << 
+                out << "q" << s << " [shape=doublecircle," <<
                   "label=\"q" << s << "/\\n" << mutt->get_final_weight(s) << "\"] " << std::endl;
               }
             else
@@ -262,7 +262,7 @@ print_dot(std::ostream & out, HfstTransducer& t)
          ++state)
       {
         std::map<HfstState, std::string> target_labels;
-        for (HfstBasicTransducer::HfstTransitions::const_iterator arc = 
+        for (HfstBasicTransducer::HfstTransitions::const_iterator arc =
              state->begin();
              arc != state->end();
              ++arc)
@@ -279,7 +279,7 @@ print_dot(std::ostream & out, HfstTransducer& t)
                 first = std::string("??");
               }
             else if (first == hfst::internal_unknown)
-              { 
+              {
                 first = std::string("?1");
               }
             if (second == hfst::internal_epsilon)
@@ -295,7 +295,7 @@ print_dot(std::ostream & out, HfstTransducer& t)
                 second = std::string("?2");
               }
 #define DOT_MAX_LABEL_SIZE 64
-            char* l = static_cast<char*>(malloc(sizeof(char) * 
+            char* l = static_cast<char*>(malloc(sizeof(char) *
                                                 DOT_MAX_LABEL_SIZE));
             if (first == second)
               {
@@ -311,7 +311,7 @@ print_dot(std::ostream & out, HfstTransducer& t)
                             HFST_THROW_MESSAGE(HfstException, "sprinting dot arc label");
                           }
                       }
-                    else 
+                    else
                       {
                         if (snprintf(l, DOT_MAX_LABEL_SIZE,
                                      "%s/%.2f", first.c_str(),
@@ -332,7 +332,7 @@ print_dot(std::ostream & out, HfstTransducer& t)
                             HFST_THROW_MESSAGE(HfstException, "sprinting dot arc label");
                           }
                       }
-                    else 
+                    else
                       {
                         if (snprintf(l, DOT_MAX_LABEL_SIZE,
                                      "%s", first.c_str()) < 0)
@@ -341,7 +341,7 @@ print_dot(std::ostream & out, HfstTransducer& t)
                                                "sprinting dot arc label");
                           }
                       } // if old label empty
-                  } // if weighted 
+                  } // if weighted
               } // if id pair
             else
               {
@@ -354,7 +354,7 @@ print_dot(std::ostream & out, HfstTransducer& t)
                                     first.c_str(), second.c_str(),
                                     arc->get_weight()) < 0)
                           {
-                            HFST_THROW_MESSAGE(HfstException,                                                                                               
+                            HFST_THROW_MESSAGE(HfstException,
                                   "sprinting dot arc label");
                           }
                       }

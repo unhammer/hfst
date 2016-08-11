@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 #if HAVE_CONFIG_H
@@ -21,7 +21,7 @@ namespace hfst { namespace implementations
 
   /* -----------------------------------------------------------
 
-      Conversion functions between HfstBasicTransducer and foma transducer. 
+      Conversion functions between HfstBasicTransducer and foma transducer.
 
       ---------------------------------------------------------- */
 
@@ -31,7 +31,7 @@ namespace hfst { namespace implementations
 
   /* -----------------------------------------------------------------
      
-     Internal functions used by the actual conversion functions. 
+     Internal functions used by the actual conversion functions.
      
      ----------------------------------------------------------------- */
 
@@ -49,8 +49,8 @@ namespace hfst { namespace implementations
     return number_of_transitions;
   }
 
-  /* 
-     Handle a start state in a foma transducer. 
+  /*
+     Handle a start state in a foma transducer.
      
      @param fsm            The start state.
      @param start_state_id The number of the start state, the value -1 means
@@ -59,7 +59,7 @@ namespace hfst { namespace implementations
                               at some point.
     */
   static void handle_start_state
-      (struct fsm_state * fsm, 
+      (struct fsm_state * fsm,
        int &start_state_id,
        bool &start_state_found)
     {
@@ -68,7 +68,7 @@ namespace hfst { namespace implementations
         start_state_id = (fsm)->state_no; // define the start state
         start_state_found=true;           // define that it is found
       }
-      // If the start state is encountered again, 
+      // If the start state is encountered again,
       else if ((fsm)->state_no == start_state_id) {
         // do nothing.
       }
@@ -81,7 +81,7 @@ namespace hfst { namespace implementations
       }
     }
 
-  /* Copy the alphabet of foma transducer \a t to HFST basic transducer 
+  /* Copy the alphabet of foma transducer \a t to HFST basic transducer
      \a net. */
   static void copy_alphabet(const struct fsm * t, HfstBasicTransducer * net)
   {
@@ -101,7 +101,7 @@ namespace hfst { namespace implementations
   {
     const HfstBasicTransducer::HfstTransitionGraphAlphabet & alpha
       = hfst_fsm->get_alphabet();
-    for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it 
+    for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it
            = alpha.begin();
          it != alpha.end(); it++)
       {
@@ -117,7 +117,7 @@ namespace hfst { namespace implementations
   
   /* ----------------------------------------------------------------------
 
-     Create an HfstBasicTransducer equivalent to foma transducer \a t. 
+     Create an HfstBasicTransducer equivalent to foma transducer \a t.
      
      ---------------------------------------------------------------------- */
 
@@ -149,7 +149,7 @@ namespace hfst { namespace implementations
     bool start_state_found=false;
 
   // For every line in foma transducer:
-  for (int i=0; (fsm+i)->state_no != -1; i++) {    
+  for (int i=0; (fsm+i)->state_no != -1; i++) {
 
     // Count the number of transitions in the current state
     // and initialize the transition vector of the net accordingly
@@ -157,7 +157,7 @@ namespace hfst { namespace implementations
       {
         unsigned int number_of_transitions = get_number_of_transitions(fsm+i);
         net->initialize_transition_vector
-          ((fsm+i)->state_no, 
+          ((fsm+i)->state_no,
            number_of_transitions);
       }
 
@@ -167,16 +167,16 @@ namespace hfst { namespace implementations
     }
 
     // 2. If there are transitions leaving from the state,
-    if ((fsm+i)->target != -1) 
+    if ((fsm+i)->target != -1)
       {
         // copy the transition.
         net->add_transition
           ((fsm+i)->state_no,
            HfstBasicTransition
            ((fsm+i)->target,
-            harmonization_vector.at((fsm+i)->in), 
-            harmonization_vector.at((fsm+i)->out), 
-            0, false), false);    
+            harmonization_vector.at((fsm+i)->in),
+            harmonization_vector.at((fsm+i)->out),
+            0, false), false);
       }
     
     // 3. If the source state is final in foma,
@@ -197,7 +197,7 @@ namespace hfst { namespace implementations
       "Foma transducer has no start state");*/
   }
   
-  /* If start state number (N) is not zero, swap state numbers N and zero 
+  /* If start state number (N) is not zero, swap state numbers N and zero
      in internal transducer. TODO */
   if (start_state_id != 0) {
     net->swap_state_numbers(start_state_id,0);
@@ -214,8 +214,8 @@ namespace hfst { namespace implementations
       {
     if (alphabet_before.find(*after_it) == alphabet_before.end())
       {
-        std::cerr << "ERROR: " 
-              << *after_it 
+        std::cerr << "ERROR: "
+              << *after_it
               << " was inserted to the alphabet!"
               << std::endl;
       }
@@ -225,8 +225,8 @@ namespace hfst { namespace implementations
       {
     if (alphabet_after.find(*before_it) == alphabet_after.end())
       {
-        std::cerr << "ERROR: " 
-              << *before_it 
+        std::cerr << "ERROR: "
+              << *before_it
               << " was removed from the alphabet!"
               << std::endl;
       }
@@ -242,7 +242,7 @@ namespace hfst { namespace implementations
 
   /* ------------------------------------------------------------------------
      
-     Create a foma transducer equivalent to HfstBasicTransducer \a hfst_fsm. 
+     Create a foma transducer equivalent to HfstBasicTransducer \a hfst_fsm.
 
      ------------------------------------------------------------------------ */
 
@@ -254,7 +254,7 @@ namespace hfst { namespace implementations
     alphabet_before.erase(internal_epsilon);
     alphabet_before.erase(internal_unknown);
     alphabet_before.erase(internal_identity);
-#endif // DEBUG_CONVERSION    
+#endif // DEBUG_CONVERSION
 
     struct fsm_construct_handle *h;
     struct fsm *net;
@@ -268,15 +268,15 @@ namespace hfst { namespace implementations
          it != hfst_fsm->end(); it++)
       {
         // ----- Go through the set of transitions in each state -----
-        for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
+        for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
                = it->begin();
              tr_it != it->end(); tr_it++)
           {
             // Copy the transition
             const char * input = tr_it->get_transition_data().get_input_symbol().c_str();
             const char * output = tr_it->get_transition_data().get_output_symbol().c_str();
-            fsm_construct_add_arc(h, 
-                                  (int)source_state, 
+            fsm_construct_add_arc(h,
+                                  (int)source_state,
                                   (int)tr_it->get_target_state(),
                                   const_cast<char *>(input),
                                   const_cast<char *>(output) );
@@ -285,14 +285,14 @@ namespace hfst { namespace implementations
           }
         // ----- transitions gone through -----
         source_state++;
-      }  
+      }
     // ----- all states gone through -----
     
 
     // ----- Go through the final states -----
-    for (HfstBasicTransducer::FinalWeightMap::const_iterator it 
+    for (HfstBasicTransducer::FinalWeightMap::const_iterator it
            = hfst_fsm->final_weight_map.begin();
-         it != hfst_fsm->final_weight_map.end(); it++) 
+         it != hfst_fsm->final_weight_map.end(); it++)
       {
         // Set the state as final
         fsm_construct_set_final(h, (int)it->first);

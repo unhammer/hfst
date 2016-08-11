@@ -29,29 +29,29 @@ void RightArrowRuleContainer::add_rule_and_display_and_resolve_conflicts
 (ConflictResolvingRightArrowRule * rule,std::ostream &out)
 {
   if (center_to_rule_map.has_key(rule->center_pair))
-    { 
+    {
       if (report_right_arrow_conflicts)
-    { 
+    {
       out << "There is a =>-rule conflict between "
           << Rule::get_print_name
-        (center_to_rule_map[rule->center_pair]->name) 
-          << " and " << Rule::get_print_name(rule->name) << "." 
+        (center_to_rule_map[rule->center_pair]->name)
+          << " and " << Rule::get_print_name(rule->name) << "."
           << std::endl
-          << "Resolving the conflict by joining contexts." 
+          << "Resolving the conflict by joining contexts."
           << std::endl << std::endl;
     }
 
       if (resolve_right_arrow_conflicts)
-        { 
-          center_to_rule_map[rule->center_pair]->resolve_conflict(*rule); 
+        {
+          center_to_rule_map[rule->center_pair]->resolve_conflict(*rule);
           rule->is_empty = true;
         }
       else
         { rule_vector.push_back(rule); }
     }
   else
-    { 
-      center_to_rule_map[rule->center_pair] = rule; 
+    {
+      center_to_rule_map[rule->center_pair] = rule;
       rule_vector.push_back(rule);
     }
 }

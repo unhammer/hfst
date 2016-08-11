@@ -50,7 +50,7 @@ class Rule
        const OtherSymbolTransducer &center,
        const OtherSymbolTransducerVector &contexts);
 
-  //! @brief Construct a rule which is equivalent to the intersection of the 
+  //! @brief Construct a rule which is equivalent to the intersection of the
   //! rules in @a v.
   Rule(const std::string &name,
        const RuleVector &v);
@@ -82,13 +82,13 @@ class Rule
   static OtherSymbolTransducer get_center
     (const OtherSymbolTransducer &restricted_center);
 
-  //! Replace "__HFST_TWOLC_SPACE" with " " and replace 
+  //! Replace "__HFST_TWOLC_SPACE" with " " and replace
   //! "__HFST_TWOLC_RULE_NAME=" with "".
   static std::string get_print_name(const std::string &s);
 
   //! Freely add symbols in @a diacritics, which do not occur in the alphabet
   //! of this rule.
-  void add_missing_symbols_freely(const SymbolRange &diacritics);  
+  void add_missing_symbols_freely(const SymbolRange &diacritics);
   
 };
 

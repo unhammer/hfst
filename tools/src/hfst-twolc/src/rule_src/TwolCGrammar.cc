@@ -36,8 +36,8 @@ TwolCGrammar::TwolCGrammar(bool be_quiet,
 }
 
 void TwolCGrammar::define_diacritics(const SymbolRange &diacritics)
-{ 
-  this->diacritics = diacritics; 
+{
+  this->diacritics = diacritics;
   OtherSymbolTransducer::define_diacritics(diacritics);
 }
 
@@ -57,21 +57,21 @@ void TwolCGrammar::add_rule(const std::string &name,
     case op::LEFT:
       rule = new ConflictResolvingLeftArrowRule(name,center,contexts);
       left_arrow_rule_container.add_rule_and_display_and_resolve_conflicts
-    (static_cast<ConflictResolvingLeftArrowRule*>(rule),std::cerr); 
+    (static_cast<ConflictResolvingLeftArrowRule*>(rule),std::cerr);
       break;
     case op::LEFT_RIGHT:
       rule = new ConflictResolvingRightArrowRule(name,center,contexts);
       right_arrow_rule_container.add_rule_and_display_and_resolve_conflicts
-    (static_cast<ConflictResolvingRightArrowRule*>(rule),std::cerr); 
+    (static_cast<ConflictResolvingRightArrowRule*>(rule),std::cerr);
       name_to_rule_subcases[get_original_name(name)].insert(rule);
       rule = new ConflictResolvingLeftArrowRule(name,center,contexts);
       left_arrow_rule_container.add_rule_and_display_and_resolve_conflicts
-    (static_cast<ConflictResolvingLeftArrowRule*>(rule),std::cerr); 
+    (static_cast<ConflictResolvingLeftArrowRule*>(rule),std::cerr);
       break;
     case op::NOT_LEFT:
       rule = new LeftRestrictionArrowRule(name,center,contexts);
       other_rule_container.add_rule
-    (static_cast<LeftRestrictionArrowRule*>(rule)); 
+    (static_cast<LeftRestrictionArrowRule*>(rule));
       break;
     default:
       assert(false);
@@ -134,7 +134,7 @@ void TwolCGrammar::add_rule(const std::string &name,
     {
       Rule * rule;
 
-      std::string center_name = 
+      std::string center_name =
         name + " CENTER=" + it->first + ":" + it->second;
       
       switch (oper)
@@ -147,22 +147,22 @@ void TwolCGrammar::add_rule(const std::string &name,
         case op::LEFT:
           rule = new ConflictResolvingLeftArrowRule(center_name,*it,contexts);
           left_arrow_rule_container.add_rule_and_display_and_resolve_conflicts
-            (static_cast<ConflictResolvingLeftArrowRule*>(rule),std::cerr); 
+            (static_cast<ConflictResolvingLeftArrowRule*>(rule),std::cerr);
           break;
         case op::LEFT_RIGHT:
           rule = new ConflictResolvingRightArrowRule(center_name,*it,contexts);
           right_arrow_rule_container.add_rule_and_display_and_resolve_conflicts
-            (static_cast<ConflictResolvingRightArrowRule*>(rule),std::cerr); 
+            (static_cast<ConflictResolvingRightArrowRule*>(rule),std::cerr);
           name_to_rule_subcases[get_original_name(center_name)].insert(rule);
 
           rule = new ConflictResolvingLeftArrowRule(center_name,*it,contexts);
           left_arrow_rule_container.add_rule_and_display_and_resolve_conflicts
-            (static_cast<ConflictResolvingLeftArrowRule*>(rule),std::cerr); 
+            (static_cast<ConflictResolvingLeftArrowRule*>(rule),std::cerr);
           break;
         case op::NOT_LEFT:
           rule = new LeftRestrictionArrowRule(center_name,*it,contexts);
           other_rule_container.add_rule
-            (static_cast<LeftRestrictionArrowRule*>(rule)); 
+            (static_cast<LeftRestrictionArrowRule*>(rule));
           break;
         default:
           assert(false);
@@ -203,23 +203,23 @@ int main(void)
 
   bool have_openfst = false;
 #if HAVE_OPENFST
-  have_openfst = true; 
+  have_openfst = true;
 #endif // HAVE_OPENFST
 
   bool have_sfst = false;
 #if HAVE_SFST
-  have_sfst = true; 
+  have_sfst = true;
 #endif // HAVE_SFST
 
   bool have_foma = false;
 #if HAVE_FOMA
-  have_foma = true; 
+  have_foma = true;
 #endif // HAVE_FOMA
 
-ImplementationType transducer_type 
-= have_openfst ? hfst::TROPICAL_OPENFST_TYPE : 
+ImplementationType transducer_type
+= have_openfst ? hfst::TROPICAL_OPENFST_TYPE :
   have_sfst ? hfst::SFST_TYPE :
-  have_foma ? hfst::FOMA_TYPE : 
+  have_foma ? hfst::FOMA_TYPE :
   hfst::ERROR_TYPE;
 
  OtherSymbolTransducer::set_transducer_type(transducer_type);
@@ -247,7 +247,7 @@ ImplementationType transducer_type
   OtherSymbolTransducer b_c_pair("b","c");
 
   OtherSymbolTransducer context = unknown;
-  context.    
+  context.
     apply(&HfstTransducer::concatenate,b_c_pair).
     apply(&HfstTransducer::concatenate,diamond).
     apply(&HfstTransducer::concatenate,unknown).
@@ -262,7 +262,7 @@ ImplementationType transducer_type
 
   OtherSymbolTransducer a_d_pair("a","d");
   OtherSymbolTransducer context1 = unknown;
-  context1.    
+  context1.
     //apply(&HfstTransducer::concatenate,a_d_pair).
     apply(&HfstTransducer::concatenate,b_c_pair).
     apply(&HfstTransducer::concatenate,diamond).

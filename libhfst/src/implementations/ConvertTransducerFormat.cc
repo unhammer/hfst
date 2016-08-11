@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 #if HAVE_CONFIG_H
@@ -20,16 +20,16 @@
 namespace hfst { namespace implementations
 {
 
-  ConversionFunctions::String2NumberMap 
+  ConversionFunctions::String2NumberMap
     ConversionFunctions::string_to_number_map;
   StringVector ConversionFunctions::number_to_string_vector;
 
-  StringVectorInitializer 
+  StringVectorInitializer
   dummy3(ConversionFunctions::number_to_string_vector);
-  String2NumberMapInitializer 
+  String2NumberMapInitializer
   dummy4(ConversionFunctions::string_to_number_map);
 
-  std::string ConversionFunctions::get_string(unsigned int number) 
+  std::string ConversionFunctions::get_string(unsigned int number)
   {
     if (number >= number_to_string_vector.size()) {
       return std::string(""); } // number not found
@@ -42,14 +42,14 @@ namespace hfst { namespace implementations
       string_to_number_map.find(str);
     if (it == string_to_number_map.end()) { // string not found
       number_to_string_vector.push_back(str);
-      unsigned int new_index = number_to_string_vector.size()-1; 
+      unsigned int new_index = number_to_string_vector.size()-1;
       string_to_number_map[str] = new_index;
       return new_index;
     }
     return it->second;
   }
   
-  ConversionFunctions::NumberVector 
+  ConversionFunctions::NumberVector
     ConversionFunctions::get_harmonization_vector
       (const StringVector &coding_vector)
   {
@@ -71,7 +71,7 @@ namespace hfst { namespace implementations
   (const hfst::HfstTransducer &t) {
 #if HAVE_SFST
     if (t.type == SFST_TYPE) {
-      HfstBasicTransducer * retval = sfst_to_hfst_basic_transducer(t.implementation.sfst); 
+      HfstBasicTransducer * retval = sfst_to_hfst_basic_transducer(t.implementation.sfst);
       retval->name = t.get_name();
       return retval;
     }
@@ -80,13 +80,13 @@ namespace hfst { namespace implementations
 #if HAVE_OPENFST
     if (t.type == TROPICAL_OPENFST_TYPE) {
       HfstBasicTransducer * retval = tropical_ofst_to_hfst_basic_transducer
-        (t.implementation.tropical_ofst); 
+        (t.implementation.tropical_ofst);
       retval->name = t.get_name();
       return retval;
     }
 #if HAVE_OPENFST_LOG
     if (t.type == LOG_OPENFST_TYPE) {
-      HfstBasicTransducer * retval = log_ofst_to_hfst_basic_transducer(t.implementation.log_ofst); 
+      HfstBasicTransducer * retval = log_ofst_to_hfst_basic_transducer(t.implementation.log_ofst);
       retval->name = t.get_name();
       return retval;
     }
@@ -95,7 +95,7 @@ namespace hfst { namespace implementations
     
 #if HAVE_FOMA
     if (t.type == FOMA_TYPE) {
-      HfstBasicTransducer * retval = foma_to_hfst_basic_transducer(t.implementation.foma); 
+      HfstBasicTransducer * retval = foma_to_hfst_basic_transducer(t.implementation.foma);
       retval->name = t.get_name();
       return retval;
     }
@@ -103,7 +103,7 @@ namespace hfst { namespace implementations
 
 #if HAVE_XFSM
     if (t.type == XFSM_TYPE) {
-      HfstBasicTransducer * retval = xfsm_to_hfst_basic_transducer(t.implementation.xfsm); 
+      HfstBasicTransducer * retval = xfsm_to_hfst_basic_transducer(t.implementation.xfsm);
       retval->name = t.get_name();
       return retval;
     }
@@ -114,7 +114,7 @@ namespace hfst { namespace implementations
     //#if HAVE_MY_TRANSDUCER_LIBRARY
     //    if (t.type == MY_TRANSDUCER_LIBRARY_TYPE)
     //      return my_transducer_library_transducer_to_hfst_basic_transducer
-    //        (t.implementation.my_transducer_library); 
+    //        (t.implementation.my_transducer_library);
     //#endif // HAVE_MY_TRANSDUCER_LIBRARY
 
     if (t.type == HFST_OL_TYPE || t.type == HFST_OLW_TYPE)
@@ -172,7 +172,7 @@ int main(void)
             HfstTransducer fsm1("cat", "dog", tok, types[i]);
             fsm1.set_final_weights(4);
             
-            HfstBasicTransducer * fsm1_converted = 
+            HfstBasicTransducer * fsm1_converted =
               ConversionFunctions::hfst_transducer_to_hfst_basic_transducer(fsm1);
             
             HfstTransducer fsm1_converted_twice(*fsm1_converted, types[i]);

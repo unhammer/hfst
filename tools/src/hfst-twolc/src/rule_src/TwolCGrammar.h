@@ -33,15 +33,15 @@
 namespace op
 {
   enum OPERATOR
-  { 
-    RIGHT, 
-    LEFT, 
-    NOT_LEFT, 
-    LEFT_RIGHT, 
-    RE_RIGHT, 
-    RE_LEFT, 
-    RE_NOT_LEFT, 
-    RE_LEFT_RIGHT 
+  {
+    RIGHT,
+    LEFT,
+    NOT_LEFT,
+    LEFT_RIGHT,
+    RE_RIGHT,
+    RE_LEFT,
+    RE_NOT_LEFT,
+    RE_LEFT_RIGHT
   };
 }
 

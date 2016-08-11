@@ -30,7 +30,7 @@
   #ifdef ZLIB
     #include "zlib.h"
   #endif
-#endif // #ifdef ORIGINAL 
+#endif // #ifdef ORIGINAL
 
 extern int g_show_flags;
 extern int g_obey_flags;
@@ -171,7 +171,7 @@ struct global_help {
     {"print upper-words","prints words on the upper side of top FSM","Short form: upper-words"},
     {"print upper-words > filename","prints words on the upper side of top FSM to file","Short form:upper-words"},
     {"print words","prints words of top FSM","Short form: words"},
-    {"print words > filename","prints words of top FSM to file","Short form: words"},    
+    {"print words > filename","prints words of top FSM to file","Short form: words"},
     {"prune net","makes top network coaccessible",""},
     {"push (defined) <name>","adds a defined FSM to top of stack",""},
     {"quit","exit foma",""},
@@ -442,9 +442,9 @@ int iface_apply_file(char *infilename, char *outfilename, int direction) {
             if (direction == AP_D)
                 result = apply_down(ah,NULL);
             if (direction == AP_U)
-                result = apply_up(ah,NULL);            
+                result = apply_up(ah,NULL);
             if (result == NULL)
-                break;            
+                break;
             fprintf(OUTFILE,"%s\n", result);
         }
     }
@@ -480,7 +480,7 @@ void iface_apply_down(char *word) {
 void iface_apply_up(char *word) {
     int i;
     char *result;
-    struct apply_handle *ah; 
+    struct apply_handle *ah;
     if (!iface_stack_check(1)) {
         return;
     }
@@ -511,7 +511,7 @@ void iface_close() {
 
 void iface_compact() {
     if (iface_stack_check(1)) {
-        fsm_compact(stack_find_top()->fsm); 
+        fsm_compact(stack_find_top()->fsm);
 	sigma_sort(stack_find_top()->fsm);
         stack_add(fsm_topsort(fsm_minimize(stack_pop())));
     }
@@ -550,7 +550,7 @@ void iface_crossproduct() {
     struct fsm *one, *two;
     if (iface_stack_check(2)) {
 	one = stack_pop();
-	two = stack_pop();         
+	two = stack_pop();
         stack_add(fsm_topsort(fsm_minimize(fsm_cross_product(one,two))));
     }
 }
@@ -599,14 +599,14 @@ void iface_ignore() {
     struct fsm *one, *two;
     if (iface_stack_check(2)) {
 	one = stack_pop();
-	two = stack_pop();         
+	two = stack_pop();
         stack_add(fsm_topsort(fsm_minimize(fsm_ignore(one,two,OP_IGNORE_ALL))));
     }
 }
 
 void iface_intersect() {
     if (iface_stack_check(2)) {
-        while (stack_size()>1) 
+        while (stack_size()>1)
             stack_add(fsm_topsort(fsm_minimize(fsm_intersect(stack_pop(),stack_pop()))));
     }
 }
@@ -671,7 +671,7 @@ void iface_pop() {
     else {
         net = stack_pop();
 	fsm_destroy(net);
-    }        
+    }
 }
 
 void iface_lower_words(int limit) {
@@ -697,7 +697,7 @@ void iface_lower_words(int limit) {
 
 void iface_name_net(char *name) {
     if (iface_stack_check(1)) {
-        strncpy(stack_find_top()->fsm->name, name, 40); 
+        strncpy(stack_find_top()->fsm->name, name, 40);
         iface_print_name();
     }
 }
@@ -735,14 +735,14 @@ void iface_print_cmatrix_att(char *filename) {
             printf("No confusion matrix defined.\n");
         } else {
             if (filename == NULL) {
-                outfile = stdout;            
+                outfile = stdout;
             } else {
                 outfile = fopen(filename,"w");
                 printf("Writing confusion matrix to file '%s'.\n", filename);
-            }        
+            }
             cmatrix_print_att(stack_find_top()->fsm, outfile);
         }
-    }    
+    }
 }
 
 void iface_print_cmatrix() {
@@ -752,7 +752,7 @@ void iface_print_cmatrix() {
         } else {
             cmatrix_print(stack_find_top()->fsm);
         }
-    }    
+    }
 }
 
 void iface_print_defined() {
@@ -861,7 +861,7 @@ void iface_print_shortest_string() {
     if (iface_stack_check(1)) {
         one = fsm_copy(stack_find_top()->fsm);
         /* L -  ?+  [[L .o. [?:"@TMP@"]*].l .o. "@TMP@":?*].l; */
-        if (stack_find_top()->fsm->arity == 1) {           
+        if (stack_find_top()->fsm->arity == 1) {
             Result = fsm_minimize(fsm_minus(fsm_copy(one),fsm_concat(fsm_kleene_plus(fsm_identity()),fsm_lower(fsm_compose(fsm_lower(fsm_compose(fsm_copy(one),fsm_kleene_star(fsm_cross_product(fsm_identity(),fsm_symbol("@TMP@"))))),fsm_kleene_star(fsm_cross_product(fsm_symbol("@TMP@"),fsm_identity())))))));
             ah = apply_init(Result);
             word = apply_words(ah);
@@ -901,7 +901,7 @@ void iface_print_shortest_string_size() {
             ResultU = fsm_minimize(fsm_lower(fsm_compose(oneu,fsm_kleene_star(fsm_cross_product(fsm_identity(),fsm_symbol("a"))))));
             ResultL = fsm_minimize(fsm_lower(fsm_compose(onel,fsm_kleene_star(fsm_cross_product(fsm_identity(),fsm_symbol("a"))))));
             printf("Shortest acyclic upper path length: %i\n",(ResultU->statecount)-1);
-            printf("Shortest acyclic lower path length: %i\n",(ResultL->statecount)-1);            
+            printf("Shortest acyclic lower path length: %i\n",(ResultL->statecount)-1);
         }
     }
 }
@@ -917,7 +917,7 @@ int iface_read_att(char *filename) {
     } else {
         stack_add(tempnet);
         return 0;
-    }   
+    }
 }
 
 int iface_read_prolog(char *filename) {
@@ -1030,7 +1030,7 @@ void iface_save_defined(char *filename) {
     save_defined(g_defines, filename);
 }
 
-#if defined(ORIGINAL) || defined(ZLIB) 
+#if defined(ORIGINAL) || defined(ZLIB)
 void iface_save_stack(char *filename) {
     gzFile outfile;
     struct stack_entry *stack_ptr;
@@ -1075,7 +1075,7 @@ void iface_show_variable(char *name) {
             return;
         }
     }
-    printf("*There is no global variable '%s'.\n",name);    
+    printf("*There is no global variable '%s'.\n",name);
 }
 
 void iface_set_variable(char *name, char *value) {
@@ -1265,7 +1265,7 @@ void iface_words_file(char *filename, int type) {
         }
         apply_reset_enumerator(ah);
 	fclose(outfile);
-    }   
+    }
 }
 
 void iface_words(int limit) {
@@ -1343,15 +1343,15 @@ void iface_pairs_call(int limit, int random) {
     if (iface_stack_check(1)) {
         ah = stack_get_ah();
 	apply_set_show_flags(ah, g_show_flags);
-	apply_set_obey_flags(ah, g_obey_flags);	
+	apply_set_obey_flags(ah, g_obey_flags);
 	apply_set_space_symbol(ah, "\001");
 	apply_set_epsilon(ah, "\002");
 	apply_set_separator(ah, "\003");
         for (i = limit; i > 0; i--) {
-	    if (random == 1)		
+	    if (random == 1)
 		result = apply_random_words(ah);
 	    else
-		result = apply_words(ah);		
+		result = apply_words(ah);
             if (result == NULL)
                 break;
 	    iface_split_result(result, &upper, &lower);
@@ -1361,7 +1361,7 @@ void iface_pairs_call(int limit, int random) {
         }
 	apply_set_space_symbol(ah, " ");
 	apply_set_epsilon(ah, "0");
-	apply_set_separator(ah, ":");	
+	apply_set_separator(ah, ":");
         apply_reset_enumerator(ah);
     }
 }
@@ -1390,12 +1390,12 @@ void iface_pairs_file(char *filename) {
 	}
 	ah = stack_get_ah();
 	apply_set_show_flags(ah, g_show_flags);
-	apply_set_obey_flags(ah, g_obey_flags);	
+	apply_set_obey_flags(ah, g_obey_flags);
 	apply_set_space_symbol(ah, "\001");
 	apply_set_epsilon(ah, "\002");
 	apply_set_separator(ah, "\003");
         for (;;) {
-	    result = apply_words(ah);		
+	    result = apply_words(ah);
             if (result == NULL)
                 break;
 	    iface_split_result(result, &upper, &lower);
@@ -1405,7 +1405,7 @@ void iface_pairs_file(char *filename) {
         }
 	apply_set_space_symbol(ah, " ");
 	apply_set_epsilon(ah, "0");
-	apply_set_separator(ah, ":");	
+	apply_set_separator(ah, ":");
         apply_reset_enumerator(ah);
 	fclose(outfile);
     }
@@ -1436,7 +1436,7 @@ int iface_write_att(char *filename) {
 }
 
 void iface_write_prolog(char *filename) {
-  if (iface_stack_check(1))       
+  if (iface_stack_check(1))
     foma_write_prolog(stack_find_top()->fsm, filename);
 }
 
@@ -1514,10 +1514,10 @@ static int print_net(struct fsm *net, char *filename) {
   fprintf(out,"Arity: %i\n", net->arity);
   for (; stateptr->state_no != -1; stateptr++) {
     if (stateptr->state_no != previous_state) {
-      if (stateptr->start_state) { 
+      if (stateptr->start_state) {
           fprintf(out,"S");
       }
-      if (stateptr->final_state) { 
+      if (stateptr->final_state) {
           fprintf(out,"f");
       }
       if (stateptr->in==-1) {
@@ -1576,7 +1576,7 @@ void print_mem_size(struct fsm *net) {
     } else if (s >= 1048576 && s < 1073741824) {
         sprintf(size, "%.1f MB. ", sf/1048576);
     } else if (s >= 1073741824) {
-        sprintf(size, "%.1f GB. ", sf/1073741824);        
+        sprintf(size, "%.1f GB. ", sf/1073741824);
     }
     fprintf(stdout, "%s", size);
     fflush(stdout);
@@ -1656,8 +1656,8 @@ static int print_dot(struct fsm *net, char *filename) {
   }
 
   printed = xxcalloc(net->linecount,sizeof(printed));
-  /* Go through arcs */  
-  for (i=0; (stateptr+i)->state_no != -1; i++) {      
+  /* Go through arcs */
+  for (i=0; (stateptr+i)->state_no != -1; i++) {
       if ((stateptr+i)->target == -1 || printed[i] == 1)
           continue;
       fprintf(dotfile,"%i -> %i [label=\"", (stateptr+i)->state_no, (stateptr+i)->target);
@@ -1681,7 +1681,7 @@ static int print_dot(struct fsm *net, char *filename) {
               }
           }
       }
-      fprintf(dotfile,"\"];\n");  
+      fprintf(dotfile,"\"];\n");
   }
 
   

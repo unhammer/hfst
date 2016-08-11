@@ -23,7 +23,7 @@ RuleSymbolVector::RuleSymbolVector(const VariableValueMap &vvm):
 std::string RuleSymbolVector::replace_variables(void)
 {
   std::string result;
-  for (std::vector<std::string>::const_iterator it = 
+  for (std::vector<std::string>::const_iterator it =
      std::vector<std::string>::begin();
        it != std::vector<std::string>::end();
        ++it)
@@ -44,7 +44,7 @@ std::string RuleSymbolVector::replace_variables(void)
         (symbol.size()-1,
          "__HFST_TWOLC_SPACE"+ it->first + "=" + it->second); }
     }
-      result += 
+      result +=
     (vvm.has_key(symbol) ? vvm.get_value(symbol) : symbol) + " ";
     }
   return result;
@@ -53,7 +53,7 @@ std::string RuleSymbolVector::replace_variables(void)
 std::string RuleSymbolVector::replace_variables(const RuleCenter &center)
 {
   std::string result;
-  for (std::vector<std::string>::const_iterator it = 
+  for (std::vector<std::string>::const_iterator it =
          std::vector<std::string>::begin();
        it != std::vector<std::string>::end();
        ++it)
@@ -77,15 +77,15 @@ std::string RuleSymbolVector::replace_variables(const RuleCenter &center)
       else if (symbol == "__HFST_TWOLC_RULE_CENTER")
         { symbol = center.first + " __HFST_TWOLC_: " + center.second; }
 
-      result += 
+      result +=
     (vvm.has_key(symbol) ? vvm.get_value(symbol) : symbol) + " ";
     }
   return result;
 }
 
 RuleSymbolVector &RuleSymbolVector::push_back(const std::string &s)
-{ 
-  std::vector<std::string>::push_back(s); 
+{
+  std::vector<std::string>::push_back(s);
   return *this;
 }
 

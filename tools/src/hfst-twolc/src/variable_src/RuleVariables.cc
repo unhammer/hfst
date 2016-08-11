@@ -72,7 +72,7 @@ void RuleVariables::clear(void)
 
 bool RuleVariables::empty(void) const
 {
-  return 
+  return
     freely_blocks.begin() == freely_blocks.end() &&
     matched_blocks.begin() == matched_blocks.end() &&
     mixed_blocks.begin() == mixed_blocks.end();

@@ -33,7 +33,7 @@ class RightArrowRuleContainer : public RuleContainer
  protected:
   static bool report_right_arrow_conflicts;
   static bool resolve_right_arrow_conflicts;
-  typedef HandyMap<SymbolPair,ConflictResolvingRightArrowRule*> 
+  typedef HandyMap<SymbolPair,ConflictResolvingRightArrowRule*>
     CenterToRuleMap;
   CenterToRuleMap center_to_rule_map;
  public:

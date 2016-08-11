@@ -14,7 +14,7 @@
 case 'i':
   inputfilename = hfst_strdup(optarg);
   inputfile = hfst_fopen(inputfilename, "r");
-  if (inputfile == stdin) 
+  if (inputfile == stdin)
     {
       free(inputfilename);
       inputfilename = hfst_strdup("<stdin>");

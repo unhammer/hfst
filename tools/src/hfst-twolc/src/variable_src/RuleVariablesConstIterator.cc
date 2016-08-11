@@ -67,7 +67,7 @@ RuleVariablesConstIterator &RuleVariablesConstIterator::operator=
 
 bool RuleVariablesConstIterator::operator==
 (const RuleVariablesConstIterator &another)
-{ return f_it == another.f_it && ma_it == another.ma_it && 
+{ return f_it == another.f_it && ma_it == another.ma_it &&
     mi_it == another.mi_it; }
 
 bool RuleVariablesConstIterator::operator!=
@@ -81,11 +81,11 @@ void RuleVariablesConstIterator::operator++(void)
       if (ma_it + 1 == ma_end)
     {
       if (mi_it + 1 == mi_end)
-        { 
+        {
           f_it = f_end;
           ma_it = ma_end;
           mi_it = mi_end;
-          return; 
+          return;
         }
       else
         { ++mi_it; }

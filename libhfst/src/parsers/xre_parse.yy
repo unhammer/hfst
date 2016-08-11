@@ -1,14 +1,14 @@
 %{
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
-#define YYDEBUG 1 
+#define YYDEBUG 1
 
 #include <stdio.h>
 #include <assert.h>
@@ -25,7 +25,7 @@ using namespace hfst::implementations;
 
 #include "xre_utils.h"
 
-namespace hfst { 
+namespace hfst {
   namespace xre {
     // number of characters read, used for scanning function definition xre for argument symbols
     extern unsigned int cr;
@@ -45,8 +45,8 @@ namespace hfst {
     }
 
     bool is_weighted()
-    {   
-        return (hfst::xre::format == hfst::TROPICAL_OPENFST_TYPE || 
+    {
+        return (hfst::xre::format == hfst::TROPICAL_OPENFST_TYPE ||
                 hfst::xre::format == hfst::LOG_OPENFST_TYPE);
     }
   }
@@ -94,14 +94,14 @@ int xrelex ( YYSTYPE * , yyscan_t );
     hfst::HfstTransducerVector* transducerVector;
 
    std::pair<hfst::xeroxRules::ReplaceArrow, std::vector<hfst::xeroxRules::Rule> >* replaceRuleVectorWithArrow;
-   std::pair< hfst::xeroxRules::ReplaceArrow, hfst::xeroxRules::Rule>* replaceRuleWithArrow;   
+   std::pair< hfst::xeroxRules::ReplaceArrow, hfst::xeroxRules::Rule>* replaceRuleWithArrow;
    std::pair< hfst::xeroxRules::ReplaceArrow, hfst::HfstTransducerPairVector>* mappingVectorWithArrow;
    std::pair< hfst::xeroxRules::ReplaceArrow, hfst::HfstTransducerPair>* mappingWithArrow;
        
    std::pair<hfst::xeroxRules::ReplaceType, hfst::HfstTransducerPairVector>* contextWithMark;
    
    hfst::xeroxRules::ReplaceType replType;
-   hfst::xeroxRules::ReplaceArrow replaceArrow; 
+   hfst::xeroxRules::ReplaceArrow replaceArrow;
 
 }
 
@@ -121,7 +121,7 @@ int xrelex ( YYSTYPE * , yyscan_t );
 %type <transducerPairVector> CONTEXTS_VECTOR RESTR_CONTEXTS_VECTOR
 %type <transducerPair> CONTEXT RESTR_CONTEXT
 %type <replType>  CONTEXT_MARK
-%type <label>     HALFARC SUB2     
+%type <label>     HALFARC SUB2
 %type <label>     SYMBOL_OR_QUOTED
 
 %type <transducerVector> REGEXP_LIST   // function call
@@ -140,7 +140,7 @@ int xrelex ( YYSTYPE * , yyscan_t );
        RTL_LONGEST_MATCH RTL_SHORTEST_MATCH
        LTR_LONGEST_MATCH LTR_SHORTEST_MATCH
       
-%right REPLACE_CONTEXT_UU REPLACE_CONTEXT_LU 
+%right REPLACE_CONTEXT_UU REPLACE_CONTEXT_LU
        REPLACE_CONTEXT_UL REPLACE_CONTEXT_LL
 
 %left  UNION MINUS UPPER_MINUS LOWER_MINUS UPPER_PRIORITY_UNION
@@ -150,7 +150,7 @@ int xrelex ( YYSTYPE * , yyscan_t );
 
 %left  COMMACOMMA
 
-%left  COMMA 
+%left  COMMA
        
 %left  BEFORE AFTER
 
@@ -167,13 +167,13 @@ int xrelex ( YYSTYPE * , yyscan_t );
 %token EPSILON_TOKEN ANY_TOKEN BOUNDARY_MARKER
 %token LEXER_ERROR
 %token END_OF_EXPRESSION
-%token PAIR_SEPARATOR 
+%token PAIR_SEPARATOR
 %nonassoc <label> QUOTED_LITERAL
 %%
 
-XRE: REGEXP1 { } 
-     | 
-     { 
+XRE: REGEXP1 { }
+     |
+     {
        // only comments
        hfst::xre::contains_only_comments = true;
        return 0;
@@ -182,7 +182,7 @@ XRE: REGEXP1 { }
 REGEXP1: REGEXP2 END_OF_EXPRESSION {
       // std::cerr << "regexp1:regexp2 end of expr \n"<< std::endl;
        // Symbols of form <foo> are not harmonized in xfst, that is why
-       // they are escaped as @_<foo>_@ and need to be unescaped finally.  
+       // they are escaped as @_<foo>_@ and need to be unescaped finally.
        // hfst::xre::last_compiled = & hfst::xre::unescape_enclosing_angle_brackets($1)->minimize();
        hfst::xre::last_compiled = & $1->minimize();
        $$ = hfst::xre::last_compiled;
@@ -192,9 +192,9 @@ REGEXP1: REGEXP2 END_OF_EXPRESSION {
    }
    | REGEXP2 {
    
-        //std::cerr << "regexp1:regexp2\n"<< *$1 << std::endl; 
+        //std::cerr << "regexp1:regexp2\n"<< *$1 << std::endl;
        // Symbols of form <foo> are not harmonized in xfst, that is why
-       // they are escaped as @_<foo>_@ and need to be unescaped finally.  
+       // they are escaped as @_<foo>_@ and need to be unescaped finally.
         // hfst::xre::last_compiled = & hfst::xre::unescape_enclosing_angle_brackets($1)->minimize();
         hfst::xre::last_compiled = & $1->minimize();
         $$ = hfst::xre::last_compiled;
@@ -203,11 +203,11 @@ REGEXP1: REGEXP2 END_OF_EXPRESSION {
 
 
 REGEXP2: REPLACE
-         { 
+         {
             $$ = & $1->minimize();
-          //  std::cerr << "regexp2:replace \n"<< std::endl; 
+          //  std::cerr << "regexp2:replace \n"<< std::endl;
          }
-       | REGEXP2 COMPOSITION REPLACE 
+       | REGEXP2 COMPOSITION REPLACE
        {
         if ($1->has_flag_diacritics() && $3->has_flag_diacritics())
           {
@@ -285,7 +285,7 @@ REGEXP2: REPLACE
 	        if (empty.compare(*$3))
 	        {
                         empty_replace_transducer=true;
-	        }	
+	        }
 
 	        if (empty_replace_transducer)
 	        {
@@ -293,13 +293,13 @@ REGEXP2: REPLACE
 		        // as they will be removed anyway
 		        hfst::xre::set_substitution_function_symbol($2);
 		        tmpTr->substitute(&hfst::xre::substitution_function);
-	        }	
+	        }
 
                 // `[ a:b, b, x y ]
                 // substitute b with x | y
                 tmpTr->substitute(tmp, *$3, false); // no harmonization
 
-	        if (!empty_replace_transducer) 
+	        if (!empty_replace_transducer)
                 {
                         // a:b .o. b -> x | y
                         // [[a:b].i .o. b -> x | y].i - this is for cases when b is on left side
@@ -342,7 +342,7 @@ REGEXP2: REPLACE
 SUB1: SUBSTITUTE_LEFT LEFT_BRACKET REPLACE COMMA { $$ = $3; } ; // first argument
 SUB2: HALFARC COMMA { $$ = $1; } ;  // symbol that needs to be replaced
 SUB3: SYMBOL_LIST RIGHT_BRACKET {  $$ = $1;  }  // symbol list
-      |     
+      |
       RIGHT_BRACKET { $$ = new HfstTransducer(hfst::xre::format); } // an empty symbol list
       ;
 
@@ -392,7 +392,7 @@ REPLACE : REGEXP3 { }
 
 PARALLEL_RULES: PARALLEL_RULES COMMACOMMA RULE
          {
-           //std::cerr << "parallel_rules: parallel_rules ,, rule"<< std::endl;      
+           //std::cerr << "parallel_rules: parallel_rules ,, rule"<< std::endl;
            if ($3->first != $1->first)
            {
              xreerror("Replace type mismatch in parallel rules");
@@ -405,7 +405,7 @@ PARALLEL_RULES: PARALLEL_RULES COMMACOMMA RULE
          }
          | RULE
          {
-         //std::cerr << "parallel_rules:rule"<< std::endl;        
+         //std::cerr << "parallel_rules:rule"<< std::endl;
             std::vector<Rule> * ruleVector = new std::vector<Rule>();
             ruleVector->push_back($1->second);
             
@@ -416,7 +416,7 @@ PARALLEL_RULES: PARALLEL_RULES COMMACOMMA RULE
 
 RULE: MAPPINGPAIR_VECTOR
       {
-         // std::cerr << "rule: mapping_vector"<< std::endl;      
+         // std::cerr << "rule: mapping_vector"<< std::endl;
         // HfstTransducer allMappingsDisjuncted = disjunctVectorMembers($1->second);
          
          Rule rule( $1->second );;
@@ -425,7 +425,7 @@ RULE: MAPPINGPAIR_VECTOR
       }
       | MAPPINGPAIR_VECTOR CONTEXTS_WITH_MARK
       {
-       //  std::cerr << "rule: mapping_vector contextsWM"<< std::endl;      
+       //  std::cerr << "rule: mapping_vector contextsWM"<< std::endl;
      //   HfstTransducer allMappingsDisjuncted = disjunctVectorMembers($1->second);
         
         Rule rule( $1->second, $2->second, $2->first );
@@ -437,7 +437,7 @@ RULE: MAPPINGPAIR_VECTOR
 // Mappings: ( ie. a -> b , c -> d , ... , g -> d)
 MAPPINGPAIR_VECTOR: MAPPINGPAIR_VECTOR COMMA MAPPINGPAIR
       {
-        // std::cerr << "mapping_vector : mapping_vector comma mapping"<< std::endl;      
+        // std::cerr << "mapping_vector : mapping_vector comma mapping"<< std::endl;
          // check if new Arrow is the same as the first one
 
          if ($1->first != $3->first)
@@ -448,17 +448,17 @@ MAPPINGPAIR_VECTOR: MAPPINGPAIR_VECTOR COMMA MAPPINGPAIR
  
          $1->second.push_back($3->second);
          $$ =  new std::pair< ReplaceArrow, HfstTransducerPairVector> ($1->first, $1->second);
-         delete $3; 
+         delete $3;
             
       }
       
       | MAPPINGPAIR
       {
-         // std::cerr << "mapping_vector : mapping"<< std::endl;      
+         // std::cerr << "mapping_vector : mapping"<< std::endl;
          HfstTransducerPairVector * mappingPairVector = new HfstTransducerPairVector();
          mappingPairVector->push_back( $1->second );
          $$ =  new std::pair< ReplaceArrow, HfstTransducerPairVector> ($1->first, * mappingPairVector);
-         delete $1; 
+         delete $1;
       }
      
       ;
@@ -466,8 +466,8 @@ MAPPINGPAIR_VECTOR: MAPPINGPAIR_VECTOR COMMA MAPPINGPAIR
     
 MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
       {
-	  hfst::xre::warn_about_special_symbols_in_replace($1);  
-	  hfst::xre::warn_about_special_symbols_in_replace($3);  
+	  hfst::xre::warn_about_special_symbols_in_replace($1);
+	  hfst::xre::warn_about_special_symbols_in_replace($3);
           HfstTransducerPair mappingPair(*$1, *$3);
           $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($2, mappingPair);
 
@@ -534,31 +534,31 @@ MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
           delete $1, $4;
       }
       
-      ;    
+      ;
 
 // Contexts: ( ie. || k _ f , ... , f _ s )
 CONTEXTS_WITH_MARK:  CONTEXT_MARK CONTEXTS_VECTOR
-         {       
+         {
          $$ =  new std::pair< ReplaceType, HfstTransducerPairVector> ($1, *$2);
-         }  
+         }
          ;
 CONTEXTS_VECTOR: CONTEXT
          {
             HfstTransducerPairVector * ContextVector = new HfstTransducerPairVector();
             ContextVector->push_back(*$1);
             $$ = ContextVector;
-            delete $1; 
+            delete $1;
          }
 
       | CONTEXTS_VECTOR COMMA CONTEXT
          {
             $1->push_back(*$3);
             $$ = $1;
-            delete $3; 
+            delete $3;
          }
       
       ;
-CONTEXT: REPLACE CENTER_MARKER REPLACE 
+CONTEXT: REPLACE CENTER_MARKER REPLACE
          {
             if (hfst::xre::has_non_identity_pairs($1)) // if non-identity symbols present..
             {
@@ -572,7 +572,7 @@ CONTEXT: REPLACE CENTER_MARKER REPLACE
             }
             
             HfstTransducer t1(*$1);
-            HfstTransducer t2(*$3); 
+            HfstTransducer t2(*$3);
 
              if (hfst::xre::is_weighted())
              {
@@ -589,7 +589,7 @@ CONTEXT: REPLACE CENTER_MARKER REPLACE
              t2.minimize().prune_alphabet(false);
 
             $$ = new HfstTransducerPair(t1, t2);
-            delete $1, $3; 
+            delete $1, $3;
          }
       | REPLACE CENTER_MARKER
          {
@@ -609,9 +609,9 @@ CONTEXT: REPLACE CENTER_MARKER REPLACE
             }
             t1.minimize().prune_alphabet(false);
 
-            HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);            
+            HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
             $$ = new HfstTransducerPair(t1, epsilon);
-            delete $1; 
+            delete $1;
          }
       | CENTER_MARKER REPLACE
          {
@@ -634,7 +634,7 @@ CONTEXT: REPLACE CENTER_MARKER REPLACE
              
             HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
             $$ = new HfstTransducerPair(epsilon, t1);
-            delete $2; 
+            delete $2;
          }
        | CENTER_MARKER
           {
@@ -646,7 +646,7 @@ CONTEXT: REPLACE CENTER_MARKER REPLACE
          {
             $$ = REPL_UP;
          }
-         | REPLACE_CONTEXT_LU 
+         | REPLACE_CONTEXT_LU
          {
             $$ = REPL_RIGHT;
          }
@@ -743,22 +743,22 @@ RESTR_CONTEXTS_VECTOR: RESTR_CONTEXT
             HfstTransducerPairVector * ContextVector = new HfstTransducerPairVector();
             ContextVector->push_back(*$1);
             $$ = ContextVector;
-            delete $1; 
+            delete $1;
          }
 
       | RESTR_CONTEXTS_VECTOR COMMA RESTR_CONTEXT
          {
             $1->push_back(*$3);
             $$ = $1;
-            delete $3; 
+            delete $3;
          }
       
       ;
       
-RESTR_CONTEXT: REGEXP4 CENTER_MARKER REGEXP4 
+RESTR_CONTEXT: REGEXP4 CENTER_MARKER REGEXP4
          {
             $$ = new HfstTransducerPair(*$1, *$3);
-            delete $1, $3; 
+            delete $1, $3;
          }
       | REGEXP4 CENTER_MARKER
          {
@@ -768,13 +768,13 @@ RESTR_CONTEXT: REGEXP4 CENTER_MARKER REGEXP4
             
            // std::cerr << "Epsilon: \n" << epsilon  << std::endl;
             $$ = new HfstTransducerPair(*$1, epsilon);
-            delete $1; 
+            delete $1;
          }
       | CENTER_MARKER REGEXP4
          {
             HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
             $$ = new HfstTransducerPair(epsilon, *$2);
-            delete $2; 
+            delete $2;
          }
       | CENTER_MARKER
          {
@@ -825,7 +825,7 @@ REGEXP5: REGEXP6 { }
        ;
 
 REGEXP6: REGEXP7 { }
-       | REGEXP6 REGEXP7 { 
+       | REGEXP6 REGEXP7 {
         $$ = & $1->concatenate(*$2, harmonize_);
         delete $2;
         }
@@ -919,7 +919,7 @@ REGEXP9: REGEXP10 { }
             $$ = & $1->repeat_n($2);
         }
        | REGEXP9 CATENATE_N_PLUS {
-            //std::cerr << "value is ::::: \n"<< $2 << std::endl; 
+            //std::cerr << "value is ::::: \n"<< $2 << std::endl;
             $$ = & $1->repeat_n_plus($2+1);
         }
        | REGEXP9 CATENATE_N_MINUS {
@@ -992,7 +992,7 @@ REGEXP11: REGEXP12 { }
         }
         ;
 
-// building 3rd argument in the substitute list        
+// building 3rd argument in the substitute list
 SYMBOL_LIST: HALFARC {
             if (strcmp($1, hfst::internal_unknown.c_str()) == 0)
               {
@@ -1003,7 +1003,7 @@ SYMBOL_LIST: HALFARC {
                 $$ = new HfstTransducer($1, $1, hfst::xre::format);
               }
             free($1);
-        } 
+        }
         | SYMBOL_LIST HALFARC {
             HfstTransducer * tmp ;
             if (strcmp($2, hfst::internal_unknown.c_str()) == 0)
@@ -1017,12 +1017,12 @@ SYMBOL_LIST: HALFARC {
 
             $1->disjunct(*tmp, false); // do not harmonize
             $$ = & $1->minimize();
-            delete $2, tmp; 
+            delete $2, tmp;
             }
         ;
 
 REGEXP12: LABEL { }
-        | LABEL WEIGHT { 
+        | LABEL WEIGHT {
             $$ = & $1->set_final_weights($2, true);
         }
         | READ_BIN {
@@ -1059,7 +1059,7 @@ REGEXP12: LABEL { }
                 tmp.disjunct(spv, 0);
               }
               fclose(f);
-              HfstTransducer * retval = new HfstTransducer(tmp, hfst::xre::format); 
+              HfstTransducer * retval = new HfstTransducer(tmp, hfst::xre::format);
               retval->minimize();
               $$ = retval;
             }
@@ -1083,7 +1083,7 @@ REGEXP12: LABEL { }
                 tmp.disjunct(spv, 0);
               }
               fclose(f);
-              HfstTransducer * retval = new HfstTransducer(tmp, hfst::xre::format); 
+              HfstTransducer * retval = new HfstTransducer(tmp, hfst::xre::format);
               retval->minimize();
               $$ = retval;
             }
@@ -1218,8 +1218,8 @@ LABEL: HALFARC {
                 YYABORT;
               }
 
-              // if we are scanning a function definition for argument symbols, 
-              // do not include the characters read when evaluating functions inside it 
+              // if we are scanning a function definition for argument symbols,
+              // do not include the characters read when evaluating functions inside it
               unsigned int chars_read = hfst::xre::cr;
 
               int parse_retval = xreparse(scanner);
@@ -1255,10 +1255,10 @@ HALFARC: SYMBOL_OR_QUOTED
      {
        // Symbols of form <foo> are not harmonized in xfst, that is why
        // they need to be escaped as @_<foo>_@.
-       // $$ = hfst::xre::escape_enclosing_angle_brackets($1); 
+       // $$ = hfst::xre::escape_enclosing_angle_brackets($1);
        hfst::xre::warn_about_hfst_special_symbol($1);
        hfst::xre::warn_about_xfst_special_symbol($1);
-       $$ = $1; 
+       $$ = $1;
      }
      | EPSILON_TOKEN {
         $$ = strdup(hfst::internal_epsilon.c_str());
@@ -1271,13 +1271,13 @@ HALFARC: SYMBOL_OR_QUOTED
      }
      ;
 
-REGEXP_LIST: REGEXP_LIST COMMA REGEXP2 { 
+REGEXP_LIST: REGEXP_LIST COMMA REGEXP2 {
        $$->push_back(*($3));
-       delete $3; 
-     } 
-     | REGEXP2 { 
+       delete $3;
+     }
+     | REGEXP2 {
        $$ = new hfst::HfstTransducerVector();
-       $$->push_back(*($1)); 
+       $$->push_back(*($1));
        delete $1;
      }
      ;

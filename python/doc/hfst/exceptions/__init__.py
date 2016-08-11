@@ -12,7 +12,7 @@ class HfstTransducerTypeMismatchException(HfstException):
     pass
 
 
-## The library required by the implementation type requested is not linked to HFST. 
+## The library required by the implementation type requested is not linked to HFST.
 class ImplementationTypeNotAvailableException(HfstException):
     pass
 
@@ -32,25 +32,25 @@ class NotValidPrologFormatException(HfstException):
     pass
 
 
-## Stream cannot be read. 
+## Stream cannot be read.
 class StreamNotReadableException(HfstException):
     pass
 
 
-## Stream cannot be written. 
-# 
+## Stream cannot be written.
+#
 # Thrown by #hfst.HfstOutputStream.write and #hfst.HfstTransducer.write_att
 class StreamCannotBeWrittenException(HfstException):
     pass
 
 
-## Stream is closed. 
-# 
+## Stream is closed.
+#
 # Thrown by #hfst.HfstTransducer.write_att
 # #hfst.HfstOutputStream.write
-# 
-# An example: 
-# 
+#
+# An example:
+#
 # \verbatim
 # try:
 #     tr = hfst.regex('foo')
@@ -65,7 +65,7 @@ class StreamIsClosedException(HfstException):
 
 
 ## The stream is at end.
-# 
+#
 #     Thrown by
 #     #hfst.HfstTransducer
 #     #hfst.HfstInputStream.__init__
@@ -73,9 +73,9 @@ class EndOfStreamException(HfstException):
     pass
 
 
-## Transducer is cyclic. 
-# 
-#     Thrown by #hfst.HfstTransducer.extract_paths. An example 
+## Transducer is cyclic.
+#
+#     Thrown by #hfst.HfstTransducer.extract_paths. An example
 # \verbatim
 # transducer = hfst.regex('[a:b]*')
 # try:
@@ -91,13 +91,13 @@ class TransducerIsCyclicException(HfstException):
     pass
 
 
-## The stream does not contain transducers. 
-# 
-#     Thrown by 
+## The stream does not contain transducers.
+#
+#     Thrown by
 #     #hfst.HfstTransducer
 #     #hfst.HfstInputStream.__init__
-# 
-#     An example. 
+#
+#     An example.
 # \verbatim
 # f = open('foofile', 'w')
 # f.write('This is an ordinary text file.\n')
@@ -114,9 +114,9 @@ class NotTransducerStreamException(HfstException):
     pass
 
 
-## The stream is not in valid AT&T format. 
-# 
-#     An example: 
+## The stream is not in valid AT&T format.
+#
+#     An example:
 # \verbatim
 # f = open('testfile1.att', 'w')
 # f.write('0 1 a b\n\
@@ -130,7 +130,7 @@ class NotTransducerStreamException(HfstException):
 #     print('Could not read file: it is not in valid ATT format.')
 # f.close()
 # \endverbatim
-#     thrown by 
+#     thrown by
 #     #hfst.HfstTransducer.__init__
 class NotValidAttFormatException(HfstException):
     pass
@@ -141,10 +141,10 @@ class NotValidLexcFormatException(HfstException):
     pass
 
 
-## State is not final (and cannot have a final weight). 
-# 
+## State is not final (and cannot have a final weight).
+#
 #     An example :
-# 
+#
 # \verbatim
 # tr = hfst.HfstBasicTransducer()
 # tr.add_state(1)
@@ -154,10 +154,10 @@ class NotValidLexcFormatException(HfstException):
 # except hfst.exceptions.StateIsNotFinalException:
 #     print("State is not final.")
 # \endverbatim
-# 
+#
 # You should use function #hfst.HfstBasicTransducer.is_final_state if you are not sure whether a
 # state is final.
-# 
+#
 # Thrown by #hfst.HfstBasicTransducer get_final_weight.
 class StateIsNotFinalException(HfstException):
     pass
@@ -171,7 +171,7 @@ class ContextTransducersAreNotAutomataException(HfstException):
 
 ## Transducers are not automata.
 #
-# Example: 
+# Example:
 # \verbatim
 # tr1 = hfst.regex('foo:bar')
 # tr2 = hfst.regex('bar:baz')
@@ -179,7 +179,7 @@ class ContextTransducersAreNotAutomataException(HfstException):
 #     tr1.cross_product(tr2)
 # except hfst.exceptions.TransducersAreNotAutomataException:
 #     print('Transducers must be automata in cross product.')
-# \endverbatim 
+# \endverbatim
 #     This exception is thrown by
 #     #hfst.HfstTransducer.cross_product
 #     when either input transducer does not have equivalent input and
@@ -189,9 +189,9 @@ class TransducersAreNotAutomataException(HfstException):
 
 
 ## The state number argument is not valid.
-# 
+#
 #     An example :
-# 
+#
 # \verbatim
 # tr = hfst.HfstBasicTransducer()
 # tr.add_state(1)
@@ -204,32 +204,32 @@ class StateIndexOutOfBoundsException(HfstException):
     pass
 
 
-## Transducer has a malformed HFST header. 
-# 
+## Transducer has a malformed HFST header.
+#
 # Thrown by #hfst.HfstTransducer.__init__ #hfst.HfstInputStream
 class TransducerHeaderException(HfstException):
     pass
 
 
-## An OpenFst transducer does not have an input symbol table. 
-# 
+## An OpenFst transducer does not have an input symbol table.
+#
 #     When converting from OpenFst to tropical or log HFST, the OpenFst transducer
 #     must have at least an input symbol table. If the output symbol table
 #     is missing, it is assumed to be equivalent to the input symbol table.
-# 
+#
 #     Thrown by hfst.HfstTransducer.__init__
 class MissingOpenFstInputSymbolTableException(HfstException):
     pass
 
 
 ## Two or more transducers do not have the same type.
-# 
+#
 #     This can happen if (1) the calling and called transducer in a binary
 #     operation, (2) two transducers in a pair of transducers,
 #     (3) two consecutive transducers coming from an HfstInputStream or
 #     (4) two transducers in a function taking two or more transducers as
 #     arguments do not have the same type.
-# 
+#
 # An example:
 # \verbatim
 # hfst.set_default_fst_type(hfst.types.TROPICAL_OPENFST_TYPE)
@@ -245,15 +245,15 @@ class TransducerTypeMismatchException(HfstException):
     pass
 
 
-## The set of transducer pairs is empty. 
-# 
+## The set of transducer pairs is empty.
+#
 #     Thrown by rule functions.
 class EmptySetOfContextsException(HfstException):
     pass
 
 
 ## The type of a transducer is not specified.
-# 
+#
 #    This exception is thrown when an implementation type argument
 #    is hfst.types.ERROR_TYPE.
 class SpecifiedTypeRequiredException(HfstException):
@@ -265,21 +265,21 @@ class HfstFatalException(HfstException):
     pass
 
 
-## Transducer has wrong type. 
-# 
+## Transducer has wrong type.
+#
 #     This exception suggests that an HfstTransducer has not been properly
 #     initialized, probably due to a bug in the HFST library. Alternatively
-#     the default constructor of HfstTransducer has been called at some point. 
-# 
+#     the default constructor of HfstTransducer has been called at some point.
+#
 #     @see #hfst.HfstTransducer.__init__
 class TransducerHasWrongTypeException(HfstException):
     pass
 
 
-## String is not valid utf-8. 
-# 
+## String is not valid utf-8.
+#
 #     This exception suggests that an input string is not valid utf8.
-# 
+#
 class IncorrectUtf8CodingException(HfstException):
     pass
 

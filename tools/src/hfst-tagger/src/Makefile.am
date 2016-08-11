@@ -1,5 +1,5 @@
 AM_CXXFLAGS= -O3 -g -Wall -Wextra -Wcast-qual -Wno-deprecated -Wfatal-errors -Wno-sign-compare\
-             -I$(top_builddir)/tools/src/inc -I$(top_builddir)/tools/src 
+             -I$(top_builddir)/tools/src/inc -I$(top_builddir)/tools/src
 
 bin_PROGRAMS=hfst-build-tagger$(EXEEXT) hfst-open-input-file-for-tagger$(EXEEXT) hfst-tag \
 hfst-reweight-tagger$(EXEEXT) hfst-train-tagger-system$(EXEEXT)

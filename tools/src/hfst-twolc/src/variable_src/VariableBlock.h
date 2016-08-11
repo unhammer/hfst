@@ -30,8 +30,8 @@
 #include "MixedConstContainerIterator.h"
 
 //! @brief Prototype for variable blocks.
-template<class IT> class VariableBlock : 
-public VariableContainer<VariableValues,IT> 
+template<class IT> class VariableBlock :
+public VariableContainer<VariableValues,IT>
 {
  public:
   VariableBlock(void):
@@ -45,25 +45,25 @@ public VariableContainer<VariableValues,IT>
        {
      if (it->empty())
        { throw EmptyContainer(); }
-     VariableContainer<VariableValues,IT>::add_object(*it); 
+     VariableContainer<VariableValues,IT>::add_object(*it);
        }
    }
 };
 
-//! @brief Container for the variables in a variable block with matcher 
+//! @brief Container for the variables in a variable block with matcher
 //! <tt>FREELY</tt>
-typedef VariableBlock<ConstContainerIterator<VariableValues> > 
+typedef VariableBlock<ConstContainerIterator<VariableValues> >
   FreelyVariableBlock;
 
-//! @brief Container for the variables in a variable block with matcher 
+//! @brief Container for the variables in a variable block with matcher
 //! <tt>MATCHED</tt>
-typedef 
-VariableBlock<MatchedConstContainerIterator<VariableValues> > 
+typedef
+VariableBlock<MatchedConstContainerIterator<VariableValues> >
   MatchedVariableBlock;
 
-//! @brief Container for the variables in a variable block with matcher 
+//! @brief Container for the variables in a variable block with matcher
 //! <tt>MIXED</tt>
-typedef VariableBlock<MixedConstContainerIterator<VariableValues> > 
+typedef VariableBlock<MixedConstContainerIterator<VariableValues> >
   MixedVariableBlock;
 
 #endif // VARIABLE_BLOCK_H_

@@ -56,7 +56,7 @@
 #if defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 
 /* C99 says to define __STDC_LIMIT_MACROS before including stdint.h,
- * if you want the limit (max/min) macros for int types. 
+ * if you want the limit (max/min) macros for int types.
  */
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS 1
@@ -73,7 +73,7 @@ typedef uint32_t flex_uint32_t;
 typedef signed char flex_int8_t;
 typedef short flex_int16_t;
 typedef int flex_int32_t;
-typedef unsigned char flex_uint8_t; 
+typedef unsigned char flex_uint8_t;
 typedef unsigned short flex_uint16_t;
 typedef unsigned int flex_uint32_t;
 
@@ -1362,8 +1362,8 @@ struct fsm *fsm_lexc_parse_string(char *string, int verbose) {
    if (lexclex() != 1) {
      if (lexentries != -1) {
          printf("%i\n",lexentries);
-     }       
-   } 
+     }
+   }
    lexc_delete_buffer(my_string_buffer);
    g_defines = olddefines;
    return(lexc_to_fsm());
@@ -1379,13 +1379,13 @@ void lexc_trim(char *s) {
   /* Remove trailing ; and = and space and initial space */
   int i,j;
   for (i = strlen(s)-1; *(s+i) == ';' || *(s+i) == '=' || *(s+i) == ' ' || *(s+i) == '\t'; i--)
-    *(s+i) = '\0';  
+    *(s+i) = '\0';
   for (i=0; *(s+i) == ' ' || *(s+i) == '\t' || *(s+i) == '\n'; i++) {
   }
   for (j=0; *(s+i) != '\0'; i++, j++) {
     *(s+j) = *(s+i);
   }
-  *(s+j) = *(s+i);  
+  *(s+j) = *(s+i);
 }
 
 /* Nonreserved = anything except ; < > ! or space */
@@ -1763,7 +1763,7 @@ YY_RULE_SETUP
   if (lexentries != -1) {
     printf("%i, ",lexentries);
   }
-  printf("%s...",lexctext+8); 
+  printf("%s...",lexctext+8);
   fflush(stdout);
   lexentries = 0;
   lexc_set_current_lexicon(lexctext+8, SOURCE_LEXICON);
@@ -1838,7 +1838,7 @@ YY_RULE_SETUP
     *(lexctext+lexcleng-1) = ';';
     if (my_yyparse(lexctext, lexclineno, g_defines, NULL) == 0) {
        lexc_set_network(current_parse);
-    }    
+    }
     BEGIN(LEXENTRIES);
 }
 	YY_BREAK
@@ -2367,7 +2367,7 @@ static int yy_get_next_buffer (void)
 
 /** Immediately switch to a different input stream.
  * @param input_file A readable stream.
- * 
+ *
  * @note This function does not reset the start condition to @c INITIAL .
  */
     void lexcrestart  (FILE * input_file )
@@ -2385,7 +2385,7 @@ static int yy_get_next_buffer (void)
 
 /** Switch to a different input buffer.
  * @param new_buffer The new input buffer.
- * 
+ *
  */
     void lexc_switch_to_buffer  (YY_BUFFER_STATE  new_buffer )
 {
@@ -2429,7 +2429,7 @@ static void lexc_load_buffer_state  (void)
 /** Allocate and initialize an input buffer state.
  * @param file A readable stream.
  * @param size The character buffer size in bytes. When in doubt, use @c YY_BUF_SIZE.
- * 
+ *
  * @return the allocated buffer state.
  */
     YY_BUFFER_STATE lexc_create_buffer  (FILE * file, int  size )
@@ -2458,7 +2458,7 @@ static void lexc_load_buffer_state  (void)
 
 /** Destroy the buffer.
  * @param b a buffer created with lexc_create_buffer()
- * 
+ *
  */
     void lexc_delete_buffer (YY_BUFFER_STATE  b )
 {
@@ -2509,7 +2509,7 @@ extern int isatty (int );
 
 /** Discard all buffered characters. On the next scan, YY_INPUT will be called.
  * @param b the buffer state to be flushed, usually @c YY_CURRENT_BUFFER.
- * 
+ *
  */
     void lexc_flush_buffer (YY_BUFFER_STATE  b )
 {
@@ -2538,7 +2538,7 @@ extern int isatty (int );
  *  the current state. This function will allocate the stack
  *  if necessary.
  *  @param new_buffer The new state.
- *  
+ *
  */
 void lexcpush_buffer_state (YY_BUFFER_STATE new_buffer )
 {
@@ -2568,7 +2568,7 @@ void lexcpush_buffer_state (YY_BUFFER_STATE new_buffer )
 
 /** Removes and deletes the top of the stack, if present.
  *  The next element becomes the new top.
- *  
+ *
  */
 void lexcpop_buffer_state (void)
 {
@@ -2635,8 +2635,8 @@ static void lexcensure_buffer_stack (void)
 /** Setup the input buffer state to scan directly from a user-specified character buffer.
  * @param base the character buffer
  * @param size the size in bytes of the character buffer
- * 
- * @return the newly allocated buffer state object. 
+ *
+ * @return the newly allocated buffer state object.
  */
 YY_BUFFER_STATE lexc_scan_buffer  (char * base, yy_size_t  size )
 {
@@ -2670,7 +2670,7 @@ YY_BUFFER_STATE lexc_scan_buffer  (char * base, yy_size_t  size )
 /** Setup the input buffer state to scan a string. The next call to lexclex() will
  * scan from a @e copy of @a str.
  * @param yystr a NUL-terminated string to scan
- * 
+ *
  * @return the newly allocated buffer state object.
  * @note If you want to scan bytes that may contain NUL values, then use
  *       lexc_scan_bytes() instead.
@@ -2685,7 +2685,7 @@ YY_BUFFER_STATE lexc_scan_string (yyconst char * yystr )
  * scan from a @e copy of @a bytes.
  * @param yybytes the byte buffer to scan
  * @param _yybytes_len the number of bytes in the buffer pointed to by @a bytes.
- * 
+ *
  * @return the newly allocated buffer state object.
  */
 YY_BUFFER_STATE lexc_scan_bytes  (yyconst char * yybytes, int  _yybytes_len )
@@ -2748,7 +2748,7 @@ static void yy_fatal_error (yyconst char* msg )
 /* Accessor  methods (get/set functions) to struct members. */
 
 /** Get the current line number.
- * 
+ *
  */
 int lexcget_lineno  (void)
 {
@@ -2757,7 +2757,7 @@ int lexcget_lineno  (void)
 }
 
 /** Get the input stream.
- * 
+ *
  */
 FILE *lexcget_in  (void)
 {
@@ -2765,7 +2765,7 @@ FILE *lexcget_in  (void)
 }
 
 /** Get the output stream.
- * 
+ *
  */
 FILE *lexcget_out  (void)
 {
@@ -2773,7 +2773,7 @@ FILE *lexcget_out  (void)
 }
 
 /** Get the length of the current token.
- * 
+ *
  */
 int lexcget_leng  (void)
 {
@@ -2781,7 +2781,7 @@ int lexcget_leng  (void)
 }
 
 /** Get the current token.
- * 
+ *
  */
 
 char *lexcget_text  (void)
@@ -2791,7 +2791,7 @@ char *lexcget_text  (void)
 
 /** Set the current line number.
  * @param line_number
- * 
+ *
  */
 void lexcset_lineno (int  line_number )
 {
@@ -2802,7 +2802,7 @@ void lexcset_lineno (int  line_number )
 /** Set the input stream. This does not discard the current
  * input buffer.
  * @param in_str A readable stream.
- * 
+ *
  * @see lexc_switch_to_buffer
  */
 void lexcset_in (FILE *  in_str )

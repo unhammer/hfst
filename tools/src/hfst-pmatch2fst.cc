@@ -91,15 +91,15 @@ print_usage()
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
             "Compile regular expressions into transducer(s)\n (Experimental version)"
-            "\n", program_name); 
+            "\n", program_name);
     print_common_program_options(message_out);
-    print_common_unary_program_options(message_out); 
+    print_common_unary_program_options(message_out);
     fprintf(message_out, "String and format options:\n"
             "  -e, --epsilon=EPS         Map EPS as zero\n"
             "      --flatten             Compile in all RTNs\n");
     fprintf(message_out, "\n");
 
-    fprintf(message_out, 
+    fprintf(message_out,
             "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
             "If EPS is not defined, the default representation of 0 is used\n"
             "Weights are currently not implemented.\n"
@@ -294,7 +294,7 @@ process_stream(HfstOutputStream& outstream)
 
 extern int pmatchdebug;
 
-int main( int argc, char **argv ) 
+int main( int argc, char **argv )
 {
 #ifdef WINDOWS
   _setmode(1, _O_BINARY);
@@ -313,7 +313,7 @@ int main( int argc, char **argv )
     {
         fclose(outfile);
     }
-    verbose_printf("Reading from %s, writing to %s\n", 
+    verbose_printf("Reading from %s, writing to %s\n",
                    inputfilename, outfilename);
     // here starts the buffer handling part
     HfstOutputStream* outstream = (outfile != stdout) ?

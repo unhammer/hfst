@@ -58,7 +58,7 @@ if [ -z $@ ] ; then
     if [ "x$verbose" == "x-v" ] ; then
         echo "running $foma_exec $fomaopts"
     fi
-    if ! $foma_exec $fomaopts; then 
+    if ! $foma_exec $fomaopts; then
         echo "$foma_exec failed"
         exit 1
     fi

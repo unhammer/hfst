@@ -90,7 +90,7 @@ print_usage()
             "      --max-recursion     Upper limit for recursion\n"
             "  -t, --time-cutoff=S     Limit search after having used S seconds per input\n"
             "  -p  --profile           Produce profiling data\n");
-    fprintf(message_out, 
+    fprintf(message_out,
             "Use standard streams for input and output.\n"
             "\n"
         );
@@ -213,7 +213,7 @@ int parse_options(int argc, char** argv)
         switch (c)
         {
 #include "inc/getopt-cases-common.h"
-#include "inc/getopt-cases-unary.h"            
+#include "inc/getopt-cases-unary.h"
         case 'n':
             blankline_separated = false;
             break;

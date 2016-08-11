@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 #if HAVE_CONFIG_H
@@ -24,14 +24,14 @@ namespace hfst { namespace implementations
 
   /* -----------------------------------------------------------
 
-      Conversion functions between HfstBasicTransducer and 
-      optimized lookup transducers 
+      Conversion functions between HfstBasicTransducer and
+      optimized lookup transducers
 
       ---------------------------------------------------------- */
 
 /* An auxiliary function. */
 unsigned int hfst_ol_to_hfst_basic_add_state
-(hfst_ol::Transducer * t, 
+(hfst_ol::Transducer * t,
  HfstBasicTransducer * basic,
  hfst_ol::HfstOlToBasicStateMap & state_map,
  bool weighted,
@@ -79,15 +79,15 @@ unsigned int hfst_ol_to_hfst_basic_add_state
   {
       HfstBasicTransducer * basic = new HfstBasicTransducer();
       bool weighted = t->get_header().probe_flag(hfst_ol::Weighted);
-      const hfst_ol::SymbolTable& symbols 
+      const hfst_ol::SymbolTable& symbols
         = t->get_alphabet().get_symbol_table();
       
       
-      /* This contains indices to either (1) the start of a set of entries 
-         in the transition index table, or (2) the boundary before a set 
-         of entries in the transition table; in this case, the following 
-         entries will all have the same input symbol. In either case 
-         the index represents a state and may be final The will already be 
+      /* This contains indices to either (1) the start of a set of entries
+         in the transition index table, or (2) the boundary before a set
+         of entries in the transition table; in this case, the following
+         entries will all have the same input symbol. In either case
+         the index represents a state and may be final The will already be
          an entry in state_map for each value in agenda */
       std::vector<hfst_ol::TransitionTableIndex> agenda;
       hfst_ol::HfstOlToBasicStateMap state_map;
@@ -103,7 +103,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
           
           unsigned int current_state = state_map[current_index];
           
-          hfst_ol::TransitionTableIndexSet transitions 
+          hfst_ol::TransitionTableIndexSet transitions
             = t->get_transitions_from_state(current_index);
           for(hfst_ol::TransitionTableIndexSet::const_iterator it
                 =transitions.begin();it!=transitions.end();it++)
@@ -114,7 +114,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
               {
                   state_number++;
                   hfst_ol_to_hfst_basic_add_state
-                    (t, basic, state_map, weighted, 
+                    (t, basic, state_map, weighted,
                      transition.get_target(), state_number);
                   agenda.push_back(transition.get_target());
               }
@@ -170,11 +170,11 @@ void get_states_and_symbols(
     
     unsigned int first_transition = 0;
     unsigned int state_number = 0;
-    for (HfstBasicTransducer::const_iterator it = t->begin(); 
+    for (HfstBasicTransducer::const_iterator it = t->begin();
          it != t->end(); ++it) {
         hfst_ol::Weight final_w = 0.0;
         if (t->is_final_state(state_number)) {
-            final_w = t->get_final_weight(state_number);    
+            final_w = t->get_final_weight(state_number);
         }
         state_placeholders.push_back(hfst_ol::StatePlaceholder(
                                          state_number,
@@ -182,7 +182,7 @@ void get_states_and_symbols(
                                          first_transition,
                                          final_w));
         ++first_transition; // there's a padding entry between states
-        for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
+        for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
                  = it->begin();
              tr_it != it->end(); ++tr_it) {
             ++first_transition;
@@ -262,9 +262,9 @@ void get_states_and_symbols(
     // about the states except starting indices
 
     state_number = 0;
-    for (HfstBasicTransducer::const_iterator it = t->begin(); 
+    for (HfstBasicTransducer::const_iterator it = t->begin();
          it != t->end(); ++it) {
-        for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
+        for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
                = it->begin();
              tr_it != it->end(); ++tr_it) {
             // add input in case we're seeing it the first time

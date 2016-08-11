@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 #ifndef _SFST_TRANSDUCER_H_
@@ -25,7 +25,7 @@
     \brief Declarations of functions and datatypes that form a bridge between
     HFST API and SFST. */
 
-namespace hfst { 
+namespace hfst {
 namespace implementations
 {
   //using namespace SFST;
@@ -36,7 +36,7 @@ namespace implementations
 
   void sfst_set_hopcroft(bool);
 
-  class SfstInputStream 
+  class SfstInputStream
   {
   private:
     std::string filename;
@@ -69,14 +69,14 @@ namespace implementations
     static bool is_fst(std::istream &s);
   };
 
-  class SfstOutputStream 
+  class SfstOutputStream
   {
   private:
     std::string filename;
     FILE *ofile;
     //void write_3_0_library_header(FILE *file, bool is_minimal);
   public:
-    SfstOutputStream(void); 
+    SfstOutputStream(void);
     SfstOutputStream(const std::string &filename);
     void close(void);
     void write(const char &c);
@@ -200,14 +200,14 @@ namespace implementations
       static void insert_to_alphabet(SFST::Transducer *t, const std::string &symbol);
       static void remove_from_alphabet
     (SFST::Transducer *t, const std::string &symbol);
-      static unsigned int get_symbol_number(SFST::Transducer *t, 
+      static unsigned int get_symbol_number(SFST::Transducer *t,
                         const std::string &symbol);
 
     protected:
       static void initialize_alphabet(SFST::Transducer *t);
       static SFST::Transducer * expand_arcs(SFST::Transducer * t, StringSet &unknown);
 
-      static void expand_node( SFST::Transducer *t, SFST::Node *origin, SFST::Label &l, 
+      static void expand_node( SFST::Transducer *t, SFST::Node *origin, SFST::Label &l,
                                SFST::Node *target, hfst::StringSet &s );
       static void expand2
         ( SFST::Transducer *t, SFST::Node *node,

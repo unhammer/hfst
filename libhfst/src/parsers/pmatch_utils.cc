@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 /**
@@ -45,7 +45,7 @@ pmatcherror(const char *msg)
         char buf[200];
         memcpy(buf, hfst::pmatch::data, 200 - 1);
         buf[200 - 1] = '\0';
-        fprintf(stderr, "***    parsing %s [line %d, near %s]...\n", 
+        fprintf(stderr, "***    parsing %s [line %d, near %s]...\n",
                 buf, pmatchlineno, pmatchtext);
     }
     exit(0);
@@ -58,9 +58,9 @@ void pmatchwarning(const char *msg)
     }
 }
 
-namespace hfst 
-{ 
-namespace pmatch 
+namespace hfst
+{
+namespace pmatch
 {
 
 char* data;
@@ -92,9 +92,9 @@ void warn(std::string warning)
 PmatchUtilityTransducers*
 get_utils()
 {
-  if (utils == NULL) 
+  if (utils == NULL)
     {
-      utils = new PmatchUtilityTransducers(); 
+      utils = new PmatchUtilityTransducers();
     }
   return utils;
 }
@@ -606,7 +606,7 @@ std::string codepoint_to_utf8(unsigned int codepoint)
         buf[1] = 128 + codepoint / 4096 % 64;
         buf[2] = 128 + codepoint / 64 % 64;
         buf[3] = 128 + codepoint % 64;
-        buf[4] = '\0'; 
+        buf[4] = '\0';
     } else {
         u_parse_err = true;
     }
@@ -690,7 +690,7 @@ get_weight(const char *s)
 {
     double rv = -3.1415;
     const char* weightstart = s;
-    while ((*weightstart != '\0') && 
+    while ((*weightstart != '\0') &&
            ((*weightstart == ' ') || (*weightstart == '\t') ||
             (*weightstart == ';')))
     {

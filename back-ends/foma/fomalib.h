@@ -167,7 +167,7 @@ struct fsmcontexts {
 
 struct fsmrules {
     struct fsm *left;
-    struct fsm *right;   
+    struct fsm *right;
     struct fsm *right2;    /*Only needed for A -> B ... C rules*/
     struct fsm *cross_product;
     struct fsmrules *next;

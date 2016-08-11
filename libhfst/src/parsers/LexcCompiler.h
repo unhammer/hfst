@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 //! @file LexcCompiler.h
@@ -125,7 +125,7 @@ class LexcCompiler
   //! @brief add entry defined by regular expression @a xre, pointing to
   //! @a continuation weighing @a weight to current lexicon.
   LexcCompiler& addXreEntry(const std::string& xre,
-                            const std::string& continuation, 
+                            const std::string& continuation,
                             const double weight);
 
   //! @brief add macro definition named @a name matching regular expression

@@ -48,7 +48,7 @@
   // For reading input one byte at a time.
   InputReader input_reader(line_number);
 
-  // non_alphabet_symbol_queue is used to store the grammar symbols which are 
+  // non_alphabet_symbol_queue is used to store the grammar symbols which are
   // not located in the Alphabet section of the grammar.
   HandyDeque<std::string> non_alphabet_symbol_queue;
 
@@ -64,11 +64,11 @@
 
 
 
-%union 
+%union
 { int symbol_number; };
 
 
- /* 
+ /*
     All unary operators have stronger precedence than binary ones.
  */
 
@@ -80,19 +80,19 @@
 
  /* Unary operators ordered by precedence from lowest to highest. */
 %right <symbol_number> STAR PLUS
-%left  <symbol_number> CONTAINMENT CONTAINMENT_ONCE TERM_COMPLEMENT COMPLEMENT 
+%left  <symbol_number> CONTAINMENT CONTAINMENT_ONCE TERM_COMPLEMENT COMPLEMENT
 %right <symbol_number> POWER
 
  /* "[", "]", "(" and ")". */
-%right <symbol_number> RIGHT_SQUARE_BRACKET RIGHT_PARENTHESIS 
+%right <symbol_number> RIGHT_SQUARE_BRACKET RIGHT_PARENTHESIS
 %left  <symbol_number> LEFT_SQUARE_BRACKET LEFT_PARENTHESIS
 
  /* Twolc rule operators */
-%token <symbol_number> LEFT_RESTRICTION_ARROW LEFT_ARROW RIGHT_ARROW 
+%token <symbol_number> LEFT_RESTRICTION_ARROW LEFT_ARROW RIGHT_ARROW
 %token <symbol_number> LEFT_RIGHT_ARROW
 
  /* Twolc regular expression rule operators */
-%token <symbol_number> RE_LEFT_RESTRICTION_ARROW RE_LEFT_ARROW RE_RIGHT_ARROW 
+%token <symbol_number> RE_LEFT_RESTRICTION_ARROW RE_LEFT_ARROW RE_RIGHT_ARROW
 %token <symbol_number> RE_LEFT_RIGHT_ARROW
 
  /* Twolc regular expression rule center brackets. */
@@ -100,7 +100,7 @@
 %left  <symbol_number> RE_LEFT_SQUARE_BRACKET
 
  /* Basic tokens. */
-%token <symbol_number>  ALPHABET_DECLARATION DIACRITICS_DECLARATION 
+%token <symbol_number>  ALPHABET_DECLARATION DIACRITICS_DECLARATION
 %token <symbol_number>  SETS_DECLARATION DEFINITION_DECLARATION
 %token <symbol_number>  RULES_DECLARATION PAIR_SEPARATOR SYMBOL SEMI_COLON
 %token <symbol_number>  SET_NAME DEFINITION_NAME EQUALS CENTER_MARKER
@@ -110,13 +110,13 @@
 ALL: GRAMMAR {}
 ;
 
-GRAMMAR: ALPHABET GRAMMAR1 
+GRAMMAR: ALPHABET GRAMMAR1
 | GRAMMAR1
 
-GRAMMAR1: DIACRITICS GRAMMAR2 
+GRAMMAR1: DIACRITICS GRAMMAR2
 | GRAMMAR2
 
-GRAMMAR2: SETS GRAMMAR3 
+GRAMMAR2: SETS GRAMMAR3
 | GRAMMAR3
 
 GRAMMAR3: DEFINITIONS GRAMMAR4
@@ -129,9 +129,9 @@ RULES:RULES_DECLARATION RULE_LIST
 RULE_LIST: /* empty */
 | RULE_LIST RULE
 
-RULE: RULE_NAME_DECL RULE_CENTER RULE_OPERATOR RULE_CONTEXTS 
+RULE: RULE_NAME_DECL RULE_CENTER RULE_OPERATOR RULE_CONTEXTS
 NEGATIVE_RULE_CONTEXTS
-| RULE_NAME_DECL RE_RULE_CENTER RE_RULE_OPERATOR RULE_CONTEXTS 
+| RULE_NAME_DECL RE_RULE_CENTER RE_RULE_OPERATOR RULE_CONTEXTS
 NEGATIVE_RULE_CONTEXTS
 
 RULE_NAME_DECL: RULE_NAME
@@ -164,7 +164,7 @@ RE_RULE_OPERATOR: RE_LEFT_ARROW
 RULE_CONTEXTS: /* empty */
 | RULE_CONTEXTS RULE_CONTEXT
 
-NEGATIVE_RULE_CONTEXTS: /* empty */ 
+NEGATIVE_RULE_CONTEXTS: /* empty */
 | EXCEPT RULE_CONTEXTS
 
 RULE_CONTEXT: REGULAR_EXPRESSION CENTER_MARKER REGULAR_EXPRESSION
@@ -174,7 +174,7 @@ ALPHABET: ALPHABET_DECLARATION ALPHABET_PAIR_LIST SEMI_COLON_LIST
 
 DIACRITICS: DIACRITICS_DECLARATION SYMBOL_LIST SEMI_COLON_LIST
 
-SETS: SETS_DECLARATION SET_LIST 
+SETS: SETS_DECLARATION SET_LIST
 
 DEFINITIONS: DEFINITION_DECLARATION DEFINITION_LIST
 
@@ -203,8 +203,8 @@ RE: PAIR
 | LEFT_SQUARE_BRACKET REGULAR_EXPRESSION RIGHT_SQUARE_BRACKET
 | LEFT_PARENTHESIS REGULAR_EXPRESSION RIGHT_PARENTHESIS
 
-SET_LIST: /* empty */ 
-| SET_LIST SET_DEFINITION 
+SET_LIST: /* empty */
+| SET_LIST SET_DEFINITION
 
 SYMBOL_LIST: /* empty */
 | SYMBOL_LIST SYMBOL
@@ -242,9 +242,9 @@ void insert_alphabet_pairs(const HandyDeque<std::string> &symbol_queue,
 	   *it == "__HFST_TWOLC_#" ||
 	   *it == "__HFST_TWOLC_SPACE" ||
 	   *it == "__HFST_TWOLC_TAB" ||
-           it->find("__HFST_TWOLC_") == std::string::npos)  
+           it->find("__HFST_TWOLC_") == std::string::npos)
 	  &&
-	  *(it+1) == "__HFST_TWOLC_:" 
+	  *(it+1) == "__HFST_TWOLC_:"
 	  &&
 	  (*(it+2) == "__HFST_TWOLC_0" ||
 	   *(it+2) == "__HFST_TWOLC_.#." ||
@@ -252,7 +252,7 @@ void insert_alphabet_pairs(const HandyDeque<std::string> &symbol_queue,
 	   *(it+2) == "__HFST_TWOLC_SPACE" ||
 	   *(it+2) == "__HFST_TWOLC_TAB" ||
            (it+2)->find("__HFST_TWOLC_") == std::string::npos))
-	{	  
+	{
 	  std::string input_symbol = *it == "__HFST_TWOLC_#" ? "#" : *it;
 	  ++(++it);
 	  std::string output_symbol = *it == "__HFST_TWOLC_#" ? "#" : *it;
@@ -263,7 +263,7 @@ void insert_alphabet_pairs(const HandyDeque<std::string> &symbol_queue,
 }
 
 // Add all pairs in the grammar, which are missing from the Alphabet section,
-// into the Alphabet section. 
+// into the Alphabet section.
 void complete_alphabet(void)
 {
   HandySet<SymbolPair> symbol_pair_set;
@@ -281,19 +281,19 @@ void complete_alphabet(void)
     }
 }
 
-// Print warning. 
-void warn(const char * warning) 
+// Print warning.
+void warn(const char * warning)
 { input_reader.warn(warning); }
 
 // Print error messge and exit 1.
-void yyerror(const char * text) 
-{ 
+void yyerror(const char * text)
+{
   std::cerr << text << std::endl;
   (void)text;
-  exit(1); 
+  exit(1);
 }
 
-void semantic_error(const char * text) 
+void semantic_error(const char * text)
 { input_reader.error(text); }
 
 int main(int argc, char * argv[])

@@ -42,7 +42,7 @@ class SequenceTagger
 			     State result_state,
 			     AcyclicAutomaton &result);
 
-  WeightedStringPairVector 
+  WeightedStringPairVector
     get_weighted_analysis(AcyclicAutomaton &result) const;
 
   State get_state(const StatePair &configuration,

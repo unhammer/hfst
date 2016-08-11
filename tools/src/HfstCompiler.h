@@ -101,15 +101,15 @@ namespace hfst
       static Range *add_var_values( char *name, Range*);
       Range *add_values( unsigned int, unsigned int, Range*);
       static Range *append_values( Range *r2, Range *r );
-      static Ranges *add_range( Range*, Ranges* );    
+      static Ranges *add_range( Range*, Ranges* );
       //static void add_alphabet( HfstTransducer* );
       
       static Contexts *make_context( HfstTransducer *l, HfstTransducer *r );
-      static Contexts *add_context( Contexts *nc, Contexts *c );    
+      static Contexts *add_context( Contexts *nc, Contexts *c );
       
       HfstTransducer * substitute(HfstTransducer *t, Character old_char, Character new_char);
       HfstTransducer * substitute(HfstTransducer *t, Character old_char_in, Character old_char_out,
-                  Character new_char_in, Character new_char_out);      
+                  Character new_char_in, Character new_char_out);
       HfstTransducer * substitute(HfstTransducer *t, Character old_char_in, Character old_char_out,
                   HfstTransducer *tr);
 
@@ -123,7 +123,7 @@ namespace hfst
       HfstTransducer * replace_in_context(HfstTransducer * mapping, Repl_Type repl_type, Contexts *contexts, bool optional);
       HfstTransducer * replace(HfstTransducer * mapping, Repl_Type repl_type, bool optional);
       HfstTransducer * restriction( HfstTransducer * t, Twol_Type type, Contexts *c, int direction );
-      HfstTransducer * make_rule( HfstTransducer * lc, Range * lower_range, Twol_Type type, 
+      HfstTransducer * make_rule( HfstTransducer * lc, Range * lower_range, Twol_Type type,
                   Range * upper_range, HfstTransducer * rc, ImplementationType implementation_type );
       
       void def_alphabet( HfstTransducer *a );
@@ -145,7 +145,7 @@ namespace hfst
 
       static void error( const char *message );
       static void error2( const char *message, char *input );
-    };    
+    };
 }
 
 #endif

@@ -1,11 +1,11 @@
 %{
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 #define YYDEBUG 0
@@ -50,7 +50,7 @@
          hfst::pmatch::PmatchObjectPair * restrictionContext;
          hfst::pmatch::MappingPairVector * restrictionContexts;
          hfst::xeroxRules::ReplaceType replType;
-         hfst::xeroxRules::ReplaceArrow replaceArrow; 
+         hfst::xeroxRules::ReplaceArrow replaceArrow;
      }
 
 %start PMATCH
@@ -82,7 +82,7 @@ PMATCH_RIGHT_CONTEXT PMATCH_LEFT_CONTEXT PMATCH_NEGATIVE_RIGHT_CONTEXT PMATCH_NE
 %right LEFT_ARROW RIGHT_ARROW LEFT_RIGHT_ARROW LEFT_RESTRICTION // LEFT_RESTRICTION not implemented
 %left  REPLACE_RIGHT REPLACE_LEFT OPTIONAL_REPLACE_RIGHT OPTIONAL_REPLACE_LEFT
 REPLACE_LEFT_RIGHT OPTIONAL_REPLACE_LEFT_RIGHT RTL_LONGEST_MATCH RTL_SHORTEST_MATCH
-LTR_LONGEST_MATCH LTR_SHORTEST_MATCH 
+LTR_LONGEST_MATCH LTR_SHORTEST_MATCH
 %right REPLACE_CONTEXT_UU REPLACE_CONTEXT_LU REPLACE_CONTEXT_UL REPLACE_CONTEXT_LL
 %left  UNION MINUS UPPER_MINUS LOWER_MINUS UPPER_PRIORITY_UNION LOWER_PRIORITY_UNION
 %left  IGNORING IGNORE_INTERNALLY LEFT_QUOTIENT
@@ -622,7 +622,7 @@ READ_FROM: READ_BIN {
             tmp.disjunct(spv, 0);
         }
         fclose(f);
-        HfstTransducer * t = new HfstTransducer(tmp, hfst::pmatch::format); 
+        HfstTransducer * t = new HfstTransducer(tmp, hfst::pmatch::format);
         t->minimize();
         $$ = new PmatchTransducerContainer(t);
     }
@@ -773,7 +773,7 @@ PMATCH_NEGATIVE_LEFT_CONTEXT: NLC_LEFT EXPRESSION2 RIGHT_PARENTHESIS {
 //             caller_args[callee_args[i]] = new HfstTransducer(it->at(i), tok, hfst::pmatch::format);
 //         }
 //         $$->disjunct(*hfst::pmatch::functions[$2].evaluate(caller_args));
-//         // Clean up the string transducers we allocated each time 
+//         // Clean up the string transducers we allocated each time
 //         for (std::map<std::string, HfstTransducer *>::iterator it = caller_args.begin();
 //              it != caller_args.end(); ++it) {
 //             delete it->second;

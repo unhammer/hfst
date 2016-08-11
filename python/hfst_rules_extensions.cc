@@ -3,7 +3,7 @@ namespace hfst {
 
 namespace hfst_rules {
 
-  HfstTransducer two_level_if(const HfstTransducerPair & context, const StringPairSet & mappings, const StringPairSet & alphabet) 
+  HfstTransducer two_level_if(const HfstTransducerPair & context, const StringPairSet & mappings, const StringPairSet & alphabet)
   {
     hfst::HfstTransducerPair context_(context);
     StringPairSet mappings_(mappings);
@@ -58,7 +58,7 @@ namespace hfst_rules {
     StringPairSet alphabet_(alphabet);
     return hfst::rules::replace_up(mapping_, optional, alphabet_);
   }
-  HfstTransducer replace_down(const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)  
+  HfstTransducer replace_down(const HfstTransducer &mapping, bool optional, const StringPairSet &alphabet)
   {
     hfst::HfstTransducer mapping_(mapping);
     StringPairSet alphabet_(alphabet);

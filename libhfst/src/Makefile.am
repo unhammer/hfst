@@ -1,13 +1,13 @@
 ## Process this file with automake to produce Makefile.in
 
-# Copyright (c) 2016 University of Helsinki                          
-#                                                                    
-# This library is free software; you can redistribute it and/or      
-# modify it under the terms of the GNU Lesser General Public         
-# License as published by the Free Software Foundation; either       
-# version 3 of the License, or (at your option) any later version.    
-# See the file COPYING included with this distribution for more      
-# information. 
+# Copyright (c) 2016 University of Helsinki
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 3 of the License, or (at your option) any later version.
+# See the file COPYING included with this distribution for more
+# information.
 
 SUBDIRS=implementations parsers
 AUTOMAKE_OPTIONS=subdir-objects
@@ -42,7 +42,7 @@ if WANT_FOMA
   libhfst_la_LIBADD +=$(top_builddir)/back-ends/foma/libfoma.la
 endif
 
-if WANT_MINGW	
+if WANT_MINGW
   AM_CPPFLAGS += -I${top_srcdir}/back-ends/openfstwin/src/include \
 			-I${top_srcdir}/back-ends/dlfcn -DWINDOWS
   libhfst_la_LIBADD += $(top_builddir)/back-ends/dlfcn/libdl.la \

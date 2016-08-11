@@ -1,7 +1,7 @@
 //! @file grammar_defs.h
-//! 
+//!
 //! @author Miikka Silfverberg
-//! 
+//!
 //! @brief Simple data structures for basic twolc grammar concepts.
 
 //   This program is free software: you can redistribute it and/or modify
@@ -37,10 +37,10 @@ typedef std::pair<std::string,std::string> SymbolPair;
 //! @brief A range of symbols e.g. in a set definition.
 typedef std::vector<std::string> SymbolRange;
 
-//! @brief A range of symbol pairs e.g. in the alphabet. 
+//! @brief A range of symbol pairs e.g. in the alphabet.
 typedef std::vector<SymbolPair>  SymbolPairRange;
 
-//! @brief A range of symbol pairs e.g. in the alphabet. 
+//! @brief A range of symbol pairs e.g. in the alphabet.
 typedef std::vector<SymbolPair>  SymbolPairVector;
 
 //! @brief A symbols set consisting of a name and a @a SymbolRange.

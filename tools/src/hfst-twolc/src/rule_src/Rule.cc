@@ -23,7 +23,7 @@ Rule::Rule(const std::string &name,
   name(unescape_name(name)),
   center(center)
 {
-  OtherSymbolTransducerVector contexts_copy = contexts; 
+  OtherSymbolTransducerVector contexts_copy = contexts;
   for (OtherSymbolTransducerVector::iterator it = contexts_copy.begin();
        it != contexts_copy.end();
        ++it)
@@ -42,16 +42,16 @@ Rule::Rule(const std::string &name,
        it != v.end();
        ++it)
     {
-      if (! (*it)->empty())    
-    { 
+      if (! (*it)->empty())
+    {
       rule_transducer.apply
-        (&HfstTransducer::intersect,(*it)->rule_transducer); 
+        (&HfstTransducer::intersect,(*it)->rule_transducer);
       is_empty = false;
     }
     }
 }
 
-Rule::~Rule(void) 
+Rule::~Rule(void)
 {}
 
 std::string Rule::get_print_name(const std::string &s)
@@ -172,21 +172,21 @@ OtherSymbolTransducer Rule::get_center
      apply(&HfstTransducer::concatenate,diamond).
      apply(&HfstTransducer::concatenate,restricted_center).
      apply(&HfstTransducer::concatenate,diamond).
-     apply(&HfstTransducer::concatenate,unknown);  
+     apply(&HfstTransducer::concatenate,unknown);
    return center;
 }
 
 void Rule::add_missing_symbols_freely(const SymbolRange &diacritics)
 {
-  std::set<std::string> symbol_set = 
+  std::set<std::string> symbol_set =
     HfstBasicTransducer(rule_transducer.get_transducer()).get_alphabet();
   for (SymbolRange::const_iterator it = diacritics.begin();
        it != diacritics.end();
        ++it)
-    { 
+    {
       if (symbol_set.find(*it) == symbol_set.end())
-    { 
-      rule_transducer.add_symbol_to_alphabet(*it); 
+    {
+      rule_transducer.add_symbol_to_alphabet(*it);
       rule_transducer.apply(&HfstTransducer::insert_freely,
                 SymbolPair(*it,*it), true); }
     }

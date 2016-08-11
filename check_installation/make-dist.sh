@@ -49,7 +49,7 @@ cp --parents ./morphology_tests/* $DISTDIR/
 cp ./check-ospell.sh $DISTDIR
 cp --parents ./ospell_tests/* $DISTDIR/
 
-echo "  Creating the package..." 
+echo "  Creating the package..."
 tar -cvf $DISTDIR.tar $DISTDIR
 gzip $DISTDIR.tar
 

@@ -34,19 +34,19 @@ std::string remove_sign(std::string str,const std::string &sign)
 { return replace_substr(str,sign,""); }
 
 std::string unescape(std::string str)
-{ 
+{
   if (str.find('\n') != std::string::npos)
     { throw FaultyStringInput("unescape",str ); }
-  // Change "%%" to "\n", remove all remaining %'s 
+  // Change "%%" to "\n", remove all remaining %'s
   // and change all '\n's to '%'.
   return
     replace_substr(remove_sign(replace_substr(str,"%%","\n"),'%'),"\n","%");
 }
 
-int strcmp_unescaped(const std::string &str1, 
+int strcmp_unescaped(const std::string &str1,
             const std::string &str2)
 {
-  // Remove all escapes from str1 and str2 and 
+  // Remove all escapes from str1 and str2 and
   // compare them.
   std::string str1_copy = unescape(str1);
   std::string str2_copy = unescape(str2);
@@ -54,16 +54,16 @@ int strcmp_unescaped(const std::string &str1,
 }
 
 std::string remove_white_space(std::string str)
-{ 
+{
   if (str.find('\n') != std::string::npos)
     { throw FaultyStringInput("remove_white_space",str); }
-  str = 
+  str =
     replace_substr(remove_sign(replace_substr(str,"% ","\n"),' '),
            "\n","__HFST_TWOLC_SPACE");
-  str = 
+  str =
     replace_substr(remove_sign(replace_substr(str,"%\t","\n"),'\t'),
            "\n","__HFST_TWOLC_TAB");
-  str = 
+  str =
     replace_substr(remove_sign(replace_substr(str,"%\r","\n"),'\r'),
            "\n","__HFST_TWOLC_CR");
   str =
@@ -75,16 +75,16 @@ std::string remove_white_space(std::string str)
 std::string unescape_and_remove_white_space(std::string str)
 { return unescape(remove_white_space(str)); }
 
-std::string unquote(const std::string &str) 
-{ 
+std::string unquote(const std::string &str)
+{
   if (str.size() < 2 || str[0] != '"' || str[str.size()-1] != '"')
     { throw FaultyStringInput("unquote",str); }
-  // Return the substring of str spanning from the 
-  // second to the next to final character.  
-  return str.substr(1,str.size()-2); 
+  // Return the substring of str spanning from the
+  // second to the next to final character.
+  return str.substr(1,str.size()-2);
 }
 
-int str2int(const std::string &str) 
+int str2int(const std::string &str)
 {
   std::istringstream in(str);
   int number;
@@ -129,7 +129,7 @@ StringVector &StringVector::add_values(const StringVector &another)
 
 std::string unescape_name(const std::string &name)
 {
-  std::string new_name = 
+  std::string new_name =
     replace_substr(replace_substr(name,"__HFST_TWOLC_RULE_NAME=",""),
            "__HFST_TWOLC_SPACE"," ");
   return new_name;
@@ -172,22 +172,22 @@ int main(void)
   s3 = unquote("\"ab\"");
   assert(s3 == "ab");
   try
-    { 
-      s3 = unquote(""); 
+    {
+      s3 = unquote("");
       assert(false);
     }
   catch (const FaultyStringInput &fsi)
     { /* nothing */ }
   try
-    { 
-      s3 = unquote("\""); 
+    {
+      s3 = unquote("\"");
       assert(false);
     }
   catch (const FaultyStringInput &fsi)
     { /* nothing */ }
   try
-    { 
-      s3 = unquote("a"); 
+    {
+      s3 = unquote("a");
       assert(false);
     }
   catch (const FaultyStringInput &fsi)
@@ -240,7 +240,7 @@ int main(void)
   assert(str2int("-1 3") == -1);
   assert(str2int("20") == 20);
   try
-    { 
+    {
       str2int("");
       assert(false);
     }
@@ -248,7 +248,7 @@ int main(void)
     { /* nothing */ }
 
   try
-    { 
+    {
       str2int("a");
       assert(false);
     }
@@ -266,7 +266,7 @@ int main(void)
   //assert(remove_white_space("foo% bar%\tbaz%\r") == "foo bar\tbaz\r");
   //assert(remove_white_space("foo% \tbar") == "foo bar");
   try
-    { 
+    {
       (void)remove_white_space("foo\nbar");
       assert(false);
     }
@@ -276,7 +276,7 @@ int main(void)
   // unescape_and_remove_white_space(...)
   //assert(unescape_and_remove_white_space(" foo%%% ") == "foo% ");
   try
-    { 
+    {
       (void)unescape_and_remove_white_space("foo\nbar");
       assert(false);
     }

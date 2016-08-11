@@ -39,7 +39,7 @@ typedef SSIZE_T ssize_t;
       #pragma comment (lib, "openfst64.lib")
     #else
       #pragma comment (lib, "openfst.lib")
-    #endif              
+    #endif
   #endif
 #endif
 #endif

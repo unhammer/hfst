@@ -3,7 +3,7 @@ namespace hfst {
   class HfstFile {
     private:
       FILE * file;
-    public:  
+    public:
       HfstFile();
       ~HfstFile();
       void set_file(FILE * f);
@@ -19,7 +19,7 @@ namespace hfst {
   FILE * HfstFile::get_file() { return file; };
   void HfstFile::close() { if (file != stdout && file != stderr && file != stdin) { fclose(file); } };
   void HfstFile::write(const char * str) { fprintf(file, "%s", str); };
-  bool HfstFile::is_eof(void) { return (feof(file) != 0); }; 
+  bool HfstFile::is_eof(void) { return (feof(file) != 0); };
 
   HfstFile hfst_open(const char * filename, const char * mode) {
     FILE * f = fopen(filename, mode);

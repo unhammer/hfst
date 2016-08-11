@@ -61,8 +61,8 @@ static bool print_weight = false;
 void
 print_usage()
 {
-  // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp                                                                                                                                                               
-  // Usage line                                                                                                                                                                                                                            
+  // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
+  // Usage line
   fprintf(message_out, "Usage: %s [OPTIONS...]\n"
           "Compile XFST scripts or execute XFST commands interactively\n"
           "\n", "hfst-xfst" /*program_name*/);
@@ -70,8 +70,8 @@ print_usage()
   print_common_program_options(message_out);
   fprintf(message_out, "\n");
   fprintf(message_out, "Xfst-specific options:\n");
-  fprintf(message_out, 
-          "  -e, --execute=CMD        Execute command CMD on startup\n" 
+  fprintf(message_out,
+          "  -e, --execute=CMD        Execute command CMD on startup\n"
           "  -f, --format=FMT         Write result using FMT as backend format\n"
           "  -F, --scriptfile=FILE    Read commands from FILE, and quit\n"
           "  -l, --startupfile=FILE   Read commands from FILE on startup\n"
@@ -107,7 +107,7 @@ int
 parse_options(int argc, char** argv)
 {
   extend_options_getenv(&argc, &argv);
-  // use of this function requires options are settable on global scope                                                                                                                                                                    
+  // use of this function requires options are settable on global scope
   while (true)
     {
         static const struct option long_options[] =
@@ -218,7 +218,7 @@ parse_options(int argc, char** argv)
 int parse_file(const char* filename, hfst::xfst::XfstCompiler &comp)
 {
   char* line = hfst_file_to_mem(filename);
-  if (NULL == line) 
+  if (NULL == line)
     {
       error(EXIT_FAILURE, 0, "error when reading file %s\n", filename);
       return EXIT_FAILURE;
@@ -237,7 +237,7 @@ void insert_zeroes(char * array, unsigned int number)
 {
   for (unsigned int i=0; i<number; i++)
     {
-      array[i] = '\0'; 
+      array[i] = '\0';
     }
 }
 
@@ -288,7 +288,7 @@ char *my_generator(const char *text, int state) {
     list_index++;
 
     if (strncmp (name, text, len) == 0) {
-      nummatches++;      
+      nummatches++;
       return(strdup(name+smatch));
     }
   }
@@ -407,7 +407,7 @@ int main(int argc, char** argv)
         }
     }
 
-  if (pipe_input) 
+  if (pipe_input)
     {
       verbose_printf("Reading from standard input...\n");
       comp.setReadInteractiveTextFromStdin(false);

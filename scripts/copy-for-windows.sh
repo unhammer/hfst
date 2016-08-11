@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# A script for copying winopenfst (top directory given as the second argument) 
+# A script for copying winopenfst (top directory given as the second argument)
 # and foma backends and libhfst/src in a directory given as first argument
 # for native windows compilation.
 
@@ -33,7 +33,7 @@ regex.c reverse.c rewrite.c sigma.c \
 spelling.c stringhash.c structures.c \
 topsort.c trie.c utf8.c foma.h fomalib.h \
 fomalibconf.h regex.h;
-do 
+do
     cp back-ends/foma/$file $1/back-ends/foma/;
 done
 # there is a file with the same name in openfstwin
@@ -47,9 +47,9 @@ mkdir $1/back-ends/openfstwin/src/include/fst
 mkdir $1/back-ends/openfstwin/src/lib
 
 for file in \
-compat flags fst properties symbol-table symbol-table-ops util; 
+compat flags fst properties symbol-table symbol-table-ops util;
 do
-    cp $openfstdir/src/lib/$file.cc $1/back-ends/openfstwin/src/lib/$file.cpp 
+    cp $openfstdir/src/lib/$file.cc $1/back-ends/openfstwin/src/lib/$file.cpp
 done
 
 # file symbol-table-ops.cc not in version 1.2.6

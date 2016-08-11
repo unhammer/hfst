@@ -59,18 +59,18 @@
  *   b. construct the language Insert = @#@ NoSpecial* /[ %[ CP %] ] @#@
 *       NoSpecial being any single non-auxiliary symbol
  *      i.e. identity relations interspersed with cross-products
- *      and where every string begins and ends with the special symbol @#@      
+ *      and where every string begins and ends with the special symbol @#@
  *      Now we have strings such as aaa[a>0]a[a>b]va
  *      Where the bracketed sequences are rewrite centers
  *      Naturally, for many parallel rules, we take the union of *all* rule
- *      cross-products in CP.   
+ *      cross-products in CP.
  *      Two additions:
  *      i) if the rule is dotted, e.g. [..] -> b
- *         we get stuff like "xxx[[0>b]]xxx" ... 
+ *         we get stuff like "xxx[[0>b]]xxx" ...
  *         with two opening and closing brackets
- *      ii) if the rule is a chunking rule A -> B ...C 
+ *      ii) if the rule is a chunking rule A -> B ...C
  *          we get stuff like "xxx[0>BAAA0>C]xxx" where the A's are Id(a)
- *          
+ *
  *   c. constrain the bracketed sequences as per the type of rewrite rule
  *      Replace = [Insert & Context & Coerce]
  *      Context is a context restriction statement on the legitimacy of the [ ] sequence
@@ -85,9 +85,9 @@
  *        A&0 and the non empty A-0 and are treated as separate parallel rules
  *        the empty part has a separate Coerce & Context statement
  *        restricting and coercing the rule center to occur in the proper
- *        context if also flanked by i) and Id or ii) some symbol on the 
- *        upper side (i.e. not [[ which indicates dotted centers 
- *          
+ *        context if also flanked by i) and Id or ii) some symbol on the
+ *        upper side (i.e. not [[ which indicates dotted centers
+ *
  *   d. Construct a transducer from the bracketed language by calling
  *      rewrite_cp_to_fst() which converts single-tape languages with strings
  *      such as a[c>d]e to a:a c:d e:e and removes the auxiliaries.
@@ -97,7 +97,7 @@
  * More detail:
 
  *  Insert = @#@ NoSpecial/[ %[ UnionCP %] ] @#@
- *  i.e. as described above.  UnionCP = C1|C2|C3... 
+ *  i.e. as described above.  UnionCP = C1|C2|C3...
  *  cross products where C1 = [A:B] for a rule A op B
 
  *  Context = [ => Dir(L) _ C1 Dir(R) , Dir(L2) _ C1 Dir(R2) , ...
@@ -119,20 +119,20 @@
  *  For coerce, we take the intersection of every center
  *  and context pair (to which the center applies).
 
- *  For the empty center part of dotted rules, we use: CoerceD = 
+ *  For the empty center part of dotted rules, we use: CoerceD =
  *  ~[[EndOutside & [?* [Id|Sigl]] & [?* Dir(L)] ] [ [Dir(R) ?*] & [Id|Sigr] ?*]]
  *  where Sigl = \%] %];
  *  and   Sigr = %[ \%[;
  *  meaning the language that never contains a L R sequence
  *  if both L and R are identity symbols or regular [ rules
  *  ruling out sequences such as x [a>0]
- *                                ^  
+ *                                ^
  *  if x is the left context and a the right one.
 
  *  LR = ~[[[EndOutside] & [?* Dir(L)]] [[Dir(C) - [%[ ?*]] & $%[  ] Dir(R) ?*]
  *  This is our left-to-right restriction.  EndOutside = ~[?* %[ \%]*] - [?* %>]
  *  (this again is a tweak: endoutside could be defined without the subtraction).
- *  The logic of LR is simple: we shouldn't gave a Center inside C ... [ ] sequence 
+ *  The logic of LR is simple: we shouldn't gave a Center inside C ... [ ] sequence
  *  where C extends inside the bracket: meaning, we could have started rewriting
  *  earlier.
 
@@ -144,14 +144,14 @@
  *  SM = ~$[Dir(L) %[ C/Low1  [NoSpecial/Low1 ?* & Dir(R) ?*]]
  *  Here Low1 is the language we use to ignore the lower side inside [ ] brackets
  *  The logic is this: We don't allow a L [ C R sequence where the C doesn't end
- *  in ], i.e. is followed by at least one symbol which is not ] 
+ *  in ], i.e. is followed by at least one symbol which is not ]
  *  (indicating we could have chosen a longer rewrite).
 
  *  Additional notes: we have a special function to perform the context restriction
  *  involved in constructing Context for two reasons:
  *  1) We want to maintain the @#@ symbols and not treat them as special which
  *     the generic context_restrict doesn't do.
- *  2) We need some efficiency tweaks, such as are done in Coerce to 
+ *  2) We need some efficiency tweaks, such as are done in Coerce to
  *     minimize nondeterminism.
  
  *  If we have dotted rules we extend Context with [ => [ _ also.
@@ -277,7 +277,7 @@ struct fsm *fsm_rewrite(struct rewrite_set *all_rules) {
                 rules->cross_product = fsm_minimize(fsm_concat(rewrite_cp(fsm_empty_string(),fsm_copy(rules->right)),fsm_concat(fsm_copy(rules->left),rewrite_cp(fsm_empty_string(),fsm_copy(rules->right2)))));
             }
             if ((rules->arrow_type & ARROW_DOTTED) != 0) {
-                dottedrules++;                
+                dottedrules++;
                 //printf("RET\n");
                 rules->cross_product = fsm_minimize(fsm_concat(fsm_symbol("@[@"),fsm_concat(rules->cross_product,fsm_symbol("@]@"))));
             }
@@ -308,8 +308,8 @@ struct fsm *fsm_rewrite(struct rewrite_set *all_rules) {
         if (c == 0) {
             ruleset->rewrite_contexts = xxcalloc(1,sizeof(struct fsmcontexts));
             ruleset->rewrite_contexts->cpleft = fsm_empty_string();
-            ruleset->rewrite_contexts->cpright = fsm_empty_string();        
-            ruleset->rewrite_contexts->next = NULL;        
+            ruleset->rewrite_contexts->cpright = fsm_empty_string();
+            ruleset->rewrite_contexts->next = NULL;
         }
     }
 
@@ -323,7 +323,7 @@ struct fsm *fsm_rewrite(struct rewrite_set *all_rules) {
     
     /* Context = [ => Lower(L) _ C1|...|Cn ] Upper(R) */
     //printf("RuleCP\n"); fflush(stdout);
-    for (ruleset = all_rules; ruleset != NULL; ruleset = ruleset->next) {        
+    for (ruleset = all_rules; ruleset != NULL; ruleset = ruleset->next) {
         RuleCP = fsm_empty_set();
         for (rules = ruleset->rewrite_rules; rules != NULL; rules = rules->next) {
             RuleCP = fsm_minimize(fsm_union(RuleCP,fsm_copy(rules->cross_product)));
@@ -335,9 +335,9 @@ struct fsm *fsm_rewrite(struct rewrite_set *all_rules) {
     allcontexts = NULL;
     /* Do Context */
 
-    //printf("Context\n"); fflush(stdout); 
-    for (ruleset = all_rules; ruleset != NULL; ruleset = ruleset->next) {        
-        /* For every context pair, add its rule union to list of restricts */        
+    //printf("Context\n"); fflush(stdout);
+    for (ruleset = all_rules; ruleset != NULL; ruleset = ruleset->next) {
+        /* For every context pair, add its rule union to list of restricts */
         for (contexts = ruleset->rewrite_contexts; contexts != NULL; contexts = contexts->next) {
             newcontext = xxcalloc(1,sizeof(struct fsmcontexts));
             /* left = L */
@@ -360,12 +360,12 @@ struct fsm *fsm_rewrite(struct rewrite_set *all_rules) {
     if (allcontexts == NULL) {
         Context = fsm_universal();
     } else {
-        if (dottedrules == 0) {        
+        if (dottedrules == 0) {
             Context = rewr_context_restrict(fsm_symbol("@[@"),allcontexts);
         } else {
             //printf("Doing dottedcontext\n");
 
-            newcontext = xxcalloc(1,sizeof(struct fsmcontexts));            
+            newcontext = xxcalloc(1,sizeof(struct fsmcontexts));
             newcontext->left = fsm_symbol("@[@");
             newcontext->right = fsm_empty_string();
             newcontext->next = allcontexts;
@@ -467,7 +467,7 @@ struct fsm *fsm_rewrite(struct rewrite_set *all_rules) {
                     Coerce = fsm_intersect(Coerce, thisCoerce);
                 } else {
                     Coerce = thisCoerce;
-                }           
+                }
 		fsm_destroy(CoerceCenter);
 	    }
         }
@@ -478,7 +478,7 @@ struct fsm *fsm_rewrite(struct rewrite_set *all_rules) {
     fsm_destroy(EndOutside);
     fsm_destroy(Insert);
 
-    //printf("Have result\n"); fflush(stdout); 
+    //printf("Have result\n"); fflush(stdout);
     //Result = fsm_intersect(Insert,fsm_intersect(Context,Coerce));
     Result = fsm_intersect(Context,Coerce);
     Result = fsm_substitute_symbol(Result, "@#@", "@_EPSILON_SYMBOL_@");
@@ -513,7 +513,7 @@ struct fsm *rewr_context_restrict(struct fsm *X, struct fsmcontexts *LR) {
     for (pairs = LR; pairs != NULL; pairs = pairs->next) {
         if (pairs->left == NULL) {
             pairs->left = fsm_empty_string();
-        } else {            
+        } else {
             sigma_add("@VARX@",pairs->left->sigma);
             sigma_sort(pairs->left);
         }
@@ -538,7 +538,7 @@ struct fsm *rewr_context_restrict(struct fsm *X, struct fsmcontexts *LR) {
 
     if (sigma_find("@VARX@", Result->sigma) != -1) {
         Result = fsm_complement(fsm_substitute_symbol(Result, "@VARX@","@_EPSILON_SYMBOL_@"));
-    } else {    
+    } else {
         Result = fsm_complement(Result);
     }
     fsm_destroy(UnionP);
@@ -657,7 +657,7 @@ struct fsm *rewrite_cp(struct fsm *U, struct fsm *L) {
     sigma_add_special(EPSILON,PadL->sigma);
     sigma_add_special(UNKNOWN,PadL->sigma);
 
-    sigma_add_special(IDENTITY,PadU->sigma); 
+    sigma_add_special(IDENTITY,PadU->sigma);
     sigma_add_special(EPSILON,PadU->sigma);
     sigma_add_special(UNKNOWN,PadU->sigma);
 
@@ -705,7 +705,7 @@ struct fsm *rewrite_cp(struct fsm *U, struct fsm *L) {
 struct fsm *rewrite_cp_to_fst(struct fsm *net, char *lower_symbol, char *zero_symbol) {
     struct state_link {
         int in;
-        int out; 
+        int out;
         struct fsm_state *outptr; /* This points to where the target state is */
         _Bool crowded;
     } *state_link;
@@ -761,7 +761,7 @@ struct fsm *rewrite_cp_to_fst(struct fsm *net, char *lower_symbol, char *zero_sy
         /* Yes, whose target */
 
             if ((state_link+t)->outptr == NULL) {
-                (state_link+t)->outptr = (fsm+i);            
+                (state_link+t)->outptr = (fsm+i);
             }
         }
     }
@@ -773,7 +773,7 @@ struct fsm *rewrite_cp_to_fst(struct fsm *net, char *lower_symbol, char *zero_sy
 
     for (i=0,j=0; (fsm+i)->state_no != -1; i++) {
         if ((fsm+i)->target != -1 && (state_link+(fsm+i)->target)->out != -1) {
-            for (tempfsm=(state_link+(fsm+i)->target)->outptr,t=tempfsm->state_no;tempfsm->state_no == t ;tempfsm++) {               
+            for (tempfsm=(state_link+(fsm+i)->target)->outptr,t=tempfsm->state_no;tempfsm->state_no == t ;tempfsm++) {
                 in = (fsm+i)->in;
                 out = tempfsm->out;
                 if (in == IDENTITY || out == IDENTITY) {

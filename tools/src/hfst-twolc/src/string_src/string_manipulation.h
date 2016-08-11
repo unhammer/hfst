@@ -29,14 +29,14 @@
 #include <cstdlib>
 #include <cstring>
 #include <cassert>
-#include <iostream> 
+#include <iostream>
 #include <vector>
 
-//! @brief Thrown when a string manipulation function receives incorrect 
-//! string input. 
+//! @brief Thrown when a string manipulation function receives incorrect
+//! string input.
 struct FaultyStringInput
 {
-  //! @var Name of the function which threw this instance. 
+  //! @var Name of the function which threw this instance.
   std::string function;
 
   //! @var The incorrect input @function received.
@@ -55,7 +55,7 @@ std::string new_string(size_t lgth);
 //! @brief Safe copy of a @a char *. Free using @a free.
 char * string_copy(const char * str);
  
-//! @brief Recursively substitute each occurrence of @a substr with 
+//! @brief Recursively substitute each occurrence of @a substr with
 //! @a replacement.
 //! @param str perform substitution on this string.
 //! @param substr the substring to be substituted.
@@ -74,22 +74,22 @@ std::string remove_sign(std::string str,char sign);
 //! @brief Return @a str with all occurrences of @a sign removed.
 std::string remove_sign(std::string str,const std::string &sign);
 
-//! @brief For a string enclosed in quotation marks, return the unquoted 
-//! string. 
+//! @brief For a string enclosed in quotation marks, return the unquoted
+//! string.
 //! @pre @a str is of the form  <tt>\".*\"</tt>
 //! @note Only the first layer of quotation is removed.
 std::string unquote(const std::string &str);
 
-//! @brief Perform equivalent of perl <tt>s/%(%?)/$1/g</tt>. 
+//! @brief Perform equivalent of perl <tt>s/%(%?)/$1/g</tt>.
 //! @pre @a str doesn't contain '\\n'
 std::string unescape(const std::string str);
 
-//! @brief Compare @a str1 and @a str2 after unescape() has been applied on 
+//! @brief Compare @a str1 and @a str2 after unescape() has been applied on
 //! them.
 //! @pre neighted @a str1 nor @a str2 contains '\\n'.
-//! @return Return true if @a str1, thus compared, is alphabetically less than 
+//! @return Return true if @a str1, thus compared, is alphabetically less than
 //! @a str2.
-int strcmp_unescaped(const std::string &str1, 
+int strcmp_unescaped(const std::string &str1,
              const std::string &str2);
 
 //! @brief Transform a string of form <tt>(-)[0-9]+</tt> into an integer.
@@ -106,7 +106,7 @@ std::string remove_white_space(std::string str);
 std::string unescape_and_remove_white_space(std::string str);
 
 //! @brief Copy the first complete c-string found in @a source to @a target.
-//! @pre The space reserved for @a source may not be smaller than the space 
+//! @pre The space reserved for @a source may not be smaller than the space
 //! reserved for @a target.
 void copy_c_string(char * target,const char * source);
 
@@ -138,7 +138,7 @@ class StringVector : public std::vector<std::string>
  public:
   //! @brief Initialize empty.
   StringVector(void);
-  //! @brief Split @a s to tokens at spaces and store the tokens in @a this. 
+  //! @brief Split @a s to tokens at spaces and store the tokens in @a this.
   StringVector(const std::string &s);
 
   //! @brief Add the values in @a another at the end of @a this.

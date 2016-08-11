@@ -68,7 +68,7 @@
   // A map storing named regular expressions (i.e. definitions).
   HandyMap<std::string,OtherSymbolTransducer> definition_map;
 
-  // The grammar, which compiles rules, resolves conflicts and stores 
+  // The grammar, which compiles rules, resolves conflicts and stores
   // rule transducers.
   // TwolCGrammar grammar(true,true);
   TwolCGrammar * grammar;
@@ -81,18 +81,18 @@
 
 
 
-%union 
-{ 
+%union
+{
   int symbol_number;
   OtherSymbolTransducer * regular_expression;
-  char * value; 
+  char * value;
   SymbolRange * symbol_range;
   SymbolPairVector * symbol_pair_range;
   op::OPERATOR rule_operator;
 };
 
 
- /* 
+ /*
     All unary operators have stronger precedence than binary ones.
  */
 
@@ -104,19 +104,19 @@
 
  /* Unary operators ordered by precedence from lowest to highest. */
 %right <symbol_number> STAR PLUS
-%left  <symbol_number> CONTAINMENT CONTAINMENT_ONCE TERM_COMPLEMENT COMPLEMENT 
+%left  <symbol_number> CONTAINMENT CONTAINMENT_ONCE TERM_COMPLEMENT COMPLEMENT
 %right <symbol_number> POWER
 
  /* "[", "]", "(", ")". */
-%right <symbol_number> RIGHT_SQUARE_BRACKET RIGHT_PARENTHESIS 
+%right <symbol_number> RIGHT_SQUARE_BRACKET RIGHT_PARENTHESIS
 %left  <symbol_number> LEFT_SQUARE_BRACKET LEFT_PARENTHESIS
 
  /* Twolc rule operators */
-%token <symbol_number> LEFT_RESTRICTION_ARROW LEFT_ARROW RIGHT_ARROW 
+%token <symbol_number> LEFT_RESTRICTION_ARROW LEFT_ARROW RIGHT_ARROW
 %token <symbol_number> LEFT_RIGHT_ARROW
 
  /* Twolc regular expression rule operators */
-%token <symbol_number> RE_LEFT_RESTRICTION_ARROW RE_LEFT_ARROW RE_RIGHT_ARROW 
+%token <symbol_number> RE_LEFT_RESTRICTION_ARROW RE_LEFT_ARROW RE_RIGHT_ARROW
 %token <symbol_number> RE_LEFT_RIGHT_ARROW
 
  /* Twolc regular expression rule center brackets. */
@@ -124,7 +124,7 @@
 %left  <symbol_number> RE_LEFT_SQUARE_BRACKET
 
  /* Basic tokens. */
-%token <symbol_number>  ALPHABET_DECLARATION DIACRITICS_DECLARATION 
+%token <symbol_number>  ALPHABET_DECLARATION DIACRITICS_DECLARATION
 %token <symbol_number>  SETS_DECLARATION DEFINITION_DECLARATION
 %token <symbol_number>  RULES_DECLARATION COLON SEMI_COLON
 %token <symbol_number>  EQUALS CENTER_MARKER QUESTION_MARK EXCEPT
@@ -133,7 +133,7 @@
 %type<regular_expression> PAIR REGULAR_EXPRESSION RE_LIST RE RULE_CONTEXT
 %type<regular_expression> RE_RULE_CENTER
 %type<regular_expression> RULE_CONTEXTS NEGATIVE_RULE_CONTEXTS
-%type<symbol_range>       SYMBOL_LIST 
+%type<symbol_range>       SYMBOL_LIST
 %type<symbol_pair_range>  CENTER_PAIR CENTER_LIST RULE_CENTER
 %type<rule_operator>      RULE_OPERATOR RE_RULE_OPERATOR
 %type<value>              CENTER_SYMBOL PAIR_SYMBOL
@@ -143,13 +143,13 @@
 ALL: GRAMMAR {}
 ;
 
-GRAMMAR: ALPHABET GRAMMAR1 
+GRAMMAR: ALPHABET GRAMMAR1
 | GRAMMAR1
 
-GRAMMAR1: DIACRITICS GRAMMAR2 
+GRAMMAR1: DIACRITICS GRAMMAR2
 | GRAMMAR2
 
-GRAMMAR2: SETS GRAMMAR3 
+GRAMMAR2: SETS GRAMMAR3
 | GRAMMAR3
 
 GRAMMAR3: DEFINITIONS GRAMMAR4
@@ -166,7 +166,7 @@ RULE_LIST: /* empty */
 | RULE_LIST RULE
 
 RULE: RULE_NAME RULE_CENTER RULE_OPERATOR RULE_CONTEXTS NEGATIVE_RULE_CONTEXTS
-{ 
+{
   // Subtract negative contexts from positive contexts.
   $4->apply(&HfstTransducer::subtract,*$5);
 
@@ -182,7 +182,7 @@ RULE: RULE_NAME RULE_CENTER RULE_OPERATOR RULE_CONTEXTS NEGATIVE_RULE_CONTEXTS
   delete $4;
   delete $5;
 }
-| RULE_NAME RE_RULE_CENTER RE_RULE_OPERATOR RULE_CONTEXTS 
+| RULE_NAME RE_RULE_CENTER RE_RULE_OPERATOR RULE_CONTEXTS
 NEGATIVE_RULE_CONTEXTS
 {
   // Subtract negative contexts from positive contexts.
@@ -212,15 +212,15 @@ RE_RULE_CENTER: RE_LEFT_SQUARE_BRACKET REGULAR_EXPRESSION RE_RIGHT_SQUARE_BRACKE
 CENTER_LIST: CENTER_PAIR
 { $$ = $1; }
 | CENTER_LIST UNION CENTER_PAIR
-{ 
+{
   $$ = $1;
   $$->push_back(*$3->begin());
   delete $3;
 }
 
 CENTER_PAIR: CENTER_SYMBOL COLON CENTER_SYMBOL
-{ 
-  $$ = alphabet.get_symbol_pair_vector(SymbolPair($1,$3)); 
+{
+  $$ = alphabet.get_symbol_pair_vector(SymbolPair($1,$3));
   free($1); free($3);
 }
 
@@ -250,7 +250,7 @@ RE_RULE_OPERATOR: RE_LEFT_ARROW
 RULE_CONTEXTS: /* empty */
 { $$ = new OtherSymbolTransducer(); }
 | RULE_CONTEXTS RULE_CONTEXT
-{ 
+{
   $$ = &$1->apply(&HfstTransducer::disjunct,*$2);
   delete $2;
 }
@@ -275,7 +275,7 @@ ALPHABET_HEADER:ALPHABET_DECLARATION
 { message("Reading alphabet."); }
 
 DIACRITICS: DIACRITICS_HEADER SYMBOL_LIST SEMI_COLON_LIST
-{ 
+{
   grammar->define_diacritics(*$2);
   alphabet.define_diacritics(*$2);
   delete $2;
@@ -284,7 +284,7 @@ DIACRITICS: DIACRITICS_HEADER SYMBOL_LIST SEMI_COLON_LIST
 DIACRITICS_HEADER:DIACRITICS_DECLARATION
 { message("Reading diacritics."); }
 
-SETS: SETS_HEADER SET_LIST 
+SETS: SETS_HEADER SET_LIST
 
 SETS_HEADER:SETS_DECLARATION
 { message("Reading sets."); }
@@ -307,7 +307,7 @@ DEFINITION: DEFINITION_NAME EQUALS REGULAR_EXPRESSION SEMI_COLON_LIST
 REGULAR_EXPRESSION: RE_LIST
 { $$ = $1; }
 | REGULAR_EXPRESSION UNION RE_LIST
-{ 
+{
   $$ = &$1->apply(&HfstTransducer::disjunct,*$3);
   delete $3;
 }
@@ -340,7 +340,7 @@ REGULAR_EXPRESSION: RE_LIST
 RE_LIST: /* empty */
 { $$ = new OtherSymbolTransducer(HFST_EPSILON); }
 | RE_LIST RE
-{ 
+{
   $$ = &$1->apply(&HfstTransducer::concatenate,*$2);
   delete $2;
 }
@@ -348,12 +348,12 @@ RE_LIST: /* empty */
 RE: PAIR
 { $$ = $1; }
 | RE POWER NUMBER
-{ 
+{
   $$ = &$1->apply(&HfstTransducer::repeat_n,get_number($3));
   free($3);
 }
 | RE POWER NUMBER_RANGE
-{ 
+{
   $$ = &$1->apply(&HfstTransducer::repeat_n_to_k,
           get_number($3),get_second_number($3));
   free($3);
@@ -375,8 +375,8 @@ RE: PAIR
 | LEFT_PARENTHESIS REGULAR_EXPRESSION RIGHT_PARENTHESIS
 { $$ = &$2->apply(&HfstTransducer::optionalize); }
 
-SET_LIST: /* empty */ 
-| SET_LIST SET_DEFINITION 
+SET_LIST: /* empty */
+| SET_LIST SET_DEFINITION
 
 SYMBOL_LIST: /* empty */
 { $$ = new SymbolRange; }
@@ -398,32 +398,32 @@ ALPHABET_PAIR_LIST: /* empty */
 | ALPHABET_PAIR_LIST ALPHABET_PAIR
 
 PAIR: PAIR_SYMBOL COLON PAIR_SYMBOL
-{ 
-  if (std::string("__HFST_TWOLC_0") == $1 && 
+{
+  if (std::string("__HFST_TWOLC_0") == $1 &&
       std::string("__HFST_TWOLC_0") == $3)
     { $$ = new OtherSymbolTransducer(HFST_EPSILON); }
   else if (std::string("__HFST_TWOLC_#") == $1)
-    { 
+    {
       // __HFST_TWOLC_# corresponds to the #-symbol in grammars. It should
       // be split into an absolute word boundary "__HFST_TWOLC_.#." and a
       // relative word boundary "#". On the surface the relative word-boundary
       // may correspond to whatever it did correspond to in the rule file.
       // The absolute word boundary surface realization is treated the same as
       // the surface realizations of other absolute word boundaries.
-      OtherSymbolTransducer wb = 
+      OtherSymbolTransducer wb =
     alphabet.get_transducer(SymbolPair
                 ("__HFST_TWOLC_.#.","__HFST_TWOLC_.#."));
-      OtherSymbolTransducer alt_wb = 
+      OtherSymbolTransducer alt_wb =
     alphabet.get_transducer
     (SymbolPair
-     ("#",$3 == std::string("__HFST_TWOLC_#") ? "#" : $3));      
+     ("#",$3 == std::string("__HFST_TWOLC_#") ? "#" : $3));
       wb.apply(&HfstTransducer::disjunct,alt_wb);
 
       $$ = new OtherSymbolTransducer(wb);
-    }  
+    }
   else
     { $$ = new OtherSymbolTransducer
-    (alphabet.get_transducer(SymbolPair($1,$3))); 
+    (alphabet.get_transducer(SymbolPair($1,$3)));
       if (alphabet.is_empty_pair(SymbolPair($1,$3)))
     {
       std::string error;
@@ -438,7 +438,7 @@ PAIR: PAIR_SYMBOL COLON PAIR_SYMBOL
           std::string symbol1 = Rule::get_print_name($1);
           std::string symbol2 = Rule::get_print_name($3);
 
-          error = std::string("The pair set ") + symbol1 + ":" + symbol2 + 
+          error = std::string("The pair set ") + symbol1 + ":" + symbol2 +
         " is empty.";
         }
       error +=  std::string("\n\n") +
@@ -449,7 +449,7 @@ PAIR: PAIR_SYMBOL COLON PAIR_SYMBOL
         "the context of a rule or result from substituting values for\n" +
         "variables in a rule with variables.\n\n" +
 
-        "Compilation is terminated because a rule context, definition\n" + 
+        "Compilation is terminated because a rule context, definition\n" +
         "or rule center becomes empty.\n\n";
 
       semantic_error(error.c_str());
@@ -460,8 +460,8 @@ PAIR: PAIR_SYMBOL COLON PAIR_SYMBOL
   free($3);
 }
 | DEFINITION_NAME COLON DEFINITION_NAME
-{ 
-  $$ = new OtherSymbolTransducer(definition_map[$1]); 
+{
+  $$ = new OtherSymbolTransducer(definition_map[$1]);
   free($1);
   free($3);
 }
@@ -472,7 +472,7 @@ PAIR_SYMBOL: SYMBOL
 { $$ = string_copy("__HFST_TWOLC_?"); }
 
 ALPHABET_PAIR: SYMBOL COLON SYMBOL
-{ 
+{
   alphabet.define_alphabet_pair(SymbolPair($1,$3));
   free($1);
   free($3);
@@ -484,26 +484,26 @@ SEMI_COLON_LIST: SEMI_COLON
 %%
 
 // Print warning.
-void warn(const char * warning) 
-{ 
+void warn(const char * warning)
+{
 #ifdef DEBUG_TWOLC_3_GRAMMAR
   std::cerr << warning << std::endl;
 #else
-  (void)warning; 
+  (void)warning;
 #endif
 }
 
 // Print error messge and exit 1.
-void yyerror(const char * text) 
-{ 
+void yyerror(const char * text)
+{
   (void)text;
   input_reader.error(text);
-  exit(1); 
+  exit(1);
 }
 
 // Print error messge and exit 1.
-void semantic_error(const char * text) 
-{ 
+void semantic_error(const char * text)
+{
   std::cerr << std::endl << "Error: " << text << std::endl;
   exit(1);
 }
@@ -554,7 +554,7 @@ int main(int argc, char * argv[])
   yydebug = 1;
 #endif
 
-  try 
+  try
     {
       CommandLine command_line(argc,argv);
       if (command_line.help || command_line.usage || command_line.version)

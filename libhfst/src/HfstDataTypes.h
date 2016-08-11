@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 #ifndef _HFST_DATA_TYPES_H_
@@ -21,7 +21,7 @@
 #include <set>
 
 
-/** @file HfstDataTypes.h  
+/** @file HfstDataTypes.h
     \brief Datatypes that are needed when using the HFST API. */
 
 namespace hfst
@@ -38,7 +38,7 @@ namespace hfst
   // ENUMS AND TYPEDEFS...
 
   /** \brief The type of an HfstTransducer. */
-  enum ImplementationType 
+  enum ImplementationType
   {
     SFST_TYPE, /**< An SFST transducer, unweighted. */
     TROPICAL_OPENFST_TYPE, /**< An OpenFst transducer with tropical weights. */
@@ -46,14 +46,14 @@ namespace hfst
     FOMA_TYPE, /**< A foma transducer, unweighted. */
     XFSM_TYPE, /**< An xfsm transducer, unweighted (mostly for testing purposes). */
     /* Add an enumerator for your transducer type here. */
-    //MY_TRANSDUCER_LIBRARY_TYPE, 
+    //MY_TRANSDUCER_LIBRARY_TYPE,
     HFST_OL_TYPE, /**< An HFST optimized lookup transducer, unweighted */
     HFST_OLW_TYPE, /**< An HFST optimized lookup transducer with weights */
     HFST2_TYPE, /**< HFST2 header present, conversion required */
     UNSPECIFIED_TYPE, /**< Format left open by e.g. default constructor */
-    ERROR_TYPE /**< Type not recognised. 
-                  This type might be returned by a function 
-                  if an error occurs. */ 
+    ERROR_TYPE /**< Type not recognised.
+                  This type might be returned by a function
+                  if an error occurs. */
   };
 
   const char * implementation_type_to_string(ImplementationType type);
@@ -62,9 +62,9 @@ namespace hfst
   /** \brief The type of a push operation.
       @see HfstTransducer::push_weights */
   enum PushType
-  { 
+  {
     TO_INITIAL_STATE /**< Push weights towards initial state. */,
-    TO_FINAL_STATE /**< Push weights towards final state(s). */ 
+    TO_FINAL_STATE /**< Push weights towards final state(s). */
   };
 
   //! @brief A vector of transducers
@@ -111,7 +111,7 @@ namespace hfst
   namespace implementations {
     template <class C> class HfstTransitionGraph;
     class HfstTropicalTransducerTransitionData;
-    typedef HfstTransitionGraph<HfstTropicalTransducerTransitionData> 
+    typedef HfstTransitionGraph<HfstTropicalTransducerTransitionData>
       HfstBasicTransducer;
     class HfstFastTransitionData;
     typedef HfstTransitionGraph<HfstFastTransitionData>
@@ -119,7 +119,7 @@ namespace hfst
     typedef unsigned int HfstState;
 
     template <class C> class HfstTransition;
-    typedef HfstTransition<HfstTropicalTransducerTransitionData> 
+    typedef HfstTransition<HfstTropicalTransducerTransitionData>
       HfstBasicTransition;
     typedef HfstTransition<HfstFastTransitionData>
       HfstFastTransition;
@@ -130,5 +130,5 @@ namespace hfst
 
 
 }
-// vim: set ft=cpp.doxygen: 
+// vim: set ft=cpp.doxygen:
 #endif

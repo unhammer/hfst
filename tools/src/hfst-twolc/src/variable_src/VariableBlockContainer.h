@@ -26,30 +26,30 @@
 #include "VariableBlock.h"
 
 //! Iterator for @a FreelyVariableBlock objects.
-typedef ConstContainerIterator<FreelyVariableBlock> 
+typedef ConstContainerIterator<FreelyVariableBlock>
 FreelyVariableBlockConstIterator;
 
 //! Iterator for @a MatchedVariableBlock objects.
-typedef ConstContainerIterator<MatchedVariableBlock> 
+typedef ConstContainerIterator<MatchedVariableBlock>
 MatchedVariableBlockConstIterator;
 
 //! Iterator for @a MixedVariableBlock objects.
-typedef ConstContainerIterator<MixedVariableBlock> 
+typedef ConstContainerIterator<MixedVariableBlock>
 MixedVariableBlockConstIterator;
 
 //! Container for @a FreelyVariableBlock objects.
-typedef 
-VariableContainer<FreelyVariableBlock,FreelyVariableBlockConstIterator> 
+typedef
+VariableContainer<FreelyVariableBlock,FreelyVariableBlockConstIterator>
 FreelyVariableBlockContainer;
 
 //! Container for @a MatchedVariableBlock objects.
-typedef 
-VariableContainer<MatchedVariableBlock,MatchedVariableBlockConstIterator> 
+typedef
+VariableContainer<MatchedVariableBlock,MatchedVariableBlockConstIterator>
 MatchedVariableBlockContainer;
 
 //! Container for @a MixedVariableBlock objects.
-typedef 
-VariableContainer<MixedVariableBlock,MixedVariableBlockConstIterator> 
+typedef
+VariableContainer<MixedVariableBlock,MixedVariableBlockConstIterator>
 MixedVariableBlockContainer;
 
 #endif // VARIABLE_BLOCK_CONTAINER_H_

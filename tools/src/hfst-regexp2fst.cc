@@ -83,10 +83,10 @@ print_usage()
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
     "Compile (weighted) regular expressions into transducer(s)"
-        "\n", program_name); 
+        "\n", program_name);
         print_common_program_options(message_out);
-        print_common_unary_program_options(message_out); 
-        fprintf(message_out, 
+        print_common_unary_program_options(message_out);
+        fprintf(message_out,
 "String and format options:\n"
 "  -f, --format=FMT          Write result in FMT format\n"
 "  -j, --disjunct            Disjunct all regexps instead of transforming\n"
@@ -108,13 +108,13 @@ print_usage()
                 );
         fprintf(message_out, "\n");
 
-        fprintf(message_out, 
+        fprintf(message_out,
             "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
             "FMT must be one of the following: "
             "{foma, sfst, openfst-tropical, openfst-log}.\n"
             "If EPS is not defined, the default representation of 0 is used\n"
-            "VALUEs recognized are {true,ON,yes} and {false,OFF,no}.\n"    
-            "Xfst variables are {flag-is-epsilon (default OFF)}.\n"    
+            "VALUEs recognized are {true,ON,yes} and {false,OFF,no}.\n"
+            "Xfst variables are {flag-is-epsilon (default OFF)}.\n"
             "\n"
             );
 
@@ -270,7 +270,7 @@ process_stream(HfstOutputStream& outstream)
   comp.set_flag_harmonization(harmonize_flags);
   HfstTransducer disjunction(output_format);
 
-  char delim = (line_separated)? '\n' : ';';  
+  char delim = (line_separated)? '\n' : ';';
   char* first_line = 0;
 
   if (!line_separated)
@@ -291,7 +291,7 @@ process_stream(HfstOutputStream& outstream)
                   if (transducer_n == 1)
                     {
                       error(EXIT_FAILURE, 0, "%s: XRE parsing failed: expression #%u "
-                            "contains only whitespace or comments", inputfilename, 
+                            "contains only whitespace or comments", inputfilename,
                             (unsigned int)transducer_n);
                     }
                   break;
@@ -389,7 +389,7 @@ process_stream(HfstOutputStream& outstream)
     {
       if (delim == '\n')
         {
-          hfst_set_name(disjunction, 
+          hfst_set_name(disjunction,
                         "?",
                         "xre");
         }
@@ -406,7 +406,7 @@ process_stream(HfstOutputStream& outstream)
 
 //extern int xredebug;
 
-int main( int argc, char **argv ) 
+int main( int argc, char **argv )
   {
 #ifdef WINDOWS
     _setmode(1, _O_BINARY);
@@ -434,7 +434,7 @@ int main( int argc, char **argv )
     {
       fclose(outfile);
     }
-  verbose_printf("Reading from %s, writing to %s\n", 
+  verbose_printf("Reading from %s, writing to %s\n",
                  inputfilename, outfilename);
   // here starts the buffer handling part
   HfstOutputStream* outstream = (outfile != stdout) ?

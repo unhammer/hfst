@@ -15,7 +15,7 @@ namespace hfst {
       add(hfst::internal_identity.c_str(),2);
     }
     
-    HfstAlphabet::HfstAlphabet(const HfstAlphabet &alpha) 
+    HfstAlphabet::HfstAlphabet(const HfstAlphabet &alpha)
     {
       for (CharMap::const_iterator it = alpha.cm.begin(); it != alpha.cm.end(); it++) {
     cm[it->first] = basic::fst_strdup(it->second);
@@ -61,7 +61,7 @@ namespace hfst {
       printf("..alphabet\n");
     }
     
-    void HfstAlphabet::insert(NumberPair sp) { 
+    void HfstAlphabet::insert(NumberPair sp) {
       /* check special symbols */ pairs.insert(sp); };
     void HfstAlphabet::clear_pairs() { pairs.clear(); };
     HfstAlphabet::CharMap HfstAlphabet::get_char_map() { return cm; };
@@ -75,7 +75,7 @@ namespace hfst {
     int HfstAlphabet::symbol2code( const char * s ) const {
       SymbolMap::const_iterator p = sm.find(s);
       if (p != sm.end()) return p->second;
-      return EOF;       
+      return EOF;
     }
     
     const char *HfstAlphabet::code2symbol( unsigned int c ) const {
@@ -231,7 +231,7 @@ namespace hfst {
     }*/
     }
 
-    std::pair<unsigned int, unsigned int> HfstAlphabet::next_label(char * &string, bool extended) 
+    std::pair<unsigned int, unsigned int> HfstAlphabet::next_label(char * &string, bool extended)
     {
       // read first character
       int c = next_code( string, extended );
@@ -258,7 +258,7 @@ namespace hfst {
       std::pair<unsigned int, unsigned int> retval(lc, (unsigned int)c);
       if (retval.first == 0 && retval.second == 0)
     return next_label(string, extended); // ignore epsilon transitions
-      return retval; 
+      return retval;
     }
     
   }

@@ -60,7 +60,7 @@ The bindings should be usable after installation in Python with command:
 
   import hfst
 
-NOTE: If you want to use Python bindings locally, either add the absolute path 
+NOTE: If you want to use Python bindings locally, either add the absolute path
 to this folder to PYTHONPATH, e.g. by executing
 
     PYTHONPATH="path/to/hfst-top-dir/python:"$PYTHONPATH
@@ -108,4 +108,4 @@ If this is the case, run
     sed -i 's/class HfstException(_object):/class HfstException(Exception):/' libhfst.py
 
 after build/installation to be able to use HfstException and its subclasses in
-Python. 
+Python.

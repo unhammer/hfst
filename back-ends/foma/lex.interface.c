@@ -56,7 +56,7 @@
 #if defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 
 /* C99 says to define __STDC_LIMIT_MACROS before including stdint.h,
- * if you want the limit (max/min) macros for int types. 
+ * if you want the limit (max/min) macros for int types.
  */
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS 1
@@ -73,7 +73,7 @@ typedef uint32_t flex_uint32_t;
 typedef signed char flex_int8_t;
 typedef short flex_int16_t;
 typedef int flex_int32_t;
-typedef unsigned char flex_uint8_t; 
+typedef unsigned char flex_uint8_t;
 typedef unsigned short flex_uint16_t;
 typedef unsigned int flex_uint32_t;
 
@@ -194,7 +194,7 @@ extern FILE *interfacein, *interfaceout;
 
     /* Note: We specifically omit the test for yy_rule_can_match_eol because it requires
      *       access to the local variable yy_act. Since yyless() is a macro, it would break
-     *       existing scanners that call yyless() from OUTSIDE interfacelex. 
+     *       existing scanners that call yyless() from OUTSIDE interfacelex.
      *       One obvious solution it to make yy_act a global. I tried that, and saw
      *       a 5% performance hit in a non-interfacelineno scanner, because yy_act is
      *       normally declared as a register variable-- so it is not worth it.
@@ -7692,16 +7692,16 @@ static yyconst flex_int16_t yy_chk[27006] =
 /* Table of booleans, true if rule could match eol. */
 static yyconst flex_int32_t yy_rule_can_match_eol[213] =
     {   0,
-0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 
-    1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 
+0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0,
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0,     };
 
 extern int interface_flex_debug;
@@ -7756,7 +7756,7 @@ char *interfacetext;
 char funcdef[16384];
 
 struct func_args {
-   char *arg; 
+   char *arg;
    int argno;
    struct func_args *next;
 };
@@ -7791,7 +7791,7 @@ int get_iface_lineno(void) {
 }
 
 void clear_func_args(void) {
-    struct func_args *fa, *fp;  
+    struct func_args *fa, *fp;
     for (fa = func_args; fa != NULL; ) {
 	xxfree(fa->arg);
 	fp = fa;
@@ -7812,7 +7812,7 @@ void add_func_arg(char *s) {
 }
 
 char *rep_func_arg(char *s) {
-  struct func_args *fa;  
+  struct func_args *fa;
   char *argstr;
   for (fa = func_args; fa != NULL; fa = fa->next) {
     if (strcmp(fa->arg,s) == 0) {
@@ -8086,8 +8086,8 @@ YY_DECL
 #line 132 "interface.l"
 
  
-  if (YY_START == APPLY_P && promptmode == PROMPT_MAIN) 
-    BEGIN(INITIAL); 
+  if (YY_START == APPLY_P && promptmode == PROMPT_MAIN)
+    BEGIN(INITIAL);
 
 
 #line 8094 "lex.interface.c"
@@ -9296,8 +9296,8 @@ case 173:
 /* rule 173 can match eol */
 YY_RULE_SETUP
 #line 466 "interface.l"
-{ 
-  iface_print_net(tempstr, trim(interfacetext));  
+{
+  iface_print_net(tempstr, trim(interfacetext));
   BEGIN(INITIAL);
 }
 	YY_BREAK
@@ -9330,13 +9330,13 @@ YY_RULE_SETUP
 #line 485 "interface.l"
 {
   if ((interfacein = fopen(trim(interfacetext), "r" )) != NULL) {
-    printf("Opening file '%s'.\n", trim(interfacetext));    
+    printf("Opening file '%s'.\n", trim(interfacetext));
     input_is_file = 1;
     interfacepush_buffer_state(interface_create_buffer(interfacein,YY_BUF_SIZE*2));
   } else {
     printf("Error opening file '%s'\n",trim(interfacetext));
   }
-  BEGIN(INITIAL); 
+  BEGIN(INITIAL);
 }
 	YY_BREAK
 case 178:
@@ -9466,7 +9466,7 @@ case 194:
 YY_RULE_SETUP
 #line 561 "interface.l"
 {
-  iface_substitute_symbol(interfacetext, tempstr); 
+  iface_substitute_symbol(interfacetext, tempstr);
   BEGIN(INITIAL);
 }
 	YY_BREAK
@@ -9485,7 +9485,7 @@ case 197:
 YY_RULE_SETUP
 #line 567 "interface.l"
 {
-  iface_substitute_defined(interfacetext, tempstr); 
+  iface_substitute_defined(interfacetext, tempstr);
   BEGIN(INITIAL);
 }
 	YY_BREAK
@@ -9548,7 +9548,7 @@ YY_RULE_SETUP
 {
   if ((lexcfilein = file_to_mem(trim(interfacetext))) != NULL) {
      stack_add(fsm_lexc_parse_string(lexcfilein, 1));
-     xxfree(lexcfilein); 
+     xxfree(lexcfilein);
   } else {
     printf("Error opening file '%s'.\n", interfacetext);
   }
@@ -9602,7 +9602,7 @@ YY_RULE_SETUP
 {
       if (!input_is_file)
         printf("Unknown command. Ignoring until end of line.\n");
-      else 
+      else
         printf("***Unknown command '%s' on line %i. Aborting.\n",interfacetext,interfacelineno);
       return 1;
 }
@@ -10062,7 +10062,7 @@ static int yy_get_next_buffer (void)
 
 /** Immediately switch to a different input stream.
  * @param input_file A readable stream.
- * 
+ *
  * @note This function does not reset the start condition to @c INITIAL .
  */
     void interfacerestart  (FILE * input_file )
@@ -10080,7 +10080,7 @@ static int yy_get_next_buffer (void)
 
 /** Switch to a different input buffer.
  * @param new_buffer The new input buffer.
- * 
+ *
  */
     void interface_switch_to_buffer  (YY_BUFFER_STATE  new_buffer )
 {
@@ -10124,7 +10124,7 @@ static void interface_load_buffer_state  (void)
 /** Allocate and initialize an input buffer state.
  * @param file A readable stream.
  * @param size The character buffer size in bytes. When in doubt, use @c YY_BUF_SIZE.
- * 
+ *
  * @return the allocated buffer state.
  */
     YY_BUFFER_STATE interface_create_buffer  (FILE * file, int  size )
@@ -10153,7 +10153,7 @@ static void interface_load_buffer_state  (void)
 
 /** Destroy the buffer.
  * @param b a buffer created with interface_create_buffer()
- * 
+ *
  */
     void interface_delete_buffer (YY_BUFFER_STATE  b )
 {
@@ -10204,7 +10204,7 @@ extern int isatty (int );
 
 /** Discard all buffered characters. On the next scan, YY_INPUT will be called.
  * @param b the buffer state to be flushed, usually @c YY_CURRENT_BUFFER.
- * 
+ *
  */
     void interface_flush_buffer (YY_BUFFER_STATE  b )
 {
@@ -10233,7 +10233,7 @@ extern int isatty (int );
  *  the current state. This function will allocate the stack
  *  if necessary.
  *  @param new_buffer The new state.
- *  
+ *
  */
 void interfacepush_buffer_state (YY_BUFFER_STATE new_buffer )
 {
@@ -10263,7 +10263,7 @@ void interfacepush_buffer_state (YY_BUFFER_STATE new_buffer )
 
 /** Removes and deletes the top of the stack, if present.
  *  The next element becomes the new top.
- *  
+ *
  */
 void interfacepop_buffer_state (void)
 {
@@ -10330,8 +10330,8 @@ static void interfaceensure_buffer_stack (void)
 /** Setup the input buffer state to scan directly from a user-specified character buffer.
  * @param base the character buffer
  * @param size the size in bytes of the character buffer
- * 
- * @return the newly allocated buffer state object. 
+ *
+ * @return the newly allocated buffer state object.
  */
 YY_BUFFER_STATE interface_scan_buffer  (char * base, yy_size_t  size )
 {
@@ -10365,7 +10365,7 @@ YY_BUFFER_STATE interface_scan_buffer  (char * base, yy_size_t  size )
 /** Setup the input buffer state to scan a string. The next call to interfacelex() will
  * scan from a @e copy of @a str.
  * @param yystr a NUL-terminated string to scan
- * 
+ *
  * @return the newly allocated buffer state object.
  * @note If you want to scan bytes that may contain NUL values, then use
  *       interface_scan_bytes() instead.
@@ -10380,7 +10380,7 @@ YY_BUFFER_STATE interface_scan_string (yyconst char * yystr )
  * scan from a @e copy of @a bytes.
  * @param yybytes the byte buffer to scan
  * @param _yybytes_len the number of bytes in the buffer pointed to by @a bytes.
- * 
+ *
  * @return the newly allocated buffer state object.
  */
 YY_BUFFER_STATE interface_scan_bytes  (yyconst char * yybytes, int  _yybytes_len )
@@ -10443,7 +10443,7 @@ static void yy_fatal_error (yyconst char* msg )
 /* Accessor  methods (get/set functions) to struct members. */
 
 /** Get the current line number.
- * 
+ *
  */
 int interfaceget_lineno  (void)
 {
@@ -10452,7 +10452,7 @@ int interfaceget_lineno  (void)
 }
 
 /** Get the input stream.
- * 
+ *
  */
 FILE *interfaceget_in  (void)
 {
@@ -10460,7 +10460,7 @@ FILE *interfaceget_in  (void)
 }
 
 /** Get the output stream.
- * 
+ *
  */
 FILE *interfaceget_out  (void)
 {
@@ -10468,7 +10468,7 @@ FILE *interfaceget_out  (void)
 }
 
 /** Get the length of the current token.
- * 
+ *
  */
 int interfaceget_leng  (void)
 {
@@ -10476,7 +10476,7 @@ int interfaceget_leng  (void)
 }
 
 /** Get the current token.
- * 
+ *
  */
 
 char *interfaceget_text  (void)
@@ -10486,7 +10486,7 @@ char *interfaceget_text  (void)
 
 /** Set the current line number.
  * @param line_number
- * 
+ *
  */
 void interfaceset_lineno (int  line_number )
 {
@@ -10497,7 +10497,7 @@ void interfaceset_lineno (int  line_number )
 /** Set the input stream. This does not discard the current
  * input buffer.
  * @param in_str A readable stream.
- * 
+ *
  * @see interface_switch_to_buffer
  */
 void interfaceset_in (FILE *  in_str )

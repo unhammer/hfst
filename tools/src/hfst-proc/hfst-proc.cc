@@ -149,7 +149,7 @@ bool print_version(void)
 {
   std::cout <<
     "\n" <<
-    "hfst-proc 0.0" << 
+    "hfst-proc 0.0" <<
 #ifdef HAVE_CONFIG_H
     " (" << PACKAGE_STRING << ")" <<
 #endif
@@ -198,7 +198,7 @@ int main(int argc, char **argv)
       {"show-raw-in-cg", no_argument,       0, 'r'},
       {"analyses",       required_argument, 0, 'N'},
       // -l is probably too error prone to document
-      {"weight-classes", required_argument, 0, 'l'}, 
+      {"weight-classes", required_argument, 0, 'l'},
       {"case-sensitive", no_argument,       0, 'c'},
       {"dictionary-case",no_argument,       0, 'w'},
       {"null-flush",     no_argument,       0, 'z'},
@@ -303,7 +303,7 @@ int main(int argc, char **argv)
         }
       break;
     
-    case 'e': 
+    case 'e':
       processCompounds = true;
       break;
     case 'c':
@@ -420,7 +420,7 @@ int main(int argc, char **argv)
     catch (TransducerHasWrongTypeException &ex)
       {
         std::cerr << "Transducer must be in HFST optimized lookup format." << std::endl;
-        return EXIT_FAILURE;        
+        return EXIT_FAILURE;
       }
     ProcTransducer t(in);
     if(verboseFlag)

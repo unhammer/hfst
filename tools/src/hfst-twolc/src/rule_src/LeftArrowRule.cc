@@ -25,7 +25,7 @@ LeftArrowRule::LeftArrowRule
 
 OtherSymbolTransducer LeftArrowRule::compile(void)
 {
-  OtherSymbolTransducer abstract_center = 
+  OtherSymbolTransducer abstract_center =
     center.get_inverse_of_upper_projection();
   context.
     apply(&HfstTransducer::intersect,abstract_center);
@@ -46,23 +46,23 @@ int main(void)
 {
   bool have_openfst = false;
 #if HAVE_OPENFST
-  have_openfst = true; 
+  have_openfst = true;
 #endif // HAVE_OPENFST
 
   bool have_sfst = false;
 #if HAVE_SFST
-  have_sfst = true; 
+  have_sfst = true;
 #endif // HAVE_SFST
 
   bool have_foma = false;
 #if HAVE_FOMA
-  have_foma = true; 
+  have_foma = true;
 #endif // HAVE_FOMA
 
-ImplementationType transducer_type 
-= have_openfst ? hfst::TROPICAL_OPENFST_TYPE : 
+ImplementationType transducer_type
+= have_openfst ? hfst::TROPICAL_OPENFST_TYPE :
   have_sfst ? hfst::SFST_TYPE :
-  have_foma ? hfst::FOMA_TYPE : 
+  have_foma ? hfst::FOMA_TYPE :
   hfst::ERROR_TYPE;
 
  OtherSymbolTransducer::set_transducer_type(transducer_type);
@@ -92,7 +92,7 @@ ImplementationType transducer_type
 
   // ?* a:b <D> ?* <D> ?*
   OtherSymbolTransducer context = unknown;
-  context.    
+  context.
     apply(&HfstTransducer::concatenate,a_b_pair).
     apply(&HfstTransducer::concatenate,diamond).
     apply(&HfstTransducer::concatenate,unknown_optional).

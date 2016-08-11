@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 //! @file XreCompiler.cc
@@ -17,7 +17,7 @@
 
 #ifdef WINDOWS
 #include "hfst-string-conversions.h"
-#endif 
+#endif
 
 #ifndef UNIT_TEST
 
@@ -34,7 +34,7 @@ namespace hfst { namespace xre {
 #endif
     bool verbose_(false);
 
-XreCompiler::XreCompiler() : 
+XreCompiler::XreCompiler() :
     definitions_(),
     function_definitions_(),
     function_arguments_(),
@@ -152,13 +152,13 @@ XreCompiler::define(const std::string& name, const std::string& xre)
   HfstTransducer* compiled = compile(xre);
   if (compiled == NULL)
     {
-      //fprintf(stderr, "error in XreCompiler::define: xre '%s' could not be parsed, leaving %s undefined\n", 
+      //fprintf(stderr, "error in XreCompiler::define: xre '%s' could not be parsed, leaving %s undefined\n",
       //        xre.c_str(), name.c_str());
       //*errorstream_ << "error in XreCompiler::define: xre '" << xre << "' could not be parsed, leaving " << name << "undefined" << std::endl;
       if (this->verbose_)
         {
           std::ostream * err = get_stream(get_error_stream());
-          *err << "error: could not parse '" << xre << "', leaving '" << name << "' undefined" << std::endl; 
+          *err << "error: could not parse '" << xre << "', leaving '" << name << "' undefined" << std::endl;
           flush(err);
         }
       return false;
@@ -167,7 +167,7 @@ XreCompiler::define(const std::string& name, const std::string& xre)
   return true;
 }
 
-void 
+void
 XreCompiler::define_list(const std::string& name, const std::set<std::string>& symbol_list)
 {
   list_definitions_[name] = symbol_list;
@@ -180,10 +180,10 @@ XreCompiler::define(const std::string& name, const HfstTransducer & transducer)
 }
 
 bool
-XreCompiler::define_function(const std::string& name, 
+XreCompiler::define_function(const std::string& name,
                              unsigned int arguments,
                              const std::string& xre)
-{ 
+{
   //fprintf(stderr, "XreCompiler: defining function %s(@%i) = [%s]\n", name.c_str(), arguments, xre.c_str()); // DEBUG
   function_arguments_[name] = arguments;
   function_definitions_[name] = xre;
@@ -207,7 +207,7 @@ XreCompiler::is_function_definition(const std::string & name)
 }
 
 void
-XreCompiler::undefine(const std::string& name) 
+XreCompiler::undefine(const std::string& name)
 {
 if (definitions_.find(name) != definitions_.end())
   {
@@ -274,14 +274,14 @@ bool XreCompiler::get_positions_of_symbol_in_xre
   positions.clear();
   unsigned int cr_before = cr;
   cr = 0;
-  HfstTransducer * compiled = 
+  HfstTransducer * compiled =
     hfst::xre::compile(xre, definitions_, function_definitions_, function_arguments_, list_definitions_, format_);
   free(position_symbol);
   position_symbol = NULL;
   if (compiled == NULL)
     {
       /*fprintf(stderr, "error in XreCompiler::get_positions_of_symbol_in_xre: xre '%s' "
-              "could not be parsed, positions of symbol %s not found\n", 
+              "could not be parsed, positions of symbol %s not found\n",
               xre.c_str(), symbol.c_str());*/
       return false;
     }
@@ -407,7 +407,7 @@ main(int, char**)
     std::cout << " (a a | b c)..." << std::endl;;
     HfstTransducer* ofstAaOrBc = ofstXre.compile("a a | b c");
     assert(ofstAaOrBc != 0);
-    assert(ofstAaOrBc->compare(HfstTransducer(basicAaOrBc, 
+    assert(ofstAaOrBc->compare(HfstTransducer(basicAaOrBc,
                                               TROPICAL_OPENFST_TYPE)));
     delete ofstAaOrBc;
 #endif

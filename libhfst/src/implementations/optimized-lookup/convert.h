@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 #ifndef _HFST_OL_CONVERT_H_
@@ -301,7 +301,7 @@ struct transition_label
   int64 output_symbol;
 };
 
-struct compare_transition_labels 
+struct compare_transition_labels
 {
   bool operator() ( const transition_label &l1,
             const transition_label &l2) const
@@ -333,7 +333,7 @@ private:
 
   void add_node(StateId n, TransduceR *tr);
   /*
-    Assign every node n in t a unique id number i. Assign the start node 
+    Assign every node n in t a unique id number i. Assign the start node
     t->root_node() id number 0. Set node_to_id[n] = i and
     id_to_node[i] = n.
   */
@@ -402,7 +402,7 @@ private:
   
   TransitionTableIndex table_index; // location in the transition table
 public:
-  /* 
+  /*
      Set the symbol numbers and set the indices of the states according
      to ConvertIdNumberMap nodes_to_id_numbers.
   */
@@ -461,18 +461,18 @@ public:
 struct ConvertTransitionCompare
 {
   bool operator() (const ConvertTransition * t1,
-           const ConvertTransition * t2) const 
-  { 
-    return t1->operator<(*t2); 
+           const ConvertTransition * t2) const
+  {
+    return t1->operator<(*t2);
   }
 };
 
 struct ConvertTransitionIndexCompare
 {
   bool operator() (const ConvertTransitionIndex * i1,
-           const ConvertTransitionIndex * i2) const 
+           const ConvertTransitionIndex * i2) const
   {
-    return i1->operator<(*i2); 
+    return i1->operator<(*i2);
   }
 };
 
@@ -545,13 +545,13 @@ public:
   void insert_transition_indices(TransducerTable<T>& index_table) const;
   
   template<class T>
-  TransitionTableIndex append_transitions(TransducerTable<T>& transition_table, 
+  TransitionTableIndex append_transitions(TransducerTable<T>& transition_table,
                                           TransitionTableIndex place) const;
 };
 
  typedef std::vector<ConvertFstState*> ConvertFstStateVector;
 
-class ConvertTransitionTableIndices 
+class ConvertTransitionTableIndices
 {
 private:
   PlaceHolderVector indices;
@@ -641,7 +641,7 @@ public:
   Transducer* to_transducer() const;
   
   // exposed to this module during the constructor
-  static ConvertTransducer* constructing_transducer; 
+  static ConvertTransducer* constructing_transducer;
 };
 
 #endif // HAVE_OPENFST

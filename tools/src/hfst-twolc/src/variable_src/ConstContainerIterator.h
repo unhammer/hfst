@@ -42,7 +42,7 @@ template <class T> class ConstContainerIterator
  static ConstContainerIterator begin(const TVector &v)
   {
     ConstContainerIterator i;
-    for (typename TVector::const_iterator it = v.begin(); 
+    for (typename TVector::const_iterator it = v.begin();
      it != v.end(); ++it)
       {
     i.iterator_vector.push_back(it->begin());
@@ -54,7 +54,7 @@ template <class T> class ConstContainerIterator
   static ConstContainerIterator end(const TVector &v)
   {
     ConstContainerIterator i;
-    for (typename TVector::const_iterator it = v.begin(); 
+    for (typename TVector::const_iterator it = v.begin();
      it != v.end(); ++it)
       {
     i.iterator_vector.push_back(it->end());
@@ -64,7 +64,7 @@ template <class T> class ConstContainerIterator
     return i;
   };
 
- public:  
+ public:
   //! @brief Empty instance.
   ConstContainerIterator(void)
   {}
@@ -79,14 +79,14 @@ template <class T> class ConstContainerIterator
   //! @brief Prevent memory-leaks with polymorphism.
   virtual ~ConstContainerIterator(void) {};
 
-  //! @brief Assign @a another to this. 
+  //! @brief Assign @a another to this.
   ConstContainerIterator &operator=(const ConstContainerIterator &another)
-   { 
+   {
      if (this != &another)
        {
      iterator_vector = another.iterator_vector;
-     begin_iterator_vector = another.begin_iterator_vector; 
-     end_iterator_vector = another.end_iterator_vector; 
+     begin_iterator_vector = another.begin_iterator_vector;
+     end_iterator_vector = another.end_iterator_vector;
        }
      return *this;
    };
@@ -108,9 +108,9 @@ template <class T> class ConstContainerIterator
      if (iterator_vector.at(i) + 1 == end_iterator_vector.at(i))
        { iterator_vector.at(i) = begin_iterator_vector.at(i); }
      else
-       { 
+       {
          ++iterator_vector.at(i);
-         found_a_non_final_iterator = true; 
+         found_a_non_final_iterator = true;
          break;
        }
        }
@@ -121,7 +121,7 @@ template <class T> class ConstContainerIterator
 
   //! Return an iterator which points @a i steps further than @a this.
   ConstContainerIterator operator+(size_t i) const
-  { 
+  {
     ConstContainerIterator it(*this);
     for (size_t n = 0; n < i; ++n) { ++it; }
     return it;
@@ -130,15 +130,15 @@ template <class T> class ConstContainerIterator
   //! @brief Set values for appropriate variables in @a vvm.
   void set_values(VariableValueMap * vvm) const
   {
-    for (typename TIteratorVector::const_iterator it = 
+    for (typename TIteratorVector::const_iterator it =
        iterator_vector.begin();
-     it != iterator_vector.end(); 
+     it != iterator_vector.end();
      ++it)
       { it->set_values(vvm); }
   }
   
   //! @brief Dereference. Needed only for complienace with c++ definition of
-  //! forward iterators. Genuine functionality is implemented with 
+  //! forward iterators. Genuine functionality is implemented with
   //! @a set_values().
   TVector operator*(void)
     { return TVector(); }

@@ -75,7 +75,7 @@ namespace hfst
          HfstTransducer encodeFlagDiacritics( const HfstTransducer &tr );
          
          /**
-         *  \brief  In the transducer \tr, change back all "non-special" flag diacritics to normal, 
+         *  \brief  In the transducer \tr, change back all "non-special" flag diacritics to normal,
          * functional flag diacritics
          *  It means that $ sign will be changed to @ sign
          *  ie. $P.FOO.BAR$ will be changed into @P.FOO.BAR@
@@ -251,7 +251,7 @@ namespace hfst
 
 
         // the problem is that the mark-up rules can be mixed with ordinary rules
-        // ie a -> b ... c , a -> d ; 
+        // ie a -> b ... c , a -> d ;
         // this is why each markup mapping should be accessed seperratly
         // HfstTransducer mark_up_replace(    const Rule &rule,
                                 // const StringPair &marks,

@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 #ifndef _FLAG_DIACRITICS_H_
@@ -68,7 +68,7 @@ public:
     HFSTDLL static std::string get_operator(const std::string& diacritic);
     HFSTDLL static std::string get_feature(const std::string& diacritic);
     HFSTDLL static std::string get_value(const std::string& diacritic);
-    HFSTDLL static bool has_value(const std::string& diacritic); 
+    HFSTDLL static bool has_value(const std::string& diacritic);
 };
 
 template<class T> class FdState;
@@ -107,14 +107,14 @@ public:
             if(second_full_stop_pos == std::string::npos)
             {
                 assert(op == Cop || op == Dop || op == Rop);
-                feat = str.substr(first_full_stop_pos+1, 
+                feat = str.substr(first_full_stop_pos+1,
                                   last_char_pos-first_full_stop_pos-1);
             }
             else
             {
-                feat = str.substr(first_full_stop_pos+1, 
+                feat = str.substr(first_full_stop_pos+1,
                                   second_full_stop_pos-first_full_stop_pos-1);
-                val = str.substr(second_full_stop_pos+1, 
+                val = str.substr(second_full_stop_pos+1,
                                  last_char_pos-second_full_stop_pos-1);
             }
       
@@ -131,7 +131,7 @@ public:
       
             operations.insert
               (std::pair<T,FdOperation>
-               (symbol, 
+               (symbol,
                 FdOperation(op, feature_map[feat], value_map[val], str)));
             symbol_map.insert(std::pair<std::string,T>(str, symbol));
         }
@@ -143,16 +143,16 @@ public:
     const FdOperation* get_operation(T symbol) const
         {
           // for some reason this fails to compile???
-          //std::map<T,FdOperation>::const_iterator i 
+          //std::map<T,FdOperation>::const_iterator i
           //  = operations.find(symbol);
           //return (i==operations.end()) ? NULL : &(i->second);
         
-          return (operations.find(symbol)==operations.end()) ? NULL : 
+          return (operations.find(symbol)==operations.end()) ? NULL :
             &(operations.find(symbol)->second);
         }
     const FdOperation* get_operation(const std::string& symbol) const
         {
-            return (symbol_map.find(symbol)==symbol_map.end()) ? NULL : 
+            return (symbol_map.find(symbol)==symbol_map.end()) ? NULL :
               get_operation(symbol_map.find(symbol)->second);
         }
     
@@ -176,7 +176,7 @@ public:
       
             while(true)
             {
-                std::string::size_type next_diacritic_pos 
+                std::string::size_type next_diacritic_pos
                   = FdOperation::find_diacritic(remaining, length);
                 if(next_diacritic_pos == std::string::npos)
                     break;
@@ -233,7 +233,7 @@ public:
             if(op)
                 return apply_operation(*op);
             return true; // if the symbol isn't a diacritic
-        }    
+        }
     bool apply_operation(const FdOperation& op)
         {
             switch(op.Operator()) {
@@ -263,13 +263,13 @@ public:
           
             case Uop: // unification
               if(values[op.Feature()] == 0 || /* if the feature is unset or */
-                 values[op.Feature()] == op.Value() || /* the feature is at 
-                                                          this value already 
+                 values[op.Feature()] == op.Value() || /* the feature is at
+                                                          this value already
                                                           or */
                  (values[op.Feature()] < 0 &&
-                  (values[op.Feature()]*(-1) != op.Value())) /* the feature is 
-                                                              negatively set 
-                                                              to something 
+                  (values[op.Feature()]*(-1) != op.Value())) /* the feature is
+                                                              negatively set
+                                                              to something
                                                               else */
                  )
                 {

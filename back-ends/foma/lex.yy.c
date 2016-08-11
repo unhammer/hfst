@@ -33,7 +33,7 @@
 #if defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 
 /* C99 says to define __STDC_LIMIT_MACROS before including stdint.h,
- * if you want the limit (max/min) macros for int types. 
+ * if you want the limit (max/min) macros for int types.
  */
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS 1
@@ -50,7 +50,7 @@ typedef uint32_t flex_uint32_t;
 typedef signed char flex_int8_t;
 typedef short flex_int16_t;
 typedef int flex_int32_t;
-typedef unsigned char flex_uint8_t; 
+typedef unsigned char flex_uint8_t;
 typedef unsigned short flex_uint16_t;
 typedef unsigned int flex_uint32_t;
 
@@ -184,7 +184,7 @@ typedef struct yy_buffer_state *YY_BUFFER_STATE;
 
     /* Note: We specifically omit the test for yy_rule_can_match_eol because it requires
      *       access to the local variable yy_act. Since yyless() is a macro, it would break
-     *       existing scanners that call yyless() from OUTSIDE yylex. 
+     *       existing scanners that call yyless() from OUTSIDE yylex.
      *       One obvious solution it to make yy_act a global. I tried that, and saw
      *       a 5% performance hit in a non-yylineno scanner, because yy_act is
      *       normally declared as a register variable-- so it is not worth it.
@@ -1666,12 +1666,12 @@ static yyconst flex_int16_t yy_chk[4546] =
 /* Table of booleans, true if rule could match eol. */
 static yyconst flex_int32_t yy_rule_can_match_eol[129] =
     {   0,
-1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 1, 1, 0, 0, 0,     };
 
 /* The intent behind this definition is that it'll catch
@@ -2214,7 +2214,7 @@ YY_RULE_SETUP
 	yylval_param->net = fsm_parse_regex_string(tempstr2);
 	if (yylval_param->net != NULL) {
 	    return NET;
-	}  
+	}
     }
 }
 	YY_BREAK
@@ -2372,7 +2372,7 @@ YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
 #line 272 "regex.l"
 {
-    decode_quoted(yytext);										  
+    decode_quoted(yytext);
     yylval_param->net = fsm_symbol(yytext);
     BEGIN(QTDEND);
     return NET;
@@ -2407,7 +2407,7 @@ case 21:
 YY_RULE_SETUP
 #line 294 "regex.l"
 {
-  yylval_param->net = fsm_identity();  
+  yylval_param->net = fsm_identity();
   return NET;
 }
 	YY_BREAK
@@ -2424,7 +2424,7 @@ YY_RULE_SETUP
 case 24:
 YY_RULE_SETUP
 #line 302 "regex.l"
-{ return ISIDENTITY;      } 
+{ return ISIDENTITY;      }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
@@ -2954,7 +2954,7 @@ YY_RULE_SETUP
 case 119:
 YY_RULE_SETUP
 #line 451 "regex.l"
-{                       return ENDM;                } 
+{                       return ENDM;                }
 	YY_BREAK
 case 120:
 YY_RULE_SETUP
@@ -3745,7 +3745,7 @@ static void yyensure_buffer_stack (yyscan_t yyscanner)
  * @param base the character buffer
  * @param size the size in bytes of the character buffer
  * @param yyscanner The scanner object.
- * @return the newly allocated buffer state object. 
+ * @return the newly allocated buffer state object.
  */
 YY_BUFFER_STATE yy_scan_buffer  (char * base, yy_size_t  size , yyscan_t yyscanner)
 {
@@ -3948,7 +3948,7 @@ void yyset_lineno (int  line_number , yyscan_t yyscanner)
 
         /* lineno is only valid if an input buffer exists. */
         if (! YY_CURRENT_BUFFER )
-           yy_fatal_error( "yyset_lineno called with no buffer" , yyscanner); 
+           yy_fatal_error( "yyset_lineno called with no buffer" , yyscanner);
     
     yylineno = line_number;
 }
@@ -3963,7 +3963,7 @@ void yyset_column (int  column_no , yyscan_t yyscanner)
 
         /* column is only valid if an input buffer exists. */
         if (! YY_CURRENT_BUFFER )
-           yy_fatal_error( "yyset_column called with no buffer" , yyscanner); 
+           yy_fatal_error( "yyset_column called with no buffer" , yyscanner);
     
     yycolumn = column_no;
 }

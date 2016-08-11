@@ -145,7 +145,7 @@ Rule_CXXFLAGS=-DTEST_RULE -Wno-deprecated
 
 LeftArrowRule_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
                       $(STRING_SRC)/string_manipulation.cc \
-                      $(RULE_SRC)/Rule.cc $(RULE_SRC)/LeftArrowRule.cc	
+                      $(RULE_SRC)/Rule.cc $(RULE_SRC)/LeftArrowRule.cc
 LeftArrowRule_CXXFLAGS=-DTEST_LEFT_ARROW_RULE -Wno-deprecated
 
 LeftRestrictionArrowRule_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \

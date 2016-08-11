@@ -30,16 +30,16 @@ ConflictResolvingRightArrowRule::ConflictResolvingRightArrowRule
 
 bool ConflictResolvingRightArrowRule::conflicts_this
 (ConflictResolvingRightArrowRule &another)
-{ return 
+{ return
     center_pair.first == another.center_pair.first &&
     center_pair.second == another.center_pair.second; }
 
 void ConflictResolvingRightArrowRule::resolve_conflict
 (ConflictResolvingRightArrowRule &another)
-{ 
+{
   context.
     apply(&HfstTransducer::disjunct,another.context).
-    apply(&HfstTransducer::minimize); 
+    apply(&HfstTransducer::minimize);
   name += " and " + another.name;
 }
 

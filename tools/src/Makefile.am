@@ -275,14 +275,14 @@ hfst_lexc_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC)
 #hfst_lexc2fst_BUILT=parsers/lexc-parser.h parsers/xre_parse.h
 hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC)
 hfst_flookup_SOURCES=hfst-flookup.cc $(HFST_COMMON_SRC)
-hfst_pair_test_SOURCES=hfst-pair-test.cc $(HFST_COMMON_SRC) 
+hfst_pair_test_SOURCES=hfst-pair-test.cc $(HFST_COMMON_SRC)
 hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
 hfst_name_SOURCES=hfst-name.cc $(HFST_COMMON_SRC)
 hfst_optimized_lookup_SOURCES=hfst-optimized-lookup.cc
 hfst_pmatch_SOURCES=hfst-pmatch.cc $(HFST_COMMON_SRC)
 #hfst_preprocess_for_optimized_lookup_format_SOURCES=hfst-preprocess-for-optimized-lookup-format.cc
 #	$(HFST_COMMON_SRC)
-hfst_tokenize_SOURCES=hfst-tokenize.cc $(HFST_COMMON_SRC)	
+hfst_tokenize_SOURCES=hfst-tokenize.cc $(HFST_COMMON_SRC)
 hfst_project_SOURCES=hfst-project.cc $(HFST_COMMON_SRC)
 hfst_prune_alphabet_SOURCES=hfst-prune-alphabet.cc $(HFST_COMMON_SRC)
 hfst_push_weights_SOURCES=hfst-push-weights.cc $(HFST_COMMON_SRC)
@@ -334,16 +334,16 @@ uninstall-local:
 		rm hfst-tokenise && \
 		rm hfst-proc2
 
-BUILT_SOURCES=$(hfst_lexc_BUILT) 
+BUILT_SOURCES=$(hfst_lexc_BUILT)
 
-CLEANFILES=$(hfst_compiler_header_file) hfst-compiler.cc $(hfst_lexc_BUILT) 
+CLEANFILES=$(hfst_compiler_header_file) hfst-compiler.cc $(hfst_lexc_BUILT)
 
 
 hfst_calculate_CXXFLAGS= -Wall -Wno-error -Wno-sign-compare -Wno-deprecated
 
 ## YACC and FLEX with autotools argh
 AM_YFLAGS=-d
-AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c 
+AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 
 hfst-scanner.ll: hfst-compiler.$(HEADER)
 

@@ -114,7 +114,7 @@ print_usage()
             "  <[dog::1]+> # ;        Use weights in regular expressions\n"
             "\n"
             "Using weights has an effect only if FORMAT is weighted, i.e.\n"
-            "{ openfst-tropical, openfst-log, optimized-lookup-weighted }.\n"    
+            "{ openfst-tropical, openfst-log, optimized-lookup-weighted }.\n"
             "\n",
             program_name, program_name );
         print_report_bugs();

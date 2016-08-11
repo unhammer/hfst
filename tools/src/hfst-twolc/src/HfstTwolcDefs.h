@@ -58,7 +58,7 @@ template <class C> class HandyDeque : public std::deque<C>
 {
  public:
   C get_front_and_pop(void)
-  { 
+  {
     C temp = std::deque<C>::front();
     std::deque<C>::pop_front();
     return temp;
@@ -68,8 +68,8 @@ template <class C> class HandyDeque : public std::deque<C>
 template <class C> std::ostream &operator<<
 (std::ostream &out, const HandyDeque<C> &d)
 {
-  for (typename HandyDeque<C>::const_iterator it = d.begin(); 
-       it != d.end(); 
+  for (typename HandyDeque<C>::const_iterator it = d.begin();
+       it != d.end();
        ++it)
     { out << *it << " "; }
   return out;

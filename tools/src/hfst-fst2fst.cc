@@ -78,7 +78,7 @@ print_usage()
     "  -Q  --quick                       When converting to optimized-lookup, don't try hard to compress\n");
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
-        fprintf(message_out, 
+        fprintf(message_out,
             "FMT must be name of a format usable by libhfst, i.e. one of the following:\n"
         "{ foma, openfst-tropical, openfst-log, sfst, xfsm\n"
         "  optimized-lookup-weighted, optimized-lookup-unweighted }.\n"
@@ -100,7 +100,7 @@ parse_options(int argc, char** argv)
         {
           HFST_GETOPT_COMMON_LONG,
           HFST_GETOPT_UNARY_LONG,
-          // add tool-specific options here 
+          // add tool-specific options here
           {"use-backend-format", no_argument, 0, 'b'},
           {"format",       required_argument, 0, 'f'},
           {"sfst",               no_argument, 0, 'S'},
@@ -114,7 +114,7 @@ parse_options(int argc, char** argv)
           {0,0,0,0}
         };
         int option_index = 0;
-        // add tool-specific options here 
+        // add tool-specific options here
         int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
                              HFST_GETOPT_UNARY_SHORT "SFtlOwQf:bx",
                              long_options, &option_index);
@@ -133,7 +133,7 @@ parse_options(int argc, char** argv)
           output_type = hfst_parse_format_name(optarg);
 #ifndef HAVE_XFSM
           if (output_type == hfst::XFSM_TYPE)
-            error(EXIT_FAILURE, 0, 
+            error(EXIT_FAILURE, 0,
                   "xfsm back-end is not available");
 #endif
           break;
@@ -150,7 +150,7 @@ parse_options(int argc, char** argv)
 #ifdef HAVE_XFSM
           output_type = hfst::XFSM_TYPE;
 #else
-          error(EXIT_FAILURE, 0, 
+          error(EXIT_FAILURE, 0,
                 "xfsm back-end is not available");
 #endif
           break;
@@ -175,7 +175,7 @@ parse_options(int argc, char** argv)
     
     if (output_type == hfst::UNSPECIFIED_TYPE)
     {
-        error(EXIT_FAILURE, 0, 
+        error(EXIT_FAILURE, 0,
               "You must specify an output type "
               "(one of -S, -F, -t, -x, -l, -O, or -w)");
     }
@@ -206,7 +206,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         char* inputname = hfst_get_name(orig, inputfilename);
         if (transducer_n == 1)
         {
-          verbose_printf("Converting %s...\n", inputname); 
+          verbose_printf("Converting %s...\n", inputname);
         }
         else
         {
@@ -248,10 +248,10 @@ int main( int argc, char **argv ) {
     {
         fclose(outfile);
     }
-    verbose_printf("Reading from %s, writing to %s\n", 
+    verbose_printf("Reading from %s, writing to %s\n",
         inputfilename, outfilename);
     char* format_description = hfst_strformat(output_type);
-    if (hfst_format && (output_type != hfst::XFSM_TYPE)) 
+    if (hfst_format && (output_type != hfst::XFSM_TYPE))
       {
         verbose_printf("Writing %s format transducers with HFST3 headers\n",
                        format_description);
@@ -277,7 +277,7 @@ int main( int argc, char **argv ) {
     try {
       instream = (inputfile != stdin) ?
         new HfstInputStream(inputfilename) : new HfstInputStream();
-    } 
+    }
     catch(const FileIsInGZFormatException e)
       {
         error(EXIT_FAILURE, 0, "%s seems to be a gzipped native foma file, you must first unzip it",

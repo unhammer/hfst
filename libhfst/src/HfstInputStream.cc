@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 //! @FIXME: The structure of this class and its functions is disorganised.
@@ -119,7 +119,7 @@ namespace hfst
   short &HfstInputStream::stream_get(short &i)
   {
     if (input_stream != NULL)
-      { 
+      {
         input_stream->read((char*)&i,sizeof(i));
         return i;
       }
@@ -147,7 +147,7 @@ namespace hfst
 #endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
       case MY_TRANSDUCER_LIBRARY_TYPE:
-        return i = 
+        return i =
           this->implementation.my_transducer_library->stream_get_short();
         break;
 #endif
@@ -337,13 +337,13 @@ namespace hfst
           this->implementation.sfst->read_transducer();
 
           /* If we were reading an SFST transducer with no HFST header,
-             it is possible that epsilon is coded differently than 
+             it is possible that epsilon is coded differently than
              "@_EPSILON_SYMBOL_@" and/or that numbers 1 and 2 are reserved
-             for other use than "@_UNKNOWN_SYMBOL_@" or 
+             for other use than "@_UNKNOWN_SYMBOL_@" or
              "@_IDENTITY_SYMBOL_@". */
           if (not has_hfst_header)
             {
-              HfstBasicTransducer * net = 
+              HfstBasicTransducer * net =
                 ConversionFunctions::
                   sfst_to_hfst_basic_transducer
                 (t.implementation.sfst);
@@ -370,7 +370,7 @@ namespace hfst
              "@_UNKNOWN_SYMBOL_@" or "@_IDENTITY_SYMBOL_@". */
           if (! has_hfst_header)
             {
-              HfstBasicTransducer * net = 
+              HfstBasicTransducer * net =
                 ConversionFunctions::
                   tropical_ofst_to_hfst_basic_transducer
                 (t.implementation.tropical_ofst, false);
@@ -393,10 +393,10 @@ namespace hfst
               
 
               // special symbol-to-number mappings
-              std::vector<std::pair<unsigned short, std::string> > 
+              std::vector<std::pair<unsigned short, std::string> >
                 special_cases;
               // normal symbol-to-number mappings
-              std::vector<std::pair<unsigned short, std::string> > 
+              std::vector<std::pair<unsigned short, std::string> >
                 symbol_mappings;
 
               unsigned short max_number=0;
@@ -406,9 +406,9 @@ namespace hfst
                 max_number++;
 
                 unsigned short symbol_number=0;
-                symbol_number = symbol_number + 
+                symbol_number = symbol_number +
                   (unsigned short)stream_get() * 1;
-                symbol_number = symbol_number + 
+                symbol_number = symbol_number +
                   (unsigned short)stream_get() * 256;
                 
                 std::string symbol_string("");
@@ -418,9 +418,9 @@ namespace hfst
                   c = stream_get();
                 }
 
-                // epsilon, unknown and identity numbers must be handled 
+                // epsilon, unknown and identity numbers must be handled
                 //separately
-                if (symbol_number == 0 || symbol_number == 1 || 
+                if (symbol_number == 0 || symbol_number == 1 ||
                     symbol_number == 2) {
                   special_cases.push_back
                     (std::pair<unsigned short, std::string>
@@ -442,10 +442,10 @@ namespace hfst
                 else {
 
                   //special_cases[i].first, max_number+1);
-                  fst::StdVectorFst * tmp = 
+                  fst::StdVectorFst * tmp =
                     t.tropical_ofst_interface.substitute
-                    (t.implementation.tropical_ofst, 
-                     special_cases[i].first, 
+                    (t.implementation.tropical_ofst,
+                     special_cases[i].first,
                      (unsigned short)++max_number);
                   t.implementation.tropical_ofst = tmp;
 
@@ -486,7 +486,7 @@ namespace hfst
              "@_UNKNOWN_SYMBOL_@" or "@_IDENTITY_SYMBOL_@". */
           if (! has_hfst_header)
             {
-              HfstBasicTransducer * net = 
+              HfstBasicTransducer * net =
                 ConversionFunctions::
                   log_ofst_to_hfst_basic_transducer
                 (t.implementation.log_ofst, false);
@@ -498,7 +498,7 @@ namespace hfst
             }
 
         if (hfst_version_2_weighted_transducer) // this should not happen
-          { 
+          {
             //fprintf(stderr, "ERROR: not transducer stream\n");
             //exit(1);
             HFST_THROW_MESSAGE(HfstFatalException, "not transducer stream");
@@ -691,7 +691,7 @@ namespace hfst
              strcmp("LOG_OFST", header_data[1].second.c_str()) == 0 )
       type = LOG_OPENFST_TYPE;
 #if HAVE_MY_TRANSDUCER_LIBRARY
-    else if (strcmp("MY_TRANSDUCER_LIBRARY", header_data[1].second.c_str()) 
+    else if (strcmp("MY_TRANSDUCER_LIBRARY", header_data[1].second.c_str())
              == 0 )
       type = MY_TRANSDUCER_LIBRARY_TYPE;
 #endif
@@ -720,10 +720,10 @@ namespace hfst
   }
     
 
-  /* Try to read a hfst header. If successful, return true and the number 
-     of bytes read. If not, return false and 0. Throw a 
+  /* Try to read a hfst header. If successful, return true and the number
+     of bytes read. If not, return false and 0. Throw a
      NotTransducerStreamException if the header cannot
-     be parsed after a field "HFST3" or "HFST". 
+     be parsed after a field "HFST3" or "HFST".
      Throw a TransducerHeaderException if the header data cannot be parsed. */
   bool HfstInputStream::read_hfst_header(int &bytes_read)
   {
@@ -735,11 +735,11 @@ namespace hfst
     }
     int header_bytes=0;
     // try to read an HFST version 3.0 header
-    if (read_library_header(header_bytes)) 
+    if (read_library_header(header_bytes))
       {
       int size_bytes=0;
       int header_size = get_header_size(size_bytes); // throws error
-      StringPairVector header_info = 
+      StringPairVector header_info =
         get_header_data(header_size);
       process_header_data(header_info, false);           // throws error
 
@@ -748,7 +748,7 @@ namespace hfst
       }
     header_bytes=0;
     // try to read a pre-release HFST version 3.0 header
-    if (read_library_header_old(header_bytes)) 
+    if (read_library_header_old(header_bytes))
       {
       int type_bytes=0;
       type = get_fst_type_old(type_bytes); // throws error
@@ -785,7 +785,7 @@ namespace hfst
     return ERROR_TYPE;
   }
 
-  bool HfstInputStream::read_library_header_old(int &bytes_read) 
+  bool HfstInputStream::read_library_header_old(int &bytes_read)
   {
     const char *id = "HFST3";
     
@@ -795,7 +795,7 @@ namespace hfst
         stream_unget(c);
         if(i > 0) {
           for(int j=i-1; j>=0; j--) {
-            stream_unget(id[j]); 
+            stream_unget(id[j]);
           }
         }
         bytes_read=0;
@@ -848,12 +848,12 @@ namespace hfst
     StringPairVector retval;
     int bytes_read=0;
 
-    while(true) 
+    while(true)
       {
         std::string str1 = stream_getstring();
         std::string str2 = stream_getstring();
 
-        bytes_read = bytes_read + (int)str1.length() + (int)str2.length() + 2; 
+        bytes_read = bytes_read + (int)str1.length() + (int)str2.length() + 2;
 
         if (bytes_read > header_size) {
           debug_error("#7");
@@ -880,7 +880,7 @@ namespace hfst
 
   /* The implementation type of the first transducer in the stream. */
   ImplementationType HfstInputStream::stream_fst_type()
-  { 
+  {
     int bytes_read=0;
 
     // whether the stream contains an HFST version 3.0 transducer
@@ -937,7 +937,7 @@ namespace hfst
   }
 
   /* Open a transducer stream to stdout.
-     The implementation type of the stream is defined by 
+     The implementation type of the stream is defined by
      the type of the first transducer in the stream. */
   HfstInputStream::HfstInputStream(void):
     bytes_to_skip(0), filename(std::string()), has_hfst_header(false),
@@ -961,12 +961,12 @@ namespace hfst
 #endif
 #if HAVE_OPENFST
     case TROPICAL_OPENFST_TYPE:
-      implementation.tropical_ofst = 
+      implementation.tropical_ofst =
         new hfst::implementations::TropicalWeightInputStream;
       break;
 #if HAVE_OPENFST_LOG
     case LOG_OPENFST_TYPE:
-      implementation.log_ofst = 
+      implementation.log_ofst =
         new hfst::implementations::LogWeightInputStream;
       break;
 #endif
@@ -984,7 +984,7 @@ namespace hfst
 #endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
     case MY_TRANSDUCER_LIBRARY_TYPE:
-      implementation.my_transducer_library 
+      implementation.my_transducer_library
         = new hfst::implementations::MyTransducerLibraryInputStream;
       break;
 #endif
@@ -993,7 +993,7 @@ namespace hfst
         new hfst::implementations::HfstOlInputStream(false);
       break;
     case HFST_OLW_TYPE:
-      implementation.hfst_ol = 
+      implementation.hfst_ol =
         new hfst::implementations::HfstOlInputStream(true);
       break;
     default:
@@ -1003,7 +1003,7 @@ namespace hfst
     }
   }
 
-  // FIXME: HfstOutputStream takes a string parameter, 
+  // FIXME: HfstOutputStream takes a string parameter,
   //        HfstInputStream a const char*
   HfstInputStream::HfstInputStream(const std::string &filename):
     bytes_to_skip(0), filename(std::string(filename)), has_hfst_header(false),
@@ -1012,7 +1012,7 @@ namespace hfst
     if (strcmp("",filename.c_str()) != 0) {
       std::ifstream ifs(filename.c_str());
       if (ifs.fail())
-        HFST_THROW_MESSAGE(NotTransducerStreamException, 
+        HFST_THROW_MESSAGE(NotTransducerStreamException,
                            "file could not be opened");
       input_stream = &ifs;
       if (stream_eof())
@@ -1034,52 +1034,52 @@ namespace hfst
       {
 #if HAVE_SFST
       case SFST_TYPE:
-        implementation.sfst 
+        implementation.sfst
           = new hfst::implementations::SfstInputStream(filename);
         break;
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
-        if (strcmp(filename.c_str(),"") == 0) {  
+        if (strcmp(filename.c_str(),"") == 0) {
           // FIXME: this should be done in TropicalWeight layer
-          implementation.tropical_ofst = 
+          implementation.tropical_ofst =
             new hfst::implementations::TropicalWeightInputStream();
         }
         else
-          implementation.tropical_ofst = 
+          implementation.tropical_ofst =
             new hfst::implementations::TropicalWeightInputStream(filename);
         break;
 #if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
-        implementation.log_ofst = 
+        implementation.log_ofst =
           new hfst::implementations::LogWeightInputStream(filename);
         break;
 #endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
-        implementation.foma 
+        implementation.foma
           = new hfst::implementations::FomaInputStream(filename);
         break;
 #endif
 #if HAVE_XFSM
       case XFSM_TYPE:
-        implementation.xfsm 
+        implementation.xfsm
           = new hfst::implementations::XfsmInputStream(filename);
         break;
 #endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
       case MY_TRANSDUCER_LIBRARY_TYPE:
-        implementation.my_transducer_library 
+        implementation.my_transducer_library
           = new hfst::implementations::MyTransducerLibraryInputStream(filename);
         break;
 #endif
       case HFST_OL_TYPE:
-        implementation.hfst_ol 
+        implementation.hfst_ol
           = new hfst::implementations::HfstOlInputStream(filename, false);
         break;
       case HFST_OLW_TYPE:
-        implementation.hfst_ol 
+        implementation.hfst_ol
           = new hfst::implementations::HfstOlInputStream(filename, true);
         break;
       default:
@@ -1091,7 +1091,7 @@ namespace hfst
   }
   
   HfstInputStream::~HfstInputStream(void)
-  { 
+  {
     switch (type)
       {
 #if HAVE_SFST

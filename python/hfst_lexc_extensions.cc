@@ -51,7 +51,7 @@ hfst::HfstTransducer * hfst_compile_lexc(hfst::lexc::LexcCompiler & comp, const 
           hfst_lexc_output = os.str();
           hfst::set_warning_stream(&std::cerr);
           return retval;
-        }        
+        }
 }
 
 }

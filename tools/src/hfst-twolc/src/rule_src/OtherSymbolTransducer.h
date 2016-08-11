@@ -58,7 +58,7 @@ static const std::string TWOLC_DIAMOND = "__HFST_TWOLC_DIAMOND";
 static const std::string TWOLC_EPSILON = "__HFST_TWOLC_0";
 static const std::string TWOLC_FREELY_INSERT = "__HFST_TWOLC_FREELY_INSERT";
 
-//! @brief Pointer to a member function of @a HfstTransducer taking zero 
+//! @brief Pointer to a member function of @a HfstTransducer taking zero
 //! arguments.
 typedef HfstTransducer &(HfstTransducer::*HfstTransducerZeroArgMember) (void);
 
@@ -110,7 +110,7 @@ typedef HfstTransducer &(HfstTransducer::*HfstTransducerSubstPairMember)
 typedef HfstTransducer &(HfstTransducer::*HfstTransducerSubstPairFstMember)
   (const SymbolPair &,HfstTransducer &,bool);
 
-//! @brief For calling a pointer to a member function passed as argument. 
+//! @brief For calling a pointer to a member function passed as argument.
 #define CALL_MEMBER_FN(object,ptr_to_member) ((object).*(ptr_to_member))
 
 class Rule;
@@ -163,13 +163,13 @@ class OtherSymbolTransducer
   //! @brief Apply @a p onto @a this taking @a another as argument and
   //! minimize @a this.
   //!
-  //! Before applying @a p, harmonize the other-symbols in @a this and 
+  //! Before applying @a p, harmonize the other-symbols in @a this and
   //! @a another.
-  OtherSymbolTransducer 
+  OtherSymbolTransducer
     &apply(const HfstTransducerOneArgMember,
        const OtherSymbolTransducer &another);
 
-  OtherSymbolTransducer 
+  OtherSymbolTransducer
     &apply(const HfstTransducerBoolArgMember,
        const OtherSymbolTransducer &another);
 
@@ -181,40 +181,40 @@ class OtherSymbolTransducer
 
   //! @brief Apply @a p onto @a this taking @a num as argument and
   //! minimize @a this.
-  OtherSymbolTransducer 
+  OtherSymbolTransducer
     &apply(const HfstTransducerOneNumArgMember,unsigned int number);
 
   //! @brief Apply @a p onto @a this taking @a num1 and @a num2 as arguments
   //! and minimize @a this.
-  OtherSymbolTransducer 
+  OtherSymbolTransducer
     &apply(const HfstTransducerTwoNumArgMember,unsigned int num1,
        unsigned int num2);
 
   //! @brief Apply @a p onto @a this taking @a pair as argument and
   //! minimize @a this.
-  OtherSymbolTransducer 
+  OtherSymbolTransducer
     &apply
     (const HfstTransducerOneSymbolPairArgMember,const SymbolPair &pair);
 
-  OtherSymbolTransducer 
+  OtherSymbolTransducer
     &apply
     (const HfstTransducerOneSymbolPairBoolArgMember,const SymbolPair &pair, bool b);
 
-  //! @brief Apply @a p onto @a this taking @a str1, @a str2, @a b1 and @a b2 
+  //! @brief Apply @a p onto @a this taking @a str1, @a str2, @a b1 and @a b2
   //! as arguments and minimize @a this.
-  OtherSymbolTransducer 
-    &apply(const HfstTransducerSubstMember p,const std::string &str1, 
+  OtherSymbolTransducer
+    &apply(const HfstTransducerSubstMember p,const std::string &str1,
        const std::string &str2, bool b1, bool b2);
 
   //! @brief Apply @a p onto @a this taking @a p1 and @a p2 as arguments and
   //! minimize @a this.
-  OtherSymbolTransducer 
+  OtherSymbolTransducer
     &apply(const HfstTransducerSubstPairMember p,const SymbolPair &p1,
        const SymbolPair &p2);
 
   //! @brief Apply @a p onto @a this taking @a p1 and @a p2 as arguments and
   //! minimize @a this.
-  OtherSymbolTransducer 
+  OtherSymbolTransducer
     &apply(const HfstTransducerSubstPairFstMember p,const SymbolPair &p1,
            const OtherSymbolTransducer &t, bool b);
 
@@ -236,7 +236,7 @@ class OtherSymbolTransducer
   //! @brief Set the state @a state final.
   static void set_final(HfstBasicTransducer &center_t,size_t state);
 
-  //! @brief Return true, iff the intersection of @a this and @a another is 
+  //! @brief Return true, iff the intersection of @a this and @a another is
   //! empty. If it is non-empty, store the first common string found in v.
   bool is_empty_intersection(const OtherSymbolTransducer &another,
                  StringVector &);
@@ -244,15 +244,15 @@ class OtherSymbolTransducer
   //! @brief Return true, iff @a another is a subset of the @a this.
   bool is_subset(const OtherSymbolTransducer &another);
 
-  //! @brief Return a copy where all output symbols are replaced 
+  //! @brief Return a copy where all output symbols are replaced
   //! by other-symbols.
   OtherSymbolTransducer get_inverse_of_upper_projection(void);
 
-  //! @brief Perform the effect of <tt>?* X ?*</tt> where <tt>X</tt> is 
+  //! @brief Perform the effect of <tt>?* X ?*</tt> where <tt>X</tt> is
   //! @a this.
   OtherSymbolTransducer &contained(void);
 
-  //! @brief Perform the effect of <tt>?* X ?* - ?* X ?* X ?* </tt> where 
+  //! @brief Perform the effect of <tt>?* X ?* - ?* X ?* X ?* </tt> where
   //! <tt>X</tt> is @a this.
   OtherSymbolTransducer &contained_once(void);
 
@@ -260,12 +260,12 @@ class OtherSymbolTransducer
   //! @a this.
   OtherSymbolTransducer &negated(void);
 
-  //! @brief Perform the equivalent of <tt>? - X</tt> where <tt>X</tt> is 
+  //! @brief Perform the equivalent of <tt>? - X</tt> where <tt>X</tt> is
   //! @a this.
   OtherSymbolTransducer &term_complemented(void);
 
   //! @brief Return a rule context <tt>X D ?* D Y</tt> where <tt>X</tt> is the
-  //! left context, <tt>Y</tt> is the right context, <tt>D</tt> is the 
+  //! left context, <tt>Y</tt> is the right context, <tt>D</tt> is the
   //! diamond symbol <tt>__HFST_TWOLC_DIAMOND</tt>.
   static OtherSymbolTransducer get_context(OtherSymbolTransducer &left,
                        OtherSymbolTransducer &right);
@@ -297,7 +297,7 @@ class OtherSymbolTransducer
 //! @brief Container for OtherSymbolTransducers.
 typedef std::vector<OtherSymbolTransducer> OtherSymbolTransducerVector;
 
-//! @brief Container for named regular expressions represented as 
+//! @brief Container for named regular expressions represented as
 //! @a OtherSymbolTransducer objects.
 typedef std::map<std::string,OtherSymbolTransducer> NameToRegexMap;
 

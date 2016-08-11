@@ -80,7 +80,7 @@ parse_options(int argc, char** argv)
             {0,0,0,0}
         };
         int option_index = 0;
-        // add tool-specific options here 
+        // add tool-specific options here
         int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
                              HFST_GETOPT_UNARY_SHORT "wDnf:",
                              long_options, &option_index);
@@ -181,7 +181,7 @@ float get_coefficient(const std::string &line)
 }
 
 FloatVector parse_coefficients(void)
-{ 
+{
   std::ifstream coeff_in("hfst_tagger_config");
 
   if (coeff_in.peek() == EOF)

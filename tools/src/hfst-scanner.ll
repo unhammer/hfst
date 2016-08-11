@@ -1,4 +1,4 @@
-%option 8Bit batch yylineno nounput noyywrap 
+%option 8Bit batch yylineno nounput noyywrap
 /*header-file="hfst-scanner.h"*/
 
 /* the "incl" state is used to pick up the name of an include file */
@@ -163,13 +163,13 @@ FN	[A-Za-z0-9._/\-*+]
 
 \<({C5}|\\.)*\>   { yylval.name = unquote(yytext,false); return SYMBOL; }
 
-\"<{FN}+>\" { 
+\"<{FN}+>\" {
                     yylval.value = fst_strdup(yytext+2);
 		    yylval.value[strlen(yylval.value)-2] = 0;
                     return STRING2;
                   }
 
-\"{FN}+\" { 
+\"{FN}+\" {
                     yylval.value = fst_strdup(yytext+1);
 		    yylval.value[strlen(yylval.value)-1] = 0;
                     return STRING;
@@ -179,7 +179,7 @@ FN	[A-Za-z0-9._/\-*+]
 \\[ \t]*([ \t]\%.*)?\r?\n { print_lineno(); /* ignored */ }
 \r?\n             { print_lineno(); return NEWLINE; }
 
-\\[0-9]+          { long l=atol(yytext+1); 
+\\[0-9]+          { long l=atol(yytext+1);
 		    if (l <= 1114112) { yylval.value=fst_strdup(hfst_utf8::int2utf8((unsigned)l)); return UTF8CHAR; }
 		    yyerror(strdup("invalid expression"));
                   }

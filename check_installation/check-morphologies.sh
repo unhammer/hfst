@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #
-# Check all installed HFST morphologies. 
+# Check all installed HFST morphologies.
 #
 
 script_prefix=
@@ -67,7 +67,7 @@ do
                 printf "%-32s%s\n" $prog "FAIL: program not found or executable"
                 exit_prog
             fi
-        fi  
+        fi
 
         if ! [ "$hfst_tool_prefix" = "" ]; then
             if (! ls $hfst_tool_prefix/hfst-proc > /dev/null 2> /dev/null ); then
@@ -82,12 +82,12 @@ do
             prog_full_path="./copied_morphology_script.sh"
         fi
 
-	# test that the program handles a non-word 
-        rm -f input 
-        echo "foo" > input 
+	# test that the program handles a non-word
+        rm -f input
+        echo "foo" > input
         if (! $prog_full_path $format input 2>1 > /dev/null); then
 	    printf "%-32s%s\n" $prog "FAIL: program cannot handle input 'foo' (given as first argument)"
-            exit_prog 
+            exit_prog
         fi
 
 	if (! cat input | $prog_full_path $format 2>1 > /dev/null); then

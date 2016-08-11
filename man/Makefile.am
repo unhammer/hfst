@@ -36,8 +36,8 @@ hfst_tools=hfst-compare.1 hfst-compose.1 \
 	hfst-pair-test.1 hfst-prune-alphabet.1 hfst-reweight.1 hfst-shuffle.1 \
 	hfst-traverse.1 hfst-tokenize.1 hfst-pmatch.1 hfst-pmatch2fst.1 \
 	hfst-optimized-lookup.1
-hfst_xfst=hfst-xfst.1 
-hfst_apertium_proc=hfst-apertium-proc.1 
+hfst_xfst=hfst-xfst.1
+hfst_apertium_proc=hfst-apertium-proc.1
 hfst_foma=hfst-foma.1 # hand-written
 hfst_foma_wrapper=hfst-foma-wrapper.1 # hand-written
 hfst_tag_and_reweight=hfst-tag.1 hfst-reweight-tagger.1
@@ -59,19 +59,19 @@ dist_man1_MANS=$(hfst_tools) $(hfst_xfst) $(hfst_apertium_proc) $(hfst_foma) $(h
 LN_S=ln -s -f
 
 hfst-determinise.1:
-	$(LN_S) hfst-determinize.1 hfst-determinise.1 
+	$(LN_S) hfst-determinize.1 hfst-determinise.1
 
 hfst-expand.1:
-	$(LN_S) hfst-fst2strings.1 hfst-expand.1 
+	$(LN_S) hfst-fst2strings.1 hfst-expand.1
 
 hfst-intersect.1:
-	$(LN_S) hfst-conjunct.1 hfst-intersect.1 
+	$(LN_S) hfst-conjunct.1 hfst-intersect.1
 
 hfst-minimise.1:
-	$(LN_S) hfst-minimize.1 hfst-minimise.1 
+	$(LN_S) hfst-minimize.1 hfst-minimise.1
 
 hfst-minus.1:
-	$(LN_S) hfst-subtract.1 hfst-minus.1 
+	$(LN_S) hfst-subtract.1 hfst-minus.1
 
 hfst-optimised-lookup.1:
 	$(LN_S) hfst-optimized-lookup.1 hfst-optimised-lookup.1
@@ -80,10 +80,10 @@ hfst-proc.1:
 	$(LN_S) hfst-apertium-proc.1 hfst-proc.1
 
 hfst-sfstpl2fst.1:
-	$(LN_S) hfst-calculate.1 hfst-sfstpl2fst.1 
+	$(LN_S) hfst-calculate.1 hfst-sfstpl2fst.1
 
-hfst-summarise.1: 
-	$(LN_S) hfst-summarize.1 hfst-summarise.1 
+hfst-summarise.1:
+	$(LN_S) hfst-summarize.1 hfst-summarise.1
 
 hfst-train-tagger-loc.1:
 	$(LN_S) hfst-train-tagger.1 hfst-train-tagger-loc.1
@@ -112,7 +112,7 @@ man:
 	make bootstrap && make aliases
 
 # Generate man pages from help messages
-bootstrap: 
+bootstrap:
 	for f in $(hfst_tools); do \
 		N=`echo $$f | sed 's/.1/ \-\-help/' | sed 's/hfst/..\/tools\/src\/hfst/' | sh | sed -n 2p`; \
 		help2man \
@@ -155,5 +155,5 @@ bootstrap:
 aliases:
 	for f in $(aliases) ; do \
 		make $$f; \
-	done; 
+	done;
 

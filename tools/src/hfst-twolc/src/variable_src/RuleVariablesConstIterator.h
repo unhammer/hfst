@@ -2,7 +2,7 @@
 //!
 //! @author Miikka Silfverberg
 //!
-//! @brief Const iterator for @a RuleVariables objects. 
+//! @brief Const iterator for @a RuleVariables objects.
 
 //   This program is free software: you can redistribute it and/or modify
 //   it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ class RuleVariablesConstIterator
   //! Increment.
   void operator++(void);
 
-  //! @brief Return an iterator which is equivalent to @a this incremented 
+  //! @brief Return an iterator which is equivalent to @a this incremented
   //! @a i times.
   RuleVariablesConstIterator operator+(size_t i);
 

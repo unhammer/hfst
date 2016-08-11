@@ -10,7 +10,7 @@ fi
 
 rm -f a2b.script
 echo "regex a:b;" > a2b.script
-echo "save stack a2b.xfst.hfst" >> a2b.script 
+echo "save stack a2b.xfst.hfst" >> a2b.script
 
 for format in sfst openfst-tropical foma;
 do

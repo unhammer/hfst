@@ -44,7 +44,7 @@ for type in [hfst.types.SFST_TYPE, hfst.types.TROPICAL_OPENFST_TYPE, hfst.types.
         tok.add_multichar_symbol('foo')
         tok.add_skip_symbol('b')
         assert tok.tokenize('foobar','Foobar') == \
-            (('foo', 'F'), ('a', 'o'), ('r', 'o'), ('@_EPSILON_SYMBOL_@', 'a'), ('@_EPSILON_SYMBOL_@', 'r'))  
+            (('foo', 'F'), ('a', 'o'), ('r', 'o'), ('@_EPSILON_SYMBOL_@', 'a'), ('@_EPSILON_SYMBOL_@', 'r'))
         
         tok = hfst.HfstTokenizer()
         assert tok.tokenize_space_separated('f o o b a r') == \
@@ -56,7 +56,7 @@ for type in [hfst.types.SFST_TYPE, hfst.types.TROPICAL_OPENFST_TYPE, hfst.types.
         assert tok.tokenize_space_separated('foo bar') == \
             (('foo', 'foo'), ('bar', 'bar'))
         assert tok.tokenize_space_separated('foobar') == \
-            (('foobar', 'foobar'),)    
+            (('foobar', 'foobar'),)
         
         try:
             hfst.HfstTokenizer.check_utf8_correctness('föö')

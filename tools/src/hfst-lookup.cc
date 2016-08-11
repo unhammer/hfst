@@ -103,7 +103,7 @@ static size_t max_number=-1;
 static size_t MAX_NUMBER=5;
 static float beam=-1;
 
-#define CASCADE_UNION 1 
+#define CASCADE_UNION 1
 #define CASCADE_PRIORITY_UNION 2
 #define CASCADE_COMPOSITION 3
 static int cascade_ = CASCADE_UNION;
@@ -175,7 +175,7 @@ static const char* XEROX_END_SETF = "%n";
 static const char* XEROX_EMPTY_BEGIN_SETF = "";
 static const char* XEROX_EMPTY_LOOKUPF = "%i\t%i+?\t%w%n";
 static const char* XEROX_EMPTY_END_SETF = "%n";
-// ¶    ¶+? 
+// ¶    ¶+?
 static const char* XEROX_UNKNOWN_BEGIN_SETF = "";
 static const char* XEROX_UNKNOWN_LOOKUPF = "%i\t%i+?\t%w%n";
 static const char* XEROX_UNKNOWN_END_SETF = "%n";
@@ -243,7 +243,7 @@ print_usage()
         "\n", program_name);
 
     print_common_program_options(message_out);
-    fprintf(message_out, 
+    fprintf(message_out,
         "Input/Output options:\n"
         "  -i, --input=INFILE       Read input transducer from INFILE\n"
         "  -o, --output=OUTFILE     Write output to OUTFILE\n"
@@ -268,7 +268,7 @@ print_usage()
             "  -P, --progress                   Show neat progress bar if possible\n");
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
-    fprintf(message_out, 
+    fprintf(message_out,
             "OFORMAT is one of {xerox,cg,apertium}, xerox being default\n"
             "IFORMAT is one of {text,spaced,apertium}, default being text,\n"
             "unless OFORMAT is apertium\n"
@@ -299,7 +299,7 @@ print_usage()
 #endif
     fprintf(message_out, "\n");
 
-    fprintf(message_out, 
+    fprintf(message_out,
             "Todo:\n"
             "  Support --xfst=obey-flags for optimized lookup format.\n"
             "  Support --cycles for optimized lookup format.\n");
@@ -344,7 +344,7 @@ parse_options(int argc, char** argv)
             {0,0,0,0}
         };
         int option_index = 0;
-        // add tool-specific options here 
+        // add tool-specific options here
         int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
                              HFST_GETOPT_UNARY_SHORT "I:O:F:xc:n:X:e:E:b:t:p::PC:",
                              long_options, &option_index);
@@ -452,7 +452,7 @@ parse_options(int argc, char** argv)
               {
                 obey_flags = false;
               }
-            else 
+            else
               {
                 error(EXIT_FAILURE, 0, "Xfst variable %s unrecognised",
                       optarg);
@@ -800,7 +800,7 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
             // give up trying
             anal_start = lookupform;
         }
-        b = static_cast<char*>(calloc(sizeof(char), 
+        b = static_cast<char*>(calloc(sizeof(char),
                     anal_start - lookupform + 1));
         b = static_cast<char*>(memcpy(b, lookupform, anal_start - lookupform));
         a = static_cast<char*>(calloc(sizeof(char),
@@ -869,7 +869,7 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
                 src++;
             }
             else if (*src == 'w')
-              { 
+              {
                 int skip = 0;
 #ifdef _MSC_VER
                 if (w == std::numeric_limits<float>::infinity())
@@ -1021,7 +1021,7 @@ line_to_lookup_path(char** s, hfst::HfstStrings2FstTokenizer& tok,
           
           std::string S = escape_special_characters(*s);
 
-          StringPairVector spv 
+          StringPairVector spv
             = tok.tokenize_string_pair(S, true);
           
           for (StringPairVector::const_iterator it = spv.begin();
@@ -1041,7 +1041,7 @@ line_to_lookup_path(char** s, hfst::HfstStrings2FstTokenizer& tok,
             {
               std::string S = escape_special_characters(*s);
 
-              StringPairVector spv 
+              StringPairVector spv
                 = tok.tokenize_string_pair(S, false);
               
               for (StringPairVector::const_iterator it = spv.begin();
@@ -1055,7 +1055,7 @@ line_to_lookup_path(char** s, hfst::HfstStrings2FstTokenizer& tok,
         }
       case APERTIUM_INPUT:
           {
-            char* real_s 
+            char* real_s
               = static_cast<char*>(calloc(sizeof(char),strlen(*s)+1));
 
             *markup = static_cast<char*>(calloc(sizeof(char), strlen(*s)+1));
@@ -1124,7 +1124,7 @@ line_to_lookup_path(char** s, hfst::HfstStrings2FstTokenizer& tok,
     return rv;
 }
 
-void lookup_fd_and_print(HfstBasicTransducer * tr, HfstTransducer * TR, HfstOneLevelPaths& results, 
+void lookup_fd_and_print(HfstBasicTransducer * tr, HfstTransducer * TR, HfstOneLevelPaths& results,
                          const HfstOneLevelPath& s, size_t * limit = NULL, bool print_pairs_at_this_point = false,
                          bool print_fail = false, const HfstOneLevelPath * input_to_print = NULL,
                          bool no_newline = false);
@@ -1170,7 +1170,7 @@ lookup_simple(const HfstOneLevelPath& s, HfstTransducer& t, bool* infinity, bool
 
 
 /* Replace all strings \a str1 in \a symbol with \a str2. */
-static std::string replace_all(std::string symbol, 
+static std::string replace_all(std::string symbol,
                                const std::string &str1,
                                const std::string &str2)
 {
@@ -1180,20 +1180,20 @@ static std::string replace_all(std::string symbol,
       symbol.erase(pos, str1.size()); // erase str1
       symbol.insert(pos, str2);       // insert str2 instead
       pos = symbol.find               // find next str1
-        (str1, pos+str2.size());      
+        (str1, pos+str2.size());
     }
   return symbol;
 }
 
 
-static std::string get_print_format(const std::string &s) 
+static std::string get_print_format(const std::string &s)
 {
   if (is_epsilon(s))
     return std::string(strdup(epsilon_format));
 
-  if (quote_special) 
+  if (quote_special)
     {
-      return 
+      return
         replace_all
         ( replace_all
           ( replace_all
@@ -1206,7 +1206,7 @@ static std::string get_print_format(const std::string &s)
 }
 
 static void print_lookup_string(const StringVector &s) {
-  for (StringVector::const_iterator it = s.begin(); 
+  for (StringVector::const_iterator it = s.begin();
        it != s.end(); it++) {
 #ifdef WINDOWS
     if (!pipe_output)
@@ -1219,7 +1219,7 @@ static void print_lookup_string(const StringVector &s) {
 
 static std::string get_lookup_string(const StringVector &s) {
   std::string retval("");
-  for (StringVector::const_iterator it = s.begin(); 
+  for (StringVector::const_iterator it = s.begin();
        it != s.end(); it++) {
     retval += get_print_format(*it);
   }
@@ -1247,7 +1247,7 @@ bool is_possible_to_get_result(const HfstOneLevelPath & s,
 static unsigned int transducer_number=0;
 
 
-void lookup_fd_and_print(HfstBasicTransducer * tr, HfstTransducer * TR, HfstOneLevelPaths& results, 
+void lookup_fd_and_print(HfstBasicTransducer * tr, HfstTransducer * TR, HfstOneLevelPaths& results,
                          const HfstOneLevelPath& s, size_t * limit /* = NULL*/, bool print_pairs_at_this_point/* = false*/,
                          bool print_fail /* = false*/, const HfstOneLevelPath * input_to_print /* = NULL*/,
                          bool no_newline /* = false*/)
@@ -1258,7 +1258,7 @@ void lookup_fd_and_print(HfstBasicTransducer * tr, HfstTransducer * TR, HfstOneL
 
   if (tr != NULL)
     {
-      if (is_possible_to_get_result(s, cascade_symbols_seen[transducer_number], 
+      if (is_possible_to_get_result(s, cascade_symbols_seen[transducer_number],
                                     cascade_unknown_or_identity_seen[transducer_number]))
         {
           tr->lookup(s.second, results_spv, limit,
@@ -1403,7 +1403,7 @@ lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity,
   HfstOneLevelPaths* results = new HfstOneLevelPaths;
 
   bool possible = is_possible_to_get_result
-    (s, cascade_symbols_seen[transducer_number], 
+    (s, cascade_symbols_seen[transducer_number],
      cascade_unknown_or_identity_seen[transducer_number]);
 
   if (possible && time_cutoff == 0.0 && t.is_lookup_infinitely_ambiguous(s, obey_flags))
@@ -1608,7 +1608,7 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstBasicTransducer> cascade,
       for (HfstOneLevelPaths::const_iterator it = result->begin();
            it != result->end(); it++)
         {
-          results->insert(*it); 
+          results->insert(*it);
         }
       delete result;
 
@@ -1688,7 +1688,7 @@ print_lookups(const HfstOneLevelPaths& kvs,
 
 
 HfstOneLevelPaths*
-perform_lookups(HfstOneLevelPath& origin, std::vector<HfstTransducer>& cascade, 
+perform_lookups(HfstOneLevelPath& origin, std::vector<HfstTransducer>& cascade,
                 bool unknown, bool* infinite)
 {
   HfstOneLevelPaths* kvs;
@@ -1712,7 +1712,7 @@ perform_lookups(HfstOneLevelPath& origin, std::vector<HfstTransducer>& cascade,
 
 
 HfstOneLevelPaths*
-perform_lookups(HfstOneLevelPath& origin, std::vector<HfstBasicTransducer>& cascade, 
+perform_lookups(HfstOneLevelPath& origin, std::vector<HfstBasicTransducer>& cascade,
                 bool unknown, bool* infinite)
 {
   HfstOneLevelPaths* kvs;
@@ -1752,7 +1752,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
         hfst::ImplementationType type = trans.get_type();
         std::set<std::string> symbols_seen;
 
-        if (type != HFST_OL_TYPE && type != HFST_OLW_TYPE) 
+        if (type != HFST_OL_TYPE && type != HFST_OLW_TYPE)
           {
             only_optimized_lookup = false;
           }
@@ -1763,16 +1763,16 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
           }
         if (transducer_n==1)
           {
-            verbose_printf("Reading %s...\n", inputname); 
+            verbose_printf("Reading %s...\n", inputname);
           }
         else
           {
             verbose_printf("Reading %s..." SIZE_T_SPECIFIER "\n", inputname,
-                           transducer_n); 
+                           transducer_n);
           }
 
         // add multicharacter symbols to mc_symbols
-        if (type == hfst::SFST_TYPE || 
+        if (type == hfst::SFST_TYPE ||
             type == hfst::TROPICAL_OPENFST_TYPE ||
             type == hfst::LOG_OPENFST_TYPE ||
             type == hfst::FOMA_TYPE)
@@ -1781,7 +1781,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
             for (HfstBasicTransducer::const_iterator it = basic.begin();
                  it != basic.end(); it++)
               {
-                for (HfstBasicTransducer::HfstTransitions::const_iterator 
+                for (HfstBasicTransducer::HfstTransitions::const_iterator
                        tr_it = it->begin(); tr_it != it->end(); tr_it++)
                   {
                     std::string mcs = tr_it->get_input_symbol();
@@ -1810,16 +1810,16 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     inputstream.close();
 
     /*
-    if ((cascade_ == CASCADE_COMPOSITION || cascade_ == CASCADE_PRIORITY_UNION) && 
-        (inputstream.get_type() == HFST_OL_TYPE || 
+    if ((cascade_ == CASCADE_COMPOSITION || cascade_ == CASCADE_PRIORITY_UNION) &&
+        (inputstream.get_type() == HFST_OL_TYPE ||
          inputstream.get_type() == HFST_OLW_TYPE) ) {
       error(EXIT_FAILURE, 0, "option --cascade not supported on "
               "optimized lookup transducers");
               }*/
 
     /*
-    if (print_pairs && 
-        (inputstream.get_type() == HFST_OL_TYPE || 
+    if (print_pairs &&
+        (inputstream.get_type() == HFST_OL_TYPE ||
          inputstream.get_type() == HFST_OLW_TYPE) ) {
       error(EXIT_FAILURE, 0, "pair printing not supported on "
               "optimized lookup transducers");
@@ -1839,14 +1839,14 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     char* line = 0;
     size_t llen = 0;
 
-    hfst::HfstStrings2FstTokenizer input_tokenizer(mc_symbols, 
+    hfst::HfstStrings2FstTokenizer input_tokenizer(mc_symbols,
                          std::string(epsilon_format));
 
     if (!only_optimized_lookup)
       {
         char* format_string = hfst_strformat(cascade[0].get_type());
         if (!silent) {
-          warning(0, 0, 
+          warning(0, 0,
                   "It is not possible to perform fast lookups with %s "
                   "format automata.\n"
                   "Using HFST basic transducer format "
@@ -1945,7 +1945,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                                   unknown, &infinite);
           }
 
-        if (! print_pairs) { 
+        if (! print_pairs) {
           // printing was already done in function lookup_fd
           print_lookups(*kvs, *kv, markup, unknown, infinite, outstream);
           fflush(outstream);
@@ -1955,7 +1955,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
 
         print_prompt();
       } // while lines in input
-    if (show_progress_bar) 
+    if (show_progress_bar)
       {
         fprintf(stderr, "%ld/%ld... Done\n", filepos, filesize);
       }
@@ -1963,7 +1963,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     if (print_statistics)
       {
         fprintf(outstream, "Strings\tFound\tMissing\tResults\n"
-                "%lu\t%lu\t%lu\t%lu\n", 
+                "%lu\t%lu\t%lu\t%lu\n",
                 inputs, analysed, no_analyses, analyses);
         fprintf(outstream, "Coverage\tAmbiguity\n"
                 "%f\t%f\n",
@@ -2005,7 +2005,7 @@ int main( int argc, char **argv ) {
     {
         fclose(inputfile);
     }
-    verbose_printf("Reading from %s, writing to %s\n", 
+    verbose_printf("Reading from %s, writing to %s\n",
         inputfilename, outfilename);
     verbose_printf("Output formats:\n"
             "  regular:`%s'`%s...'`%s',\n"
@@ -2020,12 +2020,12 @@ int main( int argc, char **argv ) {
             epsilon_format, space_format, show_flags);
     // here starts the buffer handling part
     HfstInputStream* instream = NULL;
-    try 
+    try
       {
         instream = (inputfile != stdin) ?
           new HfstInputStream(inputfilename) :
           new HfstInputStream();
-      } 
+      }
     catch(const HfstException e)
       {
         error(EXIT_FAILURE, 0, "%s is not a valid transducer file",

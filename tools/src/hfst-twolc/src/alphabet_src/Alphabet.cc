@@ -34,7 +34,7 @@ SymbolPairVector * Alphabet::get_symbol_pair_vector(const SymbolPair &pair)
 }
 
 const OtherSymbolTransducer &Alphabet::get_transducer(const SymbolPair &pair)
-{ return alphabet.has_key(pair) ? alphabet[pair] : compute(pair); } 
+{ return alphabet.has_key(pair) ? alphabet[pair] : compute(pair); }
 
 bool Alphabet::is_pair(const std::string &input,const std::string &output)
 {
@@ -63,8 +63,8 @@ void Alphabet::define_singleton_set(const std::string &name)
 
 bool Alphabet::is_set_pair(const SymbolPair &pair) const
 {
-  return 
-    pair.first.find("__HFST_TWOLC_SET_NAME=") != std::string::npos || 
+  return
+    pair.first.find("__HFST_TWOLC_SET_NAME=") != std::string::npos ||
     pair.second.find("__HFST_TWOLC_SET_NAME=") != std::string::npos;
 }
 
@@ -81,17 +81,17 @@ const OtherSymbolTransducer &Alphabet::compute(const SymbolPair &pair)
   OtherSymbolTransducer pair_transducer;
 
   if (diacritics.has_element(input))
-    { 
+    {
       pair_transducer.apply(&HfstTransducer::disjunct,
-                OtherSymbolTransducer(input,input)); 
-      if (input != output && output != TWOLC_EPSILON && 
+                OtherSymbolTransducer(input,input));
+      if (input != output && output != TWOLC_EPSILON &&
       output != TWOLC_UNKNOWN)
     { std::cerr << "Warning: Diacritic " << input << " in pair "
             << input << ":" << output << " will correspond 0."
             << std::endl; }
     }
   else if (input == TWOLC_UNKNOWN && output == TWOLC_UNKNOWN)
-    { 
+    {
       for (HandySet<SymbolPair>::const_iterator it = alphabet_set.begin();
        it != alphabet_set.end();
        ++it)
@@ -121,7 +121,7 @@ const OtherSymbolTransducer &Alphabet::compute(const SymbolPair &pair)
             { continue; }
 
           if (*it == jt->second)
-            { 
+            {
               pair_transducer.apply(&HfstTransducer::disjunct,
                                     OtherSymbolTransducer
                                     (jt->first,jt->second)); }
@@ -144,7 +144,7 @@ const OtherSymbolTransducer &Alphabet::compute(const SymbolPair &pair)
             { continue; }
           
           if (*it == jt->first)
-            { 
+            {
               pair_transducer.apply(&HfstTransducer::disjunct,
                                     OtherSymbolTransducer
                                     (jt->first,jt->second)); }
@@ -156,16 +156,16 @@ const OtherSymbolTransducer &Alphabet::compute(const SymbolPair &pair)
       const SymbolRange &input_set = sets[input];
       const SymbolRange &output_set = sets[output];
 
-      for (SymbolRange::const_iterator it = input_set.begin(); 
-       it != input_set.end(); 
+      for (SymbolRange::const_iterator it = input_set.begin();
+       it != input_set.end();
        ++it)
     {
-      for (SymbolRange::const_iterator jt = output_set.begin(); 
+      for (SymbolRange::const_iterator jt = output_set.begin();
            jt != output_set.end();
            ++jt)
         {
           if (is_pair(*it,*jt))
-            { 
+            {
               pair_transducer.apply(&HfstTransducer::disjunct,
                                     OtherSymbolTransducer(*it,*jt));
             }
@@ -178,20 +178,20 @@ const OtherSymbolTransducer &Alphabet::compute(const SymbolPair &pair)
 }
 
 void Alphabet::define_alphabet_pair(const SymbolPair &pair)
-{ 
-  alphabet_set.insert(pair); 
+{
+  alphabet_set.insert(pair);
   input_symbols.insert(pair.first);
   output_symbols.insert(pair.second);
 }
 
 void Alphabet::define_diacritics(const SymbolRange &diacs)
-{ 
-  diacritics.insert(diacs.begin(),diacs.end()); 
+{
+  diacritics.insert(diacs.begin(),diacs.end());
   for (HandySet<std::string>::iterator it = diacritics.begin();
        it != diacritics.end();
        ++it)
-    { 
-      alphabet_set.erase(SymbolPair(*it,*it)); 
+    {
+      alphabet_set.erase(SymbolPair(*it,*it));
       alphabet_set.erase(SymbolPair(*it,TWOLC_EPSILON));
       input_symbols.erase(*it);
       output_symbols.erase(*it);
@@ -208,23 +208,23 @@ int main(void)
 {
   bool have_openfst = false;
 #if HAVE_OPENFST
-  have_openfst = true; 
+  have_openfst = true;
 #endif //HAVE_OPENFST
 
   bool have_sfst = false;
 #if HAVE_SFST
-  have_sfst = true; 
+  have_sfst = true;
 #endif //HAVE_SFST
 
   bool have_foma = false;
 #if HAVE_FOMA
-  have_foma = true; 
+  have_foma = true;
 #endif // HAVE_FOMA
 
   OtherSymbolTransducer::set_transducer_type
-    (have_openfst ? hfst::TROPICAL_OPENFST_TYPE : 
+    (have_openfst ? hfst::TROPICAL_OPENFST_TYPE :
      have_sfst ? hfst::SFST_TYPE :
-     have_foma ? hfst::FOMA_TYPE : 
+     have_foma ? hfst::FOMA_TYPE :
      hfst::ERROR_TYPE);
 
   Alphabet alphabet;

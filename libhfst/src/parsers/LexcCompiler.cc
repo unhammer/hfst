@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 //! @file LexcCompiler.cc
@@ -256,7 +256,7 @@ LexcCompiler& LexcCompiler::parse(const char* filename)
       {
         std::ostream * err = get_stream(error_);
         *err << "could not open " << filename << " for reading" << std::endl;
-        flush(err);  
+        flush(err);
         //fprintf(stderr, "could not open %s for reading\n", filename);
         parseErrors_ = true;
         return *this;
@@ -1051,7 +1051,7 @@ LexcCompiler::compileLexical()
         joinersAll.repeat_star();
         joinersAll.minimize();
 
-        if (debug) 
+        if (debug)
           {
             *err << "lexicons before compose: " << std::endl;
             *err << lexicons;
@@ -1069,10 +1069,10 @@ LexcCompiler::compileLexical()
 
         lexicons.compose(joinersAll).minimize();
 
-        if (debug) 
+        if (debug)
           {
             *err << "lexicons after composition: " << std::endl;
-            *err << lexicons << std::endl; 
+            *err << lexicons << std::endl;
             flush(err);
           }
 
@@ -1094,11 +1094,11 @@ LexcCompiler::compileLexical()
                            s != transducerAlphabet.end();
                            ++s)
             {
-              if (debug) 
-                { 
+              if (debug)
+                {
                   *err << "handling alpha: '" << *s << "'..." << std::endl;
                   flush(err);
-                  //fprintf(stderr, "handling alpha: '%s'...\n", s->c_str()); 
+                  //fprintf(stderr, "handling alpha: '%s'...\n", s->c_str());
                 }
                 String alph = *s;
 
@@ -1107,9 +1107,9 @@ LexcCompiler::compileLexical()
                     replace(alph.begin(), alph.end(), '$', '@');
                     //std::cout << alph << '\n';
                     fakeFlagsToRealFlags.insert(StringPair(*s, alph));
-                    if (debug) 
+                    if (debug)
                       {
-                        *err << "debug: inserting fakeFlagsToRealFlags replacement: " << *s << " -> " << alph << std::endl; 
+                        *err << "debug: inserting fakeFlagsToRealFlags replacement: " << *s << " -> " << alph << std::endl;
                         flush(err);
                       }
                     //lexicons.substitute(*s, alph).minimize();
@@ -1130,10 +1130,10 @@ LexcCompiler::compileLexical()
         lexicons.substitute(allSubstitutions).minimize();
         lexicons.prune_alphabet();
 
-        if (debug) 
+        if (debug)
           {
             *err << "lexicons after substitution: " << std::endl;
-            *err << lexicons << std::endl; 
+            *err << lexicons << std::endl;
             flush(err);
           }
         
@@ -1160,9 +1160,9 @@ LexcCompiler::compileLexical()
 
                 //std::cout << alph << '\n';
                 fakeRegexprToReal.insert(StringPair(it->first, alph));
-                if (debug) 
+                if (debug)
                   {
-                    *err << "debug: inserting fakeRegexprToReal replacement: " << it->first << " -> " << alph << std::endl; 
+                    *err << "debug: inserting fakeRegexprToReal replacement: " << it->first << " -> " << alph << std::endl;
                     flush(err);
                   }
 
@@ -1196,8 +1196,8 @@ LexcCompiler::compileLexical()
             }
             HfstBasicTransducer btr(*(it->second));
             regMarkToTr[alph] = btr;
-            if (debug) 
-              { 
+            if (debug)
+              {
                 *err << "debug: regMarkToTr[" << alph << "] = " << std::endl;
                 btr.write_in_att_format(*err);
                 flush(err);
@@ -1210,7 +1210,7 @@ LexcCompiler::compileLexical()
 
         lexicons_basic.prune_alphabet();
 
-        if (debug) 
+        if (debug)
           {
             *err << "lexicons_basic after regexp substitution: " << std::endl;
             lexicons_basic.write_in_att_format(*err);
@@ -1228,8 +1228,8 @@ LexcCompiler::compileLexical()
 
     HfstTransducer* rv = new HfstTransducer(lexicons_basic, format_);
 
-    // Preserve only first flag of consecutive P and R lexname flag series, 
-    // e.g. change P.LEXNAME.1 R.LEXNAME.1 P.LEXNAME.2 R.LEXNAME.2 into P.LEXNAME.1 
+    // Preserve only first flag of consecutive P and R lexname flag series,
+    // e.g. change P.LEXNAME.1 R.LEXNAME.1 P.LEXNAME.2 R.LEXNAME.2 into P.LEXNAME.1
     if (with_flags_) //&& minimize_flags_)
     {
         StringSet transducerAlphabet = rv->get_alphabet();
@@ -1240,19 +1240,19 @@ LexcCompiler::compileLexical()
         {
             String alph = *s;
             String alph10 = alph.substr(0,10);
-            if ( alph10 == "@P.LEXNAME" || alph10 == "@R.LEXNAME" )  
+            if ( alph10 == "@P.LEXNAME" || alph10 == "@R.LEXNAME" )
             {
                 flagD.insert(alph);
             }
         }
 
-        // Construct a rule for consecutive flag removal: 
+        // Construct a rule for consecutive flag removal:
         // [FLAG1 | FLAG2 ... FLAGN] -> 0 || [FLAG1 | FLAG2 ... FLAGN] _
         // and also an inverted rule
         std::string flag_remover_regexp("[ ");
         bool first_flag = true;
         
-        for (StringSet::const_iterator it 
+        for (StringSet::const_iterator it
                = flagD.begin(); it != flagD.end(); ++it)
         {
             if (!first_flag)
@@ -1266,9 +1266,9 @@ LexcCompiler::compileLexical()
         std::string context_regexp(flag_remover_regexp);
         flag_remover_regexp.append(" -> 0 || ").append(context_regexp).append(" _ ");
 
-        if (debug) 
-        { 
-            fprintf(stderr, "flag_remover_regexp: %s\n", flag_remover_regexp.c_str()); 
+        if (debug)
+        {
+            fprintf(stderr, "flag_remover_regexp: %s\n", flag_remover_regexp.c_str());
         }
          
         hfst::xre::XreCompiler xre_comp(format_);
@@ -1281,7 +1281,7 @@ LexcCompiler::compileLexical()
         // [ [FLAG1 | FLAG2 ... FLAGN] -> 0 || [FLAG1 | FLAG2 ... FLAGN] _ ].inv
         //                        .o.
         //                       RESULT
-        //                        .o. 
+        //                        .o.
         // [FLAG1 | FLAG2 ... FLAGN] -> 0 || [FLAG1 | FLAG2 ... FLAGN] _
         HfstTransducer filtered_lexicons(*inverted_flag_filter);
         filtered_lexicons.compose(*rv, true);

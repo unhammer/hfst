@@ -1,10 +1,10 @@
-// Copyright (c) 2016 University of Helsinki                          
-//                                                                    
-// This library is free software; you can redistribute it and/or      
-// modify it under the terms of the GNU Lesser General Public         
-// License as published by the Free Software Foundation; either       
+// Copyright (c) 2016 University of Helsinki
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
-// See the file COPYING included with this distribution for more      
+// See the file COPYING included with this distribution for more
 // information.
 
 #include "./transducer.h"
@@ -228,8 +228,8 @@ void Encoder::read_input_symbol(const char * s, const int s_num)
         ascii_symbols[(unsigned char)(*s)] = s_num;
     }
     // If there's an ascii tokenized symbol shadowing this, remove it
-    if (strlen(s) > 1 && 
-        should_ascii_tokenize((unsigned char)(*s)) && 
+    if (strlen(s) > 1 &&
+        should_ascii_tokenize((unsigned char)(*s)) &&
         ascii_symbols[(unsigned char)(*s)] != NO_SYMBOL_NUMBER) {
       ascii_symbols[(unsigned char)(*s)] = NO_SYMBOL_NUMBER;
     }
@@ -453,7 +453,7 @@ void Transducer::try_epsilon_indices(unsigned int input_pos,
     {
         try_epsilon_transitions(input_pos,
                                 output_pos,
-                                tables->get_index_target(i) - 
+                                tables->get_index_target(i) -
                                 TRANSITION_TARGET_TABLE_START);
         found_transition = true;
     }
@@ -505,7 +505,7 @@ void Transducer::find_index(SymbolNumber input,
         find_transitions(input,
                          input_pos,
                          output_pos,
-                         tables->get_index_target(i+input) - 
+                         tables->get_index_target(i+input) -
                          TRANSITION_TARGET_TABLE_START);
         found_transition = true;
     }

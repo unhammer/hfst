@@ -47,7 +47,7 @@ int stack_add(struct fsm *fsm) {
   stack_ptr_previous = NULL;
 
   fsm_count(fsm);
-  if (strcmp(fsm->name,"") == 0) 
+  if (strcmp(fsm->name,"") == 0)
       sprintf(fsm->name, "%X",rand());
   for (i=0, stack_ptr = main_stack; stack_ptr->number != -1; i++) {
     stack_ptr_previous = stack_ptr;
@@ -116,7 +116,7 @@ struct fsm *stack_pop(void) {
       stack_ptr->amedh = NULL;
   }
   stack_ptr->fsm = NULL;
-  xxfree(stack_ptr);  
+  xxfree(stack_ptr);
   return(fsm);
 }
 
@@ -171,7 +171,7 @@ struct stack_entry *stack_find_bottom () {
 
 struct stack_entry *stack_find_second () {
   struct stack_entry *stack_ptr;
-  /*  
+  /*
       if (main_stack->number == -1) {
       return NULL;
       }

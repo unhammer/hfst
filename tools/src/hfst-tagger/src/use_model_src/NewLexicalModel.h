@@ -8,7 +8,7 @@
 #include "HfstTransducer.h"
 
 #ifdef USE_TR1_UNORDERED_MAP
- #include <tr1/unordered_map> 
+ #include <tr1/unordered_map>
 #else
  #include <unordered_map>
 #endif
@@ -34,7 +34,7 @@ using hfst::StringVector;
 class NewLexicalModel
 {
  public:
-  NewLexicalModel(const std::string &filename, 
+  NewLexicalModel(const std::string &filename,
                   std::istream * paradigm_guess_stream = 0);
   const WeightedStringVector &operator[] (const std::string &word);
   const WeightedStringVector &get_first_word_analysis(const std::string &word);
@@ -42,16 +42,16 @@ class NewLexicalModel
   bool is_lexicon_oov(const std::string &word);
  private:
 #ifdef USE_TR1_UNORDERED_MAP
-  typedef std::tr1::unordered_map<std::string,WeightedStringVector> 
+  typedef std::tr1::unordered_map<std::string,WeightedStringVector>
     AnalysisCache;
 #else
-  typedef std::unordered_map<std::string,WeightedStringVector> 
+  typedef std::unordered_map<std::string,WeightedStringVector>
     AnalysisCache;
 #endif
 
-  AnalysisCache   analysis_cache;  
-  AnalysisCache   upper_case_suffix_cache;  
-  AnalysisCache   lower_case_suffix_cache;  
+  AnalysisCache   analysis_cache;
+  AnalysisCache   upper_case_suffix_cache;
+  AnalysisCache   lower_case_suffix_cache;
   HfstTokenizer   tokenizer;
   StringWeightMap tag_probability_hash;
   ProbabilityMap  upper_case_suffix_penalties;

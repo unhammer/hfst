@@ -384,7 +384,7 @@ for type in types:
     result = tr.extract_longest_paths()
     if not len(result) == 1:
         raise RuntimeError(get_linenumber())
-    result = tr.extract_shortest_paths()    
+    result = tr.extract_shortest_paths()
     if not len(result) == 1:
         raise RuntimeError(get_linenumber())
 
@@ -440,11 +440,11 @@ f = open('foo_basic', 'r')
 fsm2 = hfst.HfstBasicTransducer(hfst.read_att_transducer(f, hfst.EPSILON))
 f.close()
 
-# comparison can fail because of rounding 
+# comparison can fail because of rounding
 #for type in types:
 #    FSM = hfst.HfstTransducer(fsm, type)
 #    FSM2 = hfst.HfstTransducer(fsm2, type)
-#    
+#
 #    if not (FSM.compare(FSM2)):
 #        raise RuntimeError(get_linenumber())
 #

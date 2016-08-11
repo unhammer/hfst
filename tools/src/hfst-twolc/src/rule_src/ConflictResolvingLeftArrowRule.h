@@ -41,19 +41,19 @@ class ConflictResolvingLeftArrowRule : public LeftArrowRule
   //! @brief Return true if @a another conflicts @a this.
   //!
   //! Return true if the input symbols of the centers of @a another and
-  //! @this are equal, the output symbols differ, and the contexts of @a 
+  //! @this are equal, the output symbols differ, and the contexts of @a
   //! another and @a this have a non-empty intersection.
   //!
   //! If a conflict exists, store the conflicting string in v.
   bool conflicts_this(const ConflictResolvingLeftArrowRule &another,
               StringVector &v);
 
-  //! Return @a true, if the context of @a another is a sub language of 
+  //! Return @a true, if the context of @a another is a sub language of
   //! the context of @a this.
   bool resolvable_conflict(const ConflictResolvingLeftArrowRule &another);
 
   //! @brief Resolve the conflict between @a this and @a another by subtracting
-  //! the context of @a another fromt the @a context of @a this. 
+  //! the context of @a another fromt the @a context of @a this.
   void resolve_conflict(const ConflictResolvingLeftArrowRule &another);
 
   friend class LeftArrowRuleContainer;
