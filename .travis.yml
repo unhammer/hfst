@@ -4,15 +4,6 @@ language: cpp
 sudo: required
 dist: trusty
 
-compiler:
-    - clang
-    - gcc
-
-matrix:
-    exclude:
-    - os: linux
-      compiler: clang
-
 before_install:
     - echo "$TRAVIS_OS_NAME"
     - if [[ "$TRAVIS_OS_NAME" = "linux" ]];then wget http://apertium.projectjj.com/apt/install-nightly.sh -O - | sudo bash; fi
