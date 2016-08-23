@@ -54,6 +54,8 @@ class LexcCompiler
   // as indicator as the trasnducer should be build with or without flags
   LexcCompiler(hfst::ImplementationType impl, bool withFlags, bool alignStrings);
 
+  void reset();
+
   //! @brief compile lexc description from @c infile into current compiler
   LexcCompiler& parse(FILE* infile);
 

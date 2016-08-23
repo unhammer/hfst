@@ -176,6 +176,29 @@ LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags, bool alignSt
     xre_.set_verbosity(!quiet_);
 }
 
+    void LexcCompiler::reset()
+    {
+      tokenizer_ = hfst::HfstTokenizer();
+      tokenizer_.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+      tokenizer_.add_multichar_symbol("@0@");
+      tokenizer_.add_multichar_symbol("@ZERO@");
+      tokenizer_.add_multichar_symbol("@@ANOTHER_EPSILON@@");
+      initialLexiconName_ = "Root";
+      totalEntries_ = 0;
+      currentEntries_ = 0;
+      parseErrors_ = false;
+      lexiconNames_.clear();
+      noFlags_.clear();
+      continuations_.clear();
+      currentLexiconName_ = ""; // ?
+      string hash("#");
+      lexiconNames_.insert(hash);
+      stringsTrie_ =hfst::implementations::HfstBasicTransducer(); // ?
+      stringTries_.clear();
+      stringVectors_.clear();
+      regexps_.clear();
+    }
+
 
     std::ostream * LexcCompiler::get_stream(std::ostream * oss)
     {

@@ -94,6 +94,9 @@ using hfst::implementations::HfstBasicTransition;
 namespace hfst {
 namespace xfst {
 
+  // whether we need to reset the lexc parser before reading lexc
+  static bool has_lexc_been_read_ = false;
+
   static std::map<std::string, std::string> variable_explanations_;
 
   static void initialize_variable_explanations()
@@ -5215,8 +5218,14 @@ namespace xfst {
         PROMPT_AND_RETURN_THIS;
       }
 
+    if (has_lexc_been_read_)
+      lexc_.reset();
+    else
+      has_lexc_been_read_ = true;
+
     lexc_.parse(infile);
     t = lexc_.compileLexical();
+
     if (0 != fclose(infile))
       {
         error() << "Could not close file " << filename << std::endl;
