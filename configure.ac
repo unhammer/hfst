@@ -649,16 +649,9 @@ AC_LANG_PUSH([C++])
 
 # Always use c++11 (flag 'c++0x' is understood also by older compilers)
 # Checks for highest supported C++ standard
-AX_CHECK_COMPILE_FLAG([-std=c++17], [CXXFLAGS="$CXXFLAGS -std=c++17"], [
- AX_CHECK_COMPILE_FLAG([-std=c++1z], [CXXFLAGS="$CXXFLAGS -std=c++1z"], [
-  AX_CHECK_COMPILE_FLAG([-std=c++14], [CXXFLAGS="$CXXFLAGS -std=c++14"], [
-   AX_CHECK_COMPILE_FLAG([-std=c++1y], [CXXFLAGS="$CXXFLAGS -std=c++1y"], [
-    AX_CHECK_COMPILE_FLAG([-std=c++11], [CXXFLAGS="$CXXFLAGS -std=c++11"], [
-     AS_IF([echo "$CXXFLAGS" | grep '\-std' | grep -E '((gnu\+\+)|(c\+\+))((11)|(0x)|(14)|(1y)|(17)|(1z))' > /dev/null 2> /dev/null], [], [CXXFLAGS="$CXXFLAGS -std=c++0x"])
-    ])
-   ])
-  ])
- ])
+# But, clang++ does not accept invalid OpenFST code, so limit to C++11 for now
+AX_CHECK_COMPILE_FLAG([-std=c++11], [CXXFLAGS="$CXXFLAGS -std=c++11"], [
+ AS_IF([echo "$CXXFLAGS" | grep '\-std' | grep -E '((gnu\+\+)|(c\+\+))((11)|(0x)|(14)|(1y)|(17)|(1z))' > /dev/null 2> /dev/null], [], [CXXFLAGS="$CXXFLAGS -std=c++0x"])
 ])
 
 AC_CHECK_HEADERS([unordered_map], [], [],
