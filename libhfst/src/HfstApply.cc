@@ -431,7 +431,7 @@ NETptr (*xfsm_funct)(NETptr, unsigned int n),
         {
           fsm * foma_temp =
             foma_funct(implementation.foma,another_->implementation.foma);
-          free(implementation.foma);
+          this->foma_interface.delete_foma(implementation.foma);
           implementation.foma = foma_temp;
           break;
         }
