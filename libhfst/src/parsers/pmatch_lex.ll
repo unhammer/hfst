@@ -95,6 +95,7 @@ UNICODE_ESCAPE ("\\u"{HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR})|("\\U00"{HEXCHAR}{HEX
 ".t(" { return TAG_LEFT; }
 "Lst(" { return LST_LEFT; }
 "Exc(" { return EXC_LEFT; }
+"Like(" { return LIKE_LEFT; }
 "Interpolate(" { return INTERPOLATE_LEFT; }
 "Sigma(" { return SIGMA_LEFT; }
 "Counter(" { return COUNTER_LEFT; }
@@ -262,6 +263,11 @@ UNICODE_ESCAPE ("\\u"{HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR})|("\\U00"{HEXCHAR}{HEX
 "@re\""[^""]+"\"" {
     pmatchlval.label = hfst::pmatch::get_escaped_delimited(pmatchtext, '"');
     return READ_RE;
+}
+
+"@vec\""[^""]+"\"" {
+    pmatchlval.label = hfst::pmatch::get_escaped_delimited(pmatchtext, '"');
+    return READ_VEC;
 }
 
 "\""(({UNICODE_ESCAPE}|{U8C})"-"({UNICODE_ESCAPE}|{U8C}))+"\"" {

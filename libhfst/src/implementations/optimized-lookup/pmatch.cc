@@ -120,6 +120,11 @@ void PmatchAlphabet::add_special_symbol(const std::string & str,
         end_tag_map[symbol_number] = str.substr(
             sizeof("@PMATCH_ENDTAG_") - 1,
             str.size() - (sizeof("@PMATCH_ENDTAG_@") - 1));
+    } else if (is_like_arc(str)) {
+        // Fetch the part between @PMATCH_LIKE_ and @
+        words_like_map[symbol_number] = str.substr(
+            sizeof("@PMATCH_LIKE_") - 1,
+            str.size() - (sizeof("@PMATCH_LIKE_@") - 1));
     } else if (is_insertion(str)) {
         rtn_names[name_from_insertion(str)] = symbol_number;
     } else if (is_guard(str)) {
@@ -556,6 +561,17 @@ bool PmatchAlphabet::is_end_tag(const std::string & symbol)
 bool PmatchAlphabet::is_end_tag(const SymbolNumber symbol) const
 {
     return end_tag_map.count(symbol) == 1;
+}
+
+bool PmatchAlphabet::is_like_arc(const std::string & symbol)
+{
+    return symbol.find("@PMATCH_LIKE_") == 0 &&
+        symbol.rfind("@") == symbol.size() - 1;
+}
+
+bool PmatchAlphabet::is_like_arc(const SymbolNumber symbol) const
+{
+    return words_like_map.count(symbol) == 1;
 }
 
 bool PmatchAlphabet::is_insertion(const std::string & symbol)
@@ -1151,6 +1167,7 @@ void PmatchTransducer::collect_possible_first_symbols(void)
     for (SymbolNumber i = 1; i < symbol_count; ++i) {
         if (!alphabet.is_like_epsilon(i) &&
             !alphabet.is_end_tag(i) &&
+            !alphabet.is_like_arc(i) &&
             special_symbols.count(i) == 0 &&
             i != alphabet.get_unknown_symbol() &&
             i != alphabet.get_identity_symbol() &&
@@ -1597,6 +1614,8 @@ void PmatchTransducer::take_epsilons(unsigned int input_pos,
                         container->entry_stack.push(input_pos);
                     } else if (output == alphabet.get_special(exit)) {
                         container->entry_stack.pop();
+                    } else if (alphabet.is_like_arc(output)) { // a Like() arc
+                        match_like_arc(input_pos, tape_pos);
                     }
                     
                     get_analyses(input_pos, tape_pos + 1, target);
@@ -1695,6 +1714,11 @@ void PmatchTransducer::take_rtn(SymbolNumber input,
         rtn_target->rtn_exit();
     }
     local_stack.top().running_weight = original_weight;
+}
+
+void PmatchTransducer::match_like_arc(unsigned int input_pos,
+                                      unsigned int tape_pos)
+{
 }
 
 void PmatchTransducer::take_flag(SymbolNumber input,

@@ -72,6 +72,7 @@ std::set<std::string> inserted_names;
 std::set<std::string> unsatisfied_insertions;
 std::set<std::string> used_definitions;
 std::set<std::string> function_names;
+std::vector<WordVector> word_vectors;
 char* startptr;
 hfst::ImplementationType format;
 size_t len;
@@ -288,6 +289,49 @@ HfstTransducer * add_pmatch_delimiters(HfstTransducer * regex)
 
 PmatchTransducerContainer * make_end_tag(std::string tag)
 { return epsilon_to_symbol_container("@PMATCH_ENDTAG_" + tag + "@"); }
+
+struct DotProductWithWordVectorComparison {
+    WordVector compare_with_this;
+    DotProductWithWordVectorComparison(WordVector word): compare_with_this(word) {}
+    // if the vectors are normalized, dot product is cosine similarity
+    bool operator()(WordVector & left, WordVector & right) {
+        double left_accumulator = 0;
+        double right_accumulator = 0;
+        for (size_t i = 0; i < compare_with_this.vector.size(); ++i) {
+            left_accumulator += compare_with_this.vector[i]*left.vector[i];
+            right_accumulator += compare_with_this.vector[i]*right.vector[i];
+        }
+        return left_accumulator > right_accumulator;
+    }
+};
+
+PmatchObject * make_like_arc(std::string word)
+{
+    WordVector this_word;
+    for (std::vector<WordVector>::iterator it = word_vectors.begin();
+         it != word_vectors.end(); ++it) {
+        if (word == it->word) {
+            this_word = *it;
+            break;
+        }
+    }
+    if (this_word.word == "") {
+        // got no match
+        PmatchString * retval = new PmatchString(word);
+        retval->multichar = true;
+        return retval;
+    }
+    DotProductWithWordVectorComparison comparison_object(this_word);
+    std::sort(word_vectors.begin(), word_vectors.end(), comparison_object);
+    HfstTokenizer tok;
+    HfstTransducer * retval = new HfstTransducer(format);
+    for (size_t i = 0; i < word_vectors.size() && i <= 10; ++i) {
+        HfstTransducer tmp(word_vectors[i].word, tok, format);
+        retval->disjunct(tmp);
+    }
+    std::cerr << word_vectors[0].word << "\t" << word_vectors[1].word << std::endl;
+    return new PmatchTransducerContainer(retval);
+}
 
 PmatchTransducerContainer * make_counter(std::string name)
 { return epsilon_to_symbol_container("@PMATCH_COUNTER_" + name + "@"); }
@@ -897,6 +941,52 @@ HfstTransducer * read_text(char * filename, ImplementationType type)
     }
     infile.close();
     return retval;
+}
+
+void read_vec(char * filename)
+{
+    if (word_vectors.size != 0) {
+        word_vectors.clear();
+        std::cerr << "pmatch: vector model file " << filename
+                  << " overrides earlier one\n";
+    }
+    std::ifstream infile;
+    std::string line;
+    size_t linenumber = 0;
+    infile.open(filename);
+    if(!infile.good()) {
+        std::cerr << "pmatch: could not open vector file " << filename <<
+            " for reading\n";
+    } else {
+        while(infile.good()) {
+            std::getline(infile, line);
+            ++linenumber;
+            if (line.empty()) { continue; }
+            size_t pos = line.find('\t');
+            if (pos == std::string::npos) {
+                std::cerr << "pmatch warning: vector file " << filename <<
+                    " doesn't appear to be tab-separated\n  (reading line " << linenumber << ")\n";
+                continue;
+            }
+            std::string word = line.substr(0, pos);
+            std::vector<double> components;
+            size_t nextpos;
+            while (std::string::npos != (nextpos = line.find('\t', pos + 1))) {
+                components.push_back(strtod(line.substr(pos, nextpos).c_str(), NULL));
+                pos = nextpos;
+            }
+            if (word_vectors.size() != 0 && word_vectors[0].vector.size() != components.size()) {
+                std::cerr << "pmatch warning: vector file " << filename <<
+                    " appears malformed\n  (reading line " << linenumber << ")\n";
+                continue;
+            }
+            WordVector wv;
+            wv.word = word;
+            wv.vector = components;
+            word_vectors.push_back(wv);
+        }
+    }
+    infile.close();
 }
 
 std::vector<std::vector<std::string> > read_args(char * filename, unsigned int argcount)
