@@ -664,7 +664,7 @@ LexcCompiler::addXreEntry(const string& regexp, const string& continuation,
 
     HfstTransducer* newPaths = xre_.compile(regexp);
 
-    newPaths->minimize();
+    newPaths->optimize();
 
     // encode key
     // keep regexps with different continuations separate
@@ -679,7 +679,7 @@ LexcCompiler::addXreEntry(const string& regexp, const string& continuation,
         regexps_.insert(pair<string,HfstTransducer*>(regex_key,
                                                    new HfstTransducer(format_)));
       }
-    regexps_[regex_key]->disjunct(*newPaths).minimize();
+    regexps_[regex_key]->disjunct(*newPaths).optimize();
     if (!quiet_)
       {
         if ((currentEntries_ % 10000) == 0)
@@ -824,10 +824,10 @@ LexcCompiler::compileLexical()
     HfstTransducer lexicons(stringsTrie_, format_);
 
 
-    lexicons.minimize();
+    lexicons.optimize();
 
     // repeat star to overgenerate
-    lexicons.repeat_star().minimize();
+    lexicons.repeat_star().optimize();
 
     HfstSymbolSubstitutions smallSubstitutions;
     smallSubstitutions.insert(StringPair("@0@", "@_EPSILON_SYMBOL_@"));
@@ -849,7 +849,7 @@ LexcCompiler::compileLexical()
         string endString = "#";
         joinerEncode(endString);
         HfstTransducer end(endString, tokenizer_, format_);
-        lexicons = start.concatenate(lexicons).concatenate(end).minimize();
+        lexicons = start.concatenate(lexicons).concatenate(end).optimize();
 
         for (set<string>::const_iterator s = lexiconNames_.begin();
              s != lexiconNames_.end();
@@ -903,7 +903,7 @@ LexcCompiler::compileLexical()
           lexicons = startP.
                       concatenate(lexicons).
                       concatenate(endR).
-                      minimize();
+                      optimize();
 
           for (set<string>::const_iterator s = lexiconNames_.begin();
                s != lexiconNames_.end();
@@ -972,7 +972,7 @@ LexcCompiler::compileLexical()
 
 
         joinersAll.repeat_star();
-        joinersAll.minimize();
+        joinersAll.optimize();
 
         if (debug)
           {
@@ -985,7 +985,7 @@ LexcCompiler::compileLexical()
             flush(err);
           }
 
-        lexicons.compose(joinersAll).minimize();
+        lexicons.compose(joinersAll).optimize();
 
         if (debug)
           {
@@ -1038,7 +1038,7 @@ LexcCompiler::compileLexical()
             allSubstitutions.insert(allJoinersToEpsilon.begin(), allJoinersToEpsilon.end());
         }
 
-        lexicons.substitute(allSubstitutions).minimize();
+        lexicons.substitute(allSubstitutions).optimize();
         lexicons.prune_alphabet();
 
         if (debug)
@@ -1076,7 +1076,7 @@ LexcCompiler::compileLexical()
                   }
             }
         }
-        lexicons.substitute(fakeRegexprToReal).minimize();
+        lexicons.substitute(fakeRegexprToReal).optimize();
         lexicons.prune_alphabet();
 
         std::map<String, HfstBasicTransducer> regMarkToTr;
@@ -1172,9 +1172,9 @@ LexcCompiler::compileLexical()
         hfst::xre::XreCompiler xre_comp(format_);
         
         HfstTransducer * flag_filter = xre_comp.compile(flag_remover_regexp);
-        flag_filter->minimize();
+        flag_filter->optimize();
         HfstTransducer * inverted_flag_filter = new HfstTransducer(*flag_filter);
-        inverted_flag_filter->invert().minimize();
+        inverted_flag_filter->invert().optimize();
 
         // [ [FLAG1 | FLAG2 ... FLAGN] -> 0 || [FLAG1 | FLAG2 ... FLAGN] _ ].inv
         //                        .o.
@@ -1183,12 +1183,12 @@ LexcCompiler::compileLexical()
         // [FLAG1 | FLAG2 ... FLAGN] -> 0 || [FLAG1 | FLAG2 ... FLAGN] _
         HfstTransducer filtered_lexicons(*inverted_flag_filter);
         filtered_lexicons.compose(*rv, true);
-        filtered_lexicons.compose(*flag_filter, true).minimize();
+        filtered_lexicons.compose(*flag_filter, true).optimize();
          
         rv->assign(filtered_lexicons);
     }
 
-    rv->minimize();
+    rv->optimize();
     
     if(!quiet_) *err << endl;
     

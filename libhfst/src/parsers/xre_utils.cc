@@ -448,7 +448,8 @@ unescape_enclosing_angle_brackets(HfstTransducer *t)
   if (substitutions.size() == 0)
     return t;
 
-  t->substitute(substitutions).minimize();
+  t->substitute(substitutions);
+  t->optimize();
   return t;
 }
 
@@ -765,7 +766,7 @@ xfst_curly_label_to_transducer(const char* input, const char* output)
       retval = new HfstTransducer(istr, ostr, tok, hfst::xre::format);
     }
 
-  retval->minimize();
+  retval->minimize(); // it should be safe to minimize
   return retval;
 }
 
@@ -808,19 +809,19 @@ xfst_label_to_transducer(const char* input, const char* output)
     {
       retval = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown, hfst::xre::format);
       HfstTransducer id(hfst::internal_identity, hfst::internal_identity, hfst::xre::format);
-      retval->disjunct(id).minimize();
+      retval->disjunct(id).minimize(); // it should be safe to minimize
     }
   else if (input_is_unknown)
     {
       retval = new HfstTransducer(hfst::internal_unknown, output, hfst::xre::format);
       HfstTransducer output_tr(output, output, hfst::xre::format);
-      retval->disjunct(output_tr).minimize();
+      retval->disjunct(output_tr).minimize(); // it should be safe to minimize
     }
   else if (output_is_unknown)
     {
       retval = new HfstTransducer(input, hfst::internal_unknown, hfst::xre::format);
       HfstTransducer input_tr(input, input, hfst::xre::format);
-      retval->disjunct(input_tr).minimize();
+      retval->disjunct(input_tr).minimize(); // it should be safe to minimize
     }
   else
     {
@@ -834,12 +835,12 @@ xfst_label_to_transducer(const char* input, const char* output)
     // marker = [0:M ?]*
     HfstTransducer marker("@_EPSILON_SYMBOL_@", "M", t->get_type());
     HfstTransducer id("@_IDENTITY_SYMBOL_@", t->get_type());
-    marker.concatenate(id).repeat_star().minimize();
+    marker.concatenate(id).repeat_star().minimize(); // it should be safe to minimize
 
     // the rule
     HfstTransducer right_context(*t);
-    right_context.insert_freely(StringPair("M", "@_EPSILON_SYMBOL_@")).minimize();
-    right_context.insert_freely(StringPair("M", "M")).minimize();
+    right_context.insert_freely(StringPair("M", "@_EPSILON_SYMBOL_@")).optimize();
+    right_context.insert_freely(StringPair("M", "M")).optimize();
     HfstTransducer left_context("@_EPSILON_SYMBOL_@", t->get_type());
     HfstTransducerPair context(left_context, right_context);
 
@@ -868,7 +869,8 @@ xfst_label_to_transducer(const char* input, const char* output)
 
     return new HfstTransducer(rule);
 
-    marker.compose(rule).minimize();
+    marker.compose(rule);
+    marker.optimize();
 
     return new HfstTransducer(marker);
   }
@@ -876,9 +878,10 @@ xfst_label_to_transducer(const char* input, const char* output)
   HfstTransducer * contains(const HfstTransducer * t)
   {
     HfstTransducer any(hfst::internal_identity, hfst::xre::format);
-    any.repeat_star().minimize();
+    any.repeat_star().minimize(); // it should be safe to minimize
     HfstTransducer * retval = new HfstTransducer(any);
-    retval->concatenate(*t).concatenate(any).minimize();
+    retval->concatenate(*t).concatenate(any);
+    retval->optimize();
     return retval;
   }
 
@@ -910,14 +913,16 @@ xfst_label_to_transducer(const char* input, const char* output)
     // noT = ?* - $[t]
     // (strings that do not contain t)
     HfstTransducer noT(hfst::internal_identity, t->get_type());
-    noT.repeat_star().minimize();
+    noT.repeat_star().minimize(); // it should be safe to minimize
     HfstTransducer * oneOrMoreT = contains(t);
-    noT.subtract(*oneOrMoreT).minimize();
+    noT.subtract(*oneOrMoreT);
+    noT.optimize();
     delete oneOrMoreT;
 
     // return [weighted_rule - noT]
     // (subtract strings that do not contain t from weighted rule)
-    weighted_rule.subtract(noT).minimize();
+    weighted_rule.subtract(noT);
+    weighted_rule.optimize();
     return new HfstTransducer(weighted_rule);
   }
 
@@ -926,31 +931,37 @@ xfst_label_to_transducer(const char* input, const char* output)
   {
     // any_star = [?*]
     HfstTransducer any_star(hfst::internal_identity, hfst::xre::format);
-    any_star.repeat_star().minimize();
+    any_star.repeat_star().minimize(); // it should be safe to minimize
 
     // any_plus = [?+]
     HfstTransducer any_plus(hfst::internal_identity, hfst::xre::format);
-    any_plus.repeat_plus().minimize();
+    any_plus.repeat_plus().minimize(); // it should be safe to minimize
 
     // t1 = [?+ c ?*]
     HfstTransducer * t1 = new HfstTransducer(any_plus);
-    t1->concatenate(*c).minimize();
-    t1->concatenate(any_star).minimize();
+    t1->concatenate(*c);
+    t1->optimize();
+    t1->concatenate(any_star);
+    t1->optimize();
 
     // t2 = [c ?*]
     HfstTransducer t2(*c);
-    t2.concatenate(any_star).minimize();
+    t2.concatenate(any_star);
+    t2.optimize();
 
     // t1 = [[?+ c ?*] & [c ?*]]
-    t1->intersect(t2).minimize();
+    t1->intersect(t2);
 
     // t3 = [[c ?+] & c]
     HfstTransducer t3(*c);
-    t3.concatenate(any_plus).minimize();
-    t3.intersect(*c).minimize();
+    t3.concatenate(any_plus);
+    t3.optimize();
+    t3.intersect(*c);
+    t3.optimize();
 
     // t1 = [t1 | t3]
-    t1->disjunct(t3).minimize();
+    t1->disjunct(t3);
+    t1->optimize();
     
     // cont_t1 = $[t1]
     HfstTransducer * cont_t1 = contains(t1);
@@ -959,7 +970,8 @@ xfst_label_to_transducer(const char* input, const char* output)
     HfstTransducer * cont_c = contains(c);
 
     // $[c] - $[t1]
-    cont_c->subtract(*cont_t1).minimize();
+    cont_c->subtract(*cont_t1);
+    cont_c->optimize();
     delete cont_t1;
     return cont_c;
   }
@@ -969,12 +981,15 @@ xfst_label_to_transducer(const char* input, const char* output)
     // neg_t = ~$[t]
     HfstTransducer * cont_t = contains(t);
     HfstTransducer neg_t(hfst::internal_identity, hfst::xre::format);
-    neg_t.repeat_star().minimize();
-    neg_t.subtract(*cont_t).minimize();
+    neg_t.repeat_star();
+    neg_t.optimize();
+    neg_t.subtract(*cont_t);
+    neg_t.optimize();
     delete cont_t;
     
     HfstTransducer * retval = contains_once(t);
-    retval->disjunct(neg_t).minimize();
+    retval->disjunct(neg_t);
+    retval->optimize();
     return retval;
   }
 
@@ -983,7 +998,7 @@ xfst_label_to_transducer(const char* input, const char* output)
     // Merge operation creates an XreCompiler that needs this information below. Otherwise, it will overwrite all this.
     struct XreConstructorArguments args(hfst::xre::definitions, hfst::xre::function_definitions, hfst::xre::function_arguments, hfst::xre::symbol_lists, hfst::xre::format);
 
-    tr1->minimize();
+    tr1->optimize();
     tr2->merge(*tr1, args);
     return tr2;
   }
