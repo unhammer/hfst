@@ -65,7 +65,7 @@ char* add_percents(const char* s);
  */
 char* get_quoted(const char *s);
 
-char* parse_quoted(const char *s);
+ char* parse_quoted(const char *s, unsigned int & length);
 
 int* get_n_to_k(const char* s);
 
@@ -145,6 +145,8 @@ bool is_valid_function_call(const char * name, const std::vector<HfstTransducer>
  void warn_about_hfst_special_symbol(const char * symbol);
  /* Warn about \a symbol if it is of form "<.*>" or "all" and verbose mode is on. */
  void warn_about_xfst_special_symbol(const char * symbol);
+
+ void check_multichar_symbol(const char * symbol);
 
  bool has_non_identity_pairs(const HfstTransducer * t);
 

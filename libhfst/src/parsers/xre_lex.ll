@@ -232,9 +232,13 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 }
 
 "\""[^""]+"\"" {
-    yylval->label = hfst::xre::parse_quoted(yytext);
+    unsigned int length = 0;
+    yylval->label = hfst::xre::parse_quoted(yytext, length);
     CR;
-    return QUOTED_LITERAL;
+    if (length < 2)
+      return QUOTED_LITERAL;
+    else
+      return QUOTED_MULTICHAR_LITERAL;
 }
 
 
@@ -254,10 +258,10 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     }
     yylval->label = hfst::xre::strip_percents(yytext);
     CR;
-    return SYMBOL;
+    return MULTICHAR_SYMBOL;
 }
 
-{NAME_CH}({NAME_CH}|"0")* {
+{NAME_CH} {
     if (hfst::xre::position_symbol != NULL) {
       if (strcmp(hfst::xre::position_symbol, yytext) == 0) {
         hfst::xre::positions.insert(hfst::xre::cr);
@@ -267,6 +271,18 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     CR;
     return SYMBOL;
 }
+
+{NAME_CH}({NAME_CH}|"0")+ {
+    if (hfst::xre::position_symbol != NULL) {
+      if (strcmp(hfst::xre::position_symbol, yytext) == 0) {
+        hfst::xre::positions.insert(hfst::xre::cr);
+      }
+    }
+    yylval->label = hfst::xre::strip_percents(yytext);
+    CR;
+    return MULTICHAR_SYMBOL;
+}
+
 
 {NAME_CH}({NAME_CH}|"0")*"(" {
     CR;

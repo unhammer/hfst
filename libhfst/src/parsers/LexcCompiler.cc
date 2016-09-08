@@ -261,6 +261,7 @@ LexcCompiler& LexcCompiler::parse(FILE* infile)
     hlexclex_destroy();
     hlexcin = infile;
     hlexcparse();
+    xre_.remove_defined_multichar_symbols();
     if (hlexcnerrs > 0)
       {
         parseErrors_ = true;
@@ -283,6 +284,7 @@ LexcCompiler& LexcCompiler::parse(const char* filename)
         return *this;
       }
     hlexcparse();
+    xre_.remove_defined_multichar_symbols();
     if (hlexcnerrs > 0)
       {
         parseErrors_ = true;
@@ -398,6 +400,11 @@ LexcCompiler&
 LexcCompiler::addAlphabet(const string& alpha)
 {
     tokenizer_.add_multichar_symbol(alpha);
+    if (!quiet_ && verbose_)
+      {
+        // warn about undefined multichars
+        xre_.add_defined_multichar_symbol(alpha);
+      }
     return *this;
 }
 

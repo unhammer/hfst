@@ -128,7 +128,7 @@ int xrelex ( YYSTYPE * , yyscan_t );
 %type <label> FUNCTION                 // function call
 
 %nonassoc <weight> WEIGHT
-%nonassoc <label> SYMBOL CURLY_BRACKETS
+%nonassoc <label> SYMBOL MULTICHAR_SYMBOL CURLY_BRACKETS
 
 %left  CROSS_PRODUCT COMPOSITION LENIENT_COMPOSITION INTERSECTION MERGE_RIGHT_ARROW MERGE_LEFT_ARROW
 %left  CENTER_MARKER MARKUP_MARKER
@@ -168,7 +168,7 @@ int xrelex ( YYSTYPE * , yyscan_t );
 %token LEXER_ERROR
 %token END_OF_EXPRESSION
 %token PAIR_SEPARATOR
-%nonassoc <label> QUOTED_LITERAL
+%nonassoc <label> QUOTED_LITERAL QUOTED_MULTICHAR_LITERAL
 %%
 
 XRE: REGEXP1 { }
@@ -1238,6 +1238,14 @@ LABEL: HALFARC {
      ;
 
 SYMBOL_OR_QUOTED: SYMBOL
+     | MULTICHAR_SYMBOL {
+       hfst::xre::check_multichar_symbol($1);
+       $$ = $1;
+     }
+     | QUOTED_MULTICHAR_LITERAL {
+       hfst::xre::check_multichar_symbol($1);
+       $$ = $1;
+     }
      | QUOTED_LITERAL
      ;
 

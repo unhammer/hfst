@@ -42,6 +42,7 @@ namespace hfst {
     bool allow_extra_text_at_end = false;
     extern std::ostream * error_;
     extern bool verbose_;
+    extern std::set<std::string> * defined_multichar_symbols_;
   }
 }
 
@@ -285,11 +286,12 @@ get_quoted(const char *s)
 }
 
 char*
-parse_quoted(const char *s)
+parse_quoted(const char *s, unsigned int & length)
 {
   std::ostream * err = xreerrstr();
 
     char* quoted = get_quoted(s);
+
     char* rv = static_cast<char*>(malloc(sizeof(char)*strlen(quoted) + 1)); // added + 1
     char* p = quoted;
     char* r = rv;
@@ -399,6 +401,10 @@ parse_quoted(const char *s)
       }
     *r = '\0';
     free(quoted);
+
+    length = 
+      hfst::HfstTokenizer::check_utf8_correctness_and_calculate_length(std::string(rv));
+
     return rv;
 }
 
@@ -1085,6 +1091,20 @@ void warn_about_special_symbols_in_replace(HfstTransducer * t)
         }
     }
   xreflush(err);
+}
+
+void check_multichar_symbol(const char * symbol)
+{
+  if (defined_multichar_symbols_ == NULL)
+    return;
+  
+  if (defined_multichar_symbols_->find(std::string(symbol)) ==
+      defined_multichar_symbols_->end())
+    {
+      std::ostream * err = xreerrstr();
+      *err << "warning: multichar symbol '" << symbol << "' used but not defined" << std::endl;
+      xreflush(err);
+    }
 }
 
 bool has_non_identity_pairs(const HfstTransducer * t)
