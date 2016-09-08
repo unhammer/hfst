@@ -159,7 +159,7 @@ parse_options(int argc, char** argv)
           {"encode-weights", no_argument, 0, 'E'},
           {"xerox-composition", required_argument, 0, 'x'},
           {"xfst", required_argument, 0, 'X'},
-          {"do-not-minimize", required_argument, 0, 'M'},
+          {"do-not-minimize", no_argument, 0, 'M'},
           {0,0,0,0}
         };
         int option_index = 0;
