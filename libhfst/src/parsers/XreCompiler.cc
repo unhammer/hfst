@@ -33,6 +33,7 @@ namespace hfst { namespace xre {
     bool output_to_console_(false);
 #endif
     bool verbose_(false);
+    std::set<std::string> * defined_multichar_symbols_(NULL);
 
 XreCompiler::XreCompiler() :
     definitions_(),
@@ -213,6 +214,26 @@ if (definitions_.find(name) != definitions_.end())
   {
     definitions_.erase(name);
   }
+}
+
+void
+XreCompiler::remove_defined_multichar_symbols()
+{
+  if (defined_multichar_symbols_ != NULL)
+    {
+      delete defined_multichar_symbols_;
+      defined_multichar_symbols_ = NULL;
+    }
+}
+
+void
+XreCompiler::add_defined_multichar_symbol(const std::string & symbol)
+{
+  if (defined_multichar_symbols_ == NULL)
+    {
+      defined_multichar_symbols_ = new std::set<std::string>();
+    }
+  defined_multichar_symbols_->insert(symbol);
 }
 
 extern bool expand_definitions;
