@@ -489,6 +489,9 @@ void print_location_vector(LocationVector const & locations, std::ostream & outs
             outstream << "\t" << locations.at(0).weight;
         }
         outstream << std::endl;
+        if (locations.at(0).tag == "<Boundary=Sentence>") {
+            outstream << std::endl;
+        }
     } else if (output_format == cg && locations.size() != 0) {
         // Print the cg cohort header
         outstream << "\"<" << locations.at(0).input << ">\"" << std::endl;
