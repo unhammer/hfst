@@ -270,9 +270,19 @@ XreCompiler::compile(const std::string& xre)
   //std::cerr << "XreCompiler: " << this << " : compile(\"" << xre << "\")" << std::endl;
   unsigned int cr_before = cr;
   cr = 0;
-  HfstTransducer * retval = hfst::xre::compile(xre, definitions_, function_definitions_, function_arguments_, list_definitions_, format_);
-  cr = cr_before;
-  return retval;
+  try
+    {
+      HfstTransducer * retval = hfst::xre::compile(xre, definitions_, function_definitions_, function_arguments_, list_definitions_, format_);
+      cr = cr_before;
+      return retval;
+    }
+  catch (const char * msg)
+    {
+      if (strcmp(msg, "Allocation of memory failed in Mem::add_buffer!") == 0) // sfst backend
+        HFST_THROW_MESSAGE(HfstException, "Allocation of memory failed in SFST backend.");
+      else
+        HFST_THROW_MESSAGE(HfstException, msg);
+    }
 }
 
 HfstTransducer*
@@ -282,10 +292,20 @@ XreCompiler::compile_first(const std::string& xre, unsigned int & chars_read)
   //std::cerr << "XreCompiler: " << this << " : compile_first(\"" << xre << "\"";
   unsigned int cr_before = cr;
   cr = 0;
-  HfstTransducer * retval = hfst::xre::compile_first(xre, definitions_, function_definitions_, function_arguments_, list_definitions_, format_, chars_read);
-  //std::cerr << ", " << chars_read << ")" << std::endl;
-  cr = cr_before;
-  return retval;
+  try
+    {
+      HfstTransducer * retval = hfst::xre::compile_first(xre, definitions_, function_definitions_, function_arguments_, list_definitions_, format_, chars_read);
+      //std::cerr << ", " << chars_read << ")" << std::endl;
+      cr = cr_before;
+      return retval;
+    }
+  catch (const char * msg)
+    {
+      if (strcmp(msg, "Allocation of memory failed in Mem::add_buffer!") == 0) // sfst backend
+        HFST_THROW_MESSAGE(HfstException, "Allocation of memory failed in SFST backend.");
+      else
+        HFST_THROW_MESSAGE(HfstException, msg);
+    }
 }
 
 bool XreCompiler::get_positions_of_symbol_in_xre

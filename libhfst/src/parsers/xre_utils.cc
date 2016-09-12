@@ -299,7 +299,11 @@ parse_quoted(const char *s, unsigned int & length)
     char* r = rv;
     while (*p != '\0')
       {
-        if (*p != '\\')
+        if (*p == '\n' || *p == '\r')
+          {
+            throw "Unescaped newline characters found inside quoted string.";
+          }
+        else if (*p != '\\')
           {
             *r = *p;
             r++;
