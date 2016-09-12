@@ -58,25 +58,27 @@ void xreflush(std::ostream * os)
 
 int xreerror(yyscan_t scanner, const char* msg)
 {
-  char buffer [1024];
-
-  int n = sprintf(buffer, "*** xre parsing failed: %s\n", msg);
-  if (strlen(hfst::xre::data) < 60)
-    {
-      n = sprintf(buffer+n, "***    parsing %s [near %s]\n", hfst::xre::data,
-                  xreget_text(scanner));
-    }
-  else
-    {
-      n = sprintf(buffer+n, "***    parsing %60s [near %s]...\n",
-                  hfst::xre::data, xreget_text(scanner));
-    }
-
-  buffer[1023] = '\0';
   if (hfst::xre::verbose_)
     {
+      const char * scanner_msg = xreget_text(scanner);
+
+      char * buffer = (char*) malloc(strlen(msg) + strlen(hfst::xre::data) + strlen(scanner_msg) + 100);
+
+      int n = sprintf(buffer, "*** xre parsing failed: %s\n", msg);
+      if (strlen(hfst::xre::data) < 60)
+        {
+          n = sprintf(buffer+n, "***    parsing %s [near %s]\n%c", hfst::xre::data,
+                      xreget_text(scanner), '\0');
+        }
+      else
+        {
+          n = sprintf(buffer+n, "***    parsing %60s [near %s]...\n%c",
+                      hfst::xre::data, xreget_text(scanner), '\0');
+        }
+
       std::ostream * err = xreerrstr();
       *(err) << std::string(buffer);
+      free(buffer);
       xreflush(err);
     }
   return 0;
@@ -297,7 +299,11 @@ parse_quoted(const char *s, unsigned int & length)
     char* r = rv;
     while (*p != '\0')
       {
-        if (*p != '\\')
+        if (*p == '\n' || *p == '\r')
+          {
+            throw "Unescaped newline characters found inside quoted string.";
+          }
+        else if (*p != '\\')
           {
             *r = *p;
             r++;
