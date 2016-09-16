@@ -290,7 +290,16 @@ process_stream(HfstOutputStream& outstream)
         {
           transducer_n++;
           verbose_printf("Compiling expression #%i\n", (int)transducer_n);
-          compiled = comp.compile_first(filebuf_, chars_read);
+          try
+            {
+              compiled = comp.compile_first(filebuf_, chars_read);
+            }
+          catch (const HfstException & e)
+            {
+              error(EXIT_FAILURE, 0, "%s: XRE parsing failed "
+                    "in expression #%u separated by semicolons:\n%s", inputfilename,
+                    (unsigned int)transducer_n, e.what().c_str());
+            }
           if (compiled == NULL)
             {
               if (comp.contained_only_comments())
@@ -305,7 +314,7 @@ process_stream(HfstOutputStream& outstream)
                 }
               else
                 {
-                  error(EXIT_FAILURE, 0, "%s: XRE parsing failed"
+                  error(EXIT_FAILURE, 0, "%s: XRE parsing failed "
                         "in expression #%u separated by semicolons", inputfilename,
                         (unsigned int)transducer_n);
                 }
@@ -365,7 +374,15 @@ process_stream(HfstOutputStream& outstream)
           transducer_n++;
           HfstTransducer* compiled;
           verbose_printf("Compiling expression %u\n", line_count);
-          compiled = comp.compile(exp);
+          try
+            {
+              compiled = comp.compile(exp);
+            }
+          catch (HfstException & e)
+            {
+              error_at_line(EXIT_FAILURE, 0, inputfilename, line_count,
+                            "XRE parsing failed");
+            }
           if (compiled == NULL)
             {
               if (!comp.contained_only_comments())
@@ -448,6 +465,7 @@ int main( int argc, char **argv )
         new HfstOutputStream(outfilename, output_format) :
         new HfstOutputStream(output_format);
   process_stream(*outstream);
+  delete outstream;
 
     if (encode_weights)
       {

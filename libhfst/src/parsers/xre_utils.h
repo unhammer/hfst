@@ -55,6 +55,8 @@ char* strip_percents(const char *s);
 
  char* strip_newline(char *s);
 
+ void count_lines(const char * s);
+
 /**
  * @brief add percents to string to form valid XRE symbol.
  */

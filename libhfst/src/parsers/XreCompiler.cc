@@ -23,7 +23,8 @@
 
 namespace hfst { namespace xre {
 
-    unsigned int cr=0; // chars read from xre input
+    unsigned int cr=0; // number of chars read from xre input
+    unsigned int lr=1; // number of lines read from xre input
     std::set<unsigned int> positions;
     char * position_symbol = NULL;
     std::ostream * error_(&std::cerr);

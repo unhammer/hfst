@@ -301,7 +301,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     return END_OF_EXPRESSION;
 }
 
-{LWSP}+ { CR; /*fprintf(stderr, "ignoring whitespace '%s'..\n", yytext); */ /* ignorable whitespace */ }
+{LWSP}+ { hfst::xre::count_lines(yytext); /*fprintf(stderr, "ignoring whitespace '%s'..\n", yytext); */ /* ignorable whitespace */ }
 
 ("!"|"#")[^\n]*$ { CR; /* fprintf(stderr, "ignoring comment '%s'..\n", yytext); */ /* ignore comments */ }
 

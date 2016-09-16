@@ -39,6 +39,7 @@ extern char * xreget_text(yyscan_t);
 namespace hfst {
   namespace xre {
     extern unsigned int cr; // number of characters read, defined in XreCompiler.cc
+    extern unsigned int lr; // number of lines read, defined in XreCompiler.cc
     bool allow_extra_text_at_end = false;
     extern std::ostream * error_;
     extern bool verbose_;
@@ -67,13 +68,13 @@ int xreerror(yyscan_t scanner, const char* msg)
       int n = sprintf(buffer, "*** xre parsing failed: %s\n", msg);
       if (strlen(hfst::xre::data) < 60)
         {
-          n = sprintf(buffer+n, "***    parsing %s [near %s]\n%c", hfst::xre::data,
-                      xreget_text(scanner), '\0');
+          n = sprintf(buffer+n, "***    parsing %s [near %s] on line %u\n%c", hfst::xre::data,
+                      xreget_text(scanner), hfst::xre::lr, '\0');
         }
       else
         {
-          n = sprintf(buffer+n, "***    parsing %60s [near %s]...\n%c",
-                      hfst::xre::data, xreget_text(scanner), '\0');
+          n = sprintf(buffer+n, "***    parsing %60s [near %s] on line %u...\n%c",
+                      hfst::xre::data, xreget_text(scanner), hfst::xre::lr, '\0');
         }
 
       std::ostream * err = xreerrstr();
@@ -183,6 +184,34 @@ strip_newline(char *s)
         s[pos] = '\0';
     }
   return s;
+}
+
+void 
+count_lines(const char * s)
+{
+  const char * c = s;
+  while(*c != '\0')
+    {
+      if (*c == '\n')
+        {
+          hfst::xre::lr += 1;
+        }
+      else if (*c == '\r')
+        {
+          c++;
+          if (*c == '\n')
+            {
+              hfst::xre::cr += 1;
+            }
+          else
+            {
+              c--;
+            }
+          hfst::xre::lr += 1;
+        }
+      hfst::xre::cr += 1;
+      c++;
+    }
 }
 
 char*
@@ -555,6 +584,7 @@ compile_first(const string& xre, map<string,HfstTransducer*>& defs,
     bool tmp = hfst::xre::allow_extra_text_at_end;
     hfst::xre::allow_extra_text_at_end = true;
     hfst::xre::cr = 0;
+    hfst::xre::lr = 1;
 
     int parse_retval = xreparse(scanner);
     chars_read = hfst::xre::cr;
