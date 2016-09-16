@@ -2262,7 +2262,7 @@ def tokenized_fst(arg, weight=0):
 
     Example
 
-       import libhfst
+       import hfst
        tok = hfst.HfstTokenizer()
        tok.add_multichar_symbol('foo')
        tok.add_multichar_symbol('bar')
