@@ -5387,9 +5387,9 @@ HfstTransducer::HfstTransducer(FILE * ifile,
 
     // Implemented only for internal transducer format.
     hfst::implementations::HfstBasicTransducer net =
-    hfst::implementations::HfstTransitionGraph<hfst::implementations::
-    HfstTropicalTransducerTransitionData>::
-      read_in_att_format(ifile, std::string(epsilon_symbol), linecount);
+      /*hfst::implementations::HfstTransitionGraph<hfst::implementations::
+        HfstTropicalTransducerTransitionData>::*/
+      HfstBasicTransducer::read_in_att_format(ifile, std::string(epsilon_symbol), linecount);
 
     // Conversion is done here.
     switch (type)
@@ -5463,9 +5463,9 @@ HfstTransducer::HfstTransducer(FILE * ifile,
 
     // Implemented only for internal transducer format.
     hfst::implementations::HfstBasicTransducer net =
-    hfst::implementations::HfstTransitionGraph<hfst::implementations::
-    HfstTropicalTransducerTransitionData>::
-      read_in_att_format(ifile, std::string(epsilon_symbol), linecount);
+      /*hfst::implementations::HfstTransitionGraph<hfst::implementations::
+        HfstTropicalTransducerTransitionData>::*/
+      HfstBasicTransducer::read_in_att_format(ifile, std::string(epsilon_symbol), linecount);
 
     // Conversion is done here.
     switch (type)
@@ -5553,9 +5553,9 @@ HfstTransducer &HfstTransducer::read_in_att_format
 
     unsigned int foo = 0;
     hfst::implementations::HfstBasicTransducer net =
-    hfst::implementations::HfstTransitionGraph<hfst::implementations::
-    HfstTropicalTransducerTransitionData>
-      ::read_in_att_format(ifile, std::string(epsilon_symbol), foo);
+      /*hfst::implementations::HfstTransitionGraph<hfst::implementations::
+        HfstTropicalTransducerTransitionData>*/
+      HfstBasicTransducer::read_in_att_format(ifile, std::string(epsilon_symbol), foo);
     HfstTransducer *retval = new HfstTransducer(net,type);
     (void)foo;
     return *retval;

@@ -18,7 +18,7 @@
 
 #include "HfstDataTypes.h"
 #include "HfstSymbolDefs.h"
-#include "implementations/HfstTransitionGraph.h"
+//#include "implementations/HfstTransitionGraph.h"
 #include "parsers/LexcCompiler.h"
 
 #if HAVE_SFST
@@ -71,8 +71,8 @@ namespace hfst
   namespace implementations {
     template <class T> class HfstTransitionGraph;
     class HfstTropicalTransducerTransitionData;
-    typedef HfstTransitionGraph<HfstTropicalTransducerTransitionData>
-      HfstBasicTransducer;
+    //typedef HfstTransitionGraph<HfstTropicalTransducerTransitionData>
+    class HfstBasicTransducer;
   }
   class HfstCompiler;
   class HfstTransducer;

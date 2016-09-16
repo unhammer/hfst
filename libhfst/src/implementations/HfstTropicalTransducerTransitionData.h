@@ -179,7 +179,7 @@ namespace hfst {
       friend class ComposeIntersectLexicon;
       friend class ComposeIntersectRule;
       friend class ComposeIntersectRulePair;
-      template <class C> friend class HfstTransitionGraph;
+      friend class HfstBasicTransducer;
 
     };
 

@@ -32,7 +32,7 @@
 namespace hfst { class HfstTransducer; }
 #include "XreCompiler.h"
 #include "../HfstTokenizer.h"
-#include "../implementations/HfstTransitionGraph.h"
+#include "../implementations/HfstBasicTransducer.h"
 
 namespace hfst {
 //! @brief Namespace for Xerox LexC related specific functions and classes.

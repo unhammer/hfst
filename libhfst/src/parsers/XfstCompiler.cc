@@ -67,7 +67,7 @@ typedef yy_buffer_state *YY_BUFFER_STATE;
 extern YY_BUFFER_STATE hxfst_scan_string(const char*);
 extern void hxfst_delete_buffer(YY_BUFFER_STATE);
 
-#include "implementations/HfstTransitionGraph.h"
+#include "implementations/HfstBasicTransducer.h"
 
 using hfst::implementations::HfstBasicTransducer;
 using hfst::implementations::HfstBasicTransition;

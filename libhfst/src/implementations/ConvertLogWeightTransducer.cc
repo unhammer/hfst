@@ -12,7 +12,7 @@
 #endif
 
 #include "ConvertTransducerFormat.h"
-#include "HfstTransitionGraph.h"
+#include "HfstBasicTransducer.h"
 #include "HfstTransducer.h"
 
 #ifndef MAIN_TEST
@@ -267,7 +267,7 @@ namespace hfst { namespace implementations
       }
     
     // Add also symbols that do not occur in transitions
-    for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it
+    for (HfstBasicTransducer::HfstAlphabet::iterator it
            = net->alphabet.begin();
          it != net->alphabet.end(); it++) {
         st.AddSymbol(*it);

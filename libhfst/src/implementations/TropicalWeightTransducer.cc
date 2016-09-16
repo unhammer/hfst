@@ -10,7 +10,7 @@
 #include "TropicalWeightTransducer.h"
 #include "HfstSymbolDefs.h"
 #include "HfstLookupFlagDiacritics.h"
-#include "HfstTransitionGraph.h"
+#include "HfstBasicTransducer.h"
 #include "ConvertTransducerFormat.h"
 
 #ifndef MAIN_TEST
