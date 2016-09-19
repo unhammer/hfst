@@ -170,6 +170,7 @@ namespace implementations
     public:
       static LogFst * create_empty_transducer(void);
       static LogFst * create_epsilon_transducer(void);
+      void delete_transducer(LogFst * t);
 
       // string versions
       static LogFst * define_transducer(const std::string &symbol);

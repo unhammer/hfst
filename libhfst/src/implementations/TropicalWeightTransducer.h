@@ -49,7 +49,6 @@ namespace fst
   typedef VectorFst<StdArc> StdVectorFst;
   typedef VectorFst<LogArc> LogFst;
 
-  //template <class A> class StateIteratorBase;
   template <class F> class StateIterator;
   template <class F> class ArcIterator;
 
@@ -176,6 +175,7 @@ namespace implementations
     public:
       static StdVectorFst * create_empty_transducer(void);
       static StdVectorFst * create_epsilon_transducer(void);
+      static void delete_transducer(StdVectorFst * t);
 
       // string versions
       static StdVectorFst * define_transducer(const std::string &symbol);

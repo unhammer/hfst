@@ -181,7 +181,7 @@ void set_minimization_algorithm(MinimizationAlgorithm a) {
     hfst::implementations::openfst_log_set_hopcroft(false);
 #endif
 #endif
-    // in foma, Hopcroft is always used
+   // in foma, Hopcroft is always used
 }
 
 MinimizationAlgorithm get_minimization_algorithm() {
@@ -1340,11 +1340,11 @@ HfstTransducer::~HfstTransducer(void)
 #endif
 #if HAVE_OPENFST
     case TROPICAL_OPENFST_TYPE:
-        delete implementation.tropical_ofst;
+        tropical_ofst_interface.delete_transducer(implementation.tropical_ofst);
         break;
 #if HAVE_OPENFST_LOG
     case LOG_OPENFST_TYPE:
-        delete implementation.log_ofst;
+        log_ofst_interface.delete_transducer(implementation.log_ofst);
         break;
 #endif
 #endif
@@ -2099,7 +2099,7 @@ HfstTransducer &HfstTransducer::prune()
   this->convert(TROPICAL_OPENFST_TYPE);
   fst::StdVectorFst * temp = hfst::implementations::TropicalWeightTransducer::prune
     (this->implementation.tropical_ofst);
-  delete this->implementation.tropical_ofst;
+  this->tropical_ofst_interface.delete_transducer(this->implementation.tropical_ofst);
   this->implementation.tropical_ofst = temp;
   return *this;
 #endif
@@ -2810,7 +2810,7 @@ HfstTransducer &HfstTransducer::n_best(unsigned int n)
     fst::StdVectorFst * temp =
             hfst::implementations::TropicalWeightTransducer::n_best
             (implementation.tropical_ofst,(int)n);
-    delete implementation.tropical_ofst;
+    tropical_ofst_interface.delete_transducer(implementation.tropical_ofst);
     implementation.tropical_ofst = temp;
     break;
     }
@@ -2820,7 +2820,7 @@ HfstTransducer &HfstTransducer::n_best(unsigned int n)
     hfst::implementations::LogFst * temp =
             hfst::implementations::LogWeightTransducer::n_best
             (implementation.log_ofst,(int)n);
-    delete implementation.log_ofst;
+    log_ofst_interface.delete_transducer(implementation.log_ofst);
     implementation.log_ofst = temp;
     break;
     }
@@ -3394,7 +3394,7 @@ HfstTransducer &HfstTransducer::insert_freely
     hfst::implementations::HfstBasicTransducer * net =
             ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
             (implementation.tropical_ofst);
-    delete implementation.tropical_ofst;
+    tropical_ofst_interface.delete_transducer(implementation.tropical_ofst);
           
     hfst::implementations::HfstBasicTransducer * substituting_net =
             ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
@@ -3415,7 +3415,7 @@ HfstTransducer &HfstTransducer::insert_freely
     hfst::implementations::HfstBasicTransducer * net =
             ConversionFunctions::log_ofst_to_hfst_basic_transducer
             (implementation.log_ofst);
-    delete implementation.log_ofst;
+    log_ofst_interface.delete_transducer(implementation.log_ofst);
           
     hfst::implementations::HfstBasicTransducer * substituting_net =
             ConversionFunctions::log_ofst_to_hfst_basic_transducer
@@ -3549,7 +3549,7 @@ HfstTransducer &HfstTransducer::substitute
     fst::StdVectorFst * tmp =
       this->tropical_ofst_interface.substitute
       (implementation.tropical_ofst, old_symbol, new_symbol);
-    delete implementation.tropical_ofst;
+    tropical_ofst_interface.delete_transducer(implementation.tropical_ofst);
     implementation.tropical_ofst = tmp;
     return *this;
       }
@@ -3559,7 +3559,7 @@ HfstTransducer &HfstTransducer::substitute
     hfst::implementations::LogFst * tmp =
       this->log_ofst_interface.substitute
       (implementation.log_ofst, old_symbol, new_symbol);
-    delete implementation.log_ofst;
+    log_ofst_interface.delete_transducer(implementation.log_ofst);
     implementation.log_ofst = tmp;
     return *this;
       }
@@ -3818,7 +3818,7 @@ HfstTransducer &HfstTransducer::push_weights(PushType push_type)
         hfst::implementations::StdVectorFst * tmp  =
         this->tropical_ofst_interface.push_weights
         (this->implementation.tropical_ofst, to_initial_state);
-        delete this->implementation.tropical_ofst;
+        this->tropical_ofst_interface.delete_transducer(this->implementation.tropical_ofst);
         this->implementation.tropical_ofst = tmp;
         return *this;
     }
@@ -3828,7 +3828,7 @@ HfstTransducer &HfstTransducer::push_weights(PushType push_type)
         hfst::implementations::LogFst * tmp =
         this->log_ofst_interface.push_weights
         (this->implementation.log_ofst, to_initial_state);
-        delete this->implementation.log_ofst;
+        this->log_ofst_interface.delete_transducer(this->implementation.log_ofst);
         this->implementation.log_ofst = tmp;
         return *this;
     }
@@ -4073,7 +4073,7 @@ HfstTransducer &HfstTransducer::compose
             this->tropical_ofst_interface.compose
         (this->implementation.tropical_ofst,
          another_copy->implementation.tropical_ofst);
-    delete implementation.tropical_ofst;
+    tropical_ofst_interface.delete_transducer(implementation.tropical_ofst);
     implementation.tropical_ofst = tropical_ofst_temp;
     break;
     }
@@ -4084,7 +4084,7 @@ HfstTransducer &HfstTransducer::compose
             this->log_ofst_interface.compose
       (implementation.log_ofst,
        another_copy->implementation.log_ofst);
-    delete implementation.log_ofst;
+    log_ofst_interface.delete_transducer(implementation.log_ofst);
     implementation.log_ofst = log_ofst_temp;
     break;
     }
@@ -4999,7 +4999,7 @@ convert_to_basic_transducer()
         hfst::implementations::HfstBasicTransducer * net =
       ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
       (implementation.tropical_ofst);
-        delete implementation.tropical_ofst;
+        tropical_ofst_interface.delete_transducer(implementation.tropical_ofst);
     return net;
       }
 #if HAVE_OPENFST_LOG
@@ -5008,7 +5008,7 @@ convert_to_basic_transducer()
         hfst::implementations::HfstBasicTransducer * net =
       ConversionFunctions::log_ofst_to_hfst_basic_transducer
       (implementation.log_ofst);
-        delete implementation.log_ofst;
+        log_ofst_interface.delete_transducer(implementation.log_ofst);
     return net;
       }
 #endif
@@ -5192,14 +5192,14 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
         ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
         (implementation.tropical_ofst);
       assert(internal != NULL);
-      delete implementation.tropical_ofst;
+      tropical_ofst_interface.delete_transducer(implementation.tropical_ofst);
       break;
 #if HAVE_OPENFST_LOG
     case LOG_OPENFST_TYPE:
         internal =
         ConversionFunctions::log_ofst_to_hfst_basic_transducer
           (implementation.log_ofst);
-        delete implementation.log_ofst;
+        log_ofst_interface.delete_transducer(implementation.log_ofst);
         break;
 #endif
       case HFST_OL_TYPE:
@@ -5638,11 +5638,11 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
 #endif
 #if HAVE_OPENFST
     case TROPICAL_OPENFST_TYPE:
-    delete implementation.tropical_ofst;
+    tropical_ofst_interface.delete_transducer(implementation.tropical_ofst);
     break;
 #if HAVE_OPENFST_LOG
     case LOG_OPENFST_TYPE:
-    delete implementation.log_ofst;
+    log_ofst_interface.delete_transducer(implementation.log_ofst);
     break;
 #endif
 #endif

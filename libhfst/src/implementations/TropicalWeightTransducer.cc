@@ -1348,6 +1348,11 @@ namespace hfst {
     return t;
   }
 
+  void TropicalWeightTransducer::delete_transducer(StdVectorFst * t)
+  {
+    delete t;
+  }
+
   StdVectorFst * TropicalWeightTransducer::define_transducer
   (unsigned int number)
   {

@@ -1044,6 +1044,11 @@ namespace hfst { namespace implementations
     return t;
   }
 
+  void LogWeightTransducer::delete_transducer(LogFst * t)
+  {
+    delete t;
+  }
+
   LogFst * LogWeightTransducer::define_transducer(unsigned int number)
   {
     LogFst * t = new LogFst;
