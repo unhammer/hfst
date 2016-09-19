@@ -283,7 +283,7 @@ void add_transitions_with(SymbolNumber symbol,
               std::set<SymbolNumber> & flag_symbols);
 
 #if HAVE_OPENFST // Covers remainder of file
-typedef fst::StdArc::StateId StateId;
+typedef /*fst::StdArc::StateId*/ int StateId;
 typedef fst::StdArc StdArc;
 typedef fst::StdVectorFst TransduceR;
 typedef fst::ArcIterator<TransduceR> ArcIterator;

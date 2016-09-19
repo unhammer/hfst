@@ -18,7 +18,6 @@
 
 #include "HfstDataTypes.h"
 #include "HfstSymbolDefs.h"
-//#include "implementations/HfstTransitionGraph.h"
 #include "parsers/LexcCompiler.h"
 
 #if HAVE_SFST
@@ -93,8 +92,6 @@ namespace hfst
 
 #if HAVE_OPENFST
   using hfst::implementations::TropicalWeightTransducer;
-  using hfst::implementations::TropicalWeightState;
-  using hfst::implementations::TropicalWeightStateIterator;
 #if HAVE_OPENFST_LOG
   using hfst::implementations::LogWeightTransducer;
 #endif // #if HAVE_OPENFST_LOG

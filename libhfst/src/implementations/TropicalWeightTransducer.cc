@@ -13,6 +13,13 @@
 #include "HfstBasicTransducer.h"
 #include "ConvertTransducerFormat.h"
 
+#ifdef _MSC_VER
+#include "back-ends/openfstwin/src/include/fst/fstlib.h"
+#else
+#include "back-ends/openfst/src/include/fst/fstlib.h"
+#endif // _MSC_VER
+
+
 #ifndef MAIN_TEST
 
 #define CHECK_EPSILON_CYCLES(x, y) { hfst::implementations::HfstBasicTransducer * fsm = hfst::implementations::ConversionFunctions::tropical_ofst_to_hfst_basic_transducer( x ); if (fsm->has_negative_epsilon_cycles()) { if (warning_stream != NULL) { *warning_stream << y << ": warning: transducer has epsilon cycles with a negative weight" << std::endl; } } delete fsm; }
@@ -1231,7 +1238,7 @@ namespace hfst {
   }
 
 
-  TropicalWeightStateIterator::TropicalWeightStateIterator(StdVectorFst * t):
+    /*TropicalWeightStateIterator::TropicalWeightStateIterator(StdVectorFst * t):
     iterator(new StateIterator<StdVectorFst>(*t))
   {}
 
@@ -1305,7 +1312,7 @@ namespace hfst {
   TropicalWeightTransition TropicalWeightTransitionIterator::value()
   {
     return TropicalWeightTransition(arc_iterator->Value(), this->t);
-  }
+    }*/
 
 
   fst::SymbolTable TropicalWeightTransducer::create_symbol_table

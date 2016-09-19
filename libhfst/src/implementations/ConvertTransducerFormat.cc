@@ -16,6 +16,15 @@
 #include "HfstBasicTransducer.h"
 #include "HfstTransducer.h"
 
+#if HAVE_OPENFST
+#ifdef _MSC_VER
+#include "back-ends/openfstwin/src/include/fst/fstlib.h"
+#else
+#include "back-ends/openfst/src/include/fst/fstlib.h"
+#endif // _MSC_VER
+#endif // HAVE_OPENFST
+
+
 #ifndef MAIN_TEST
 namespace hfst { namespace implementations
 {
