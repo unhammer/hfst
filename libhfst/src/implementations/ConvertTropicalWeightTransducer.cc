@@ -26,6 +26,8 @@ namespace fst
   extern template class TropicalWeightTpl<float>;
   extern template class ArcTpl<TropicalWeight>;
   extern template class VectorFst<StdArc>;
+  extern template class ArcIterator<StdVectorFst>;
+  extern template class StateIterator<StdVectorFst>;
 }
 
 

@@ -26,6 +26,8 @@ namespace fst
   extern template class LogWeightTpl<float>;
   extern template class ArcTpl<LogWeight>;
   extern template class VectorFst<LogArc>;
+  extern template class ArcIterator<LogFst>;
+  extern template class StateIterator<LogFst>;
 }
 
 
