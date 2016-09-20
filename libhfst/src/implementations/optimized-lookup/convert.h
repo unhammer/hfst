@@ -10,10 +10,6 @@
 #ifndef _HFST_OL_CONVERT_H_
 #define _HFST_OL_CONVERT_H_
 
-#if HAVE_OPENFST
-#include "fst/fstlib.h"
-#endif // HAVE_OPENFST
-
 #include "transducer.h"
 #include "pmatch.h"
 
