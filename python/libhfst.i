@@ -41,7 +41,7 @@
 #include "parsers/XreCompiler.h"
 #include "parsers/LexcCompiler.h"
 #include "parsers/XfstCompiler.h"
-#include "implementations/HfstTransitionGraph.h"
+#include "implementations/HfstBasicTransducer.h"
 #include "implementations/optimized-lookup/pmatch.h"
 
 // Most of C++ extension code is located in separate files.
