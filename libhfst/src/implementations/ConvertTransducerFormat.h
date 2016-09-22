@@ -19,9 +19,13 @@
 #include <vector>
 
 #if HAVE_OPENFST
-namespace fst 
+#if OPENFST_VERSION_1_5_4
+  #include "back-ends/openfst/src/include/fst/fst-decl.h"
+  namespace fst { typedef fst::VectorFst<LogArc> LogFst; }
+#else
+namespace fst
 {
-  template <class W> class TropicalWeightTpl;  
+  template <class W> class TropicalWeightTpl;
   typedef TropicalWeightTpl<float> TropicalWeight;
 
   template <class W> class LogWeightTpl;
@@ -35,6 +39,7 @@ namespace fst
   typedef VectorFst<StdArc> StdVectorFst;
   typedef VectorFst<LogArc> LogFst;
 }
+#endif // OPENFST_VERSION_1_5_4
 #endif // HAVE_OPENFST
 
 #if HAVE_SFST

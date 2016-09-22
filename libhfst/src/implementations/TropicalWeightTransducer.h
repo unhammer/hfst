@@ -33,6 +33,9 @@
 
 //#include "HfstAlphabet.h"
 
+#ifdef OPENFST_VERSION_1_5_4
+  #include "back-ends/openfst/src/include/fst/fst-decl.h"
+#else
 namespace fst
 {
   template <class W> class TropicalWeightTpl;
@@ -54,6 +57,7 @@ namespace fst
 
   class SymbolTable;
 }
+#endif
 
 typedef int64_t int64;
 
