@@ -629,6 +629,9 @@ AC_LANG_POP
 
 AS_IF([test "x$with_unicode_handler" = "xglib"],
       [AC_CHECK_LIB([glib-2.0], [main])
+if test x$ac_cv_lib_glib_2_0_main != xyes ; then
+   AC_MSG_FAILURE([--with-unicode-handler=glib requested but glib-2.0 not found])
+fi
        AC_DEFINE([USE_GLIB_UNICODE], 1, [if using glib for unicode string handling])])
 AS_IF([test "x$with_unicode_handler" = "xicu"],
       [AC_MSG_FAILURE([ICU not yet implemented (--with-unicode-handler=hfst to disable)])])
