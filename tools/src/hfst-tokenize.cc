@@ -21,6 +21,7 @@
 #endif
 
 
+#include <iterator>
 #include <iostream>
 #include <fstream>
 
