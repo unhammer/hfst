@@ -45,7 +45,7 @@ ext_library_dirs = []
 ext_libraries = []
 # else
 ext_library_dirs = [absolute_libhfst_src_path + "/.libs"]
-ext_libraries = ["hfst"],
+ext_libraries = ["hfst"]
 
 # These are needed when creating pypi packages
 libhfst_source_files = ["libhfst/src/parsers/XfstCompiler.cc",
