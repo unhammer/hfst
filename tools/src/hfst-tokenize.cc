@@ -74,7 +74,7 @@ enum OutputFormat {
     xerox,
     cg,
     finnpos,
-    gtd,
+    giellacg,
     conllu
 };
 OutputFormat output_format = tokenize;
@@ -87,7 +87,7 @@ void
 print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
-    fprintf(message_out, "Usage: %s [--segment | --xerox | --cg | --gtd] [OPTIONS...] RULESET\n"
+    fprintf(message_out, "Usage: %s [--segment | --xerox | --cg | --giella-cg] [OPTIONS...] RULESET\n"
             "perform matching/lookup on text streams\n"
             "\n", program_name);
     print_common_program_options(message_out);
@@ -104,7 +104,9 @@ print_usage()
             "  -z, --segment            Segmenting / tokenization mode (default)\n"
             "  -x, --xerox              Xerox output\n"
             "  -c, --cg                 Constraint Grammar output\n"
-            "  -g, --gtd                Giellatekno/Divvun CG output (implies -l2)\n"
+            "  -g, --giella-cg          CG format used in Giella infrastructe (implies -l2,\n"
+            "                           treats @PMATCH_INPUT_MARK@ as subreading separator,\n"
+            "                           and expects tags to start or end with +)\n"
             "  -C  --conllu             CoNLL-U format\n"
             "  -f, --finnpos            FinnPos output\n");
     fprintf(message_out,
@@ -124,7 +126,7 @@ void print_no_output(std::string const & input, std::ostream & outstream)
         outstream << input;
     } else if (output_format == xerox) {
         outstream << input << "\t" << input << "+?";
-    } else if (output_format == cg || output_format == gtd) {
+    } else if (output_format == cg || output_format == giellacg) {
 	    outstream << "\"<" << input << ">\"" << std::endl << "\t\"" << input << "\" ?";
     }
 //    std::cerr << "from print_no_output\n";
@@ -150,7 +152,7 @@ void print_nonmatching_sequence(std::string const & str, std::ostream & outstrea
         outstream << str << "\t" << str << "+?";
     } else if (output_format == cg) {
         outstream << "\"<" << str << ">\"" << std::endl << "\t\"" << str << "\" ?";
-    } else if (output_format == gtd) {
+    } else if (output_format == giellacg) {
         outstream << ":";
         print_escaping_newlines(str, outstream);
     } else if (output_format == conllu) {
@@ -409,7 +411,7 @@ std::string empty_to_underscore(std::string to_test)
     return to_test;
 }
 
-void print_location_vector_gtd(LocationVector const & locations, std::ostream & outstream)
+void print_location_vector_giellacg(LocationVector const & locations, std::ostream & outstream)
 {
     outstream << "\"<" << locations.at(0).input << ">\"" << std::endl;
     if(locations.size() == 1 && locations.at(0).output.empty()) {
@@ -514,8 +516,8 @@ void print_location_vector(LocationVector const & locations, std::ostream & outs
             outstream << std::endl;
         }
         outstream << std::endl;
-    } else if (output_format == gtd && locations.size() != 0) {
-        print_location_vector_gtd(locations, outstream);
+    } else if (output_format == giellacg && locations.size() != 0) {
+        print_location_vector_giellacg(locations, outstream);
     } else if (output_format == xerox) {
         for (LocationVector::const_iterator loc_it = locations.begin();
              loc_it != locations.end(); ++loc_it) {
@@ -695,6 +697,7 @@ int parse_options(int argc, char** argv)
                 {"segment", no_argument, 0, 'z'},
                 {"xerox", no_argument, 0, 'x'},
                 {"cg", no_argument, 0, 'c'},
+                {"giella-cg", no_argument, 0, 'g'},
                 {"gtd", no_argument, 0, 'g'},
                 {"conllu", no_argument, 0, 'C'},
                 {"finnpos", no_argument, 0, 'f'},
@@ -757,7 +760,7 @@ int parse_options(int argc, char** argv)
             output_format = conllu;
             break;
         case 'g':
-            output_format = gtd;
+            output_format = giellacg;
             print_weights = true;
             print_all = true;
             keep_newlines = true;
