@@ -1,8 +1,10 @@
 #!/bin/sh
 
-# A script for copying winopenfst (top directory given as the second argument)
-# and foma backends and libhfst/src in a directory given as first argument
-# for native windows compilation.
+# A script for copying winopenfst and foma backends, libhfst/src and
+# python bindings in a directory given as first argument.
+
+# In the destination directory, run:
+# C:\PythonXY\python.exe pypi_setup.py [ARGS]
 
 if [ -d "$1" ]; then
     echo "Directory $1 exists"
@@ -19,6 +21,25 @@ fi
 #    openfstdir=$2
 #fi
 
+# copy python stuff
+for file in docstrings.i libhfst.i MANIFEST.in pypi_setup.py README setup.cfg setup.py \
+hfst_extensions.cc hfst_file_extensions.cc hfst_lexc_extensions.cc hfst_lookup_extensions.cc \
+hfst_pmatch_extensions.cc hfst_prolog_extensions.cc hfst_regex_extensions.cc \
+hfst_rules_extensions.cc hfst_xfst_extensions.cc;
+do
+    cp python/$file $1/
+done
+
+mkdir $1/hfst
+mkdir $1/hfst/exceptions
+mkdir $1/hfst/types
+mkdir $1/hfst/rules
+
+cp python/hfst/__init__.py $1/hfst/
+cp python/hfst/exceptions/__init__.py $1/hfst/exceptions/
+cp python/hfst/rules/__init__.py $1/hfst/rules/
+cp python/hfst/types/__init__.py $1/hfst/types/
+
 mkdir $1/back-ends
 
 # foma back-end
@@ -28,16 +49,16 @@ for file in \
 apply.c coaccessible.c constructions.c \
 define.c determinize.c dynarray.c \
 extract.c flags.c int_stack.c io.c \
-lex.cmatrix.c lex.yy.c mem.c minimize.c \
+lex.cmatrix.c lex.yy.c lexcread.c mem.c minimize.c \
 regex.c reverse.c rewrite.c sigma.c \
 spelling.c stringhash.c structures.c \
 topsort.c trie.c utf8.c foma.h fomalib.h \
-fomalibconf.h regex.h;
+fomalibconf.h regex.h lexc.h;
 do
     cp back-ends/foma/$file $1/back-ends/foma/;
 done
 # there is a file with the same name in openfstwin
-mv $1/back-ends/foma/flags.c $1/back-ends/foma/_flags.c
+#mv $1/back-ends/foma/flags.c $1/back-ends/foma/_flags.c
 
 # openfstwin back-end
 mkdir $1/back-ends/openfstwin
@@ -96,7 +117,7 @@ done
 # libhfst/src/implementations without subdirectories
 for file in \
 ConvertTransducerFormat.h FomaTransducer.h \
-HfstOlTransducer.h HfstTransition.h HfstTransitionGraph.h \
+HfstOlTransducer.h HfstBasicTransition.h HfstBasicTransducer.h \
 HfstTropicalTransducerTransitionData.h LogWeightTransducer.h \
 TropicalWeightTransducer.h;
 do
@@ -106,7 +127,7 @@ done
 for file in \
 ConvertFomaTransducer ConvertLogWeightTransducer ConvertOlTransducer \
 ConvertTransducerFormat ConvertTropicalWeightTransducer FomaTransducer \
-HfstOlTransducer HfstTransitionGraph HfstTropicalTransducerTransitionData \
+HfstOlTransducer HfstBasicTransducer HfstBasicTransition HfstTropicalTransducerTransitionData \
 LogWeightTransducer TropicalWeightTransducer;
 do
     cp libhfst/src/implementations/$file.cc $1/libhfst/src/implementations/$file.cpp
