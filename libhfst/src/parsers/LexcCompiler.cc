@@ -91,7 +91,7 @@ LexcCompiler::LexcCompiler() :
     totalEntries_(0),
     currentEntries_(0),
 #ifdef WINDOWS
-    , output_to_console_(false),
+    output_to_console_(false),
     winoss_(std::ostringstream()),
     redirected_stream_(NULL),
 #endif
@@ -118,7 +118,7 @@ LexcCompiler::LexcCompiler(ImplementationType impl) :
     totalEntries_(0),
     currentEntries_(0),
 #ifdef WINDOWS
-    , output_to_console_(false),
+    output_to_console_(false),
     winoss_(std::ostringstream()),
     redirected_stream_(NULL),
 #endif
@@ -152,7 +152,7 @@ LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags, bool alignSt
     totalEntries_(0),
     currentEntries_(0),
 #ifdef WINDOWS
-    , output_to_console_(false),
+    output_to_console_(false),
     winoss_(std::ostringstream()),
     redirected_stream_(NULL),
 #endif
