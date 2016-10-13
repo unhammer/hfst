@@ -586,7 +586,7 @@ ENDTAG: ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
 };
 
 READ_FROM: READ_BIN {
-    HfstTransducer * read;
+    HfstTransducer * read = NULL;
     try {
         hfst::HfstInputStream instream($1);
         read = new HfstTransducer(instream);
@@ -701,7 +701,7 @@ PMATCH_AND_CONTEXT: AND_LEFT PMATCH_CONTEXTS RIGHT_PARENTHESIS
     $$ = NULL;
     for (std::vector<PmatchObject *>::reverse_iterator it = $2->rbegin();
          it != $2->rend(); ++it) {
-        if ($$ = NULL) {
+        if ($$ == NULL) {
             $$ = *it;
         } else {
             PmatchObject * tmp = $$;

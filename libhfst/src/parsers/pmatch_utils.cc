@@ -174,7 +174,7 @@ int
 getinput(char *buf, int maxlen)
 {
     int retval = 0;
-    if ( maxlen > len ) {
+    if ( maxlen > (int)len ) {
         maxlen = len;
     }
     memcpy(buf, data, maxlen);
@@ -622,7 +622,6 @@ PmatchTransducerContainer * parse_range(const char * s)
     char * quoted = get_delimited(s, '"');
     char * orig_quoted = quoted;
     char ** c = & quoted;
-    unsigned char bytes_in_char;
     HfstTransducer * retval = new HfstTransducer(format);
     while (**c != '\0') {
         unsigned int codepoint1 = 0;
@@ -1063,7 +1062,7 @@ HfstTransducer * PmatchUtilityTransducers::make_lowerfy(ImplementationType type)
 
 HfstTransducer * PmatchUtilityTransducers::cap(HfstTransducer & t, Side side, bool optional)
 {
-    HfstTransducer * retval;
+    HfstTransducer * retval = NULL;
     HfstTransducer cap(*capify);
     HfstTransducer decap(cap);
     decap.invert();
@@ -1136,7 +1135,7 @@ HfstTransducer * PmatchUtilityTransducers::tolower(HfstTransducer & t, Side side
     if (optional == false) {
         anything.subtract(*latin1_uppercase_acceptor);
     }
-    HfstTransducer * retval;
+    HfstTransducer * retval = NULL;
     if (side == Lower) {
         HfstTransducer lowercase(*lowerfy);
         lowercase.disjunct(anything);
@@ -1168,7 +1167,7 @@ HfstTransducer * PmatchUtilityTransducers::toupper(HfstTransducer & t, Side side
     if (optional == false) {
         anything.subtract(*latin1_lowercase_acceptor);
     }
-    HfstTransducer * retval;
+    HfstTransducer * retval = NULL;
     if (side == Lower) {
         HfstTransducer uppercase(*capify);
         uppercase.disjunct(anything);
@@ -1229,7 +1228,7 @@ HfstTransducer * PmatchObject::evaluate(std::vector<PmatchObject *> args)
 HfstTransducer * PmatchSymbol::evaluate(PmatchEvalType eval_type)
 {
     start_timing();
-    HfstTransducer * retval;
+    HfstTransducer * retval = NULL;
     if (symbol_in_local_context(sym)) {
         retval = symbol_from_local_context(sym)->evaluate();
     } else if (symbol_in_global_context(sym)) {
@@ -1289,7 +1288,7 @@ HfstTransducer * PmatchFunction::evaluate(std::vector<PmatchObject *> funargs)
     if (call_stack.size() != 0) {
         local_env = call_stack.back();
     };
-    for (int i = 0; i < args.size(); ++i) {
+    for (int i = 0; i < (int)args.size(); ++i) {
         local_env[args[i]] = funargs[i];
     }
     call_stack.push_back(local_env);
@@ -1313,7 +1312,7 @@ HfstTransducer * PmatchFunction::evaluate(PmatchEvalType eval_type)
 HfstTransducer * PmatchBuiltinFunction::evaluate(PmatchEvalType eval_type)
 {
     start_timing();
-    HfstTransducer * retval;
+    HfstTransducer * retval = NULL;
     if (type == Interpolate) {
         if (args->size() < 3) {
             std::stringstream errstring;
@@ -1370,7 +1369,7 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
     if (cache != NULL && should_use_cache()) {
         return new HfstTransducer(*cache);
     }
-    HfstTransducer * retval;
+    HfstTransducer * retval = NULL;
     start_timing();
     retval = root->evaluate();
     if (op == AddDelimiters) {
@@ -1570,7 +1569,7 @@ HfstTransducer * PmatchBinaryOperation::evaluate(PmatchEvalType eval_type)
         return new HfstTransducer(*cache);
     }
     start_timing();
-    HfstTransducer * retval;
+    HfstTransducer * retval = NULL;
     HfstTransducer * lhs = left->evaluate();
     HfstTransducer * rhs = right->evaluate();
     if (op == Concatenate) {
@@ -1669,7 +1668,7 @@ HfstTransducer * PmatchTernaryOperation::evaluate(PmatchEvalType eval_type)
         return new HfstTransducer(*cache);
     }
     start_timing();
-    HfstTransducer * retval;
+    HfstTransducer * retval = NULL;
     if (op == Substitute) {
         retval = left->evaluate();
         StringPair middle_pair = middle->as_string_pair();
@@ -1696,7 +1695,7 @@ HfstTransducer * PmatchTernaryOperation::evaluate(PmatchEvalType eval_type)
 HfstTransducer * PmatchAcceptor::evaluate(PmatchEvalType eval_type)
 {
     start_timing();
-    HfstTransducer * retval;
+    HfstTransducer * retval = NULL;
     switch(set) {
     case Alpha:
         retval = new HfstTransducer(* get_utils()->latin1_alpha_acceptor);
@@ -1727,7 +1726,7 @@ HfstTransducer * PmatchParallelRulesContainer::evaluate(PmatchEvalType eval_type
         return new HfstTransducer(*cache);
     }
     start_timing();
-    HfstTransducer * retval;
+    HfstTransducer * retval = NULL;
     switch (arrow) {
     case hfst::xeroxRules::E_REPLACE_RIGHT:
         retval = new HfstTransducer(replace(make_mappings(), false));
@@ -1785,7 +1784,7 @@ HfstTransducer * PmatchReplaceRuleContainer::evaluate(PmatchEvalType eval_type)
         return new HfstTransducer(*cache);
     }
     start_timing();
-    HfstTransducer * retval;
+    HfstTransducer * retval = NULL;
     switch (arrow) {
     case hfst::xeroxRules::E_REPLACE_RIGHT:
         retval = new HfstTransducer(replace(make_mapping(), false));
@@ -1855,7 +1854,7 @@ hfst::xeroxRules::Rule PmatchReplaceRuleContainer::make_mapping(void)
 HfstTransducer * PmatchQuestionMark::evaluate(PmatchEvalType eval_type)
 {
     start_timing();
-    HfstTransducer * retval;
+    HfstTransducer * retval = NULL;
     if (eval_type == Transducer) {
         retval = new HfstTransducer(hfst::internal_identity, format);
     } else {
@@ -1872,7 +1871,7 @@ HfstTransducer * PmatchRestrictionContainer::evaluate(PmatchEvalType eval_type)
         return new HfstTransducer(*cache);
     }
     start_timing();
-    HfstTransducer * retval;
+    HfstTransducer * retval = NULL;
     HfstTransducerPairVector pair_vector;
     for (MappingPairVector::iterator it = contexts->begin();
          it != contexts->end(); ++it) {

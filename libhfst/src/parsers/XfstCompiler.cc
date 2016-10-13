@@ -447,12 +447,13 @@ namespace xfst {
               negative_values.insert(feat);
               break;
             case 'R': // require
-              if (val == "") // empty require
+              if (val == "") { // empty require
                 if (values[feat] == "")
                   { return false; }
                 else { // nonempty require
                   if (is_negatively_set || (values[feat] != val)) { return false; }
                 }
+              }
               break;
             case 'D': // disallow
               if (val == "") { // empty disallow
@@ -4800,7 +4801,7 @@ namespace xfst {
         //hfst_fprintf(outstream_, "could not read arc number\n");
         return false;
       }
-    else if (number < 1 || number > number_of_arcs)
+    else if (number < 1 || number > (int)number_of_arcs)
       {
         if (number_of_arcs < 1)
           output() << "state has no arcs" << std::endl; //hfst_fprintf(outstream_, "state has no arcs\n");
@@ -4825,7 +4826,7 @@ namespace xfst {
         //        "(type '0' if you wish to exit program)\n");
         return false;
       }
-    else if (level < 0 || level > whole_path_length)
+    else if (level < 0 || level > (int)whole_path_length)
       {
         output() << "no such level: '" << level << "' (current lievel is " << (int)whole_path_length << ")" << std::endl;
         flush(&output());
@@ -5019,7 +5020,7 @@ namespace xfst {
     return pathstr;
   }
 
-  static HfstTransducer * to_literal_transducer(const hfst::StringPairVector & path, hfst::xre::XreCompiler & xre_)
+  /*  static HfstTransducer * to_literal_transducer(const hfst::StringPairVector & path, hfst::xre::XreCompiler & xre_)
   {
     std::string pathstr("[");
     for (hfst::StringPairVector::const_iterator it = path.begin(); it != path.end(); it++)
@@ -5055,7 +5056,7 @@ namespace xfst {
     HfstTransducer * retval = xre_.compile(p);  // XRE
     free(p);
     return retval;
-  }
+    }*/
 
   static std::string to_regexp(const hfst::StringPairVector & path, bool input_side)
   {

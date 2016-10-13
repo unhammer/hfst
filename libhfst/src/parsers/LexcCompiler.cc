@@ -58,11 +58,6 @@ using hfst::xre::XreCompiler;
 using hfst::StringVector;
 
 //using same alg as strings to fst
-static char *epsilonname=NULL; // FIX: use this
-static bool has_spaces=false;
-static bool disjunct_strings=false;
-static bool pairstrings=false;
-static char *multichar_symbol_filename=NULL;
 static StringVector multichar_symbols;
 
 
@@ -83,24 +78,24 @@ LexcCompiler* lexc_ = 0;
 LexcCompiler::LexcCompiler() :
     quiet_(false),
     verbose_(false),
+    align_strings_(false),
+    with_flags_(false),
+    minimize_flags_(false),
+    rename_flags_(false),
     treat_warnings_as_errors_(false),
+    allow_multiple_sublexicon_definitions_(false),
+    error_(&std::cerr),
     format_(TROPICAL_OPENFST_TYPE),
     xre_(TROPICAL_OPENFST_TYPE),
     initialLexiconName_("Root"),
     totalEntries_(0),
     currentEntries_(0),
-    parseErrors_(false),
-    with_flags_(false),
-    align_strings_(false),
-    minimize_flags_(false),
-    rename_flags_(false),
-    allow_multiple_sublexicon_definitions_(false),
-    error_(&std::cerr)
 #ifdef WINDOWS
     , output_to_console_(false),
     winoss_(std::ostringstream()),
-    redirected_stream_(NULL)
+    redirected_stream_(NULL),
 #endif
+    parseErrors_(false)
 {
     xre_.set_expand_definitions(true);
     xre_.set_error_stream(this->error_);
@@ -110,24 +105,24 @@ LexcCompiler::LexcCompiler() :
 LexcCompiler::LexcCompiler(ImplementationType impl) :
     quiet_(false),
     verbose_(false),
+    align_strings_(false),
+    with_flags_(false),
+    minimize_flags_(false),
+    rename_flags_(false),
     treat_warnings_as_errors_(false),
+    allow_multiple_sublexicon_definitions_(false),
+    error_(&std::cerr),
     format_(impl),
     xre_(impl),
     initialLexiconName_("Root"),
     totalEntries_(0),
     currentEntries_(0),
-    parseErrors_(false),
-    with_flags_(false),
-    align_strings_(false),
-    minimize_flags_(false),
-    rename_flags_(false),
-    allow_multiple_sublexicon_definitions_(false),
-    error_(&std::cerr)
 #ifdef WINDOWS
     , output_to_console_(false),
     winoss_(std::ostringstream()),
-    redirected_stream_(NULL)
+    redirected_stream_(NULL),
 #endif
+    parseErrors_(false)
 {
     tokenizer_.add_multichar_symbol("@_EPSILON_SYMBOL_@");
     tokenizer_.add_multichar_symbol("@0@");
@@ -144,24 +139,24 @@ LexcCompiler::LexcCompiler(ImplementationType impl) :
 LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags, bool alignStrings) :
     quiet_(false),
     verbose_(false),
+    align_strings_(alignStrings),
+    with_flags_(withFlags),
+    minimize_flags_(false),
+    rename_flags_(false),
     treat_warnings_as_errors_(false),
+    allow_multiple_sublexicon_definitions_(false),
+    error_(&std::cerr),
     format_(impl),
     xre_(impl),
     initialLexiconName_("Root"),
     totalEntries_(0),
     currentEntries_(0),
-    parseErrors_(false),
-    with_flags_(withFlags),
-    align_strings_(alignStrings),
-    minimize_flags_(false),
-    rename_flags_(false),
-    allow_multiple_sublexicon_definitions_(false),
-    error_(&std::cerr)
 #ifdef WINDOWS
     , output_to_console_(false),
     winoss_(std::ostringstream()),
-    redirected_stream_(NULL)
+    redirected_stream_(NULL),
 #endif
+    parseErrors_(false)
 {
     tokenizer_.add_multichar_symbol("@_EPSILON_SYMBOL_@");
     tokenizer_.add_multichar_symbol("@0@");
@@ -667,7 +662,7 @@ LexcCompiler::addXreEntry(const string& regexp, const string& continuation,
         encodedCont = joinerEncode(encodedCont);
     }
     tokenizer_.add_multichar_symbol(encodedCont);
-    char* xre_encoded = hfst::xre::add_percents(encodedCont.c_str());
+    //char* xre_encoded = hfst::xre::add_percents(encodedCont.c_str());
 
     HfstTransducer* newPaths = xre_.compile(regexp);
 

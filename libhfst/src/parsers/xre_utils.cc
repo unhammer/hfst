@@ -89,7 +89,7 @@ int
 xreerror(const char *msg)
 {
   char buffer [1024];
-  int n = sprintf(buffer, "*** xre parsing failed: %s\n", msg);
+  (void) sprintf(buffer, "*** xre parsing failed: %s\n", msg);
   buffer[1023] = '\0';
   std::ostream * err = xreerrstr();
   *err << std::string(buffer);
@@ -165,7 +165,7 @@ int
 getinput(char *buf, int maxlen)
 {
     int retval = 0;
-    if ( maxlen > len ) {
+    if ( maxlen > (int)len ) {
         maxlen = len;
     }
     memcpy(buf, data, maxlen);
@@ -741,7 +741,7 @@ expand_definition(HfstTransducer* tr, const char* symbol)
   return tr;
 }
 
-static const char * get_print_format(const char * symbol)
+  /*static const char * get_print_format(const char * symbol)
 {
   if (strcmp(hfst::internal_identity.c_str(), symbol) == 0)
     return "?";
@@ -750,7 +750,7 @@ static const char * get_print_format(const char * symbol)
   if (strcmp(hfst::internal_epsilon.c_str(), symbol) == 0)
     return "0";
   return symbol;
-}
+  }*/
 
 HfstTransducer*
 xfst_curly_label_to_transducer(const char* input, const char* output)

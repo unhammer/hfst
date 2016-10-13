@@ -271,6 +271,7 @@ template<typename T, size_t N>
 #endif
     };
 
+
 struct PmatchUtilityTransducers
 {
     PmatchUtilityTransducers();
@@ -584,7 +585,7 @@ struct PmatchBuiltinFunction: public PmatchObject {
     PmatchBuiltin type;
     PmatchBuiltinFunction(PmatchBuiltin _type,
                           std::vector<PmatchObject*>* argument_vector):
-        type(_type), args(argument_vector) {}
+    args(argument_vector), type(_type) {}
     HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
 };
 
@@ -672,8 +673,8 @@ struct PmatchReplaceRuleContainer: public PmatchObject
         arrow(pairs->arrow), mapping(pairs->mapping_pairs) {}
     PmatchReplaceRuleContainer(PmatchMappingPairsContainer * pairs,
                                PmatchContextsContainer * contexts):
-        arrow(pairs->arrow), mapping(pairs->mapping_pairs),
-        context(contexts->context_pairs), type(contexts->type) {}
+        arrow(pairs->arrow), type(contexts->type),
+          mapping(pairs->mapping_pairs), context(contexts->context_pairs) {}
     hfst::xeroxRules::Rule make_mapping(void);
     HfstTransducer * evaluate(PmatchEvalType eval_type = Transducer);
 };

@@ -1007,7 +1007,8 @@ SYMBOL_LIST: HALFARC {
 
             $1->disjunct(*tmp, false); // do not harmonize
             $$ = & $1->optimize();
-            delete $2, tmp;
+            delete $2;
+            delete tmp;
             }
         ;
 
