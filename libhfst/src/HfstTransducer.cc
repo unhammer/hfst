@@ -313,6 +313,7 @@ void HfstTransducer::remove_symbols_from_alphabet(const StringSet & symbols)
 #if HAVE_XFSM
   this->xfsm_interface.remove_symbols_from_alphabet(this->implementation.xfsm, symbols);
 #endif
+  (void)symbols;
 }
 
 
@@ -5335,6 +5336,7 @@ void HfstTransducer::write_xfsm_transducer_in_att_format(const char * filename) 
   hfst::implementations::XfsmTransducer::write_in_att_format
     (const_cast<NETptr>(this->implementation.xfsm), filename);
 #endif
+  (void)filename;
 }
 
 /* Implemented only for XFSM_TYPE. */
@@ -5346,6 +5348,7 @@ void HfstTransducer::write_xfsm_transducer_in_prolog_format(const char * filenam
   hfst::implementations::XfsmTransducer::write_in_prolog_format
     (const_cast<NETptr>(this->implementation.xfsm), filename);
 #endif
+  (void)filename;
 }
 
 void HfstTransducer::write_in_prolog_format(FILE * file, const std::string & name,
@@ -5365,6 +5368,7 @@ HfstTransducer * HfstTransducer::prolog_file_to_xfsm_transducer(const char * fil
   retval->implementation.xfsm = XfsmTransducer::prolog_file_to_xfsm_transducer(filename);
   return retval;
 #else
+  (void)filename;
   HFST_THROW(FunctionNotImplementedException);
 #endif
 }

@@ -277,7 +277,7 @@ void get_states_and_symbols(
                 string_symbol_map[tr_it->get_input_symbol()],
                 string_symbol_map[tr_it->get_output_symbol()],
                 tr_it->get_weight());
-            SymbolNumber input_sym = string_symbol_map[tr_it->get_input_symbol()];
+            //SymbolNumber input_sym = string_symbol_map[tr_it->get_input_symbol()];
             state_placeholders[state_number].add_transition(trans);
         }
         ++state_number;
@@ -293,7 +293,7 @@ void get_states_and_symbols(
   {
       const float packing_aggression = 0.85;
       const int floor_jump_threshold = 4; // a packing aggression parameter
-      bool quick = options == "quick";
+      //bool quick = options == "quick";
       // The transition array is indexed starting from this constant
       const unsigned int TA_OFFSET = 2147483648u;
 

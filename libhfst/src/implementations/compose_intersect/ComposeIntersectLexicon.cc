@@ -127,7 +127,7 @@ namespace hfst
     {
       StatePair p = get_pair(state);
 
-      bool lexicon_eps_transition_found = false;
+      //bool lexicon_eps_transition_found = false;
       
       for (SymbolTransitionMap::const_iterator it =
          transition_map_vector[p.first].begin();
@@ -140,14 +140,14 @@ namespace hfst
           if (allow_lexicon_epsilons)
             {
               lexicon_skip_symbol_compose(it->second,p.second,state);
-              lexicon_eps_transition_found = true;
+              //lexicon_eps_transition_found = true;
             }
         }
       else if (is_flag_diacritic(it->first) &&
            (! rules->known_symbol(it->first)))
         {
           lexicon_skip_symbol_compose(it->second,p.second,state);
-          lexicon_eps_transition_found = true;
+          //lexicon_eps_transition_found = true;
         }
       else
         {

@@ -525,7 +525,7 @@ void Transducer::get_analyses(unsigned int input_pos,
 //            ": maximum recursion depth exceeded, discarding results\n";
         return;
     }
-    if (max_lookups >= 0 && lookup_paths->size() >= max_lookups) {
+    if (max_lookups >= 0 && (ssize_t)lookup_paths->size() >= max_lookups) {
         // Back out because we have enough results already
         return;
     }
@@ -541,7 +541,7 @@ void Transducer::get_analyses(unsigned int input_pos,
         i -= TRANSITION_TARGET_TABLE_START;
         // First we check for finality and collect the result
         if (input_tape[input_pos] == NO_SYMBOL_NUMBER) {
-            if (max_lookups < 0 || lookup_paths->size() < max_lookups) {
+            if (max_lookups < 0 || (ssize_t)lookup_paths->size() < max_lookups) {
                 output_tape.write(output_pos, NO_SYMBOL_NUMBER, NO_SYMBOL_NUMBER);
                 if (tables->get_transition_finality(i)) {
                     current_weight += tables->get_weight(i);
@@ -590,7 +590,7 @@ void Transducer::get_analyses(unsigned int input_pos,
     else
     {
         if (input_tape[input_pos] == NO_SYMBOL_NUMBER) {
-            if (max_lookups < 0 || lookup_paths->size() < max_lookups) {
+            if (max_lookups < 0 || (ssize_t)lookup_paths->size() < max_lookups) {
                 output_tape.write(output_pos, NO_SYMBOL_NUMBER, NO_SYMBOL_NUMBER);
                 if (tables->get_index_finality(i)) {
                     current_weight += tables->get_final_weight(i);

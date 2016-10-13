@@ -290,12 +290,12 @@ void PmatchContainer::collect_first_symbols(void)
 }
 
 PmatchContainer::PmatchContainer(std::istream & inputstream):
+    entry_stack(),
     verbose(false),
     locate_mode(false),
+    line_number(0),
     profile_mode(false),
-    single_codepoint_tokenization(false),
-    entry_stack(),
-    line_number(0)
+    single_codepoint_tokenization(false)
 {
     set_properties();
     reset_recursion();
@@ -354,15 +354,15 @@ PmatchContainer::PmatchContainer(std::istream & inputstream):
 }
 
 PmatchContainer::PmatchContainer(Transducer * t):
+    entry_stack(),
     verbose(false),
     locate_mode(false),
     profile_mode(false),
-    single_codepoint_tokenization(false),
-    entry_stack()
+    single_codepoint_tokenization(false)
 {
     set_properties();
     reset_recursion();
-    TransducerHeader header = t->get_header();
+    //TransducerHeader header = t->get_header();
     alphabet = PmatchAlphabet(t->get_alphabet(), this);
     orig_symbol_count = symbol_count = alphabet.get_orig_symbol_count();
     line_number = 0;
@@ -382,12 +382,12 @@ PmatchContainer::PmatchContainer(Transducer * t):
 // so there's no advantage to passing it transducers in optimized-lookup
 // format.
 PmatchContainer::PmatchContainer(std::vector<HfstTransducer> transducers):
+    entry_stack(),
     verbose(false),
     locate_mode(false),
+    line_number(0),
     profile_mode(false),
-    single_codepoint_tokenization(false),
-    entry_stack(),
-    line_number(0)
+    single_codepoint_tokenization(false)
 {
     set_properties();
     reset_recursion();
@@ -476,7 +476,7 @@ PmatchContainer::PmatchContainer(std::vector<HfstTransducer> transducers):
                                              true, // weighted
                                              "", // no special options
                                              &harmonizer); // harmonize with this
-        TransducerHeader header = harmonized_tmp->get_header();
+        //TransducerHeader header = harmonized_tmp->get_header();
         // this will be the alphabet of the entire container
         alphabet = PmatchAlphabet(harmonized_tmp->get_alphabet(), this);
         orig_symbol_count = symbol_count = alphabet.get_orig_symbol_count();
@@ -1111,11 +1111,11 @@ PmatchTransducer::PmatchTransducer(std::vector<TransitionW> transition_vector,
                                    std::vector<TransitionWIndex> index_vector,
                                    PmatchAlphabet & alpha,
                                    PmatchContainer * cont):
+    transition_table(transition_vector),
+    index_table(index_vector),
     alphabet(alpha),
     container(cont),
-    locations(NULL),
-    transition_table(transition_vector),
-    index_table(index_vector)
+    locations(NULL)
 {
     orig_symbol_count = alphabet.get_symbol_table().size();
     // initialize the stack for local variables
@@ -1407,7 +1407,7 @@ void PmatchContainer::initialize_input(const char * input_s)
     SymbolNumber k = NO_SYMBOL_NUMBER;
     SymbolNumber boundary_sym = alphabet.get_special(boundary);
     char * single_codepoint_scratch;
-    char * single_codepoint_scratch_orig;
+    char * single_codepoint_scratch_orig = NULL;
     if (single_codepoint_tokenization) {
         single_codepoint_scratch = new char[5];
         single_codepoint_scratch_orig = single_codepoint_scratch;

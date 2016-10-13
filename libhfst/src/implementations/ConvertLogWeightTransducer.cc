@@ -64,7 +64,7 @@ namespace hfst { namespace implementations
       if (inputsym != NULL) {
         for ( fst::SymbolTableIterator it =
                 fst::SymbolTableIterator(*(inputsym));
-              not it.Done(); it.Next() ) {
+              ! it.Done(); it.Next() ) {
           if (it.Value() != 0) // epsilon is not inserted
             net->alphabet.insert( it.Symbol() );
         }
@@ -73,10 +73,10 @@ namespace hfst { namespace implementations
          symbol table. If the transducer is an HFST log transducer, it
          can have an output symbol table, but it is equivalent to the
          input symbol table. */
-      if (not has_hfst_header && outputsym != NULL) {
+      if (! has_hfst_header && outputsym != NULL) {
         for ( fst::SymbolTableIterator it =
                 fst::SymbolTableIterator(*(outputsym));
-              not it.Done(); it.Next() ) {
+              ! it.Done(); it.Next() ) {
           if (it.Value() != 0) // epsilon is not inserted
             net->alphabet.insert( it.Symbol() );
         }
@@ -105,7 +105,7 @@ namespace hfst { namespace implementations
 
   /* Go through all states */
   for (fst::StateIterator<LogFst> siter(*t);
-       not siter.Done(); siter.Next())
+       ! siter.Done(); siter.Next())
     {
       StateId s = siter.Value();
       if (s == initial_state) {
@@ -154,7 +154,7 @@ namespace hfst { namespace implementations
     }
 
     for (fst::StateIterator<LogFst> siter(*t);
-         not siter.Done(); siter.Next())
+         ! siter.Done(); siter.Next())
       {
         StateId s = siter.Value();
         if (s != initial_state) {
@@ -200,13 +200,13 @@ namespace hfst { namespace implementations
        but not in transitions are copied. */
     for ( fst::SymbolTableIterator it =
             fst::SymbolTableIterator(*(inputsym));
-          not it.Done(); it.Next() ) {
+          ! it.Done(); it.Next() ) {
       if (it.Value() != 0) // epsilon is not inserted
         net->alphabet.insert( it.Symbol() );
     }
     for ( fst::SymbolTableIterator it =
             fst::SymbolTableIterator(*(outputsym));
-          not it.Done(); it.Next() ) {
+          ! it.Done(); it.Next() ) {
       if (it.Value() != 0) // epsilon is not inserted
         net->alphabet.insert( it.Symbol() );
     }

@@ -978,7 +978,7 @@ namespace hfst {
   }
 
 
-  static StdVectorFst * copy_fst(const StdVectorFst * t)
+    /*  static StdVectorFst * copy_fst(const StdVectorFst * t)
   {
     StdVectorFst * result = new StdVectorFst();
 
@@ -1019,7 +1019,7 @@ namespace hfst {
           }
       }
     return result;
-  }
+    }*/
 
   unsigned int TropicalWeightTransducer::number_of_states(const StdVectorFst *t)
   {

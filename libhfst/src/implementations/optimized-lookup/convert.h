@@ -58,19 +58,19 @@ struct StatePlaceholder {
     state_number(state),
     start_index(UINT_MAX),
     first_transition(first),
-    final(finality),
-    final_weight(final_weight),
     type(state == 0 ? nonsimple: empty),
-    inputs(0)
+    inputs(0),
+    final(finality),
+    final_weight(final_weight)
         { }
     StatePlaceholder ():
     state_number(UINT_MAX),
     start_index(UINT_MAX),
     first_transition(UINT_MAX),
-    final(false),
-    final_weight(0.0),
     type(empty),
-    inputs(0)
+    inputs(0),
+    final(false),
+    final_weight(0.0)
     { }
     
     bool is_simple(void) const

@@ -313,6 +313,7 @@ namespace hfst
       }
 
       float zero_weight(float f) {
+        (void)f;
           return 0;
       }
 

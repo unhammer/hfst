@@ -279,6 +279,7 @@ public:
   
     void set_flag(HeaderFlag flag, bool value)
         {
+          (void)value;
             switch (flag) {
             case Weighted:
                 weighted = true;
