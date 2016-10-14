@@ -1,52 +1,57 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 """
-setup for HFST-swig
+Setup for creating PIP packages for HFST Python bindings.
+
+Before running setup, recursively copy directories 'libhfst/src'
+and 'back-ends' from HFST c++ source code under the directory where
+setup is run. Make sure that the following c++ and header files 
+from 'libhfst/src/parsers' have been generated from flex/yacc
+files before copying:
+
+  lexc-parser.cc pmatch_parse.cc xfst-parser.cc xre_parse.cc
+  lexc-parser.hh pmatch_parse.hh xfst-parser.hh xre_parse.hh
+
+Compiling the extensions requires python, swig and a c++ compiler, 
+all located on a directory listed on system PATH. On linux and mac 
+osx, readline and getline must be available and the c++ compiler
+must support flag 'std=c++0x'.
+
+The setup script has been tested on linux with gcc 4.6.3 and
+swig 2.0.4 (with python 3.2mu and 3.4m) and on windows with
+msvc 10.0 and swig 3.0.5 (with python 3.3. and 3.4).
+
 """
 
 import os
-#from distutils.core import setup, Extension
+# from distutils.core import setup, Extension
 from setuptools import setup, Extension
-
 from sys import platform
 
-# libhfst_src_path = '../libhfst/src/'
-# absolute_libhfst_src_path = os.path.abspath(libhfst_src_path)
-
-# TODO:
-# On Windows: copy C:\pythonXY\libs\pythonXY.lib (setup already does copying?)
-# On Windows: cl /LD /Fe_libhfst.pyd (setup handles this?)
-
-# When creating pypi packages
+# HFST C++ headers needed by swig when creating the python/c++ interface
 swig_include_dir = "libhfst/src/"
-# else
-# swig_include_dir = absolute_libhfst_src_path
 
 ext_swig_opts = ["-c++", "-I" + swig_include_dir, "-Wall"]
-# list append fails on windows for some reason...
 if platform == "win32":
     ext_swig_opts = ["-c++", "-I" + swig_include_dir, "-Wall", 
                      "-IC:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v7.0A\\Include"]
+# todo: see if SDK directory is needed
 
-# When creating pypi packages
+# readline is needed for hfst.start_xfst(), on windows the shell where HFST
+# python bindings are run from has its own readline which will do
 ext_extra_link_args = []
-if platform == "linux" or platform == "linux2":
+if platform == "linux" or platform == "linux2" or platform == "darwin":
     ext_extra_link_args = ['-lreadline']
-# else
-# ext_extra_link_args = []
 
-# When creating pypi packages
+# HFST headers needed when compiling the actual c++ extension
 ext_include_dirs = [".", "libhfst/src/", "back-ends/foma", "back-ends",
                     "parsers", "libhfst/src/parsers"]
 if platform == "win32":
-    ext_include_dirs.append("C:/Python33/include/") # TODO: use version of python that is in use
     ext_include_dirs.append("back-ends/openfstwin/src/include")
 else:
     ext_include_dirs.append("back-ends/openfst/src/include")
-# else
-# ext_include_dirs = [absolute_libhfst_src_path]
 
-# When creating pypi packages
+# this replaces ./configure
 ext_define_macros = [ ('HAVE_FOMA', None), ('HAVE_OPENFST', None),
                       ('HAVE_OPENFST_LOG', None) ]
 if platform == "linux" or platform == "linux2" or platform == "darwin":
@@ -55,34 +60,29 @@ if platform == "linux" or platform == "linux2" or platform == "darwin":
 if platform == "win32":
     for macro in ["HFSTEXPORT", "OPENFSTEXPORT", "_MSC_VER", "WINDOWS", "WIN32"]:
         ext_define_macros.append((macro, None))
-# else
-# ext_define_macros = []
 
-# When creating pypi packages
+# use c++0x standard, if possible
 ext_extra_compile_args = []
 if platform == "linux" or platform == "linux2" or platform == "darwin":
     ext_extra_compile_args = ["-std=c++0x"]
+# define error handling mechanism on windows
 if platform == "win32":
     ext_extra_compile_args = ["/EHsc"]
-# else
-# ext_extra_compile_args = []
 
-# When creating pypi packages
 ext_library_dirs = []
 ext_libraries = []
-# else
-# ext_library_dirs = [absolute_libhfst_src_path + "/.libs"]
-# ext_libraries = ["hfst"]
 
+# on windows, c++ source files have 'cpp' extension
 cpp = ".cc"
 if platform == "win32":
     cpp = ".cpp"
 
+# on windows, openfst back-end is in directory 'openfstwin'
 openfstdir = "openfst"
 if platform == "win32":
     openfstdir = "openfstwin"
 
-# These are needed when creating pypi packages
+# all c++ extension source files
 libhfst_source_files = ["libhfst/src/parsers/XfstCompiler" + cpp,
                         "libhfst/src/HfstApply" + cpp,
                         "libhfst/src/HfstInputStream" + cpp,
@@ -175,9 +175,8 @@ libhfst_source_files = ["libhfst/src/parsers/XfstCompiler" + cpp,
 if platform == "linux" or platform == "linux2" or platform == "darwin":
     libhfst_source_files.append("back-ends/foma/lexcread.c")
     libhfst_source_files.append("back-ends/foma/lex.lexc.c")
-# else
-# libhfst_source_files = []
 
+# The HFST c++ extension
 libhfst_module = Extension('_libhfst',
                            language = "c++",
                            sources = ["libhfst.i"] + libhfst_source_files,
@@ -189,10 +188,6 @@ libhfst_module = Extension('_libhfst',
                            extra_link_args = ext_extra_link_args,
                            extra_compile_args = ext_extra_compile_args
                            )
-
-# When making the windows package, replace data_files with
-# ["libhfst-NN.dll", "libgcc_s_seh-1.dll"] or
-# ["libhfst-NN.dll", "libgcc_s_dw2-1.dll"] or
 
 setup(name = 'hfstpy',
       version = '3.11.0_beta',
