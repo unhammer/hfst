@@ -32,8 +32,6 @@ libhfst_la_SOURCES = $(HFST_SRCS)
 libhfst_la_LIBADD = implementations/libhfstimplementations.la \
 			parsers/libhfstparsers.la
 
-AM_CPPFLAGS += -I${top_srcdir}/back-ends/foma -I${top_srcdir}/back-ends
-
 if WANT_SFST
   libhfst_la_LIBADD += $(top_builddir)/back-ends/sfst/libsfst.la
 endif
@@ -43,12 +41,9 @@ if WANT_FOMA
 endif
 
 if WANT_MINGW
-  AM_CPPFLAGS += -I${top_srcdir}/back-ends/openfstwin/src/include \
-			-I${top_srcdir}/back-ends/dlfcn -DWINDOWS
   libhfst_la_LIBADD += $(top_builddir)/back-ends/dlfcn/libdl.la \
 			$(top_builddir)/back-ends/openfstwin/src/lib/libfst.la
 else
-  AM_CPPFLAGS += -I${top_srcdir}/back-ends/openfst/src/include
   libhfst_la_LIBADD += $(top_builddir)/back-ends/openfst/src/lib/libfst.la
 endif
 

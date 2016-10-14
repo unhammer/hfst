@@ -12,15 +12,6 @@ CL_SRC=$(srcdir)/commandline_src
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
 
-AM_CPPFLAGS += -I${top_srcdir}/back-ends/foma \
-                -I${top_srcdir}/back-ends
-
-if WANT_MINGW
-  AM_CPPFLAGS += -I${top_srcdir}/back-ends/openfstwin/src/include \
-                 -I${top_srcdir}/back-ends/dlfcn -DWINDOWS
-else
-  AM_CPPFLAGS += -I${top_srcdir}/back-ends/openfst/src/include
-endif
 
 # the preprocessor scripts do not support options per se, so we whitelist
 # them here

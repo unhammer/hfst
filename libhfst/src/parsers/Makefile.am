@@ -42,8 +42,6 @@ CLEANFILES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT) $(XFST_BUILT) \
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 
-#CLEANFILES+=xre_parse.hh  pmatch_parse.hh  lexc-parser.hh xfst-parser.hh
-
 xre_lex.ll: xre_parse.$(HEADER)
 pmatch_lex.ll: pmatch_parse.$(HEADER)
 lexc-lexer.ll: lexc-parser.$(HEADER)
@@ -52,13 +50,10 @@ xfst-lexer.ll: xfst-parser.$(HEADER)
 libhfstparsers_la_SOURCES=$(SFST_SRCS) $(XRE_SRCS) $(PMATCH_SRCS) $(LEXC_SRCS) $(XFST_SRCS)
 
 AM_CPPFLAGS=-I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/libhfst/src \
-		-I${top_srcdir}/back-ends/foma -I${top_srcdir}/back-ends \
 		-Wno-deprecated
 
 if WANT_MINGW
-  AM_CPPFLAGS+= -I${top_srcdir}/back-ends/openfstwin/src/include -I${top_srcdir}/back-ends/dlfcn -DWINDOWS
-else
-  AM_CPPFLAGS+= -I${top_srcdir}/back-ends/openfst/src/include
+  AM_CPPFLAGS+= -I${top_srcdir}/back-ends/dlfcn -DWINDOWS
 endif
 
 # headers of parsers

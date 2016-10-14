@@ -21,16 +21,6 @@ LDADD = $(top_builddir)/libhfst/src/libhfst.la
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/tools/src/parsers -Wno-sign-compare
 AM_CXXFLAGS = -Wno-deprecated -Wno-sign-compare
 
-AM_CPPFLAGS+= -I${top_srcdir}/back-ends/foma/ \
-		-I${top_srcdir}/back-ends/
-
-if WANT_MINGW
-  AM_CPPFLAGS+= -I${top_srcdir}/back-ends/openfstwin/src/include \
-		-I${top_srcdir}/back-ends/dlfcn -DWINDOWS
-else
-  AM_CPPFLAGS+= -I${top_srcdir}/back-ends/openfst/src/include
-endif
-
 # sort alphabetically:
 if WANT_AFFIX_GUESSIFY
 MAYBE_AFFIX_GUESSIFY=hfst-affix-guessify$(EXEEXT)
