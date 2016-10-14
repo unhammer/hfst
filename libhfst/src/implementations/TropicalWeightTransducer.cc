@@ -91,7 +91,6 @@ namespace hfst {
       // in case of an empty transducer, infinity is returned
       // (empty in the sense of having no transitions or final states)
       float retval = std::numeric_limits<float>::infinity();
-      bool weight_found;
       for (fst::StateIterator<StdVectorFst> siter(*t);
            ! siter.Done(); siter.Next())
         {

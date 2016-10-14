@@ -703,7 +703,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                 error(EXIT_FAILURE, 0,
                       "The correspondence %s %s contains unescaped "
                       "colon-symbols. Escape them using %%.",
-                      input_case.c_str(), output_case.c_str(), line);
+                      input_case.c_str(), output_case.c_str()/*, line*/);
               }
 
             int new_exit_code = test(test_case,
@@ -743,7 +743,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                 error(EXIT_FAILURE, 0,
                       "The correspondence %s %s contains unquoted "
                       "colon-symbols. Quote them using %%.",
-                      input_case.c_str(), output_case.c_str(), line);
+                      input_case.c_str(), output_case.c_str()/*, line*/);
               }
 
             int new_exit_code = test(test_case,

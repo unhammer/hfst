@@ -1016,8 +1016,8 @@ HfstTransducer * PmatchUtilityTransducers::make_latin1_numeral_acceptor(Implemen
            ++it) {
           retval->disjunct(HfstTransducer(std::string(1, *it), type));
       }
+      //retval->minimize(); ?
       return retval;
-      retval->minimize();
   }
 
 HfstTransducer * PmatchUtilityTransducers::make_latin1_punct_acceptor(ImplementationType type)

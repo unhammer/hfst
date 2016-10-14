@@ -535,7 +535,7 @@ HfstTransducer * HfstTransducer::harmonize_(const HfstTransducer &another)
     default:
         HFST_THROW(TransducerHasWrongTypeException);
     }
-
+    return NULL; // make compiler happy
 }
 
 /*  Harmonize symbol-to-number encodings and expand unknown and
