@@ -289,17 +289,17 @@ namespace hfst
   bool HfstInputStream::set_implementation_specific_header_data
   (StringPairVector& /* data */, unsigned int /* index*/)
   {
+#if HAVE_SFST
     switch (type)
       {
-#if HAVE_SFST
       case SFST_TYPE:
         //return this->implementation.sfst->
         //set_implementation_specific_header_data(data, index);
         break;
-#endif
       default:
         break;
       }
+#endif
     return false;
   }
 

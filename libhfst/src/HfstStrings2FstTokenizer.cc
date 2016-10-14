@@ -237,7 +237,7 @@ int HfstStrings2FstTokenizer::get_col_pos(const std::string &str)
   for (size_t i = 1; i < str.size(); ++i)
     {
       if (str[i] == COL_CHAR && str[i-1] != BACKSLASH_CHAR)
-    { return i; }
+        { return (int)i; }
     }
   return -1;
 }

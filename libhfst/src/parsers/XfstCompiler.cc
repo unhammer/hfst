@@ -91,6 +91,10 @@ using hfst::implementations::HfstBasicTransition;
 
 #include "xfst_help_message.h"
 
+#ifdef _MSC_VER
+  #define strdup _strdup
+#endif
+
 namespace hfst {
 namespace xfst {
 
@@ -2627,6 +2631,7 @@ namespace xfst {
                 }
               catch (const char * msg)
                 {
+                  (void)msg;
                   error() << "error: could not substitute with '" << list << "'" << std::endl;
                   flush(&error());
                   //hfst_fprintf(errorstream_, "error: could not substitute with '%s'\n", list);
@@ -2672,6 +2677,7 @@ namespace xfst {
         }
       catch (const char * msg)
         {
+          (void)msg;
           error() << "error: could not substitute '" << target << "'" << std::endl;
           flush(&error());
           //hfst_fprintf(errorstream_, "error: could not substitute '%s'\n", target);
@@ -3115,6 +3121,7 @@ namespace xfst {
                                           variables_["obey-flags"] == "ON");
     }
     catch (const TransducerIsCyclicException & e) {
+      (void)e;
       upper_is_cyclic = true;
     }
     
@@ -3124,6 +3131,7 @@ namespace xfst {
                                           variables_["obey-flags"] == "ON");
     }
     catch (const TransducerIsCyclicException & e) {
+      (void)e;
       lower_is_cyclic = true;
     }
 
@@ -3339,6 +3347,7 @@ namespace xfst {
         }
       catch (const TransducerIsCyclicException & e)
         {
+          (void)e;
           int cutoff = string_to_size_t(variables_["print-words-cycle-cutoff"]);
           error() << "warning: transducer is cyclic, limiting the number of cycles to " << cutoff << std::endl;
           flush(&error());
@@ -4202,6 +4211,7 @@ namespace xfst {
       }
     catch (const FunctionNotImplementedException & e)
       {
+        (void)e;
         error() << "function not available" << std::endl;
         flush(&error());
         //hfst_fprintf(stderr, "function not available.\n");
@@ -4245,6 +4255,7 @@ namespace xfst {
             }
           catch (const TransducersAreNotAutomataException & e)
             {
+              (void)e;
               error() << "transducers are not automata" << std::endl;
         flush(&error());
               //hfst_fprintf(stderr, "transducers are not automata\n");
@@ -4333,6 +4344,7 @@ namespace xfst {
                 }
               catch (const FlagDiacriticsAreNotIdentitiesException & e)
                 {
+                  (void)e;
                   error() << "Error: flag diacritics must be identities in composition if flag-is-epsilon is ON." << std::endl
                           << "I.e. only FLAG:FLAG is allowed, not FLAG1:FLAG2, FLAG:bar or foo:FLAG" << std::endl
                           << "Apply twosided flag-diacritics (tfd) before composition." << std::endl;
@@ -5298,6 +5310,7 @@ namespace xfst {
         }
       catch (const HfstException & e)
         {
+          (void)e;
           if (0 != fclose(infile)) {
             error() << "Could not close file " << filename << std::endl;
             flush(&error()); }

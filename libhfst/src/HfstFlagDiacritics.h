@@ -136,7 +136,7 @@ public:
             symbol_map.insert(std::pair<std::string,T>(str, symbol));
         }
     
-    FdFeature num_features() const { return feature_map.size(); }
+    FdFeature num_features() const { return (hfst::FdFeature)feature_map.size(); }
     bool is_diacritic(T symbol) const
         { return operations.find(symbol) != operations.end(); }
       

@@ -322,17 +322,17 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
                                                              HfstTransducer&)
 #endif
   {
+#if HAVE_SFST
     switch(type)
       {
-#if HAVE_SFST
       case SFST_TYPE:
         implementation.sfst->append_implementation_specific_header_data
           (header, transducer.implementation.sfst);
         break;
-#endif
       default:
         break;
       }
+#endif
   }
 
   HfstOutputStream &HfstOutputStream::flush()

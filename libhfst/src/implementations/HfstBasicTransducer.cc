@@ -363,7 +363,7 @@
          HfstState HfstBasicTransducer::add_state(void) {
        HfstBasicTransducer::HfstTransitions tr;
        state_vector.push_back(tr);
-       return state_vector.size()-1;
+       return (HfstState)(state_vector.size()-1);
      }
 
          /** @brief Add a state \a s to this graph.
@@ -382,7 +382,7 @@
 
      /** @brief Get the biggest state number in use. */
      HfstState HfstBasicTransducer::get_max_state() const {
-       return state_vector.size()-1;
+       return (HfstState)(state_vector.size()-1);
      }
 
          /** @brief Add a transition \a transition to state \a s.
@@ -994,7 +994,7 @@
            (const std::string & str, char c, char esc)
          {
            std::vector<unsigned int> retval;
-           for (size_t i=0; i < str.length(); i++)
+           for (unsigned int i=0; i < (unsigned int)str.length(); i++)
              {
                if (str[i] == c)
                  {

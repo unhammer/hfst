@@ -22,7 +22,7 @@ namespace hfst_ol {
     class PmatchTransducer;
     class PmatchContainer;
     struct Location;
-    class WeightedDoubleTape;
+    struct WeightedDoubleTape;
 
     typedef std::vector<PmatchTransducer *> RtnVector;
     typedef std::map<std::string, SymbolNumber> RtnNameMap;
@@ -225,7 +225,7 @@ namespace hfst_ol {
             }
         }
         void unrecurse(void) { ++recursion_depth_left; }
-        void reset_recursion(void) { recursion_depth_left = max_recursion; }
+        void reset_recursion(void) { recursion_depth_left = (unsigned int)max_recursion; }
 
         friend class PmatchTransducer;
         friend class PmatchAlphabet;

@@ -1252,7 +1252,7 @@ public:
     
     unsigned int len(void)
         {
-            return s.size();
+            return (unsigned int)s.size();
         }
 
     SymbolNumber operator[](unsigned int i)

@@ -155,7 +155,7 @@ bool is_default(const char * str)
       for (HfstTwoLevelPaths::const_iterator it = paths.begin();
            it != paths.end(); it++)
         {
-          unsigned int length = it->second.size();
+          unsigned int length = (unsigned int)it->second.size();
           max_path_length = (length > max_path_length)? length : max_path_length;
         }
       return (int)max_path_length;
@@ -169,14 +169,14 @@ bool is_default(const char * str)
       for (HfstTwoLevelPaths::const_iterator it = paths.begin();
            it != paths.end(); it++)
         {
-          unsigned int length = it->second.size();
+          unsigned int length = (unsigned int)it->second.size();
           max_path_length = (length > max_path_length)? length : max_path_length;
         }
 
       for (HfstTwoLevelPaths::const_iterator it = paths.begin();
            it != paths.end(); it++)
         {
-          unsigned int length = it->second.size();
+          unsigned int length = (unsigned int)it->second.size();
           if (length == max_path_length)
             {
               result.insert(*it);

@@ -2577,7 +2577,7 @@ int HfstTransducer::longest_path_size(bool obey_flags) const
       return -1;
     }
   // else, there is at least one path
-  return results.begin()->second.size();
+  return (int)results.begin()->second.size();
 }
 
 static std::string match_any_n_times(unsigned int n, const StringSet & flags)
@@ -2943,7 +2943,7 @@ void HfstTransducer::insert_freely_missing_flags_from
     {
       HfstBasicTransducer basic(*this);
 
-      for (size_t s = 0; s <= basic.get_max_state(); ++s)
+      for (unsigned int s = 0; s <= (unsigned int)basic.get_max_state(); ++s)
         {
           for (StringSet::const_iterator it = missing_flags.begin();
                it != missing_flags.end(); it++)
@@ -3646,6 +3646,7 @@ HfstTransducer &HfstTransducer::substitute
     net->substitute(substitutions);
   }
   catch (const FunctionNotImplementedException & e) {
+    (void)e;
     for (HfstSymbolSubstitutions::const_iterator it =
            substitutions.begin(); it != substitutions.end(); it++) {
       net->substitute(it->first, it->second, true, true);
@@ -3985,6 +3986,7 @@ HfstTransducer &HfstTransducer::compose
           }
         catch (const char * msg)
           {
+            (void)msg;
             HFST_THROW(FlagDiacriticsAreNotIdentitiesException);
           }
       }
