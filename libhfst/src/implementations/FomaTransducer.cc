@@ -56,7 +56,7 @@ namespace hfst { namespace implementations {
 
   short FomaInputStream::stream_get_short()
   {
-    short i;
+    short i = 0;
     assert(1 == fread(&i,sizeof(i),1,input_file));
     return i;
   }
@@ -106,7 +106,7 @@ namespace hfst { namespace implementations {
   void FomaInputStream::skip_identifier_version_3_0(void)
   {
     char foma_identifier[10];
-    int foma_id_count = fread(foma_identifier,10,1,input_file);
+    int foma_id_count = hfst::size_t_to_int(fread(foma_identifier,10,1,input_file));
     if (foma_id_count != 1)
       {
         HFST_THROW(NotTransducerStreamException); }
@@ -118,7 +118,7 @@ namespace hfst { namespace implementations {
   void FomaInputStream::skip_hfst_header(void)
   {
     char hfst_header[6];
-    int header_count = fread(hfst_header,6,1,input_file);
+    int header_count = hfst::size_t_to_int(fread(hfst_header,6,1,input_file));
     if (header_count != 1)
       {
         HFST_THROW(NotTransducerStreamException); }

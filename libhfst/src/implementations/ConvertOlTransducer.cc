@@ -50,9 +50,10 @@ unsigned int hfst_ol_to_hfst_basic_add_state
         basic->add_state(new_state);
         basic->set_final_weight(new_state,
                                 weighted ?
-                                dynamic_cast<const hfst_ol::TransitionWIndex&>
-                                (transition_index).final_weight() :
-                                0.0);
+                                hfst::double_to_float
+                                (dynamic_cast<const hfst_ol::TransitionWIndex&>
+                                 (transition_index).final_weight()) :
+                                (float)0.0);
     }
   }
   else // indexes transition table
@@ -64,9 +65,10 @@ unsigned int hfst_ol_to_hfst_basic_add_state
         basic->add_state(new_state);
         basic->set_final_weight(new_state,
                                 weighted ?
-                                dynamic_cast<const hfst_ol::TransitionW&>
-                                (transition).get_weight() :
-                                0.0);
+                                hfst::double_to_float
+                                (dynamic_cast<const hfst_ol::TransitionW&>
+                                 (transition).get_weight()) :
+                                (float)0.0);
     }
   }
   return new_state;
@@ -207,14 +209,14 @@ void get_states_and_symbols(
     if (harmonizer == NULL) {
         
         // 1) epsilon
-        string_symbol_map[internal_epsilon] = symbol_table.size();
+        string_symbol_map[internal_epsilon] = hfst::size_t_to_ushort(symbol_table.size());
         symbol_table.push_back(internal_epsilon);
         
         // 2) input symbols
         for (std::set<std::string>::iterator it = input_symbols->begin();
              it != input_symbols->end(); ++it) {
             if (!is_epsilon(*it)) {
-                string_symbol_map[*it] = symbol_table.size();
+                string_symbol_map[*it] = hfst::size_t_to_ushort(symbol_table.size());
                 symbol_table.push_back(*it);
                 ++seen_input_symbols;
             }
@@ -224,7 +226,7 @@ void get_states_and_symbols(
         for (std::set<std::string>::iterator it = flag_diacritics->begin();
              it != flag_diacritics->end(); ++it) {
             if (!is_epsilon(*it)) {
-                string_symbol_map[*it] = symbol_table.size();
+                string_symbol_map[*it] = hfst::size_t_to_ushort(symbol_table.size());
                 // TODO: cl.exe: conversion from 'size_t' to 'char16_t'
                 flag_symbols.insert((unsigned short)symbol_table.size());
                 symbol_table.push_back(*it);
@@ -238,7 +240,7 @@ void get_states_and_symbols(
              it != other_symbols->end(); ++it) {
             if (!is_epsilon(*it) && input_symbols->count(*it) == 0 &&
               flag_diacritics->count(*it) == 0) {
-                string_symbol_map[*it] = symbol_table.size();
+                string_symbol_map[*it] = hfst::size_t_to_ushort(symbol_table.size());
                 symbol_table.push_back(*it);
             }
         }
@@ -291,7 +293,7 @@ void get_states_and_symbols(
   (const HfstBasicTransducer * t, bool weighted, std::string options,
    HfstTransducer * harmonizer)
   {
-      const float packing_aggression = 0.85;
+      const float packing_aggression = (float)0.85; // double -> const float
       const int floor_jump_threshold = 4; // a packing aggression parameter
       //bool quick = options == "quick";
       // The transition array is indexed starting from this constant
@@ -396,7 +398,7 @@ void get_states_and_symbols(
     
     unsigned int greatest_index = 0;
     if (used_indices->indices.size() != 0) {
-        greatest_index = used_indices->indices.size() - 1;
+        greatest_index = hfst::size_t_to_uint(used_indices->indices.size() - 1);
     }
 
     for(unsigned int i = 0; i <= greatest_index; ++i) {
@@ -441,7 +443,7 @@ void get_states_and_symbols(
 
     hfst_ol::TransducerAlphabet alphabet(symbol_table);
     hfst_ol::TransducerHeader header(seen_input_symbols,
-                                     symbol_table.size(),
+                                     hfst::size_t_to_ushort(symbol_table.size()),
                                      windex_table.size(),
                                      wtransition_table.size(),
                                      weighted);

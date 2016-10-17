@@ -673,7 +673,7 @@ public:
             }
         }
   
-    unsigned int size() const {return table.size();}
+    unsigned int size() const {return hfst::size_t_to_uint(table.size());}
 };
 
 class TransducerTablesInterface

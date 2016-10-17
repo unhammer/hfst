@@ -13,6 +13,30 @@
 
 namespace hfst {
 
+  FdOperation::FdOperation
+  (FdOperator op, FdFeature feat, FdValue val, const std::string& str):
+    op(op), feature(feat), value(val), name(str) {}
+
+  FdOperator FdOperation::Operator(void) const { return op; }
+  FdFeature FdOperation::Feature(void) const { return feature; }
+  FdValue FdOperation::Value(void) const { return value; }
+  std::string FdOperation::Name(void) const { return name; }
+
+  FdOperator FdOperation::char_to_operator(char c)
+  {
+    switch (c) {
+    case 'P': return Pop;
+    case 'N': return Nop;
+    case 'R': return Rop;
+    case 'D': return Dop;
+    case 'C': return Cop;
+    case 'U': return Uop;
+    default:
+      throw;
+    }
+  }
+
+
 bool FdOperation::is_diacritic(const std::string& diacritic_string)
 {
   // All diacritics have form @[A-Z][.][A-Z]+([.][A-Z]+)?@

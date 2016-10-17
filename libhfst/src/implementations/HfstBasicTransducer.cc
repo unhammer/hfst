@@ -1269,6 +1269,7 @@
                  }
                catch (const EndOfStreamException & e)
                  {
+                   (void)e;
                    HFST_THROW(NotValidPrologFormatException);
                  }
 
@@ -1302,6 +1303,7 @@
                  }
                catch (const EndOfStreamException & e)
                  {
+                   (void)e;
                    return retval;
                  }
                
@@ -1576,12 +1578,18 @@
            // set value of weight
            float weight = 0;
            if (n == 2) // a final state line with weight
-             weight = atof(a2);
+             {
+               weight = hfst::double_to_float(atof(a2));
+             }
            if (n == 5) // a transition line with weight
-             weight = atof(a5);
+             {
+               weight = hfst::double_to_float(atof(a5));
+             }
            
            if (n == 1 || n == 2)  // a final state line
-             set_final_weight( atoi(a1), weight );
+             {
+               set_final_weight( atoi(a1), weight );
+             }
            
            else if (n == 4 || n == 5) { // a transition line
              std::string input_symbol=std::string(a3);
@@ -2190,7 +2198,9 @@
              // substitutions_[from_symbol] = to_symbol
              std::vector<unsigned int> substitutions_;
              // marker that means that no substitution is made
-             unsigned int no_substitution = HfstTropicalTransducerTransitionData::get_max_number()+substitutions.size()+1;
+             size_t st = HfstTropicalTransducerTransitionData::get_max_number()+substitutions.size()+1;
+             unsigned int no_substitution = hfst::size_t_to_uint(st);
+
              substitutions_.resize
                (HfstTropicalTransducerTransitionData::get_max_number()+1, no_substitution);
              for (HfstSymbolSubstitutions::const_iterator it
@@ -2443,8 +2453,8 @@
          HfstBasicTransducer & HfstBasicTransducer::substitute_weights_with_markers() {
            
            // Go through all current states (we are going to add them)
-           HfstState limit = state_vector.size();
-           for (HfstState state = 0; state < limit; state++)
+           size_t limit = state_vector.size();
+           for (size_t state = 0; state < limit; state++)
              {
                // The transitions that are substituted
                std::stack<HfstBasicTransducer::HfstTransitions::iterator>
@@ -2498,7 +2508,9 @@
                                                      IT->get_input_symbol(),
                                                      IT->get_output_symbol(),
                                                      0);
-                   add_transition(state, new_transition);
+
+                   unsigned int source_state = hfst::size_t_to_uint(state);
+                   add_transition(source_state, new_transition);
                    add_transition(new_state, marker_transition);
                  }
 
@@ -2678,8 +2690,8 @@
          HfstBasicTransducer & HfstBasicTransducer::substitute_markers_with_weights() {
 
            // Go through all states
-           HfstState limit = state_vector.size();
-           for (HfstState state = 0; state < limit; state++)
+           size_t limit = state_vector.size();
+           for (size_t state = 0; state < limit; state++)
              {
                // The transitions that are substituted
                std::stack<HfstBasicTransducer::HfstTransitions::iterator>
@@ -3113,7 +3125,11 @@
              typedef std::set<HfstState>::const_iterator StateIt;
              unsigned int current_distance = 0; // topological distance
              TopologicalSort TopSort;
-             TopSort.set_biggest_state_number(state_vector.size()-1);
+
+             size_t st = state_vector.size()-1;
+             unsigned int biggest_state_number = hfst::size_t_to_uint(st);
+             TopSort.set_biggest_state_number(biggest_state_number);
+
              TopSort.set_state_at_distance(0,current_distance,(dist == MaximumDistance));
              bool new_states_found = false; // end condition for do-while loop
 
@@ -3164,19 +3180,23 @@
           // get topological maximum distance sort
           std::vector<std::set<HfstState> > states_sorted = this->topsort(MaximumDistance);
           // go through all sets of states in descending order
-          for (int distance = states_sorted.size() - 1; distance >= 0; distance--)
+          size_t st = states_sorted.size();
+          if (st > 0)
             {
-              const std::set<HfstState> & states
-                = states_sorted.at((unsigned int)distance);
-              // go through all states in a set
-              for (std::set<HfstState>::const_iterator it = states.begin();
-                   it != states.end(); it++)
+              for (unsigned int distance = hfst::size_t_to_uint(st-1); distance >= 0; distance--)
                 {
-                  // if a final state is encountered, return the distance
-                  // of that state
-                  if (is_final_state(*it))
+                  const std::set<HfstState> & states
+                    = states_sorted.at((unsigned int)distance);
+                  // go through all states in a set
+                  for (std::set<HfstState>::const_iterator it = states.begin();
+                       it != states.end(); it++)
                     {
-                      return distance;
+                      // if a final state is encountered, return the distance
+                      // of that state
+                      if (is_final_state(*it))
+                        {
+                          return distance;
+                        }
                     }
                 }
             }
@@ -3192,20 +3212,24 @@
              // get topological maximum distance sort
              std::vector<std::set<HfstState> > states_sorted = this->topsort(MinimumDistance);
              // go through all sets of states in descending order
-             for (int distance = states_sorted.size() - 1; distance >= 0; distance--)
+             size_t st = states_sorted.size();
+             if (st > 0)
                {
-                 const std::set<HfstState> & states
-                   = states_sorted.at((unsigned int)distance);
-                 // go through all states in a set
-                 for (std::set<HfstState>::const_iterator it = states.begin();
-                      it != states.end(); it++)
+                 for (unsigned int distance = hfst::size_t_to_uint(st-1); distance >= 0; distance--)
                    {
-                     // if a final state is encountered, add its distance
-                     // to result
-                     if (is_final_state(*it))
+                     const std::set<HfstState> & states
+                       = states_sorted.at((unsigned int)distance);
+                     // go through all states in a set
+                     for (std::set<HfstState>::const_iterator it = states.begin();
+                          it != states.end(); it++)
                        {
-                         result.push_back((unsigned int)distance);
-                         break; // go to next set of states
+                         // if a final state is encountered, add its distance
+                         // to result
+                         if (is_final_state(*it))
+                           {
+                             result.push_back((unsigned int)distance);
+                             break; // go to next set of states
+                           }
                        }
                    }
                }

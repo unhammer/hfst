@@ -1537,7 +1537,7 @@ namespace xfst {
 
       bool was_defined = xre_.is_function_definition(name);
 
-      if (! xre_.define_function(name, arguments.size(), xre_converted)) // XRE
+      if (! xre_.define_function(name, hfst::size_t_to_uint(arguments.size()), xre_converted)) // XRE
         {
           error() << "Error when defining function" << std::endl;
           flush(&error());
@@ -1561,7 +1561,7 @@ namespace xfst {
           //        name.c_str(), (int)arguments.size());
         }
 
-      function_arguments_[name] = arguments.size();
+      function_arguments_[name] = hfst::size_t_to_uint(arguments.size());
       function_definitions_[std::string(name)]
         = convert_argument_symbols(arguments, xre, "", xre_, true);
       original_function_definitions_[prototype] = xre;
@@ -3348,7 +3348,7 @@ namespace xfst {
       catch (const TransducerIsCyclicException & e)
         {
           (void)e;
-          int cutoff = string_to_size_t(variables_["print-words-cycle-cutoff"]);
+          int cutoff = hfst::size_t_to_uint(string_to_size_t(variables_["print-words-cycle-cutoff"]));
           error() << "warning: transducer is cyclic, limiting the number of cycles to " << cutoff << std::endl;
           flush(&error());
           //hfst_fprintf(warnstream_, "warning: transducer is cyclic, limiting the number of cycles to %i\n", cutoff);
@@ -4899,7 +4899,7 @@ namespace xfst {
                   PROMPT_AND_RETURN_THIS;
                 }
               else if (! return_to_level(whole_path, shortest_path,
-                                         whole_path.size() - 1))
+                                         hfst::size_t_to_uint(whole_path.size() - 1)))
                 {
                   error() << "FATAL ERROR: could not return to level '" << (int)(whole_path.size() - 1) << "'" << std::endl;
         flush(&error());

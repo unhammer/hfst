@@ -8,6 +8,9 @@
 // information.
 
 #include "HfstDataTypes.h"
+#include <limits.h>
+#include <float.h>
+#include <stdexcept>
 
 namespace hfst
 {
@@ -91,6 +94,43 @@ namespace hfst
         break;
       }
   }
+
+  int size_t_to_int(size_t value)
+  {
+    if (value > INT_MAX)
+      {
+        throw std::overflow_error("data is larger than INT_MAX");
+      }
+    return static_cast<int>(value);
+  }
+
+  unsigned int size_t_to_uint(size_t value)
+  {
+    if (value > UINT_MAX)
+      {
+        throw std::overflow_error("data is larger than UINT_MAX");
+      }
+    return static_cast<unsigned int>(value);
+  }
+
+  unsigned short size_t_to_ushort(size_t value)
+  {
+    if (value > USHRT_MAX)
+      {
+        throw std::overflow_error("data is larger than USHRT_MAX");
+      }
+    return static_cast<unsigned short>(value);
+  }
+
+  float double_to_float(double value)
+  {
+    if (value > FLT_MAX)
+      {
+        throw std::overflow_error("data is larger than FLT_MAX");
+      }
+    return static_cast<float>(value);
+  }
+
 
 }
 

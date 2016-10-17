@@ -1828,6 +1828,7 @@ namespace hfst {
       }
     catch (const std::bad_alloc & e)
       {
+        (void)e;
         HFST_THROW_MESSAGE(HfstFatalException, "TropicalWeightTransducer::nbest runs out of memory");
       }
     RmEpsilon(n_best_fst);
@@ -2925,7 +2926,7 @@ namespace hfst {
                 --i;
                 path = random_path(t, 5);
               }
-            catch (const char * msg) {} // keep on trying
+            catch (const char * msg) { (void)msg; } // keep on trying
           }
 
         /* Insert the path (another or the same). */

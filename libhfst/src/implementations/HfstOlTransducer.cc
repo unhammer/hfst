@@ -90,8 +90,11 @@ namespace hfst { namespace implementations
     else
       { res = 0; }
     
-    for(int i=num_read-1;i>=0;i--)
-      { ungetc(buffer[i], f); }
+    if (num_read > 0)
+      {
+        for(int i=hfst::size_t_to_int(num_read-1);i>=0;i--)
+          { ungetc(buffer[i], f); }
+      }
     if(num_read != 24)
       { clearerr(f); }
     
@@ -117,8 +120,11 @@ namespace hfst { namespace implementations
     else
       { res = 0; }
     
-    for(int i=num_read-1;i>=0;i--)
-      { s.putback(buffer[i]); }
+    if (num_read > 0)
+      {
+        for(int i=hfst::size_t_to_int(num_read-1);i>=0;i--)
+          { s.putback(buffer[i]); }
+      }
     if(num_read != 24)
       { s.clear(); }
     

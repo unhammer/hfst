@@ -53,7 +53,7 @@ namespace hfst { namespace implementations
       string_to_number_map.find(str);
     if (it == string_to_number_map.end()) { // string not found
       number_to_string_vector.push_back(str);
-      unsigned int new_index = number_to_string_vector.size()-1;
+      unsigned int new_index = hfst::size_t_to_uint(number_to_string_vector.size()-1);
       string_to_number_map[str] = new_index;
       return new_index;
     }

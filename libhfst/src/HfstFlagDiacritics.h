@@ -18,6 +18,7 @@
 #include <utility>
 
 #include "hfstdll.h"
+#include "HfstDataTypes.h"
 
 /** @file HfstFlagDiacritics.h
     \brief Class declarations for flag diacritic handling. */
@@ -38,27 +39,14 @@ private:
     std::string name;
 public:
     HFSTDLL FdOperation
-      (FdOperator op, FdFeature feat, FdValue val, const std::string& str):
-    op(op), feature(feat), value(val), name(str) {}
+      (FdOperator op, FdFeature feat, FdValue val, const std::string& str);
     
-    HFSTDLL FdOperator Operator(void) const { return op; }
-    HFSTDLL FdFeature Feature(void) const { return feature; }
-    HFSTDLL FdValue Value(void) const { return value; }
-    HFSTDLL std::string Name(void) const { return name; }
+    HFSTDLL FdOperator Operator(void) const;
+    HFSTDLL FdFeature Feature(void) const;
+    HFSTDLL FdValue Value(void) const;
+    HFSTDLL std::string Name(void) const;
     
-    HFSTDLL static FdOperator char_to_operator(char c)
-        {
-            switch (c) {
-            case 'P': return Pop;
-            case 'N': return Nop;
-            case 'R': return Rop;
-            case 'D': return Dop;
-            case 'C': return Cop;
-            case 'U': return Uop;
-            default:
-                throw;
-            }
-        }
+    HFSTDLL static FdOperator char_to_operator(char c);
 
     HFSTDLL static bool is_diacritic(const std::string& diacritic_str);
     HFSTDLL static std::string::size_type find_diacritic
@@ -120,12 +108,12 @@ public:
       
             if(feature_map.count(feat) == 0)
             {
-                FdFeature next = feature_map.size();
+                FdFeature next = hfst::size_t_to_ushort(feature_map.size());
                 feature_map[feat] = next;
             }
             if(value_map.count(val) == 0)
             {
-                FdValue next = value_map.size()+1;
+                FdValue next = hfst::size_t_to_ushort(value_map.size()+1);
                 value_map[val] = next;
             }
       

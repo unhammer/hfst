@@ -59,6 +59,11 @@ namespace hfst
   const char * implementation_type_to_string(ImplementationType type);
   const char * implementation_type_to_format(ImplementationType type);
 
+  int size_t_to_int(size_t value);
+  unsigned int size_t_to_uint(size_t value);
+  unsigned short size_t_to_ushort(size_t value);
+  float double_to_float(double value);
+
   /** \brief The type of a push operation.
       @see HfstTransducer::push_weights */
   enum PushType
