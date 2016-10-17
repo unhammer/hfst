@@ -66,3 +66,12 @@ do
         exit 1
     fi
 done
+
+rm foo
+rm foo_att_prolog
+rm testfile3.att
+rm testfile_.att
+rm tmp
+rm tmp1
+rm tmp2
+rm tmp3
