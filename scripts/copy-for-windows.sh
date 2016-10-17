@@ -40,6 +40,20 @@ cp python/hfst/exceptions/__init__.py $1/hfst/exceptions/
 cp python/hfst/rules/__init__.py $1/hfst/rules/
 cp python/hfst/types/__init__.py $1/hfst/types/
 
+mkdir $1/test
+for file in README test.sh test.bat \
+    test_fail.xfst testfile.att testfile_fail.att test_pass.xfst test.lexc \
+    cats_and_dogs.prolog cats_and_dogs_fail.prolog \
+    test_pmatch.py test_prolog.py test_exceptions.py test_dir_hfst.py \
+    test_dir_hfst_exceptions.py test_dir_hfst_rules.py test_tokenizer.py \
+    test_read_att_transducer.py test_xre.py test_hfst.py test_examples.py \
+    test_att_reader.py test_prolog_reader.py \
+    test_streams_1.py test_streams_2.py test_streams_3.py streets.txt;
+do
+    cp python/test/$file $1/test/
+done
+
+
 mkdir $1/back-ends
 
 # foma back-end
