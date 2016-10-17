@@ -21,6 +21,7 @@
 #include "back-ends/openfst/src/include/fst/fstlib.h"
 #endif // _MSC_VER
 
+#ifndef _MSC_VER
 namespace fst
 {
   extern template class TropicalWeightTpl<float>;
@@ -29,7 +30,7 @@ namespace fst
   extern template class ArcIterator<StdVectorFst>;
   extern template class StateIterator<StdVectorFst>;
 }
-
+#endif // _MSC_VER
 
 #ifndef MAIN_TEST
 namespace hfst { namespace implementations
