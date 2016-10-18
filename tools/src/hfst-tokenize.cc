@@ -570,12 +570,25 @@ void print_location_vector_giellacg(hfst_ol::PmatchContainer & container,
         for(hfst::StringVector::const_iterator it = words.begin(); it != words.end(); ++it) {
             // Trim left/right spaces:
             const size_t first = it->find_first_not_of(' ');
-            const size_t last = it->find_last_not_of(' ');
-            string form = it->substr(first, (last-first+1));
+            const size_t last = it->find_last_not_of(' ') + 1;
+            string form = it->substr(first, last-first);
             LocationVector loc = locate_fullmatch(container, form);
             if(loc.size() == 0) {
                 std::cerr << "Warning: Backtrack-subform '" << form << "' had no covering analyses."<<std::endl;
                 // but push it anyway, since we want exactly one subvector per splitpoint
+            }
+            if(form.length() != it->length()) { // Ensure the spaces we ignored when looking up are output in the form:
+              vector<string> lspace = vector<string>(first, " ");
+              vector<string> rspace = vector<string>(it->length()-last, " ");
+              for(LocationVector::iterator lvit = loc.begin(); lvit != loc.end(); ++lvit) {
+                lvit->input = form;
+                vector<string>& syms = lvit->input_symbol_strings;
+                syms.insert(syms.begin(), lspace.begin(), lspace.end());
+                syms.insert(syms.end(), rspace.begin(), rspace.end());
+                for(vector<size_t>::iterator ip = lvit->input_parts.begin(); ip != lvit->input_parts.end(); ++ip) {
+                  *ip += first;
+                }
+              }
             }
             splitlocs.push_back(loc);
         }

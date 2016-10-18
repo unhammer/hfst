@@ -20,25 +20,36 @@ if ! $TOOLDIR/hfst-pmatch2fst < $srcdir/tokenize-backtrack.pmscript > $srcdir/to
     exit 1
 fi
 
-# Only --gtd supports this:
-if ! echo "busse skuvla skuvla busse Jan." | $TOOLDIR/hfst-tokenize --gtd $srcdir/tokenize-backtrack.pmhfst > test.strings ; then
-    echo tokenize --gtd fail:
+# Only --giella-cg supports this:
+if ! echo "busse skuvla skuvla busse Jan." | $TOOLDIR/hfst-tokenize --giella-cg $srcdir/tokenize-backtrack.pmhfst > test.strings ; then
+    echo tokenize --giella-cg fail:
     cat test.strings
     exit 1
 fi
-if ! diff test.strings $srcdir/tokenize-backtrack-out-gtd.strings ; then
-    echo diff test.strings $srcdir/tokenize-backtrack-out-gtd.strings
+if ! diff test.strings $srcdir/tokenize-backtrack-out-giella-cg.strings ; then
+    echo diff test.strings $srcdir/tokenize-backtrack-out-giella-cg.strings
     exit 1
 fi
 
-if ! echo "su. su" | $TOOLDIR/hfst-tokenize --gtd $srcdir/tokenize-backtrack.pmhfst > test.strings ; then
-    echo tokenize --gtd contiguous fail:
+if ! echo "su. su" | $TOOLDIR/hfst-tokenize --giella-cg $srcdir/tokenize-backtrack.pmhfst > test.strings ; then
+    echo tokenize --giella-cg contiguous fail:
     cat test.strings
     exit 1
 fi
-if ! diff test.strings $srcdir/tokenize-backtrack-out-gtd-contiguous.strings ; then
-    echo diff test.strings $srcdir/tokenize-backtrack-out-gtd-contiguous.strings
+if ! diff test.strings $srcdir/tokenize-backtrack-out-giella-cg-contiguous.strings ; then
+    echo diff test.strings $srcdir/tokenize-backtrack-out-giella-cg-contiguous.strings
     exit 1
+fi
+
+if ! echo "njeallje   logi guokte" | $TOOLDIR/hfst-tokenize --giella-cg $srcdir/tokenize-backtrack.pmhfst > test.strings ; then
+    echo tokenize --giella-cg contiguous fail:
+    cat test.strings
+    exit 1
+fi
+if ! diff test.strings $srcdir/tokenize-backtrack-out-giella-cg-spaces.strings ; then
+    echo diff test.strings $srcdir/tokenize-backtrack-out-giella-cg-spaces.strings
+    echo expected failure TODO
+    # exit 1
 fi
 
 
