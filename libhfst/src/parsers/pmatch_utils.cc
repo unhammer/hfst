@@ -175,7 +175,7 @@ getinput(char *buf, int maxlen)
 {
     int retval = 0;
     if ( maxlen > (int)len ) {
-        maxlen = len;
+        maxlen = hfst::size_t_to_int(len);
     }
     memcpy(buf, data, maxlen);
     data += maxlen;
@@ -920,7 +920,7 @@ std::vector<std::vector<std::string> > read_args(char * filename, unsigned int a
                 int nextpos = -1;
                 do {
                     curpos = nextpos + 1;
-                    nextpos = line.find_first_of(" ", curpos);
+                    nextpos = hfst::size_t_to_int(line.find_first_of(" ", curpos));
                     current_tokens.push_back(line.substr(curpos, nextpos - curpos));
                 } while (nextpos != std::string::npos);
                 if (current_tokens.size() != argcount) {
@@ -1245,7 +1245,7 @@ HfstTransducer * PmatchSymbol::evaluate(PmatchEvalType eval_type)
         }
         retval = new HfstTransducer(sym, format);
     }
-    retval->set_final_weights(weight, true);
+    retval->set_final_weights(hfst::double_to_float(weight), true);
     retval->minimize();
     report_time();
     return retval;
@@ -1263,7 +1263,7 @@ HfstTransducer * PmatchString::evaluate(PmatchEvalType eval_type) {
     } else {
         tmp = new HfstTransducer(string, format);
     }
-    tmp->set_final_weights(weight, true);
+    tmp->set_final_weights(hfst::double_to_float(weight), true);
     if (cache == NULL && should_use_cache() == true) {
         cache = tmp;
         cache->minimize();
@@ -1293,7 +1293,7 @@ HfstTransducer * PmatchFunction::evaluate(std::vector<PmatchObject *> funargs)
     }
     call_stack.push_back(local_env);
     HfstTransducer * retval = root->evaluate();
-    retval->set_final_weights(weight, true);
+    retval->set_final_weights(hfst::double_to_float(weight), true);
     call_stack.pop_back();
     if (verbose) {
         double duration = (clock() - my_timer) /
@@ -1331,7 +1331,7 @@ HfstTransducer * PmatchBuiltinFunction::evaluate(PmatchEvalType eval_type)
         }
         delete interpolator;
     }
-    retval->set_final_weights(weight, true);
+    retval->set_final_weights(hfst::double_to_float(weight), true);
     report_time();
     return retval;
 }
@@ -1353,7 +1353,7 @@ HfstTransducer * PmatchNumericOperation::evaluate(PmatchEvalType eval_type)
     } else if (op == RepeatNToK) {
         tmp->repeat_n_to_k(values[0], values[1]);
     }
-    tmp->set_final_weights(weight, true);
+    tmp->set_final_weights(hfst::double_to_float(weight), true);
     if (cache == NULL && should_use_cache() == true) {
         cache = tmp;
         cache->minimize();
@@ -1551,7 +1551,7 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
             retval = tmp;
         }
     }
-    retval->set_final_weights(weight, true);
+    retval->set_final_weights(hfst::double_to_float(weight), true);
     if (cache == NULL && should_use_cache() == true) {
         cache = retval;
         cache->minimize();
@@ -1603,6 +1603,7 @@ HfstTransducer * PmatchBinaryOperation::evaluate(PmatchEvalType eval_type)
         try {
             lhs->shuffle(*rhs);
         } catch (const TransducersAreNotAutomataException & e) {
+            (void)e;
             pmatchwarning("tried to shuffle with non-automaton transducers,\n"
                           "    shuffling with their input projection instead.");
             lhs->input_project();
@@ -1634,12 +1635,13 @@ HfstTransducer * PmatchBinaryOperation::evaluate(PmatchEvalType eval_type)
             tmp = hfst::xre::merge_first_to_second(lhs, rhs);
         }
         catch (const TransducersAreNotAutomataException & e) {
+            (void)e;
             pmatcherror("Error: transducers must be automata in merge operation.");
         }
         delete lhs; lhs = tmp;
     }
     delete rhs;
-    lhs->set_final_weights(weight, true);
+    lhs->set_final_weights(hfst::double_to_float(weight), true);
     retval = lhs;
     if (cache == NULL && should_use_cache() == true) {
         cache = retval;
@@ -1681,7 +1683,7 @@ HfstTransducer * PmatchTernaryOperation::evaluate(PmatchEvalType eval_type)
             delete tmp;
         }
     }
-    retval->set_final_weights(weight, true);
+    retval->set_final_weights(hfst::double_to_float(weight), true);
     if (cache == NULL && should_use_cache() == true) {
         cache = retval;
         cache->minimize();
@@ -1715,7 +1717,7 @@ HfstTransducer * PmatchAcceptor::evaluate(PmatchEvalType eval_type)
     case Whitespace:
         retval = new HfstTransducer(* get_utils()->latin1_whitespace_acceptor);
     }
-    retval->set_final_weights(weight, true);
+    retval->set_final_weights(hfst::double_to_float(weight), true);
     report_time();
     return retval;
 }
@@ -1757,7 +1759,7 @@ HfstTransducer * PmatchParallelRulesContainer::evaluate(PmatchEvalType eval_type
         pmatcherror("Unrecognized arrow type");
         return (HfstTransducer *) NULL;
     }
-    retval->set_final_weights(weight, true);
+    retval->set_final_weights(hfst::double_to_float(weight), true);
     report_time();
     if (cache == NULL && should_use_cache() == true) {
         cache = retval;
@@ -1815,7 +1817,7 @@ HfstTransducer * PmatchReplaceRuleContainer::evaluate(PmatchEvalType eval_type)
         pmatcherror("Unrecognized arrow");
         return (HfstTransducer *) NULL;
     }
-    retval->set_final_weights(weight, true);
+    retval->set_final_weights(hfst::double_to_float(weight), true);
     report_time();
     if (cache == NULL && should_use_cache() == true) {
         cache = retval;
@@ -1860,7 +1862,7 @@ HfstTransducer * PmatchQuestionMark::evaluate(PmatchEvalType eval_type)
     } else {
         retval = new HfstTransducer(hfst::internal_unknown, format);
     }
-    retval->set_final_weights(weight, true);
+    retval->set_final_weights(hfst::double_to_float(weight), true);
     report_time();
     return retval;
 }
@@ -1884,7 +1886,7 @@ HfstTransducer * PmatchRestrictionContainer::evaluate(PmatchEvalType eval_type)
     HfstTransducer * l = left->evaluate();
     retval = new HfstTransducer(hfst::xeroxRules::restriction(*l, pair_vector));
     delete l;
-    retval->set_final_weights(weight, true);
+    retval->set_final_weights(hfst::double_to_float(weight), true);
     report_time();
     if (cache == NULL && should_use_cache() == true) {
         cache = retval;

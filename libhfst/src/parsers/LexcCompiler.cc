@@ -450,7 +450,7 @@ LexcCompiler::addStringEntry(const string& data,
     }
     tokenizer_.add_multichar_symbol(joinerEnc);
     StringPairVector newVector(tokenizer_.tokenize(joinerEnc + str + encodedCont));
-    stringsTrie_.disjunct(newVector, weight);
+    stringsTrie_.disjunct(newVector, hfst::double_to_float(weight));
 
     return *this;
 }
@@ -596,8 +596,8 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
         StringPairVector lowerV;
         lowerV = tokenizer_.tokenize(lower_string);
 
-        int upperSize = upperV.size();
-        int lowerSize = lowerV.size();
+        int upperSize = hfst::size_t_to_int(upperV.size());
+        int lowerSize = hfst::size_t_to_int(lowerV.size());
 
         if ( upperSize > lowerSize)
         {
@@ -632,7 +632,7 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
         }
         
     }
-    stringsTrie_.disjunct(newVector, weight);
+    stringsTrie_.disjunct(newVector, hfst::double_to_float(weight));
 
     return *this;
 }
@@ -714,7 +714,7 @@ LexcCompiler::addXreEntry(const string& regexp, const string& continuation,
       }
       tokenizer_.add_multichar_symbol(joinerEnc);
       StringPairVector newVector(tokenizer_.tokenize(joinerEnc + regex_key + encodedCont));
-      stringsTrie_.disjunct(newVector, weight);
+      stringsTrie_.disjunct(newVector, hfst::double_to_float(weight));
 
 
 

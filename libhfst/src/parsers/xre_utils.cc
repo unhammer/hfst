@@ -166,7 +166,7 @@ getinput(char *buf, int maxlen)
 {
     int retval = 0;
     if ( maxlen > (int)len ) {
-        maxlen = len;
+        maxlen = hfst::size_t_to_int(len);
     }
     memcpy(buf, data, maxlen);
     data += maxlen;

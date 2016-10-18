@@ -36,6 +36,8 @@ namespace hfst {
 
 #include <assert.h>
 
+#include "HfstDataTypes.h"
+
 extern void hxfsterror(const char *text);
 
 int source_stack_size = 0;

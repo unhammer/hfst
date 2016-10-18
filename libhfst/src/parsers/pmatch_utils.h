@@ -539,7 +539,7 @@ struct PmatchTransducerContainer: public PmatchObject{
             t->convert(format);
         }
         HfstTransducer * retval = new HfstTransducer(*t);
-        retval->set_final_weights(weight, true);
+        retval->set_final_weights(hfst::double_to_float(weight), true);
         return retval;
     }
 };

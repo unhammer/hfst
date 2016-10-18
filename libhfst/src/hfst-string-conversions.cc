@@ -6,6 +6,7 @@
 
 #include <cstdarg>
 #include <cstdio>
+#include "HfstDataTypes.h"
 
 #include <iostream> // for debugging
 
@@ -54,7 +55,7 @@ namespace hfst
     const HANDLE stdIn = GetStdHandle(STD_INPUT_HANDLE);
     WCHAR * buffer = new WCHAR [buffer_size];
     DWORD numRead = 0;
-    if (ReadConsoleW(stdIn, buffer, size_t(buffer_size/4), &numRead, NULL))
+    if (ReadConsoleW(stdIn, buffer, hfst::size_t_to_uint(buffer_size/4), &numRead, NULL))
       {
         if (DEBUG) { std::cerr << "get_line_from_console: numRead is " << numRead << std::endl; }
         

@@ -196,14 +196,14 @@ void
 token_update_positions(const char *token)
 {
     size_t token_length = strlen(token);
-    int newlines = count_newlines(token);
+    int newlines = hfst::size_t_to_int(count_newlines(token));
     hlexclloc.first_line = hlexclloc.last_line;
     hlexclloc.last_line = (hlexclloc.first_line + newlines);
     // FIXME: columns equal bytes not characters
     hlexclloc.first_column = hlexclloc.last_column + 1;
     if (0 == newlines)
     {
-        hlexclloc.last_column = (hlexclloc.first_column + token_length);
+        hlexclloc.last_column = (hlexclloc.first_column + hfst::size_t_to_int(token_length));
     }
     else
     {
@@ -516,7 +516,7 @@ pair<vector<string>, vector<string> > find_med_alingment(const vector<string> &s
     vector<string> medcwordout;
     
     int x, y, i ;
-    for ( x = s1.size(), y = s2.size(), i = 0; (x > 0) || (y > 0); i++)
+    for ( x = hfst::size_t_to_int(s1.size()), y = hfst::size_t_to_int(s2.size()), i = 0; (x > 0) || (y > 0); i++)
     {
         int dirValue = dir[x][y];
          

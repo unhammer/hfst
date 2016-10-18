@@ -73,6 +73,7 @@ handle_lexicon_name(const string& lexiconName)
   }
   catch(const char * msg)
   {
+    (void)msg;
     return false;
   }
   return true;
@@ -138,6 +139,7 @@ handle_string_pair_entry(const string& upper, const string& lower,
        try {
          hfst::lexc::lexc_->addStringPairEntry(upper, lower, cont, weight);
        } catch(const char * msg) {
+         (void)msg;
          return false;
        }
     }
@@ -152,6 +154,7 @@ handle_string_pair_entry(const string& upper, const string& lower,
        try {
          hfst::lexc::lexc_->addStringPairEntry(upper_, lower_, cont, weight);
        } catch(const char * msg) {
+         (void)msg;
          return false;
        }
     }

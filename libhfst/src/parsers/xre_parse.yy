@@ -214,6 +214,7 @@ REGEXP2: REPLACE
          }
          catch (const FlagDiacriticsAreNotIdentitiesException & e)
              {
+               (void)e;
                xreerror("Error: flag diacritics must be identities in composition if flag-is-epsilon is ON.\n"
                "I.e. only FLAG:FLAG is allowed, not FLAG1:FLAG2, FLAG:bar or foo:FLAG\n"
                "Apply twosided flag-diacritics (tfd) before composition.\n");
@@ -235,6 +236,7 @@ REGEXP2: REPLACE
           }
           catch (const TransducersAreNotAutomataException & e)
           {
+            (void)e;
             xreerror("Error: transducers must be automata in merge operation.");
             delete $1;
             delete $3;
@@ -871,7 +873,7 @@ REGEXP8: REGEXP9 { }
               xreerror("Containment with weight only works with automata");
               YYABORT;
             }
-            $$ = hfst::xre::contains_with_weight($3, $2);
+            $$ = hfst::xre::contains_with_weight($3, hfst::double_to_float($2));
             delete $3;
         }
        | CONTAINMENT_ONCE REGEXP8 {
@@ -975,7 +977,7 @@ REGEXP11: REGEXP12 { }
             delete $4;
         }
         | LEFT_BRACKET REGEXP2 RIGHT_BRACKET WEIGHT {
-            $$ = & $2->set_final_weights($4, true).optimize();
+            $$ = & $2->set_final_weights(hfst::double_to_float($4), true).optimize();
         }
         | LEFT_PARENTHESIS REGEXP2 RIGHT_PARENTHESIS {
             $$ = & $2->optionalize();
@@ -1014,7 +1016,7 @@ SYMBOL_LIST: HALFARC {
 
 REGEXP12: LABEL { }
         | LABEL WEIGHT {
-            $$ = & $1->set_final_weights($2, true);
+            $$ = & $1->set_final_weights(hfst::double_to_float($2), true);
         }
         | READ_BIN {
             try {

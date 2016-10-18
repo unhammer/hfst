@@ -36,6 +36,11 @@
 
 #include "xfst-utils.h"
 
+// for hfst::size_t_to_int
+#ifndef HAVE_GETLINE
+  #include "HfstDataTypes.h"
+#endif // HAVE_GETLINE
+
 using std::string;
 
 // flex stuffa
@@ -50,7 +55,7 @@ namespace hfst { namespace xfst {
     getline(char** s, size_t* n, FILE* f)
       {
         *s = static_cast<char*>(calloc(sizeof(char),*n));
-        char* r = fgets(*s, *n, f);
+        char* r = fgets(*s, hfst::size_t_to_int(*n), f);
         if (r == 0)
           {
             //fprintf(stderr, "unable to read in substitute getline\n");

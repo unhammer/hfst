@@ -27,8 +27,10 @@
 #endif
 
 #include "lexc-utils.h"
+#include "HfstDataTypes.h"
 
 #include <assert.h>
+
 
 extern void hlexcerror(const char *text);
 %}
