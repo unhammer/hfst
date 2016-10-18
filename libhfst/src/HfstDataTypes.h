@@ -20,6 +20,11 @@
 #include <map>
 #include <set>
 
+#ifdef _MSC_VER
+  #define strdup _strdup
+  #define isatty _isatty
+  #define fileno _fileno
+#endif // _MSC_VER
 
 /** @file HfstDataTypes.h
     \brief Datatypes that are needed when using the HFST API. */
@@ -63,6 +68,8 @@ namespace hfst
   unsigned int size_t_to_uint(size_t value);
   unsigned short size_t_to_ushort(size_t value);
   float double_to_float(double value);
+
+  FILE * hfst_fopen(const char * filename, const char * mode);
 
   /** \brief The type of a push operation.
       @see HfstTransducer::push_weights */

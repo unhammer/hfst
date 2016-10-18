@@ -13,7 +13,7 @@
 // common-unary-cases.h
 case 'i':
   inputfilename = hfst_strdup(optarg);
-  inputfile = hfst_fopen(inputfilename, "r");
+  inputfile = ::hfst_fopen(inputfilename, "r");
   if (inputfile == stdin)
     {
       free(inputfilename);

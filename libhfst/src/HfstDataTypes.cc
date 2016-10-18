@@ -131,6 +131,19 @@ namespace hfst
     return static_cast<float>(value);
   }
 
+  FILE * hfst_fopen(const char * filename, const char * mode)
+  {
+#ifdef _MSC_VER
+    FILE * f = NULL;
+    errno_t err = fopen_s(&f, filename, mode);
+    if (err != 0)
+      return NULL;
+    else
+      return f;
+#else
+    return fopen(filename, mode);
+#endif
+  }
 
 }
 

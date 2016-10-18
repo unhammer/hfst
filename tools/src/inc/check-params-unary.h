@@ -15,7 +15,7 @@
         if ((argc - optind) == 1)
           {
             inputfilename = hfst_strdup(argv[optind]);
-            inputfile = hfst_fopen(inputfilename, "r");
+            inputfile = ::hfst_fopen(inputfilename, "r");
             if (inputfile == stdin)
               {
                 free(inputfilename);
