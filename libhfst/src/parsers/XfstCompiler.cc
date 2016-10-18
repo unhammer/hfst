@@ -34,6 +34,8 @@ using std::stack;
 #ifndef _WIN32
   #include <glob.h>
 #else
+  #pragma warning(disable: 4161)
+  #pragma warning(disable: 4103)
   #include <windows.h>
 #endif  // WINDOWS
 

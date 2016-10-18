@@ -1,5 +1,6 @@
 #ifdef WINDOWS
-
+#pragma warning(disable: 4161)
+#pragma warning(disable: 4103)
 #include <windows.h>
 #include <string>
 

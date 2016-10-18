@@ -58,7 +58,7 @@ if platform == "linux" or platform == "linux2" or platform == "darwin":
     ext_define_macros.append(('HAVE_READLINE', None))
     ext_define_macros.append(('HAVE_GETLINE', None))
 if platform == "win32":
-    for macro in ["HFSTEXPORT", "OPENFSTEXPORT", "_MSC_VER", "WINDOWS", "WIN32"]:
+    for macro in ["HFSTEXPORT", "OPENFSTEXPORT", "_MSC_VER", "WINDOWS", "WIN32", "_CRT_SECURE_NO_WARNINGS"]:
         ext_define_macros.append((macro, None))
 
 # use c++0x standard, if possible
