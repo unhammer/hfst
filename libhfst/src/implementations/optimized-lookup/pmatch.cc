@@ -65,7 +65,7 @@ void PmatchAlphabet::add_symbol(const std::string & symbol)
     printable_vector.push_back(true);
     if (exclusionary_lists.size() != 0) {
         // if there are exclusionary lists, they should all accept the new symbol
-        symbol2lists[symbol_table.size()] = symbol_lists.size();
+        symbol2lists[symbol_table.size()] = hfst::size_t_to_ushort(symbol_lists.size());
         symbol_lists.push_back(SymbolNumberVector(exclusionary_lists.begin(),
                                                   exclusionary_lists.end()));
 #ifndef _MSC_VER
@@ -74,7 +74,7 @@ void PmatchAlphabet::add_symbol(const std::string & symbol)
         }
 #else
         for (SymbolNumberVector::const_iterator exc = exclusionary_lists.begin(); exc != exclusionary_lists.end(); exc++) {
-          symbol_list_members[list2symbols[*exc]].push_back(symbol_table.size());
+          symbol_list_members[list2symbols[*exc]].push_back(hfst::size_t_to_uint(symbol_table.size()));
         }
 #endif
     }
@@ -170,14 +170,14 @@ void PmatchAlphabet::process_symbol_list(std::string str, SymbolNumber sym)
         list_symbols.push_back(str_sym);
         if (polarity == true) {
             if (symbol2lists[str_sym] == NO_SYMBOL_NUMBER) {
-                symbol2lists[str_sym] = symbol_lists.size();
+              symbol2lists[str_sym] = hfst::size_t_to_ushort(symbol_lists.size());
                 symbol_lists.push_back(SymbolNumberVector(1, sym));
             } else {
                 symbol_lists[symbol2lists[str_sym]].push_back(sym);
             }
         }
     }
-    list2symbols[sym] = symbol_list_members.size();
+    list2symbols[sym] = hfst::size_t_to_ushort(symbol_list_members.size());
     if (polarity == false) {
         SymbolNumberVector excl_symbols;
         exclusionary_lists.push_back(sym);
@@ -186,7 +186,7 @@ void PmatchAlphabet::process_symbol_list(std::string str, SymbolNumber sym)
                 find(list_symbols.begin(), list_symbols.end(), candidate_for_list) == list_symbols.end()) {
                 excl_symbols.push_back(candidate_for_list);
                 if (symbol2lists[candidate_for_list] == NO_SYMBOL_NUMBER) {
-                    symbol2lists[candidate_for_list] = symbol_lists.size();
+                  symbol2lists[candidate_for_list] = hfst::size_t_to_ushort(symbol_lists.size());
                     symbol_lists.push_back(SymbolNumberVector(1, sym));
                 } else {
                     symbol_lists[symbol2lists[sym]].push_back(sym);
@@ -333,7 +333,7 @@ PmatchContainer::PmatchContainer(std::istream & inputstream):
             properties = parse_hfst3_header(inputstream);
             transducer_name = properties["name"];
         } catch (TransducerHeaderException & e) {
-            break;
+          (void)e; break;
         }
         header = TransducerHeader(inputstream);
         TransducerAlphabet dummy = TransducerAlphabet(
@@ -687,10 +687,10 @@ std::map<std::string, std::string> PmatchContainer::parse_hfst3_header(std::istr
         }
         int i = 0;
         while (i < remaining_header_len) {
-            int length = strlen(headervalue + i);
+            int length = hfst::size_t_to_int(strlen(headervalue + i));
             std::string property(headervalue + i, headervalue + i + length);
             i += length + 1;
-            length = strlen(headervalue + i);
+            length = hfst::size_t_to_int(strlen(headervalue + i));
             std::string value(headervalue + i, headervalue + i + length);
             properties[property] = value;
             i += length + 1;
@@ -778,7 +778,7 @@ void PmatchContainer::process(const std::string & input_str)
             if (locate_mode) {
                 if (!nonmatching_locations.empty()) {
                     LocationVector ls;
-                    Location nonmatching = alphabet.locatefy(printable_input_pos - nonmatching_locations.size(),
+                    Location nonmatching = alphabet.locatefy(printable_input_pos - hfst::size_t_to_uint(nonmatching_locations.size()),
                                                              WeightedDoubleTape(nonmatching_locations, 0.0));
                     nonmatching.output = "@_NONMATCHING_@";
                     ls.push_back(nonmatching);
@@ -810,7 +810,7 @@ void PmatchContainer::process(const std::string & input_str)
     }
     if (locate_mode && !nonmatching_locations.empty()) {
         LocationVector ls;
-        Location nonmatching = alphabet.locatefy(printable_input_pos - nonmatching_locations.size(),
+        Location nonmatching = alphabet.locatefy(printable_input_pos - hfst::size_t_to_uint(nonmatching_locations.size()),
                                                  WeightedDoubleTape(nonmatching_locations, 0.0));
         nonmatching.output = "@_NONMATCHING_@";
         ls.push_back(nonmatching);
@@ -941,7 +941,7 @@ std::string PmatchAlphabet::stringify(const DoubleTape & str)
          it != str.end(); ++it) {
         SymbolNumber output = it->output;
         if (output == special_symbols[entry]) {
-            start_tag_pos.push(retval.size());
+            start_tag_pos.push(hfst::size_t_to_uint(retval.size()));
         } else if (output == special_symbols[exit]) {
             if (start_tag_pos.size() != 0) {
                 start_tag_pos.pop();
@@ -1056,7 +1056,7 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
     container(cont),
     locations(NULL)
 {
-    orig_symbol_count = alphabet.get_symbol_table().size();
+    orig_symbol_count = hfst::size_t_to_uint(alphabet.get_symbol_table().size());
     // initialize the stack for local variables
     LocalVariables locals_front;
     locals_front.flag_state = alphabet.get_fd_table();
@@ -1117,7 +1117,7 @@ PmatchTransducer::PmatchTransducer(std::vector<TransitionW> transition_vector,
     container(cont),
     locations(NULL)
 {
-    orig_symbol_count = alphabet.get_symbol_table().size();
+    orig_symbol_count = hfst::size_t_to_uint(alphabet.get_symbol_table().size());
     // initialize the stack for local variables
     LocalVariables locals_front;
     locals_front.flag_state = alphabet.get_fd_table();
@@ -1147,7 +1147,7 @@ void PmatchTransducer::collect_possible_first_symbols(void)
     std::set<SymbolNumber> special_symbols(special_symbol_v.begin(),
                                            special_symbol_v.end());
     SymbolTable table = alphabet.get_symbol_table();
-    SymbolNumber symbol_count = table.size();
+    SymbolNumber symbol_count = hfst::size_t_to_uint(table.size());
     for (SymbolNumber i = 1; i < symbol_count; ++i) {
         if (!alphabet.is_like_epsilon(i) &&
             !alphabet.is_end_tag(i) &&

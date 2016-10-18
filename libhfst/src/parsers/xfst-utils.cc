@@ -60,27 +60,6 @@ namespace hfst { namespace xfst {
       }
 #endif
 
-    //void
-    //xfst_fclose(FILE * file, const char * name)
-    //{
-    //return fclose(file))
-    //{
-    //  //fprintf(stderr, "Unable to close %s: %s\n", name, strerror(errno));
-    //  throw strerr;
-    //}
-    //}
-
-    //FILE*
-    //xfst_fopen(const char* path, const char* mode)
-    //{
-    //FILE* f = fopen(path, mode);
-    //if (f == NULL)
-    //  {
-    //    fprintf(stderr, "Unable to open %s: %s\n", path, strerror(errno));
-    //  }
-    //return f;
-    //}
-
 char*
 strdup_token_part()
 {

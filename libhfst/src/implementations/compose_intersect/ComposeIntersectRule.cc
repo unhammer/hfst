@@ -22,7 +22,7 @@ namespace hfst
     {}
     bool ComposeIntersectRule::known_symbol(size_t symbol)
     { return
-    symbols.count(HfstTropicalTransducerTransitionData::get_symbol(symbol))
+        symbols.count(HfstTropicalTransducerTransitionData::get_symbol(hfst::size_t_to_uint(symbol)))
     > 0; }
   }
 }

@@ -736,7 +736,7 @@ LWSP [\t ]*
   // ^ include directive
 
   FILE * tmp = NULL;
-  if ((tmp = fopen(hfst::xfst::strstrip(hxfsttext), "r" )) != NULL)
+  if ((tmp = hfst::hfst_fopen(hfst::xfst::strstrip(hxfsttext), "r" )) != NULL)
   {
     //printf("Opening file '%s'.\n", hfst::xfst::strstrip(hxfsttext));
     // push the included text onto the lexer stack

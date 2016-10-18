@@ -65,10 +65,10 @@ namespace hfst
     {
       if (! has_pair(p))
     {
-      pair_state_map[p] = state_pair_vector.size();
+      pair_state_map[p] = hfst::size_t_to_uint(state_pair_vector.size());
       state_pair_vector.push_back(p);
       state_transition_vector.push_back(SymbolTransitionMap());
-      return state_pair_vector.size() - 1;
+      return hfst::size_t_to_uint(state_pair_vector.size() - 1);
     }
       return pair_state_map[p];
     }

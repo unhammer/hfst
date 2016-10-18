@@ -608,7 +608,7 @@ READ_FROM: READ_BIN {
     free($1);
 } | READ_SPACED {
     FILE * f = NULL;
-    f = fopen($1, "r");
+    f = hfst::hfst_fopen($1, "r");
     if (f == NULL) {
         pmatcherror("File cannot be opened.\n");
     } else {
@@ -628,7 +628,7 @@ READ_FROM: READ_BIN {
     }
 } | READ_PROLOG {
     FILE * f = NULL;
-    f = fopen($1, "r");
+    f = hfst::hfst_fopen($1, "r");
     if (f == NULL) {
         pmatcherror("File cannot be opened.\n");
     } else {

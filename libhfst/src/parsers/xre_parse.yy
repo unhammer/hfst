@@ -1033,7 +1033,7 @@ REGEXP12: LABEL { }
         }
         | READ_TEXT {
             FILE * f = NULL;
-            f = fopen($1, "r");
+            f = hfst::hfst_fopen($1, "r");
             if (f == NULL) {
               xreerror("File cannot be opened.\n");
               YYABORT;
@@ -1057,7 +1057,7 @@ REGEXP12: LABEL { }
         }
         | READ_SPACED {
             FILE * f = NULL;
-            f = fopen($1, "r");
+            f = hfst::hfst_fopen($1, "r");
             if (f == NULL) {
               xreerror("File cannot be opened.\n");
               YYABORT;
@@ -1081,7 +1081,7 @@ REGEXP12: LABEL { }
         }
         | READ_PROLOG {
             FILE * f = NULL;
-            f = fopen($1, "r");
+            f = hfst::hfst_fopen($1, "r");
             if (f == NULL) {
               xreerror("File cannot be opened.\n");
               YYABORT;
@@ -1105,7 +1105,7 @@ REGEXP12: LABEL { }
         }
         | READ_RE {
             FILE * f = NULL;
-            f = fopen($1, "r");
+            f = hfst::hfst_fopen($1, "r");
             if (f == NULL) {
               xreerror("File cannot be opened.\n");
               fclose(f);

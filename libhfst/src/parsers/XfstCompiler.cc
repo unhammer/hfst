@@ -91,10 +91,6 @@ using hfst::implementations::HfstBasicTransition;
 
 #include "xfst_help_message.h"
 
-#ifdef _MSC_VER
-  #define strdup _strdup
-#endif
-
 namespace hfst {
 namespace xfst {
 
@@ -289,7 +285,7 @@ namespace xfst {
 
   FILE * XfstCompiler::xfst_fopen(const char* path, const char* mode)
   {
-    FILE * f = fopen(path, mode);
+    FILE * f = hfst::hfst_fopen(path, mode);
     if (f == NULL)
       {
         error() << "could not open file " << path << std::endl;
@@ -1878,7 +1874,7 @@ namespace xfst {
   {
     assert(infilename != NULL);
     
-    FILE * infile = fopen(infilename, "r");
+    FILE * infile = hfst::hfst_fopen(infilename, "r");
     if (infile == NULL)
       {
         error() << "Could not open file " << infilename << std::endl;
@@ -3474,7 +3470,7 @@ namespace xfst {
         error() << "Writing net in dot format to temporary file '" << dotfilename << "'." << std::endl;
         flush(&error());
       }
-    FILE * dotfile = fopen(dotfilename, "wb");
+    FILE * dotfile = hfst::hfst_fopen(dotfilename, "wb");
     hfst::print_dot(dotfile, *tmp);
     fclose(dotfile);
     if (false || verbose_)
@@ -3762,7 +3758,7 @@ namespace xfst {
         xfst_lesser_fail();
         PROMPT_AND_RETURN_THIS;
       }
-    FILE * outfile = fopen(name, "wb");
+    FILE * outfile = hfst::hfst_fopen(name, "wb");
     if (outfile == NULL)
       {
         error() << "Could not open file " << name << std::endl;
@@ -4056,7 +4052,7 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::read_text_or_spaced(const char * filename, bool spaces)
   {
-    FILE * infile = fopen(filename, "r");
+    FILE * infile = hfst::hfst_fopen(filename, "r");
     if (infile == NULL)
       {
         error() << "Could not open file " << filename << std::endl;
@@ -5231,7 +5227,7 @@ namespace xfst {
           }
       }
 
-    FILE * infile = fopen(filename, "r");
+    FILE * infile = hfst::hfst_fopen(filename, "r");
     if (infile == NULL)
       {
         error() << "could not read lexc file" << std::endl;
@@ -5287,7 +5283,7 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::read_att_from_file(const char * filename)
     {
-      FILE * infile = fopen(filename, "r");
+      FILE * infile = hfst::hfst_fopen(filename, "r");
       if (infile == NULL)
         {
           error() << "could not read att file " << filename << std::endl;
@@ -5354,7 +5350,7 @@ namespace xfst {
   int
   XfstCompiler::parse(const char* filename)
     {
-      hxfstin = fopen(filename, "r");
+      hxfstin = hfst::hfst_fopen(filename, "r");
       if (hxfstin == NULL)
         {
           error() << "could not open " << filename << " for reading" << std::endl;

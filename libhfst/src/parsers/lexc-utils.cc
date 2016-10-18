@@ -226,7 +226,7 @@ strdup_token_positions()
         (hlexclloc.first_column == (hlexclloc.last_column - 1)) )
     {
         // TRANSLATORS: filename, line and column
-        (void)sprintf(filenames_lines_cols, "%s:%d.%d",
+      (void)sprintf(filenames_lines_cols, "%s:%d.%d",
             hlexcfilename, hlexclloc.first_line, hlexclloc.first_column);
     }
     else if ( hlexclloc.first_line == hlexclloc.last_line )

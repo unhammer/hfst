@@ -67,7 +67,7 @@ namespace hfst { namespace implementations {
     if (filename == std::string())
       { input_file = stdin; }
     else {
-      input_file = fopen(filename.c_str(),"r");
+      input_file = hfst::hfst_fopen(filename.c_str(),"r");
       if (input_file == NULL)
         {
           HFST_THROW(StreamNotReadableException); }
@@ -299,7 +299,7 @@ namespace hfst { namespace implementations {
     filename(std::string(str))
   {
     if (filename != std::string()) {
-      ofile = fopen(filename.c_str(), "wb");
+      ofile = hfst::hfst_fopen(filename.c_str(), "wb");
       if (ofile == NULL)
         HFST_THROW(StreamNotReadableException);
     }

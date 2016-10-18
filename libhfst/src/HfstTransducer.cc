@@ -26,7 +26,6 @@ using std::map;
 
 using hfst::implementations::ConversionFunctions;
 
-
 #ifndef MAIN_TEST
 
 namespace hfst
@@ -5285,7 +5284,7 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
 void HfstTransducer::write_in_att_format
 (const std::string &filename, bool print_weights) const
 {
-    FILE * ofile = fopen(filename.c_str(), "wb");
+  FILE * ofile = hfst::hfst_fopen(filename.c_str(), "wb");
     if (ofile == NULL) {
     std::string message(filename);
     HFST_THROW_MESSAGE(StreamCannotBeWrittenException, message);
@@ -5534,7 +5533,7 @@ HfstTransducer &HfstTransducer::read_in_att_format
 {
   if (type == XFSM_TYPE)
     { HFST_THROW(FunctionNotImplementedException); }
-  FILE * ifile = fopen(filename.c_str(), "rb");
+  FILE * ifile = hfst::hfst_fopen(filename.c_str(), "rb");
   if (ifile == NULL) {
     std::string message(filename);
     HFST_THROW_MESSAGE(StreamNotReadableException, message);

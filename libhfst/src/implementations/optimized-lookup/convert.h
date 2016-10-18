@@ -83,7 +83,7 @@ struct StatePlaceholder {
         for(std::vector<std::vector<TransitionPlaceholder> >::const_iterator it
                 = transition_placeholders.begin();
             it != transition_placeholders.end(); ++it) {
-            count += it->size();
+            count += hfst::size_t_to_uint(it->size());
         }
         return count;
     }
@@ -101,7 +101,7 @@ struct StatePlaceholder {
             while (symbol_to_transition_placeholder_v.size() <= input) {
                 symbol_to_transition_placeholder_v.push_back(UINT_MAX);
             }
-            symbol_to_transition_placeholder_v[input] = transition_placeholders.size();
+            symbol_to_transition_placeholder_v[input] = hfst::size_t_to_uint(transition_placeholders.size());
             transition_placeholders.push_back(std::vector<TransitionPlaceholder>());
             ++inputs;
             if (type != nonsimple) {
@@ -159,7 +159,7 @@ struct StatePlaceholder {
         //     }
         // } else {
         if (input_present(0)) { // if there are epsilons
-            offset = get_transition_placeholders(0).size();
+            offset = hfst::size_t_to_uint(get_transition_placeholders(0).size());
         }
         for(std::set<SymbolNumber>::iterator flag_it = flag_symbols.begin();
             flag_it != flag_symbols.end(); ++flag_it) {
@@ -168,7 +168,7 @@ struct StatePlaceholder {
                     // Flags go to 0 (even if there's no epsilon)
                     return 0;
                 }
-                offset += get_transition_placeholders(*flag_it).size();
+                offset += hfst::size_t_to_uint(get_transition_placeholders(*flag_it).size());
             }
         }
         for(unsigned int i = 1; i < symbol_to_transition_placeholder_v.size(); ++i) {
@@ -180,7 +180,7 @@ struct StatePlaceholder {
                 if (symbol == i) {
                     return offset;
                 }
-                offset += get_transition_placeholders(i).size();
+                offset += hfst::size_t_to_uint(get_transition_placeholders(i).size());
             }
         }
         std::string message("error in conversion between optimized lookup "
@@ -212,7 +212,7 @@ struct IndexPlaceholders
             while (position >= indices.size()) {
                 indices.push_back(NO_TABLE_INDEX);
             }
-            indices[position] = targets.size();
+            indices[position] = hfst::size_t_to_uint(targets.size());
             targets.push_back(std::pair<unsigned int, SymbolNumber>(target, sym));
         }
 
@@ -527,9 +527,9 @@ public:
   SymbolNumberSet * get_input_symbols(void) const;
   
   SymbolNumber number_of_input_symbols(void) const
-  { return transition_indices.size(); }
+  { return hfst::size_t_to_uint(transition_indices.size()); }
   SymbolNumber number_of_transitions(void) const
-  { return transitions.size(); }
+  { return hfst::size_t_to_uint(transitions.size()); }
   bool is_final(void) const {return final;}
   bool is_big_state(void) const
   {

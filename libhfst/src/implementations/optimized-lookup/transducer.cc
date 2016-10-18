@@ -49,7 +49,7 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is,
         }
         symbol_table.push_back(str.c_str());
     }
-    orig_symbol_count = symbol_table.size();
+    orig_symbol_count = hfst::size_t_to_uint(symbol_table.size());
 }
 
 void TransducerAlphabet::add_symbol(char * symbol)
@@ -80,7 +80,7 @@ TransducerAlphabet::TransducerAlphabet(const SymbolTable& st):
             identity_symbol = i;
         }
     }
-    orig_symbol_count = symbol_table.size();
+    orig_symbol_count = hfst::size_t_to_uint(symbol_table.size());
 }
 
 SymbolNumber TransducerAlphabet::symbol_from_string(
@@ -269,7 +269,7 @@ bool Transducer::initialize_input(const char * input)
             new_symbol[bytes_to_tokenize] = '\0';
             (*input_str_ptr) += bytes_to_tokenize;
             alphabet->add_symbol(new_symbol);
-            k = alphabet->get_symbol_table().size() - 1;
+            k = hfst::size_t_to_uint(alphabet->get_symbol_table().size() - 1);
             encoder->read_input_symbol(new_symbol, k);
             delete [] new_symbol;
         }
@@ -286,10 +286,11 @@ void Transducer::include_symbol_in_alphabet(const std::string & sym)
     if (key != NO_SYMBOL_NUMBER) {
         return;
     }
-    key = alphabet->get_symbol_table().size();
+    key = hfst::size_t_to_uint(alphabet->get_symbol_table().size());
     alphabet->add_symbol(sym);
     char * cstr_for_encoder = new char[sym.size() + 1];
-    std::strcpy(cstr_for_encoder, sym.c_str());
+    //std::strcpy(cstr_for_encoder, sym.c_str());
+    strcpy(cstr_for_encoder, sym.c_str());
     encoder->read_input_symbol(cstr_for_encoder, key);
     delete[] cstr_for_encoder;
 }
@@ -796,9 +797,9 @@ void Transducer::write(std::ostream& os) const
     header->write(os);
     alphabet->write(os);
     for(size_t i=0;i<header->index_table_size();i++)
-        tables->get_index(i).write(os, header->probe_flag(Weighted));
+      tables->get_index(hfst::size_t_to_uint(i)).write(os, header->probe_flag(Weighted));
     for(size_t i=0;i<header->target_table_size();i++)
-        tables->get_transition(i).write(os, header->probe_flag(Weighted));
+      tables->get_transition(hfst::size_t_to_uint(i)).write(os, header->probe_flag(Weighted));
 }
 
 Transducer * Transducer::copy(Transducer * t, bool weighted)

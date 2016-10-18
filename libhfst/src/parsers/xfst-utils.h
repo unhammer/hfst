@@ -33,10 +33,6 @@ namespace hfst { namespace xfst {
     ssize_t getline(char** line, size_t* n, FILE* f);
 #endif
 
-//! @brief Open file and print XFSTish stuff
-//FILE* xfst_fopen(const char* path, const char* mode);
-//! @brief Close \a file that has \a name.
-// void xfst_fclose(FILE * file, const char * name);
 //! @brief Strips initial and final white space and strdups
 char* strstrip(const char* s);
 

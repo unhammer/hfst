@@ -42,7 +42,7 @@ namespace hfst { namespace implementations {
              "XfsmInputStream::XfsmInputStream(\"\") not supported");
         }
       else {
-        FILE * input_file = fopen(filename.c_str(),"r");
+        FILE * input_file = hfst::hfst_fopen(filename.c_str(),"r");
         if (input_file == NULL)
           {
             HFST_THROW(StreamNotReadableException); }
@@ -108,7 +108,7 @@ namespace hfst { namespace implementations {
       filename(std::string(str)), net_list(NULL)
     {
       if (filename != std::string()) {
-        FILE * ofile = fopen(filename.c_str(), "wb");
+        FILE * ofile = hfst::hfst_fopen(filename.c_str(), "wb");
         if (ofile == NULL) {
           HFST_THROW(StreamNotReadableException);
         }

@@ -269,7 +269,7 @@ LexcCompiler& LexcCompiler::parse(const char* filename)
     lexc_ = this;
     hlexclex_destroy();
     hfst::lexc::set_infile_name(filename);
-    hlexcin = fopen(filename, "r");
+    hlexcin = hfst::hfst_fopen(filename, "r");
     if (hlexcin == NULL)
       {
         std::ostream * err = get_stream(error_);
@@ -1292,10 +1292,10 @@ main(int argc, char** argv)
     lexcFoma.setVerbosity(1);
     lexcFoma.setVerbosity(2);
 #endif
-    FILE* existence_check = fopen("LexcCompiler_test.lexc", "r");
+    FILE* existence_check = hfst::hfst_fopen("LexcCompiler_test.lexc", "r");
     if (existence_check == NULL)
       {
-        existence_check = fopen("LexcCompiler_test.lexc", "w");
+        existence_check = hfst::hfst_fopen("LexcCompiler_test.lexc", "w");
         assert(existence_check != NULL);
         fprintf(existence_check, "Definitions\n"        \
                 "\tdef1 = a\tb c;\n" \
@@ -1306,10 +1306,10 @@ main(int argc, char** argv)
                 "LEXICON Root\ncat # ;\ndog Plural ;\n");
         fclose(existence_check);
       }
-    existence_check = fopen("LexcCompiler_test2.lexc", "r");
+    existence_check = hfst::hfst_fopen("LexcCompiler_test2.lexc", "r");
     if (existence_check == NULL)
       {
-        existence_check = fopen("LexcCompiler_test2.lexc", "w");
+        existence_check = hfst::hfst_fopen("LexcCompiler_test2.lexc", "w");
         assert(existence_check != NULL);
         fprintf(existence_check, "LEXICON Plural\ns # ;\n");
         fclose(existence_check);
@@ -1317,7 +1317,7 @@ main(int argc, char** argv)
     std::cout << std::endl << "parsing: ";
 #if HAVE_SFST
     std::cout << "sfst parse(FILE)...";
-    FILE* sfstFile = fopen("LexcCompiler_test.lexc", "r");
+    FILE* sfstFile = hfst::hfst_fopen("LexcCompiler_test.lexc", "r");
     lexcSfst.parse(sfstFile);
     fclose(sfstFile);
     std::cout << "parse(filename)...";
@@ -1325,7 +1325,7 @@ main(int argc, char** argv)
 #endif
 #if HAVE_OPENFST
     std::cout << "ofst parse(FILE)...";
-    FILE* ofstFile = fopen("LexcCompiler_test.lexc", "r");
+    FILE* ofstFile = hfst::hfst_fopen("LexcCompiler_test.lexc", "r");
     lexcOfst.parse(ofstFile);
     fclose(ofstFile);
     std::cout << "parse(filename)...";
@@ -1333,7 +1333,7 @@ main(int argc, char** argv)
 #endif
 #if HAVE_FOMA
     std::cout << "foma parse(FILE)...";
-    FILE* fomaFile = fopen("LexcCompiler_test.lexc", "r");
+    FILE* fomaFile = hfst::hfst_fopen("LexcCompiler_test.lexc", "r");
     lexcFoma.parse(fomaFile);
     fclose(fomaFile);
     std::cout << "parse(filename)...";

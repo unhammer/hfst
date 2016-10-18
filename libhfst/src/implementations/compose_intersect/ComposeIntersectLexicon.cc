@@ -25,7 +25,7 @@ namespace hfst
 
     bool ComposeIntersectLexicon::is_flag_diacritic(size_t symbol)
     { return FdOperation::is_diacritic
-    (HfstTropicalTransducerTransitionData::get_symbol(symbol)); }
+        (HfstTropicalTransducerTransitionData::get_symbol(hfst::size_t_to_uint(symbol))); }
 
     void ComposeIntersectLexicon::clear_all_info(void)
     {
@@ -94,7 +94,7 @@ namespace hfst
       float rules_weight = rules->get_final_weight(pair_vector[s].second);
       if (lexicon_weight != std::numeric_limits<float>::infinity() &&
           rules_weight != std::numeric_limits<float>::infinity())
-        { result.set_final_weight(s,lexicon_weight+rules_weight); }
+        { result.set_final_weight(hfst::size_t_to_uint(s),lexicon_weight+rules_weight); }
     }
     }
 
@@ -216,8 +216,8 @@ namespace hfst
     (origin,
      HfstBasicTransition
      (target,
-      HfstTropicalTransducerTransitionData::get_symbol(input),
-      HfstTropicalTransducerTransitionData::get_symbol(output),
+      HfstTropicalTransducerTransitionData::get_symbol(hfst::size_t_to_uint(input)),
+      HfstTropicalTransducerTransitionData::get_symbol(hfst::size_t_to_uint(output)),
       weight)); }
 
   }
