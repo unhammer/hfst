@@ -48,8 +48,7 @@ if ! echo "njeallje   logi guokte" | $TOOLDIR/hfst-tokenize --giella-cg $srcdir/
 fi
 if ! diff test.strings $srcdir/tokenize-backtrack-out-giella-cg-spaces.strings ; then
     echo diff test.strings $srcdir/tokenize-backtrack-out-giella-cg-spaces.strings
-    echo expected failure TODO
-    # exit 1
+    exit 1
 fi
 
 

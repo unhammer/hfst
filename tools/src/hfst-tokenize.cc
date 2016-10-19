@@ -395,14 +395,15 @@ void print_cg_subreading(size_t const & indent,
 
 typedef std::set<size_t> SplitPoints;
 
-SplitPoints print_reading_giellacg(const Location *loc,
-                                   size_t indent,
-                                   const bool always_wftag,
-                                   std::ostream & outstream)
+pair<SplitPoints, size_t>
+print_reading_giellacg(const Location *loc,
+                       size_t indent,
+                       const bool always_wftag,
+                       std::ostream & outstream)
 {
     SplitPoints bt_its;
     if(loc->output.empty()) {
-        return bt_its;
+        return make_pair(bt_its, indent);
     }
     typedef hfst::StringVector::const_iterator PartIt;
     PartIt
@@ -473,7 +474,7 @@ SplitPoints print_reading_giellacg(const Location *loc,
         bt_its.insert(0);
         bt_its.insert(loc->input_symbol_strings.size());
     }
-    return bt_its;
+    return make_pair(bt_its, indent);
 }
 
 /**
@@ -549,18 +550,20 @@ void print_location_vector_giellacg(hfst_ol::PmatchContainer & container,
     std::set<SplitPoints> backtrack;
     for (LocationVector::const_iterator loc_it = locations.begin();
          loc_it != locations.end(); ++loc_it) {
-        SplitPoints bt_points = print_reading_giellacg(&(*loc_it), 1, false, outstream);
+        SplitPoints bt_points = print_reading_giellacg(&(*loc_it), 1, false, outstream).first;
         if(!bt_points.empty()) {
             backtrack.insert(bt_points);
         }
     }
     if(backtrack.empty()) {
-        return;
+	return;
     }
     // The rest of the function handles possible backtracking:
     hfst::StringVector in_syms = locations.at(0).input_symbol_strings;
+
     for(std::set<SplitPoints>::const_iterator bt_points = backtrack.begin();
         bt_points != backtrack.end(); ++bt_points) {
+
         // First, for every set of backtrack points, we split on every
         // point in that N+1-sized set (the backtrack points include
         // start/end points), and create an N-sized vector splitlocs of
@@ -578,17 +581,17 @@ void print_location_vector_giellacg(hfst_ol::PmatchContainer & container,
                 // but push it anyway, since we want exactly one subvector per splitpoint
             }
             if(form.length() != it->length()) { // Ensure the spaces we ignored when looking up are output in the form:
-              vector<string> lspace = vector<string>(first, " ");
-              vector<string> rspace = vector<string>(it->length()-last, " ");
-              for(LocationVector::iterator lvit = loc.begin(); lvit != loc.end(); ++lvit) {
-                lvit->input = form;
-                vector<string>& syms = lvit->input_symbol_strings;
-                syms.insert(syms.begin(), lspace.begin(), lspace.end());
-                syms.insert(syms.end(), rspace.begin(), rspace.end());
-                for(vector<size_t>::iterator ip = lvit->input_parts.begin(); ip != lvit->input_parts.end(); ++ip) {
-                  *ip += first;
+                vector<string> lspace = vector<string>(first, " ");
+                vector<string> rspace = vector<string>(it->length()-last, " ");
+                for(LocationVector::iterator lvit = loc.begin(); lvit != loc.end(); ++lvit) {
+                    lvit->input = form;
+                    vector<string>& syms = lvit->input_symbol_strings;
+                    syms.insert(syms.begin(), lspace.begin(), lspace.end());
+                    syms.insert(syms.end(), rspace.begin(), rspace.end());
+                    for(vector<size_t>::iterator ip = lvit->input_parts.begin(); ip != lvit->input_parts.end(); ++ip) {
+                        *ip += first;
+                    }
                 }
-              }
             }
             splitlocs.push_back(loc);
         }
@@ -607,15 +610,17 @@ void print_location_vector_giellacg(hfst_ol::PmatchContainer & container,
         vector<pair<LocationVector, size_t > > stack;
         // In CG the *last* word is the least indented, so start from
         // the end of splitlocs, indentation being 1 tab:
-        stack.push_back(make_pair(splitlocs.at(bottom), 1));
+        stack.push_back(make_pair(splitlocs.at(bottom),
+                                  0));
         while(!stack.empty() && !stack.back().first.empty()) {
             LocationVector & locs = stack.back().first;
             const Location loc = locs.back();
             locs.pop_back();
-            const size_t indent = depth + stack.back().second;
+            const size_t indent = 1 + stack.back().second;
             out.at(depth).clear();
             out.at(depth).str(string());
-            SplitPoints _no_recursive_backtrack = print_reading_giellacg(&loc, indent, true, out.at(depth));
+            // (ignore splitpoints of splitpoints)
+            const size_t new_indent = print_reading_giellacg(&loc, indent, true, out.at(depth)).second;
             if(depth == bottom) {
                 for(vector<std::ostringstream>::const_iterator it = out.begin(); it != out.end(); it++) {
                     outstream << it->str();
@@ -625,7 +630,7 @@ void print_location_vector_giellacg(hfst_ol::PmatchContainer & container,
                 ++depth;
                 if(depth > 0) {
                     stack.push_back(make_pair(splitlocs.at(bottom-depth),
-                                              indent));
+                                              new_indent));
                 }
             }
             else if(locs.empty()) {
