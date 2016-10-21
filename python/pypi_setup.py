@@ -62,9 +62,9 @@ if platform == "win32":
         ext_define_macros.append((macro, None))
 
 # use c++0x standard, if possible
-ext_extra_compile_args = []
+ext_extra_compile_args = ['']
 if platform == "linux" or platform == "linux2" or platform == "darwin":
-    ext_extra_compile_args = ["-std=c++0x"]
+    ext_extra_compile_args = ["-std=c++0x", "-Wno-sign-compare", "-Wno-strict-prototypes"]
 # define error handling mechanism on windows
 if platform == "win32":
     ext_extra_compile_args = ["/EHsc"]
@@ -140,41 +140,58 @@ libhfst_source_files = ["libhfst/src/parsers/XfstCompiler" + cpp,
                         "libhfst/src/parsers/pmatch_utils" + cpp,
                         "libhfst/src/parsers/xre_utils" + cpp,
                         "libhfst/src/parsers/xfst-utils" + cpp,
-                        "libhfst/src/parsers/xfst_help_message" + cpp,
-                        "back-ends/" + openfstdir + "/src/lib/compat" + cpp,
-                        "back-ends/" + openfstdir + "/src/lib/flags" + cpp,
-                        "back-ends/" + openfstdir + "/src/lib/fst" + cpp,
-                        "back-ends/" + openfstdir + "/src/lib/properties" + cpp,
-                        "back-ends/" + openfstdir + "/src/lib/symbol-table" + cpp,
-                        "back-ends/" + openfstdir + "/src/lib/symbol-table-ops" + cpp,
-                        "back-ends/" + openfstdir + "/src/lib/util" + cpp,
-                        "back-ends/foma/int_stack.c",
-                        "back-ends/foma/define.c",
-                        "back-ends/foma/determinize.c",
-                        "back-ends/foma/apply.c",
-                        "back-ends/foma/rewrite.c",
-                        "back-ends/foma/topsort.c",
-                        "back-ends/foma/flags.c",
-                        "back-ends/foma/minimize.c",
-                        "back-ends/foma/reverse.c",
-                        "back-ends/foma/extract.c",
-                        "back-ends/foma/sigma.c",
-                        "back-ends/foma/structures.c",
-                        "back-ends/foma/constructions.c",
-                        "back-ends/foma/coaccessible.c",
-                        "back-ends/foma/io.c",
-                        "back-ends/foma/utf8.c",
-                        "back-ends/foma/spelling.c",
-                        "back-ends/foma/dynarray.c",
-                        "back-ends/foma/mem.c",
-                        "back-ends/foma/stringhash.c",
-                        "back-ends/foma/trie.c",
-                        "back-ends/foma/lex.yy.c",
-                        "back-ends/foma/regex.c"]
+                        "libhfst/src/parsers/xfst_help_message" + cpp ]
+
+foma_source_files = [ "back-ends/foma/int_stack.c",
+                      "back-ends/foma/define.c",
+                      "back-ends/foma/determinize.c",
+                      "back-ends/foma/apply.c",
+                      "back-ends/foma/rewrite.c",
+                      "back-ends/foma/topsort.c",
+                      "back-ends/foma/flags.c",
+                      "back-ends/foma/minimize.c",
+                      "back-ends/foma/reverse.c",
+                      "back-ends/foma/extract.c",
+                      "back-ends/foma/sigma.c",
+                      "back-ends/foma/structures.c",
+                      "back-ends/foma/constructions.c",
+                      "back-ends/foma/coaccessible.c",
+                      "back-ends/foma/io.c",
+                      "back-ends/foma/utf8.c",
+                      "back-ends/foma/spelling.c",
+                      "back-ends/foma/dynarray.c",
+                      "back-ends/foma/mem.c",
+                      "back-ends/foma/stringhash.c",
+                      "back-ends/foma/trie.c",
+                      "back-ends/foma/lex.yy.c",
+                      "back-ends/foma/regex.c" ]
+
+openfst_source_files =  [ "back-ends/" + openfstdir + "/src/lib/compat" + cpp,
+                          "back-ends/" + openfstdir + "/src/lib/flags" + cpp,
+                          "back-ends/" + openfstdir + "/src/lib/fst" + cpp,
+                          "back-ends/" + openfstdir + "/src/lib/properties" + cpp,
+                          "back-ends/" + openfstdir + "/src/lib/symbol-table" + cpp,
+                          "back-ends/" + openfstdir + "/src/lib/symbol-table-ops" + cpp,
+                          "back-ends/" + openfstdir + "/src/lib/util" + cpp ]
+
 # todo: see what files are actually needed...
-if platform == "linux" or platform == "linux2" or platform == "darwin":
-    libhfst_source_files.append("back-ends/foma/lexcread.c")
-    libhfst_source_files.append("back-ends/foma/lex.lexc.c")
+# if platform == "linux" or platform == "linux2" or platform == "darwin":
+#    foma_source_files.append("back-ends/foma/lexcread.c")
+#    foma_source_files.append("back-ends/foma/lex.lexc.c")
+
+libhfst_source_files = libhfst_source_files + openfst_source_files
+
+if platform == "linux" or platform == "linux2" or platform == "win32":
+    libhfst_source_files = libhfst_source_files + foma_source_files
+
+# clang doesn't accept "-std=c++0x" flag when compiling C,
+# so foma back-end must be compiled separately
+foma_object_files = []
+if platform == "darwin":
+    import subprocess
+    for file in foma_source_files:
+        subprocess.call(["gcc", "-fPIC", "-std=c99", "-c", file])
+        foma_object_files.append(file.replace('back-ends/foma/','').replace('.c','.o'))
 
 # The HFST c++ extension
 libhfst_module = Extension('_libhfst',
@@ -186,7 +203,8 @@ libhfst_module = Extension('_libhfst',
                            libraries = ext_libraries,
                            define_macros = ext_define_macros,
                            extra_link_args = ext_extra_link_args,
-                           extra_compile_args = ext_extra_compile_args
+                           extra_compile_args = ext_extra_compile_args,
+                           extra_objects = foma_object_files
                            )
 
 setup(name = 'hfstpy',
