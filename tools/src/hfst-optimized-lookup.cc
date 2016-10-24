@@ -1824,7 +1824,7 @@ void TransducerWFdUniq::printAnalyses(std::string prepend)
     }
   std::multimap<Weight, std::string>::iterator display_it;
   for (display_it = weight_sorted_map.begin();
-       display_it != weight_sorted_map.end(), i < maxAnalyses;
+       display_it != weight_sorted_map.end() && i < maxAnalyses;
        display_it++, i++)
     {
       if (outputType == xerox)

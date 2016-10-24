@@ -141,7 +141,8 @@ debug_save_transducer(hfst::HfstTransducer& t, const char* name)
 {
     if (debug)
       {
-        char* debug_name = static_cast<char*>(malloc(sizeof(char)*(strlen("DEBUG: " + strlen(name) + 1 ))));
+        char* debug_name = static_cast<char*>
+          ( malloc( sizeof(char)*(strlen("DEBUG: ") + strlen(name) + 1) ) );
         if ((sprintf(debug_name, "DEBUG %s", name)) > 0 )
           {
             t.set_name(debug_name);

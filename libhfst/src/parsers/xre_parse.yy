@@ -326,7 +326,7 @@ REGEXP2: REPLACE
                 }
                 tmpTr->optimize();
                 $$ = tmpTr;
-                delete($1, $2, $3);
+                delete $1; delete $2; delete $3;
             }
          }
         ;
@@ -422,7 +422,7 @@ RULE: MAPPINGPAIR_VECTOR
         
         Rule rule( $1->second, $2->second, $2->first );
         $$ =  new std::pair< ReplaceArrow, Rule> ($1->first, rule);
-        delete $1, $2;
+        delete $1; delete $2;
       }
       ;
       
@@ -463,7 +463,7 @@ MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
           HfstTransducerPair mappingPair(*$1, *$3);
           $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($2, mappingPair);
 
-          delete $1, $3;
+          delete $1; delete $3;
       }
       | REPLACE REPLACE_ARROW REPLACE MARKUP_MARKER REPLACE
       {
@@ -472,7 +472,7 @@ MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
           HfstTransducerPair mappingPair = create_mapping_for_mark_up_replace( tmpMappingPair, marks );
           
           $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($2, mappingPair);
-          delete $1, $3, $5;
+          delete $1; delete $3; delete $5;
       }
       | REPLACE REPLACE_ARROW REPLACE MARKUP_MARKER
       {
@@ -482,7 +482,7 @@ MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
           HfstTransducerPair mappingPair = create_mapping_for_mark_up_replace( tmpMappingPair, marks );
                    
           $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($2, mappingPair);
-          delete $1, $3;
+          delete $1; delete $3;
       }
       | REPLACE REPLACE_ARROW MARKUP_MARKER REPLACE
       {
@@ -492,7 +492,7 @@ MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
           HfstTransducerPair mappingPair = create_mapping_for_mark_up_replace( tmpMappingPair, marks );
           
           $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($2, mappingPair);
-          delete $1, $4;
+          delete $1; delete $4;
       }
        | LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED REPLACE_ARROW REPLACE
       {
@@ -508,7 +508,7 @@ MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
       {
 	  HfstTransducerPair mappingPair(*$2, *$5);
           $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($4, mappingPair);
-          delete $2, $5;
+          delete $2; delete $5;
       }
       
        | REPLACE REPLACE_ARROW LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED
@@ -523,7 +523,7 @@ MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
       {
           HfstTransducerPair mappingPair(*$1, *$4);
           $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($2, mappingPair);
-          delete $1, $4;
+          delete $1; delete $4;
       }
       
       ;
@@ -581,7 +581,7 @@ CONTEXT: REPLACE CENTER_MARKER REPLACE
              t2.optimize().prune_alphabet(false);
 
             $$ = new HfstTransducerPair(t1, t2);
-            delete $1, $3;
+            delete $1; delete $3;
          }
       | REPLACE CENTER_MARKER
          {
@@ -696,11 +696,11 @@ REGEXP3: REGEXP4 { }
         }
        | REGEXP3 BEFORE REGEXP4 {
             $$ = new HfstTransducer( before (*$1, *$3) );
-            delete $1, $3;
+            delete $1; delete $3;
         }
        | REGEXP3 AFTER REGEXP4 {
             $$ = new HfstTransducer( after (*$1, *$3) );
-            delete $1, $3;
+            delete $1; delete $3;
         }
 
        ;
@@ -750,7 +750,7 @@ RESTR_CONTEXTS_VECTOR: RESTR_CONTEXT
 RESTR_CONTEXT: REGEXP4 CENTER_MARKER REGEXP4
          {
             $$ = new HfstTransducerPair(*$1, *$3);
-            delete $1, $3;
+            delete $1; delete $3;
          }
       | REGEXP4 CENTER_MARKER
          {
@@ -812,7 +812,7 @@ REGEXP5: REGEXP6 { }
             right->invert();
             left->invert();
             $$ = & (left->priority_union(*right).invert());
-            delete $1, $3;
+            delete $1; delete $3;
         }
        ;
 

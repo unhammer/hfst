@@ -14,7 +14,7 @@ State sentence_state = 0;
 SequenceTagger::SequenceTagger
 (SequenceModelComponent &sequence_model_component):
   sequence_model_component(sequence_model_component),
-  states(0),
+  //  states(0),
   sentences(0)
 {}
 

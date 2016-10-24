@@ -109,7 +109,7 @@ print_usage()
     fprintf(message_out, "Examples:\n"
             "  echo \"Define TOP  UppercaseAlpha Alpha* LC({professor}) EndTag(ProfName);\" | %s \n"
             "  create matcher that tags \"professor Chomsky\" as \"professor <ProfName>Chomsky</ProfName>\"\n"
-            "\n", program_name, program_name);
+            "\n", program_name);
     print_report_bugs();
     fprintf(message_out, "\n");
     print_more_info();

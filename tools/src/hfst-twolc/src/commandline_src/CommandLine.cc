@@ -246,9 +246,9 @@ int CommandLine::parse_options(int argc, char** argv)
   if (this->has_output_file)
     { this->output_file_name = outfilename; }
   this->format = form;
-  this->help = help;
-  this->usage = usage;
-  this->version = version;
+  //this->help = help;
+  //this->usage = usage;
+  //this->version = version;
   free(infilename);
   free(outfilename);
 

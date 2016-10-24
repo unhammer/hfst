@@ -71,7 +71,7 @@ size_t get_size_t(const std::string &str)
   in >> i;
 
   if (in.fail())
-    { return -1; }
+    { throw "fail"; }
 
   return i;
 }
@@ -185,23 +185,29 @@ parse_options(int argc, char** argv)
       break;
 
     case 'n':
-      max_number_of_guesses = get_size_t(optarg);
-      
-      if (max_number_of_guesses < 0)
+      try
         {
+          max_number_of_guesses = get_size_t(optarg);
+        }
+      catch (const char * msg)
+        {
+          (void)msg;
           error(EXIT_FAILURE, 0, "Invalid maximal number of guesses %s. "
-            "Give a positive int.", optarg);
+                "Give a positive int.", optarg);
         }
       
       break;
 
     case 'm':
-      max_number_of_forms = get_size_t(optarg);
-      
-      if (max_number_of_forms < 0)
+      try
         {
+          max_number_of_forms = get_size_t(optarg);
+        }
+      catch (const char * msg)
+        {
+          (void)msg;
           error(EXIT_FAILURE, 0, "Invalid maximal number of generated "
-            "forms %s. Give a positive int.", optarg);
+                "forms %s. Give a positive int.", optarg);
         }
       
       break;

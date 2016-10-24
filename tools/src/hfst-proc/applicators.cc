@@ -169,8 +169,8 @@ AnalysisApplicator::apply()
           //if(word_length == string::npos)
           size_t word_length = surface_form.size();
 
-          int revert_count = surface_form.size()-word_length+
-                         next_token_is_part_of_word ? 0 : 1;
+          int revert_count = (surface_form.size()-word_length+
+                              next_token_is_part_of_word) ? 0 : 1;
 
           if(printDebuggingInformationFlag)
             std::cout << "word_length=" << word_length << ", surface_form.size()=" << surface_form.size()

@@ -34,7 +34,7 @@ class SequenceTagger
 
   Agenda agenda;
 
-  size_t states;
+  //size_t states;
   size_t sentences;
 
   void process_configuration(const SentenceTransducer &sentence_transducer,

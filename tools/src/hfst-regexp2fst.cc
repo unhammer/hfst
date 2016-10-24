@@ -128,7 +128,7 @@ print_usage()
 //"  echo \" {cat}:{dog} ; 3 \" | %s   legacy way of defining weights\n"
 "  echo \" cat ; dog ; \"3\" \" | %s -S  create transducers\n"
 "                                               \"cat\" and \"dog\" and \"3\"\n"
-                "\n", program_name, program_name, program_name, program_name, program_name);
+                "\n", program_name, program_name, program_name, program_name);
         print_report_bugs();
         fprintf(message_out, "\n");
         print_more_info();
