@@ -95,6 +95,7 @@ WeightedStringVector tokenize_lexicon_line(const std::string &line,
 WeightedStringVector tokenize_grammar_line(const std::string &line,
 					   HfstTokenizer &tokenizer)
 {
+  (void)tokenizer;
   StringVector split_line = split(line, '\t');
 
   if ((split_line.size() % 2) != 1 or split_line.size() < 3)

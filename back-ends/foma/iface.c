@@ -63,6 +63,7 @@ extern int foma_net_print(struct fsm *net, gzFile outfile);
   #ifdef ZLIB
     extern int foma_net_print(struct fsm *net, gzFile outfile);
   #endif
+int snprintf(char *str, size_t size, const char *format, ...);
 #endif // #ifdef ORIGINAL
 
 static char *sigptr(struct sigma *sigma, int number);
