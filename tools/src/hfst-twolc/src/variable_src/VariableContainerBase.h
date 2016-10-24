@@ -17,7 +17,7 @@
 //   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef VARIABLE_CONTAINER_BASE_H_
-#define VARIABLE_CONTAINER_BASE_H
+#define VARIABLE_CONTAINER_BASE_H_
 
 #ifdef HAVE_CONFIG_H
 #  include <config.h>
