@@ -49,6 +49,7 @@ CLASSES:
 import hfst.exceptions
 import hfst.rules
 import hfst.types
+import hfst.xerox_rules
 from libhfst import is_diacritic, compile_pmatch_expression, HfstTransducer, HfstOutputStream, HfstInputStream,\
 HfstTokenizer, HfstBasicTransducer, HfstBasicTransition, XreCompiler, LexcCompiler, \
 XfstCompiler, set_default_fst_type, get_default_fst_type, fst_type_to_string, PmatchContainer, \

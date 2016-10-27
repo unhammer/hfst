@@ -88,6 +88,20 @@ namespace hfst
             replType = a_rule.get_replType();
            
         }
+
+      // for SWIG
+      Rule::Rule()
+      {
+        HfstTokenizer TOK;
+        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        hfst::ImplementationType type = hfst::ImplementationType::TROPICAL_OPENFST_TYPE;
+        HfstTransducerPair contextPair(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type),
+                                       HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type));
+        HfstTransducerPairVector epsilonContext;
+        epsilonContext.push_back(contextPair);
+        context = epsilonContext;
+        replType = REPL_UP;
+      }
        
       HfstTransducerPairVector Rule::get_mapping() const
       {

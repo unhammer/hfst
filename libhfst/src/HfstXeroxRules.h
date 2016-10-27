@@ -57,6 +57,8 @@ namespace hfst
             
             //copy
             Rule ( const Rule& );
+            // default constructor needed for SWIG...
+            Rule();
 
             HfstTransducerPairVector get_mapping() const;
             HfstTransducerPairVector get_context() const;

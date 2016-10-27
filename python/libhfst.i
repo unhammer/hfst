@@ -38,11 +38,13 @@
 #include "HfstExceptionDefs.h"
 #include "HfstTokenizer.h"
 #include "HfstFlagDiacritics.h"
+#include "HfstXeroxRules.h"
 #include "parsers/XreCompiler.h"
 #include "parsers/LexcCompiler.h"
 #include "parsers/XfstCompiler.h"
 #include "implementations/HfstBasicTransducer.h"
 #include "implementations/optimized-lookup/pmatch.h"
+namespace hfst { typedef std::vector<hfst::xeroxRules::Rule> HfstRuleVector; }
 
 // Most of C++ extension code is located in separate files.
 #include "hfst_regex_extensions.cc"
@@ -90,6 +92,7 @@ namespace std {
 %template(HfstTwoLevelPaths) set<pair<float, vector<pair<string, string > > > >;
 %template(HfstTransducerPair) pair<hfst::HfstTransducer, hfst::HfstTransducer>;
 %template(HfstTransducerPairVector) vector<pair<hfst::HfstTransducer, hfst::HfstTransducer> >;
+%template(HfstRuleVector) vector<hfst::xeroxRules::Rule>;
 }
 
 
@@ -159,7 +162,7 @@ typedef std::map<std::pair<std::string, std::string>, std::pair<std::string, std
 typedef std::vector<hfst::HfstTransducer> HfstTransducerVector;
 typedef std::pair<hfst::HfstTransducer, hfst::HfstTransducer> HfstTransducerPair;
 typedef std::vector<std::pair<hfst::HfstTransducer, hfst::HfstTransducer> > HfstTransducerPairVector;
-
+typedef std::vector<hfst::xeroxRules::Rule> HfstRuleVector;
 
 // *** Some enumerations *** //
 
@@ -167,6 +170,63 @@ enum ImplementationType
 { SFST_TYPE, TROPICAL_OPENFST_TYPE, LOG_OPENFST_TYPE, FOMA_TYPE,
   XFSM_TYPE, HFST_OL_TYPE, HFST_OLW_TYPE, HFST2_TYPE,
   UNSPECIFIED_TYPE, ERROR_TYPE };
+
+  namespace xeroxRules
+  {
+    enum ReplaceType {REPL_UP, REPL_DOWN, REPL_RIGHT, REPL_LEFT};
+
+    class Rule
+    {
+    public:
+      Rule();
+      Rule(const hfst::HfstTransducerPairVector&);
+      Rule(const hfst::HfstTransducerPairVector&, const hfst::HfstTransducerPairVector&, ReplaceType);
+      Rule(const Rule&);
+      hfst::HfstTransducerPairVector get_mapping() const;
+      hfst::HfstTransducerPairVector get_context() const;
+      ReplaceType get_replType() const;
+      void encodeFlags();
+      // friend std::ostream& operator<<(std::ostream &out, const Rule &r);
+    };
+
+    // replace up, left, right, down
+    hfst::HfstTransducer replace(const Rule &rule, bool optional);
+    // for parallel rules
+    hfst::HfstTransducer replace(const HfstRuleVector &ruleVector, bool optional);
+    // replace up, left, right, down
+%rename("xerox_replace_left") replace_left(const Rule &rule, bool optional);
+    hfst::HfstTransducer replace_left(const Rule &rule, bool optional);
+    // for parallel rules
+%rename("xerox_replace_left") replace_left(const HfstRuleVector &ruleVector, bool optional);
+    hfst::HfstTransducer replace_left(const HfstRuleVector &ruleVector, bool optional);
+    // left to right
+    hfst::HfstTransducer replace_leftmost_longest_match(const Rule &rule);
+    // left to right
+    hfst::HfstTransducer replace_leftmost_longest_match(const HfstRuleVector &ruleVector);
+    // right to left
+    hfst::HfstTransducer replace_rightmost_longest_match(const Rule &rule);
+
+    // right to left
+    hfst::HfstTransducer replace_rightmost_longest_match(const HfstRuleVector &ruleVector);
+
+    hfst::HfstTransducer replace_leftmost_shortest_match(const Rule &rule);
+
+    hfst::HfstTransducer replace_leftmost_shortest_match(const HfstRuleVector &ruleVector);
+    hfst::HfstTransducer replace_rightmost_shortest_match(const Rule &rule);
+    hfst::HfstTransducer replace_rightmost_shortest_match(const HfstRuleVector &ruleVector);
+
+    // replace up, left, right, down
+    hfst::HfstTransducer replace_epenthesis(const Rule &rule, bool optional);
+    // replace up, left, right, down
+    hfst::HfstTransducer replace_epenthesis(const HfstRuleVector &ruleVector, bool optional);
+
+    // Restriction function "=>"
+%rename("xerox_restriction") restriction(const hfst::HfstTransducer &automata, const hfst::HfstTransducerPairVector &context);
+    hfst::HfstTransducer restriction(const hfst::HfstTransducer &automata, const hfst::HfstTransducerPairVector &context);
+    hfst::HfstTransducer before(const hfst::HfstTransducer &left, const hfst::HfstTransducer &right);
+    hfst::HfstTransducer after(const hfst::HfstTransducer &left, const hfst::HfstTransducer &right);
+
+  }
 
 // enum PushType { TO_INITIAL_STATE, TO_FINAL_STATE };
 
@@ -1397,10 +1457,12 @@ class XreCompiler
 %extend{
   void define_xre(const std::string& name, const std::string& xre)
   {
+    self->set_expand_definitions(true);
     self->define(name, xre);
   }
   void define_transducer(const std::string& name, const HfstTransducer & transducer)
   {
+    self->set_expand_definitions(true);
     self->define(name, transducer);
   }
   void setOutputToConsole(bool value)
