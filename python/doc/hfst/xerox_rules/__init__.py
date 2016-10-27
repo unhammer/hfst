@@ -56,7 +56,7 @@ def replace(rule, optional):
 ## replace up, left, right, down
 # @param rule Rule, HfstRuleVector
 # @param optional Bool
-def replace_left(rule, optional):
+def xerox_replace_left(rule, optional):
         pass
 ## left to right
 # @param rule Rule, HfstRuleVector
@@ -82,7 +82,7 @@ def replace_epenthesis(rule, optional):
 ## Restriction function "=>"
 # @param automaton HfstTransducer
 # @param context HfstTransducerPairVector
-def restriction(automaton, context):
+def xerox_restriction(automaton, context):
         pass
 ## ...
 # @param left HfstTransducer
