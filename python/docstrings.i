@@ -381,7 +381,7 @@ Parameters
 * `S` :
     The symbol, transition, a tuple of transitions or a transducer
     (hfst.HfstBasicTransducer) that substitutes *s*.
-* `kvargs` :
+* `kwargs` :
     Arguments recognized are 'input' and 'output', their values can be False or
     True, True being the default. These arguments are valid only if *s* and *S*
     are strings, else they are ignored.
@@ -501,7 +501,7 @@ Parameters
 ----------
 * `str` :
     A list/tuple of strings to look up.
-* `kvargs` :
+* `kwargs` :
     infinite_cutoff=-1, max_weight=None
 * `infinite_cutoff` :
     Defaults to -1, i.e. infinite.
@@ -855,7 +855,7 @@ Open a stream for writing binary transducers.
 
 Parameters
 ----------
-* `kvargs` :
+* `kwargs` :
     Arguments recognized are filename, hfst_format, type.
 * `filename` :
     The name of the file where transducers are written. If the file exists, it
@@ -1070,7 +1070,7 @@ Parameters
 * `S` :
     The symbol, transition, a tuple of transitions or a transducer
     (hfst.HfstTransducer) that substitutes *s*.
-* `kvargs` :
+* `kwargs` :
     Arguments recognized are 'input' and 'output', their values can be False or
     True, True being the default. These arguments are valid only if *s* and *S*
     are strings, else they are ignored.
@@ -1200,7 +1200,7 @@ Extract paths that are recognized by the transducer.
 
 Parameters
 ----------
-* `kvargs` :
+* `kwargs` :
     Arguments recognized are filter_flags, max_cycles, max_number, obey_flags,
     output, random.
 * `filter_flags` :
@@ -1622,7 +1622,7 @@ Parameters
 ----------
 * `input` :
     The input.
-* `kvargs` :
+* `kwargs` :
     Possible parameters and their default values are: obey_flags=True,
     max_number=-1, time_cutoff=0.0, output='tuple'
 * `obey_flags` :
@@ -2712,7 +2712,7 @@ Parameters
 ----------
 * `filename` :
     The name of the lexc file.
-* `kvargs` :
+* `kwargs` :
     Arguments recognized are: verbosity, with_flags, output.
 * `verbosity` :
     The verbosity of the compiler, defaults to 0 (silent). Possible values are:
@@ -2776,7 +2776,7 @@ Start interactive xfst compiler.
 
 Parameters
 ----------
-* `kvargs` :
+* `kwargs` :
     Arguments recognized are: type, quit_on_fail.
 * `quit_on_fail` :
     Whether the compiler exits on any error, defaults to False.
@@ -2852,7 +2852,7 @@ Parameters
 ----------
 * `regexp` :
     The regular expression defined with Xerox transducer notation.
-* `kvargs` :
+* `kwargs` :
     Argumnets recognized are: error.
 * `error` :
     Where warnings and errors are printed. Possible values are sys.stdout,
@@ -2878,7 +2878,7 @@ Parameters
 ----------
 * `filename` :
     The name of the xfst file.
-* `kvargs` :
+* `kwargs` :
     Arguments recognized are: verbosity, quit_on_fail, output, type.
 * `verbosity` :
     The verbosity of the compiler, defaults to 0 (silent). Possible values are:

@@ -503,28 +503,28 @@ def epsilon_fst(weight=0):
 
 ## Get a transducer as defined by regular expression \a regexp.
 # @param regexp The regular expression defined with <a href="http://www.fsmbook.com/">Xerox transducer notation</a>.
-# @param kvargs Argumnets recognized are: error.
+# @param kwargs Arguments recognized are: error.
 # @param error Where warnings and errors are printed. Possible values are sys.stdout, sys.stderr (the default), a StringIO or None, indicating a quiet mode.
-def regex(regexp, **kvargs):
+def regex(regexp, **kwargs):
     pass
 
 ## Compile lexc file \a filename into a transducer.
 # @param filename The name of the lexc file.
-# @param kvargs Arguments recognized are: verbosity, with_flags, output.
+# @param kwargs Arguments recognized are: verbosity, with_flags, output.
 # @param verbosity The verbosity of the compiler, defaults to 0 (silent). Possible values are: 0, 1, 2.
 # @param with_flags Whether lexc flags are used when compiling, defaults to False.
 # @param output Where output is printed. Possible values are sys.stdout, sys.stderr, a StringIO, sys.stderr being the default?
-def compile_lexc_file(filename, **kvargs):
+def compile_lexc_file(filename, **kwargs):
     pass
 
 ## Compile (is 'run' a better term?) xfst file \a filename.
 # @param filename The name of the xfst file.
-# @param kvargs Arguments recognized are: verbosity, quit_on_fail, output, type.
+# @param kwargs Arguments recognized are: verbosity, quit_on_fail, output, type.
 # @param verbosity The verbosity of the compiler, defaults to 0 (silent). Possible values are: 0, 1, 2.
 # @param quit_on_fail Whether the script is exited on any error, defaults to True.
 # @param output Where output is printed. Possible values are sys.stdout, sys.stderr, a StringIO, sys.stderr being the default?
 # @param type Implementation type of the compiler, defaults to libhfst.get_default_fst_type().
-def compile_xfst_file(filename, **kvargs):
+def compile_xfst_file(filename, **kwargs):
     pass
 
 ## Compile pmatch expressions as defined in \a filename and return a tuple of transducers.
@@ -554,10 +554,10 @@ def compile_pmatch_expression(expr):
     pass
 
 ## Start interactive xfst compiler.
-# @param kvargs Arguments recognized are: type, quit_on_fail.
+# @param kwargs Arguments recognized are: type, quit_on_fail.
 # @param quit_on_fail Whether the compiler exits on any error, defaults to False.
 # @param type Implementation type of the compiler, defaults to libhfst.get_default_fst_type().
-def start_xfst(**kvargs):
+def start_xfst(**kwargs):
     pass
 
 ## Read AT&T input from the user and return a transducer.
@@ -751,10 +751,10 @@ class HfstBasicTransducer:
 
     ## Lookup tokenized input \a input in the transducer minding flag diacritics.
     # @param str A list/tuple of strings to look up.
-    # @param kvargs infinite_cutoff=-1, max_weight=None
+    # @param kwargs infinite_cutoff=-1, max_weight=None
     # @param infinite_cutoff Defaults to -1, i.e. infinite.
     # @param max_weight Defaults to None, i.e. infinity.
-    def lookup_fd(self, input, **kvargs):
+    def lookup_fd(self, input, **kwargs):
         pass
 
     ## Add a new state to this transducer and return its number.
@@ -994,7 +994,7 @@ class HfstBasicTransducer:
     #
     # @param s The symbol or transition to be substituted. Can also be a dictionary of substitutions, if S == None.
     # @param S The symbol, transition, a tuple of transitions or a transducer (libhfst.HfstBasicTransducer) that substitutes \a s.
-    # @param kvargs Arguments recognized are 'input' and 'output', their values can be False or True, True being the default.
+    # @param kwargs Arguments recognized are 'input' and 'output', their values can be False or True, True being the default.
     #               These arguments are valid only if \a s and \a S are strings, else they are ignored.
     # @param input Whether substitution is performed on input side, defaults to True. Valid only if \a s and \a S are strings.
     # @param output Whether substitution is performed on output side, defaults to True. Valid only if \a s and \a S are strings.
@@ -1021,7 +1021,7 @@ class HfstBasicTransducer:
     # The transition itself is deleted, but its weight is copied to the epsilon transition leading from SOURCE to the initial state of \a S.
     # Each final state of \a S is made non-final and an epsilon transition leading to TARGET is attached to it. The final weight is copied to the epsilon transition.
     #
-    def substitute(self, s, S=None, **kvargs):
+    def substitute(self, s, S=None, **kwargs):
         pass
 
     ## Return an enumeration of the states and transitions of the transducer.
@@ -1612,7 +1612,7 @@ class HfstTransducer:
     #
     # @param s The symbol or transition to be substituted. Can also be a dictionary of substitutions, if S == None.
     # @param S The symbol, transition, a tuple of transitions or a transducer (libhfst.HfstTransducer) that substitutes \a s.
-    # @param kvargs Arguments recognized are 'input' and 'output', their values can be False or True, True being the default.
+    # @param kwargs Arguments recognized are 'input' and 'output', their values can be False or True, True being the default.
     #               These arguments are valid only if \a s and \a S are strings, else they are ignored.
     # @param input Whether substitution is performed on input side, defaults to True. Valid only if \a s and \a S are strings.
     # @param output Whether substitution is performed on output side, defaults to True. Valid only if \a s and \ S are strings.
@@ -1621,12 +1621,12 @@ class HfstTransducer:
     # of argument \a S, which must be libhfst.HfstTransducer instead of libhfst.HfstBasicTransducer.
     #
     # @see libhfst.HfstBasicTransducer.substitute
-    def substitute(self, s, S=None, **kvargs):
+    def substitute(self, s, S=None, **kwargs):
         pass
 
     ## Lookup string \a input.
     # @param input The input.
-    # @param kvargs Possible parameters and their default values are: obey_flags=True, max_number=-1, time_cutoff=0.0, output='tuple'
+    # @param kwargs Possible parameters and their default values are: obey_flags=True, max_number=-1, time_cutoff=0.0, output='tuple'
     # @param obey_flags Whether flag diacritics are obeyed. Currently always True.
     # @param max_number Maximum number of results returned, defaults to -1, i.e. infinity.
     # @param time_cutoff How long the function can search for results before returning, expressed in seconds. Defaults to 0.0, i.e. infinitely.
@@ -1637,12 +1637,12 @@ class HfstTransducer:
     #       Conversion to OL might take a while but it lookup is fast.
     #       Conversion to HfstBasicTransducer is quick but lookup is slower.
     #
-    def lookup(self, input, **kvargs):
+    def lookup(self, input, **kwargs):
         pass
 
     ## Extract paths that are recognized by the transducer.
     #
-    # @param kvargs Arguments recognized are filter_flags, max_cycles, max_number, obey_flags, output, random.
+    # @param kwargs Arguments recognized are filter_flags, max_cycles, max_number, obey_flags, output, random.
     # @param filter_flags Whether flags diacritics are filtered out from the result (default True).
     # @param max_cycles Indicates how many times a cycle will be followed, with negative numbers indicating unlimited (default -1 i.e. unlimited).
     # @param max_number The total number of resulting strings is capped at this value, with 0 or negative indicating unlimited (default -1 i.e. unlimited).
@@ -1691,21 +1691,21 @@ class HfstTransducer:
     # @see #libhfst.HfstTransducer.n_best
     # @note <a href="Symbols.html">Special symbols</a> are printed as such.
     # @todo a link to flag diacritics
-    def extract_paths(self, **kvargs):
+    def extract_paths(self, **kwargs):
         pass
 
     ## Extract shortest paths of the transducer.
     # @return A dictionary.
-    def extract_shortest_paths():
+    def extract_shortest_paths(self):
         pass
 
     ## Extract longest paths of the transducer.
     # @return A dictionary.
-    def extract_longest_paths(**kvargs):
+    def extract_longest_paths(self, **kwargs):
         pass
 
     ## Get length of longest path of the transducer.
-    def longest_path_size(**kvargs):
+    def longest_path_size(self, **kwargs):
         pass
 
     # Lookup or apply a single tokenized string \a tok_input and return a maximum of \a limit results.
@@ -1888,11 +1888,11 @@ class HfstInputStream:
 class HfstOutputStream:
 
     ## Open a stream for writing binary transducers.
-    # @param kvargs Arguments recognized are filename, hfst_format, type.
+    # @param kwargs Arguments recognized are filename, hfst_format, type.
     # @param filename The name of the file where transducers are written. If the file exists, it is overwritten. If \a filename is not given, transducers are written to standard output.
     # @param hfst_format Whether transducers are written in hfst format (default is True) or as such in their backend format.
     # @param type The type of the transducers that will be written to the stream. Default is #libhfst.get_default_fst_type().
-    def __init__(self, **kvargs):
+    def __init__(self, **kwargs):
         pass
 
     ## Flush the stream.

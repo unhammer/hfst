@@ -203,28 +203,28 @@ def epsilon_fst(weight=0):
 
 ## Get a transducer as defined by regular expression \a regexp.
 # @param regexp The regular expression defined with <a href="http://www.fsmbook.com/">Xerox transducer notation</a>.
-# @param kvargs Argumnets recognized are: error.
+# @param kwargs Argumnets recognized are: error.
 # @param error Where warnings and errors are printed. Possible values are sys.stdout, sys.stderr (the default), a StringIO or None, indicating a quiet mode.
-def regex(regexp, **kvargs):
+def regex(regexp, **kwargs):
     pass
 
 ## Compile lexc file \a filename into a transducer.
 # @param filename The name of the lexc file.
-# @param kvargs Arguments recognized are: verbosity, with_flags, output.
+# @param kwargs Arguments recognized are: verbosity, with_flags, output.
 # @param verbosity The verbosity of the compiler, defaults to 0 (silent). Possible values are: 0, 1, 2.
 # @param with_flags Whether lexc flags are used when compiling, defaults to False.
 # @param output Where output is printed. Possible values are sys.stdout, sys.stderr, a StringIO, sys.stderr being the default?
-def compile_lexc_file(filename, **kvargs):
+def compile_lexc_file(filename, **kwargs):
     pass
 
 ## Compile (is 'run' a better term?) xfst file \a filename.
 # @param filename The name of the xfst file.
-# @param kvargs Arguments recognized are: verbosity, quit_on_fail, output, type.
+# @param kwargs Arguments recognized are: verbosity, quit_on_fail, output, type.
 # @param verbosity The verbosity of the compiler, defaults to 0 (silent). Possible values are: 0, 1, 2.
 # @param quit_on_fail Whether the script is exited on any error, defaults to True.
 # @param output Where output is printed. Possible values are sys.stdout, sys.stderr, a StringIO, sys.stderr being the default?
 # @param type Implementation type of the compiler, defaults to hfst.get_default_fst_type().
-def compile_xfst_file(filename, **kvargs):
+def compile_xfst_file(filename, **kwargs):
     pass
 
 ## Compile pmatch expressions as defined in \a filename and return a tuple of transducers.
@@ -254,10 +254,10 @@ def compile_pmatch_expression(expr):
     pass
 
 ## Start interactive xfst compiler.
-# @param kvargs Arguments recognized are: type, quit_on_fail.
+# @param kwargs Arguments recognized are: type, quit_on_fail.
 # @param quit_on_fail Whether the compiler exits on any error, defaults to False.
 # @param type Implementation type of the compiler, defaults to hfst.get_default_fst_type().
-def start_xfst(**kvargs):
+def start_xfst(**kwargs):
     pass
 
 ## Read AT&T input from the user and return a transducer.
@@ -563,11 +563,11 @@ class HfstBasicTransducer:
         pass
 
     # @param str A list/tuple of strings to look up.
-    # @param kvargs max_epsilon_loops=-1, max_weight=None, obey_flags=False
+    # @param kwargs max_epsilon_loops=-1, max_weight=None, obey_flags=False
     # @param max_epsilon_loops How many times epsilon input loops are followed. Defaults to -1, i.e. infinitely.
     # @param max_weight What is the maximum weight of a result allowed. Defaults to None, i.e. infinity.
     # @param obey_flags Whether flag diacritic constraints are obeyed. Defaults to False.
-    def lookup(self, input, **kvargs):
+    def lookup(self, input, **kwargs):
         pass
 
     ## Add a new state to this transducer and return its number.
@@ -638,7 +638,7 @@ class HfstBasicTransducer:
     ## Remove transition \a transition from state \a s.
     # @param s The state which \a transition belongs to.
     # @param transition The transition to be removed.
-    # @param remove_symbols_from_alphabet (?)
+    # @param remove_symbols_from_alphabet Whether 
     def remove_transition(self, s, transition, remove_symbols_from_alphabet=False):
         pass
     
@@ -744,7 +744,7 @@ class HfstBasicTransducer:
         pass
 
     ## Write this transducer in AT&T format to file \a f, \a write_weights defines whether weights are written.
-    def write_att(f, bool write_weights=True):
+    def write_att(self, f, bool write_weights=True):
         pass
 
     ## Insert freely any number of \a symbol_pair in the transducer with weight \a weight.
@@ -817,7 +817,7 @@ class HfstBasicTransducer:
     #
     # @param s The symbol or transition to be substituted. Can also be a dictionary of substitutions, if S == None.
     # @param S The symbol, transition, a tuple of transitions or a transducer (hfst.HfstBasicTransducer) that substitutes \a s.
-    # @param kvargs Arguments recognized are 'input' and 'output', their values can be False or True, True being the default.
+    # @param kwargs Arguments recognized are 'input' and 'output', their values can be False or True, True being the default.
     #               These arguments are valid only if \a s and \a S are strings, else they are ignored.
     # @param input Whether substitution is performed on input side, defaults to True. Valid only if \a s and \a S are strings.
     # @param output Whether substitution is performed on output side, defaults to True. Valid only if \a s and \a S are strings.
@@ -844,7 +844,7 @@ class HfstBasicTransducer:
     # The transition itself is deleted, but its weight is copied to the epsilon transition leading from SOURCE to the initial state of \a S.
     # Each final state of \a S is made non-final and an epsilon transition leading to TARGET is attached to it. The final weight is copied to the epsilon transition.
     #
-    def substitute(self, s, S=None, **kvargs):
+    def substitute(self, s, S=None, **kwargs):
         pass
 
     ## Return an enumeration of the states and transitions of the transducer.
@@ -1143,7 +1143,7 @@ class HfstTransducer:
     # @param f A python file where the transducer is written.
     # @param name The name of the transducer that must be given in a prolog file.
     # @param write_weights Whether weights are written.
-    def write_prolog(f, name, write_weights=True):
+    def write_prolog(self, f, name, write_weights=True):
         pass
 
     ## Minimize the transducer.
@@ -1462,7 +1462,7 @@ class HfstTransducer:
     #
     # @param s The symbol or transition to be substituted. Can also be a dictionary of substitutions, if S == None.
     # @param S The symbol, transition, a tuple of transitions or a transducer (hfst.HfstTransducer) that substitutes \a s.
-    # @param kvargs Arguments recognized are 'input' and 'output', their values can be False or True, True being the default.
+    # @param kwargs Arguments recognized are 'input' and 'output', their values can be False or True, True being the default.
     #               These arguments are valid only if \a s and \a S are strings, else they are ignored.
     # @param input Whether substitution is performed on input side, defaults to True. Valid only if \a s and \a S are strings.
     # @param output Whether substitution is performed on output side, defaults to True. Valid only if \a s and \ S are strings.
@@ -1471,12 +1471,12 @@ class HfstTransducer:
     # of argument \a S, which must be hfst.HfstTransducer instead of hfst.HfstBasicTransducer.
     #
     # @see hfst.HfstBasicTransducer.substitute
-    def substitute(self, s, S=None, **kvargs):
+    def substitute(self, s, S=None, **kwargs):
         pass
 
     ## Lookup string \a input.
     # @param input The input. A string or a pre-tokenized tuple of symbols (i.e. a tuple of strings).
-    # @param kvargs Possible parameters and their default values are: obey_flags=True, max_number=-1, time_cutoff=0.0, output='tuple'
+    # @param kwargs Possible parameters and their default values are: obey_flags=True, max_number=-1, time_cutoff=0.0, output='tuple'
     # @param obey_flags Whether flag diacritics are obeyed. Always True for HFST_OL(W)_TYPE transducers.
     # @param max_number Maximum number of results returned, defaults to -1, i.e. infinity.
     # @param time_cutoff How long the function can search for results before returning, expressed in seconds. Defaults to 0.0, i.e. infinitely. Always 0.0 for transducers that are not of HFST_OL(W)_TYPE.
@@ -1500,7 +1500,7 @@ class HfstTransducer:
 
     ## Extract paths that are recognized by the transducer.
     #
-    # @param kvargs Arguments recognized are filter_flags, max_cycles, max_number, obey_flags, output, random.
+    # @param kwargs Arguments recognized are filter_flags, max_cycles, max_number, obey_flags, output, random.
     # @param filter_flags Whether flags diacritics are filtered out from the result (default True).
     # @param max_cycles Indicates how many times a cycle will be followed, with negative numbers indicating unlimited (default -1 i.e. unlimited).
     # @param max_number The total number of resulting strings is capped at this value, with 0 or negative indicating unlimited (default -1 i.e. unlimited).
@@ -1549,21 +1549,21 @@ class HfstTransducer:
     # @see #hfst.HfstTransducer.n_best
     # @note <a href="Symbols.html">Special symbols</a> are printed as such.
     # @todo a link to flag diacritics
-    def extract_paths(self, **kvargs):
+    def extract_paths(self, **kwargs):
         pass
 
     ## Extract shortest paths of the transducer.
     # @return A dictionary.
-    def extract_shortest_paths():
+    def extract_shortest_paths(self):
         pass
 
     ## Extract longest paths of the transducer.
     # @return A dictionary.
-    def extract_longest_paths(**kvargs):
+    def extract_longest_paths(self, **kwargs):
         pass
 
     ## Get length of longest path of the transducer.
-    def longest_path_size(**kvargs):
+    def longest_path_size(self, **kwargs):
         pass
 
     # Lookup or apply a single tokenized string \a tok_input and return a maximum of \a limit results.
@@ -1706,19 +1706,19 @@ class HfstInputStream:
     ##  Close the stream.
     #
     # If the stream points to standard input, nothing is done.
-    def close():
+    def close(self):
         pass
 
     ##  Whether the stream is at end.
-    def is_eof():
+    def is_eof(self):
         pass
 
     ##  Whether badbit is set.
-    def is_bad():
+    def is_bad(self):
         pass
 
     ##  Whether the state of the stream is good for input operations.
-    def is_good():
+    def is_good(self):
         pass
     
     ## The type of the first transducer in the stream.
@@ -1726,13 +1726,13 @@ class HfstInputStream:
     # By default, all transducers in a stream have the same type, else
     # a TransducerTypeMismatchException is thrown when reading the first
     # transducer that has a different type than the previous ones.
-    def get_type():
+    def get_type(self):
         pass
 
     ## Return next transducer.
     #
     # @throws EndOfStreamException
-    def read():
+    def read(self):
         pass
 
 ## A stream for writing binary transducers.
@@ -1751,7 +1751,7 @@ class HfstInputStream:
 class HfstOutputStream:
 
     ## Open a stream for writing binary transducers.
-    # @param kvargs Arguments recognized are filename, hfst_format, type.
+    # @param kwargs Arguments recognized are filename, hfst_format, type.
     # @param filename The name of the file where transducers are written. If the file exists, it is overwritten. If \a filename is not given, transducers are written to standard output.
     # @param hfst_format Whether transducers are written in hfst format (default is True) or as such in their backend format.
     # @param type The type of the transducers that will be written to the stream. Default is #hfst.get_default_fst_type().
@@ -1774,11 +1774,11 @@ class HfstOutputStream:
     # ostr.flush()
     # ostr.close()
     # \endverbatim
-    def __init__(self, **kvargs):
+    def __init__(self, **kwargs):
         pass
 
     ## Flush the stream.
-    def flush():
+    def flush(self):
         pass
 
     ##  Write the transducer \a transducer in binary format to the stream.
@@ -1786,12 +1786,12 @@ class HfstOutputStream:
     # All transducers must have the same type as the stream, else a TransducerTypeMismatchException is thrown.
     #
     # @throws hfst.exceptions.TransducerTypeMismatchException
-    def write(transducer):
+    def write(self, transducer):
         pass
 
     ##  Close the stream.
     # If the stream points to standard output, nothing is done.
-    def close():
+    def close(self):
         pass
 
 ## TODO: documentation ???
@@ -2094,57 +2094,57 @@ class XreCompiler:
       pass
 
   ## Add a definition macro. Compilers will replace arcs labeled \a name, with a transducer defined by regular expression \a xre in later phases of compilation.
-  def define_xre(name, xre):
+  def define_xre(self, name, xre):
       pass
 
   ## Add a definition macro. Compilers will replace arcs labeled \a name, with a transducer \a transducer in later phases of compilation.
-  def define_transducer(name, transducer):
+  def define_transducer(self, name, transducer):
       pass
 
   ## todo
-  def define_list(name, symbol_list):
+  def define_list(self, name, symbol_list):
       pass
 
   ## todo
-  def define_function(name, arguments, xre):
+  def define_function(self, name, arguments, xre):
       pass
 
   ## todo
-  def undefine(name):
+  def undefine(self, name):
       pass
 
   ## Compile a transducer defined by @a xre.
   # May return a pointer to @e empty transducer on non-fatal error.
   # A None pointer is returned on fatal error, if abort is not called.
   # @return An HfstTransducer pointer.
-  def compile(xre):
+  def compile(self, xre):
       pass
 
   ## Whether \a name is a definition.
-  def is_definition(name):
+  def is_definition(self, name):
       pass
 
   ## Whether \a name is a function definition.
-  def is_function_definition(name):
+  def is_function_definition(self, name):
       pass
 
   ## Set the verbosity of the compiler.
   # @arg v True or False
-  def set_verbosity(v):
+  def set_verbosity(self, v):
       pass
 
   ## (Windows-specific) Whether output is printed to console instead of standard output.
   # @arg v True or False
-  def setOutputToConsole(v):
+  def setOutputToConsole(self, v):
       pass
 
   ## (Windows-specific) Whether output is printed to console instead of standard output.
-  def getOutputToConsole():
+  def getOutputToConsole(self, ):
       pass
 
   ## Whether definitions are expanded.
   # @arg v True or False
-  def set_expand_definitions(v):
+  def set_expand_definitions(self, v):
       pass
 
 ## A class for performing pattern matching.
@@ -2159,19 +2159,19 @@ class PmatchContainer:
   def __init__(self, defs):
       pass
   ## Match input \a input.
-  def match(input, time_cutoff = 0):
+  def match(self, input, time_cutoff = 0):
       pass
   ## todo
-  def get_profiling_info():
+  def get_profiling_info(self):
       pass
   ## todo
-  def set_verbose(b):
+  def set_verbose(self, b):
       pass
   ## todo
-  def set_extract_tags_mode(b):
+  def set_extract_tags_mode(self, b):
       pass
   ## todo
-  def set_profile(b):
+  def set_profile(self, b):
       pass
 
 # For example the transducer
