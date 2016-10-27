@@ -3126,7 +3126,13 @@
              unsigned int current_distance = 0; // topological distance
              TopologicalSort TopSort;
 
-             size_t st = state_vector.size()-1;
+             size_t st = state_vector.size();
+             if (st == 0)
+               {
+                 std::vector<std::set<HfstState> > empty;
+                 return empty;
+               }
+             st = st-1;
              unsigned int biggest_state_number = hfst::size_t_to_uint(st);
              TopSort.set_biggest_state_number(biggest_state_number);
 
@@ -3183,7 +3189,7 @@
           size_t st = states_sorted.size();
           if (st > 0)
             {
-              for (unsigned int distance = hfst::size_t_to_uint(st-1); distance >= 0; distance--)
+              for (int distance = hfst::size_t_to_int(st-1); distance >= 0; distance--)
                 {
                   const std::set<HfstState> & states
                     = states_sorted.at((unsigned int)distance);
@@ -3215,7 +3221,7 @@
              size_t st = states_sorted.size();
              if (st > 0)
                {
-                 for (unsigned int distance = hfst::size_t_to_uint(st-1); distance >= 0; distance--)
+                 for (int distance = hfst::size_t_to_int(st-1); distance >= 0; distance--)
                    {
                      const std::set<HfstState> & states
                        = states_sorted.at((unsigned int)distance);
