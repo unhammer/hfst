@@ -7,10 +7,10 @@ def get_linenumber():
     return cf.f_back.f_lineno
 
 types = []
-if hfst.HfstTransducer.is_implementation_type_available(hfst.types.TROPICAL_OPENFST_TYPE):
-    types.append(hfst.types.TROPICAL_OPENFST_TYPE)
-if hfst.HfstTransducer.is_implementation_type_available(hfst.types.FOMA_TYPE):
-    types.append(hfst.types.FOMA_TYPE)
+if hfst.HfstTransducer.is_implementation_type_available(hfst.ImplementationType.TROPICAL_OPENFST_TYPE):
+    types.append(hfst.ImplementationType.TROPICAL_OPENFST_TYPE)
+if hfst.HfstTransducer.is_implementation_type_available(hfst.ImplementationType.FOMA_TYPE):
+    types.append(hfst.ImplementationType.FOMA_TYPE)
 
 for type in types:
 
@@ -22,7 +22,7 @@ for type in types:
     tr2 = None
     tr3 = None
 
-    type_ = hfst.types.TROPICAL_OPENFST_TYPE
+    type_ = hfst.ImplementationType.TROPICAL_OPENFST_TYPE
     ostr = hfst.HfstOutputStream(filename='foobar.hfst', type=type_)
 
     tr_ = hfst.regex('{foo}:{bar}::0.5')
@@ -215,7 +215,7 @@ for type in types:
         print(tr.lookup('foo', max_number=5, output='text'), file=f)
     except hfst.exceptions.FunctionNotImplementedException:
         TR = hfst.HfstTransducer(tr)
-        TR.convert(hfst.types.HFST_OLW_TYPE)
+        TR.convert(hfst.ImplementationType.HFST_OLW_TYPE)
         print(TR.lookup('foo', max_number=5, output='text'), file=f)
 
     tr_ = tr.copy()

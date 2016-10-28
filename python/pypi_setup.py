@@ -216,6 +216,6 @@ setup(name = 'hfstpy',
       license = 'GNU GPL3',
       ext_modules = [libhfst_module],
       py_modules = ["libhfst"],
-      packages = ["hfst", "hfst.exceptions", "hfst.rules", "hfst.types"],
+      packages = ["hfst", "hfst.exceptions", "hfst.rules", "hfst.xerox_rules"],
       data_files = []
       )

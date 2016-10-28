@@ -228,8 +228,6 @@ enum ImplementationType
 
   }
 
-// enum PushType { TO_INITIAL_STATE, TO_FINAL_STATE };
-
 // *** Some other functions *** //
 
 bool is_diacritic(const std::string & symbol);
@@ -551,7 +549,7 @@ public:
           Possible values are 'tuple', 'text' and 'raw', 'tuple' being the default.
 
       Note: This function has an efficient implementation only for optimized lookup format
-      (hfst.types.HFST_OL_TYPE or hfst.types.HFST_OLW_TYPE). Other formats perform the
+      (hfst.ImplementationType.HFST_OL_TYPE or hfst.ImplementationType.HFST_OLW_TYPE). Other formats perform the
       lookup via composition. Consider converting the transducer to optimized lookup format
       or to a HfstBasicTransducer. Conversion to HFST_OL(W)_TYPE might take a while but the
       lookup is fast. Conversion to HfstBasicTransducer is quick but lookup is slower.
@@ -983,11 +981,11 @@ def __init__(self, **kvargs):
         ostr.flush()
 
         # a stream for writing native sfst type transducers to a file
-        ostr = hfst.HfstOutputStream(filename='transducer.sfst', hfst_format=False, type=hfst.types.SFST_TYPE)
+        ostr = hfst.HfstOutputStream(filename='transducer.sfst', hfst_format=False, type=hfst.ImplementationType.SFST_TYPE)
         transducer1 = hfst.regex('foo:bar')
-        transducer1.convert(hfst.types.SFST_TYPE)  # if not set as the default type
+        transducer1.convert(hfst.ImplementationType.SFST_TYPE)  # if not set as the default type
         transducer2 = hfst.regex('bar:baz')
-        transducer2.convert(hfst.types.SFST_TYPE)  # if not set as the default type
+        transducer2.convert(hfst.ImplementationType.SFST_TYPE)  # if not set as the default type
         ostr.write(transducer1)
         ostr.write(transducer2)
         ostr.flush()
@@ -2415,5 +2413,51 @@ def intersect(transducers):
         retval.intersect(tr)
     retval.minimize()
     return retval
+
+class ImplementationType:
+    """
+    Back-end implementation.
+
+    Attributes:
+
+        SFST_TYPE:               SFST type, unweighted
+        TROPICAL_OPENFST_TYPE:   OpenFst type with tropical weights
+        LOG_OPENFST_TYPE:        OpenFst type with logarithmic weights (limited support)
+        FOMA_TYPE:               FOMA type, unweighted
+        XFSM_TYPE:               XFST type, unweighted (limited support)
+        HFST_OL_TYPE:            HFST optimized-lookup type, unweighted
+        HFST_OLW_TYPE:           HFST optimized-lookup type, weighted
+        HFST2_TYPE:              HFST version 2 legacy type
+        UNSPECIFIED_TYPE:        type not specified
+        ERROR_TYPE:              (something went wrong)
+
+    """
+    SFST_TYPE = _libhfst.SFST_TYPE
+    TROPICAL_OPENFST_TYPE = _libhfst.TROPICAL_OPENFST_TYPE    
+    LOG_OPENFST_TYPE = _libhfst.LOG_OPENFST_TYPE
+    FOMA_TYPE = _libhfst.FOMA_TYPE
+    XFSM_TYPE = _libhfst.XFSM_TYPE
+    HFST_OL_TYPE = _libhfst.HFST_OL_TYPE
+    HFST_OLW_TYPE = _libhfst.HFST_OLW_TYPE
+    HFST2_TYPE = _libhfst.HFST2_TYPE
+    UNSPECIFIED_TYPE = _libhfst.UNSPECIFIED_TYPE
+    ERROR_TYPE = _libhfst.ERROR_TYPE
+
+class ReplaceType:
+    """
+    Replace type in Xerox-type rules.
+
+    Attributes:
+
+        REPL_UP:      Match contexts on input level
+        REPL_DOWN:    Match contexts on output level
+        REPL_RIGHT:   Match left contexts on input level and right contexts on output level
+        REPL_LEFT:    Match left contexts on output level and right contexts on input level
+
+    """
+    REPL_UP = _libhfst.REPL_UP
+    REPL_DOWN = _libhfst.REPL_DOWN
+    REPL_RIGHT = _libhfst.REPL_RIGHT
+    REPL_LEFT = _libhfst.REPL_LEFT
 
 %}

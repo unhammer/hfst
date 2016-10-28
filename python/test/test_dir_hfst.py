@@ -23,13 +23,13 @@ assert hfst.EPSILON == '@_EPSILON_SYMBOL_@'
 assert hfst.UNKNOWN == '@_UNKNOWN_SYMBOL_@'
 assert hfst.IDENTITY == '@_IDENTITY_SYMBOL_@'
 
-assert hfst.types.SFST_TYPE == 0
-assert hfst.types.TROPICAL_OPENFST_TYPE == 1
-assert hfst.types.LOG_OPENFST_TYPE == 2
-assert hfst.types.FOMA_TYPE == 3
-assert hfst.types.XFSM_TYPE == 4
-assert hfst.types.HFST_OL_TYPE == 5
-assert hfst.types.HFST_OLW_TYPE == 6
-assert hfst.types.HFST2_TYPE == 7
-assert hfst.types.UNSPECIFIED_TYPE == 8
-assert hfst.types.ERROR_TYPE == 9
+assert hfst.ImplementationType.SFST_TYPE == 0
+assert hfst.ImplementationType.TROPICAL_OPENFST_TYPE == 1
+assert hfst.ImplementationType.LOG_OPENFST_TYPE == 2
+assert hfst.ImplementationType.FOMA_TYPE == 3
+assert hfst.ImplementationType.XFSM_TYPE == 4
+assert hfst.ImplementationType.HFST_OL_TYPE == 5
+assert hfst.ImplementationType.HFST_OLW_TYPE == 6
+assert hfst.ImplementationType.HFST2_TYPE == 7
+assert hfst.ImplementationType.UNSPECIFIED_TYPE == 8
+assert hfst.ImplementationType.ERROR_TYPE == 9

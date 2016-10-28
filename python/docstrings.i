@@ -875,12 +875,12 @@ transducers in hfst format to standard output
      ostr.flush()
 
      ostr = hfst.HfstOutputStream(filename='transducer.sfst', hfst_format=False,
-type=hfst.types.SFST_TYPE)  # a stream for writing SFST_TYPE transducers in
+type=hfst.ImplementationType.SFST_TYPE)  # a stream for writing SFST_TYPE transducers in
 their back-end format to a file
      transducer1 = hfst.regex('foo:bar')
-     transducer1.convert(hfst.types.SFST_TYPE)  # if not set as the default type
+     transducer1.convert(hfst.ImplementationType.SFST_TYPE)  # if not set as the default type
      transducer2 = hfst.regex('bar:baz')
-     transducer2.convert(hfst.types.SFST_TYPE)  # if not set as the default type
+     transducer2.convert(hfst.ImplementationType.SFST_TYPE)  # if not set as the default type
      ostr.write(transducer1)
      ostr.write(transducer2)
      ostr.flush()
@@ -1148,7 +1148,7 @@ Disjunct this transducer with *another*.
 
 Optimize the transducer for lookup.
 
-This effectively converts the transducer into hfst.types.HFST_OL_TYPE.
+This effectively converts the transducer into hfst.ImplementationType.HFST_OL_TYPE.
 """
 
 %feature("docstring") hfst::HfstTransducer::extract_longest_paths
@@ -1166,16 +1166,16 @@ A dictionary.
 
 Extract *n* best paths of the transducer.
 
-In the case of a weighted transducer (hfst.types.TROPICAL_OPENFST_TYPE or
-hfst.types.LOG_OPENFST_TYPE), best paths are defined as paths with the lowest
-weight. In the case of an unweighted transducer (hfst.types.SFST_TYPE or
-hfst.types.FOMA_TYPE), the function returns random paths.
+In the case of a weighted transducer (hfst.ImplementationType.TROPICAL_OPENFST_TYPE or
+hfst.ImplementationType.LOG_OPENFST_TYPE), best paths are defined as paths with the lowest
+weight. In the case of an unweighted transducer (hfst.ImplementationType.SFST_TYPE or
+hfst.ImplementationType.FOMA_TYPE), the function returns random paths.
 
-This function is not implemented for hfst.types.FOMA_TYPE or
-hfst.types.SFST_TYPE. If this function is called by an HfstTransducer of type
-hfst.types.FOMA_TYPE or hfst.types.SFST_TYPE, it is converted to
-hfst.types.TROPICAL_OPENFST_TYPE, paths are extracted and it is converted back
-to hfst.types.FOMA_TYPE or hfst.types.SFST_TYPE. If HFST is not linked to
+This function is not implemented for hfst.ImplementationType.FOMA_TYPE or
+hfst.ImplementationType.SFST_TYPE. If this function is called by an HfstTransducer of type
+hfst.ImplementationType.FOMA_TYPE or hfst.ImplementationType.SFST_TYPE, it is converted to
+hfst.ImplementationType.TROPICAL_OPENFST_TYPE, paths are extracted and it is converted back
+to hfst.ImplementationType.FOMA_TYPE or hfst.ImplementationType.SFST_TYPE. If HFST is not linked to
 OpenFst library, an hfst.exceptions.ImplementationTypeNotAvailableException is
 thrown.
 """
@@ -1471,8 +1471,8 @@ A dictionary.
 
 Set the weights of all final states to *weight*.
 
-If the HfstTransducer is of unweighted type (hfst.types.SFST_TYPE or
-hfst.types.FOMA_TYPE), nothing is done.
+If the HfstTransducer is of unweighted type (hfst.ImplementationType.SFST_TYPE or
+hfst.ImplementationType.FOMA_TYPE), nothing is done.
 """
 
 %feature("docstring") hfst::HfstTransducer::push_weights_to_end
@@ -1480,8 +1480,8 @@ hfst.types.FOMA_TYPE), nothing is done.
 
 Push weights towards final state(s).
 
-If the HfstTransducer is of unweighted type (hfst.types.SFST_TYPE or
-hfst.types.FOMA_TYPE), nothing is done.
+If the HfstTransducer is of unweighted type (hfst.ImplementationType.SFST_TYPE or
+hfst.ImplementationType.FOMA_TYPE), nothing is done.
 
 An example:
 
@@ -1503,8 +1503,8 @@ See also: hfst.HfstTransducer.push_weights_to_start
 
 Push weights towards initial state.
 
-If the HfstTransducer is of unweighted type (hfst.types.SFST_TYPE or
-hfst.types.FOMA_TYPE), nothing is done.
+If the HfstTransducer is of unweighted type (hfst.ImplementationType.SFST_TYPE or
+hfst.ImplementationType.FOMA_TYPE), nothing is done.
 
 An example:
 
@@ -1636,7 +1636,7 @@ Parameters
     Possible values are 'tuple', 'text' and 'raw', 'tuple' being the default.
 
 note: This function is implemented only for optimized lookup format
-    (hfst.types.HFST_OL_TYPE or hfst.types.HFST_OLW_TYPE). Either convert to
+    (hfst.ImplementationType.HFST_OL_TYPE or hfst.ImplementationType.HFST_OLW_TYPE). Either convert to
     optimized lookup format or to HfstBasicTransducer if you wish to perform
     lookup. Conversion to OL might take a while but it lookup is fast.
     Conversion to HfstBasicTransducer is quick but lookup is slower.
@@ -1770,10 +1770,10 @@ Convert the transducer into an equivalent transducer in format *type*.
 If a weighted transducer is converted into an unweighted one, all weights are
 lost. In the reverse case, all weights are initialized to the semiring's one.
 
-A transducer of type hfst.types.SFST_TYPE, hfst.types.TROPICAL_OPENFST_TYPE,
-hfst.types.LOG_OPENFST_TYPE or hfst.types.FOMA_TYPE can be converted into an
-hfst.types.HFST_OL_TYPE or hfst.types.HFST_OLW_TYPE transducer, but an
-hfst.types.HFST_OL_TYPE or hfst.types.HFST_OLW_TYPE transducer cannot be
+A transducer of type hfst.ImplementationType.SFST_TYPE, hfst.ImplementationType.TROPICAL_OPENFST_TYPE,
+hfst.ImplementationType.LOG_OPENFST_TYPE or hfst.ImplementationType.FOMA_TYPE can be converted into an
+hfst.ImplementationType.HFST_OL_TYPE or hfst.ImplementationType.HFST_OLW_TYPE transducer, but an
+hfst.ImplementationType.HFST_OL_TYPE or hfst.ImplementationType.HFST_OLW_TYPE transducer cannot be
 converted to any other type.
 
 note: For conversion between HfstBasicTransducer and HfstTransducer, see
@@ -2163,6 +2163,62 @@ output.
 
 
 // File: namespacehfst_1_1rules.xml
+
+%feature("docstring") hfst::xeroxRules::Rule
+"""
+todo
+"""
+
+%feature("docstring") hfst::xeroxRules::replace
+"""
+todo
+"""
+
+%feature("docstring") hfst::xeroxRules::xerox_replace_left
+"""
+todo
+"""
+
+%feature("docstring") hfst::xeroxRules::replace_leftmost_longest_match
+"""
+todo
+"""
+
+%feature("docstring") hfst::xeroxRules::replace_rightmost_longest_match
+"""
+todo
+"""
+
+%feature("docstring") hfst::xeroxRules::replace_leftmost_shortest_match
+"""
+todo
+"""
+
+%feature("docstring") hfst::xeroxRules::replace_rightmost_shortest_match
+"""
+todo
+"""
+
+%feature("docstring") hfst::xeroxRules::replace_epenthesis
+"""
+todo
+"""
+
+%feature("docstring") hfst::xeroxRules::xerox_restriction
+"""
+todo
+"""
+
+%feature("docstring") hfst::xeroxRules::before
+"""
+todo
+"""
+
+%feature("docstring") hfst::xeroxRules::after
+"""
+todo
+"""
+
 
 %feature("docstring") hfst::rules::two_level_if
 """
@@ -2840,7 +2896,7 @@ Possible inputs:
 
 Get default transducer implementation type.
 
-If the default type is not set, it defaults to hfst.types.TROPICAL_OPENFST_TYPE
+If the default type is not set, it defaults to hfst.ImplementationType.TROPICAL_OPENFST_TYPE
 """
 
 %feature("docstring") regex
@@ -3176,7 +3232,7 @@ The input is not in valid prolog format.
 The type of a transducer is not specified.
 
 This exception is thrown when an implementation type argument is
-hfst.types.ERROR_TYPE.
+hfst.ImplementationType.ERROR_TYPE.
 """
 
 
@@ -3344,10 +3400,10 @@ or more transducers as arguments do not have the same type.
 
 An example:
 
-     hfst.set_default_fst_type(hfst.types.TROPICAL_OPENFST_TYPE)
+     hfst.set_default_fst_type(hfst.ImplementationType.TROPICAL_OPENFST_TYPE)
      tr1 = hfst.regex('foo')
      tr2 = hfst.regex('bar')
-     tr2.convert(hfst.types.FOMA_TYPE)
+     tr2.convert(hfst.ImplementationType.FOMA_TYPE)
      try:
          tr1.disjunct(tr2)
      except hfst.exceptions.TransducerTypeMismatchException:
