@@ -824,6 +824,9 @@ void print_location_vector(hfst_ol::PmatchContainer & container,
             outstream << accumulator.substr(0, accumulator.size() - 1);
         }
         outstream << "\t_" << std::endl;
+        if (locations.at(0).tag == "<Boundary=Sentence>") {
+            outstream << std::endl;
+        }
     }
 //    std::cerr << "from print_location_vector\n";
 }
