@@ -38,7 +38,7 @@
 #
 #   - Create transducers by \link hfst.HfstTokenizer tokenizing\endlink UTF-8 strings with multicharacter symbols
 #
-#   - Apply two-level, replace, restriction and coercion \link hfst.rules.two_level_if rules\endlink
+#   - Apply \link hfst.xerox_rules.replace replace\endlink, \link hfst.sfst_rules.two_level_if two-level\endlink, restriction and coercion rules
 #
 #
 # \section tutorial Tutorial
@@ -2347,7 +2347,9 @@ class ImplementationType:
 #
 #    - #hfst.exceptions: #hfst.exceptions.HfstException and its subclasses that are used to handle exceptional situations and errors
 #
-#    - #hfst.rules: Functions for creating transducers that implement two-level rules
+#    - #hfst.xerox_rules: Functions for creating transducers that implement Xerox-type replace rules
+#
+#    - #hfst.sfst_rules: Functions for creating transducers that implement various two-level rules
 #
 # <BR>
 #

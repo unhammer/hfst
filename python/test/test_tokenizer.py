@@ -1,6 +1,6 @@
 import hfst
 
-for type in [hfst.ImplementationType.SFST_TYPE, hfst.types.TROPICAL_OPENFST_TYPE, hfst.types.FOMA_TYPE]:
+for type in [hfst.ImplementationType.SFST_TYPE, hfst.ImplementationType.TROPICAL_OPENFST_TYPE, hfst.ImplementationType.FOMA_TYPE]:
     if hfst.HfstTransducer.is_implementation_type_available(type):
         
         tok = hfst.HfstTokenizer()

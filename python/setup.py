@@ -42,6 +42,6 @@ setup(name = 'libhfst_swig',
       description = 'SWIG-bound hfst interface',
       ext_modules = [libhfst_module],
       py_modules = ["libhfst"],
-      packages = ["hfst", "hfst.exceptions", "hfst.rules", "hfst.xerox_rules"],
+      packages = ["hfst", "hfst.exceptions", "hfst.sfst_rules", "hfst.xerox_rules"],
       data_files = []
       )

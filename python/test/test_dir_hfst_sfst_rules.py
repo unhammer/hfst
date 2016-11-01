@@ -1,4 +1,4 @@
-import hfst.rules
+import hfst.sfst_rules
 
 diritems = \
 ['coercion', 'deep_coercion', 'deep_restriction', 'deep_restriction_and_coercion', \
@@ -7,7 +7,7 @@ diritems = \
  'replace_up', 'restriction', 'restriction_and_coercion', 'surface_coercion', 'surface_restriction', \
  'surface_restriction_and_coercion', 'two_level_if', 'two_level_if_and_only_if', 'two_level_only_if']
 
-dirhfstrules = dir(hfst.rules)
+dirhfstsfstrules = dir(hfst.sfst_rules)
 
 for item in diritems:
-    assert item in dirhfstrules
+    assert item in dirhfstsfstrules
