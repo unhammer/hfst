@@ -1216,7 +1216,7 @@ Parameters
 * `output` :
     Output format. Values recognized: 'text', 'raw', 'dict' (the default). 'text'
     returns a string where paths are separated by newlines and each path is represented
-    as input_string + ":" + output_string + "\t" t weight. 'raw' yields a tuple of
+    as input_string + ':' + output_string + '\t' + weight. 'raw' yields a tuple of
     all paths where each path is a 2-tuple consisting of a weight and a tuple of
     all transition symbol pairs, each symbol pair being a 2-tuple of an input and
     an output symbol. 'dict' gives a dictionary that maps each input string into a
