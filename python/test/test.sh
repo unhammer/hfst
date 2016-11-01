@@ -22,7 +22,7 @@ for file in test_dir_hfst.py test_dir_hfst_exceptions.py test_dir_hfst_rules.py 
     test_tokenizer.py test_exceptions.py test_xre.py \
     test_read_att_transducer.py test_prolog.py \
     test_att_reader.py test_prolog_reader.py \
-    test_hfst.py test_examples.py test_pmatch.py ;
+    test_hfst.py test_examples.py test_pmatch.py test_xerox_rules.py;
 do
     if ! [ "$PYTHONPATH" = "" ]; then
         echo 'import sys' > tmp

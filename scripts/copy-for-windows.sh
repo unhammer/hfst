@@ -48,7 +48,8 @@ for file in README test.sh test.bat \
     test_dir_hfst_exceptions.py test_dir_hfst_rules.py test_tokenizer.py \
     test_read_att_transducer.py test_xre.py test_hfst.py test_examples.py \
     test_att_reader.py test_prolog_reader.py \
-    test_streams_1.py test_streams_2.py test_streams_3.py streets.txt;
+    test_streams_1.py test_streams_2.py test_streams_3.py streets.txt \
+    test_xerox_rules.py ;
 do
     cp python/test/$file $1/test/
 done
@@ -215,12 +216,10 @@ done
 mkdir $1/libhfst/src/hfst
 mkdir $1/libhfst/src/hfst/exceptions
 mkdir $1/libhfst/src/hfst/rules
-mkdir $1/libhfst/src/hfst/types
 
 cp python/hfst/__init__.py $1/libhfst/src/hfst/
 cp python/hfst/exceptions/__init__.py $1/libhfst/src/hfst/exceptions/
 cp python/hfst/rules/__init__.py $1/libhfst/src/hfst/rules/
-cp python/hfst/types/__init__.py $1/libhfst/src/hfst/types/
 
 # todo: python/test/
 
