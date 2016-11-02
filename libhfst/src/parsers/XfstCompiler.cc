@@ -151,6 +151,7 @@ namespace xfst {
         lexc_(hfst::TROPICAL_OPENFST_TYPE),
         format_(hfst::TROPICAL_OPENFST_TYPE),
         verbose_(false),
+        verbose_prompt_(false),
         latest_regex_compiled(NULL),
         quit_requested_(false),
         fail_flag_(false),
@@ -216,6 +217,7 @@ namespace xfst {
         lexc_(impl),
         format_(impl),
         verbose_(false),
+        verbose_prompt_(false),
         latest_regex_compiled(NULL),
         quit_requested_(false),
         fail_flag_(false),
@@ -272,6 +274,15 @@ namespace xfst {
         initialize_variable_explanations();
         prompt();
       }
+
+  XfstCompiler::~XfstCompiler()
+  {
+    while(!stack_.empty())
+      {
+        delete(stack_.top());
+        (void)stack_.pop();
+      }
+  }
 
   int XfstCompiler::xfst_fclose(FILE * f, const char * name)
   {

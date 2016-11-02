@@ -67,6 +67,8 @@ class XfstCompiler
   XfstCompiler();
   //! @brief Create compiler for @a impl format transducers
   XfstCompiler(hfst::ImplementationType impl);
+  //! @brief Destructor.
+  ~XfstCompiler();
 
   //! @brief Add properties from file, one property per line
   //! @todo properties cannot be stored in HFST automata
