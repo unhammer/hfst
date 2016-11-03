@@ -280,7 +280,16 @@ namespace xfst {
     while(!stack_.empty())
       {
         delete(stack_.top());
-        (void)stack_.pop();
+        stack_.pop();
+      }
+    for (std::map<std::string, hfst::HfstTransducer*>::const_iterator it
+           = definitions_.begin(); it != definitions_.end(); it++)
+      {
+        delete it->second;
+      }
+    if (latest_regex_compiled != NULL)
+      {
+        delete latest_regex_compiled;
       }
   }
 
