@@ -121,7 +121,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        	    hfst::xfst::xfst_->apply_up(stdin); CHECK;
        }
        | APPLY_UP APPLY_INPUT END_COMMAND {
-       	    hfst::xfst::xfst_->apply_up($2); CHECK;
+       	    hfst::xfst::xfst_->apply_up($2); CHECK; free($2);
        }
        | APPLY_UP NAMETOKEN END_COMMAND {
             hfst::xfst::xfst_->apply_up($2);
@@ -140,7 +140,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->apply_down(stdin); CHECK;
        }
        | APPLY_DOWN APPLY_INPUT END_COMMAND {
-       	    hfst::xfst::xfst_->apply_down($2); CHECK;
+       	    hfst::xfst::xfst_->apply_down($2); CHECK; free($2);
        }
        | APPLY_DOWN NAMETOKEN END_COMMAND {
             hfst::xfst::xfst_->apply_down($2);
@@ -311,6 +311,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        }
        | SOURCE NAMETOKEN END_COMMAND {
             hxfsterror("source not implemented yywrap\n");
+            free($2);
             return EXIT_FAILURE;
        }
        | SYSTEM {
@@ -453,6 +454,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             if (strcmp($2, "upper") && strcmp($2, "lower"))
             {
                 hxfsterror("should be upper or lower");
+                free($2);
                 return EXIT_FAILURE;
             }
             hfst::xfst::xfst_->print_arc_count($2, &hfst::xfst::xfst_->get_output_stream());
@@ -603,13 +605,13 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        }
        | PRINT_LOWER_WORDS NAMETOKEN NAMETOKEN END_COMMAND {
             hfst::xfst::xfst_->print_lower_words($2, hfst::xfst::nametoken_to_number($3), &hfst::xfst::xfst_->get_output_stream());
-            free($2); CHECK;
+            free($2); free($3); CHECK;
        }
        | PRINT_LOWER_WORDS NAMETOKEN NAMETOKEN REDIRECT_OUT END_COMMAND {
             //std::ofstream oss($4, "w");
             std::ofstream oss($4);
             hfst::xfst::xfst_->print_lower_words($2, hfst::xfst::nametoken_to_number($3), &oss);
-            free($2);
+            free($2); free($3);
             //hfst::xfst::xfst_fclose(f, $4);
             oss.close();
             CHECK;
@@ -620,6 +622,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
               hfst::xfst::xfst_->print_lower_words(NULL, i, &hfst::xfst::xfst_->get_output_stream());
             else
               hfst::xfst::xfst_->print_lower_words($2, 0, &hfst::xfst::xfst_->get_output_stream());
+            free($2);
             CHECK;
        }
        | PRINT_LOWER_WORDS END_COMMAND {
@@ -635,6 +638,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
               hfst::xfst::xfst_->print_lower_words($2, 0, &oss);
             //hfst::xfst::xfst_fclose(f, $3);
             oss.close();
+            free($2);
             CHECK;
        }
        | PRINT_LOWER_WORDS REDIRECT_OUT END_COMMAND {
@@ -647,13 +651,13 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        }
        | PRINT_RANDOM_LOWER NAMETOKEN NAMETOKEN END_COMMAND {
             hfst::xfst::xfst_->print_random_lower($2, hfst::xfst::nametoken_to_number($3), &hfst::xfst::xfst_->get_output_stream());
-            free($2); CHECK;
+            free($2); free($3); CHECK;
        }
        | PRINT_RANDOM_LOWER NAMETOKEN NAMETOKEN REDIRECT_OUT END_COMMAND {
             //std::ofstream oss($4, "w");
             std::ofstream oss($4);
             hfst::xfst::xfst_->print_random_lower($2, hfst::xfst::nametoken_to_number($3), &oss);
-            free($2);
+            free($2); free($3);
             oss.close();
             //hfst::xfst::xfst_fclose(f, $4);
             CHECK;
@@ -664,7 +668,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
               hfst::xfst::xfst_->print_random_lower(NULL, i, &hfst::xfst::xfst_->get_output_stream());
             else
               hfst::xfst::xfst_->print_random_lower($2, 15, &hfst::xfst::xfst_->get_output_stream());
-            CHECK;
+            free($2);CHECK;
        }
        | PRINT_RANDOM_LOWER END_COMMAND {
             hfst::xfst::xfst_->print_random_lower(NULL, 15, &hfst::xfst::xfst_->get_output_stream()); CHECK;
@@ -679,7 +683,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
               hfst::xfst::xfst_->print_random_lower($2, 15, &oss);
             //hfst::xfst::xfst_fclose(f, $3);
             oss.close();
-            CHECK;
+            free($2); CHECK;
        }
        | PRINT_RANDOM_LOWER REDIRECT_OUT END_COMMAND {
             //std::ofstream oss($2);
@@ -697,7 +701,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             //std::ofstream oss($4, "w");
             std::ofstream oss($4);
             hfst::xfst::xfst_->print_upper_words($2, hfst::xfst::nametoken_to_number($3), &oss);
-            free($2);
+            free($2); free($3);
             //hfst::xfst::xfst_fclose(f, $4);
             oss.close();
             CHECK;
@@ -708,7 +712,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
               hfst::xfst::xfst_->print_upper_words(NULL, i, &hfst::xfst::xfst_->get_output_stream());
             else
               hfst::xfst::xfst_->print_upper_words($2, 0, &hfst::xfst::xfst_->get_output_stream());
-            CHECK;
+            free($2); CHECK;
        }
        | PRINT_UPPER_WORDS END_COMMAND {
             hfst::xfst::xfst_->print_upper_words(NULL, 0, &hfst::xfst::xfst_->get_output_stream()); CHECK;
@@ -723,7 +727,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
               hfst::xfst::xfst_->print_upper_words($2, 0, &oss);
             //hfst::xfst::xfst_fclose(f, $3);
             oss.close();
-            CHECK;
+            free($2); CHECK;
        }
        | PRINT_UPPER_WORDS REDIRECT_OUT END_COMMAND {
             //std::ofstream oss($2);
@@ -735,13 +739,13 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        }
        | PRINT_RANDOM_UPPER NAMETOKEN NAMETOKEN END_COMMAND {
             hfst::xfst::xfst_->print_random_upper($2, hfst::xfst::nametoken_to_number($3), &hfst::xfst::xfst_->get_output_stream());
-            free($2); CHECK;
+            free($2); free($3); CHECK;
        }
        | PRINT_RANDOM_UPPER NAMETOKEN NAMETOKEN REDIRECT_OUT END_COMMAND {
             //std::ofstream oss($4, "w");
             std::ofstream oss($4);
             hfst::xfst::xfst_->print_random_upper($2, hfst::xfst::nametoken_to_number($3), &oss);
-            free($2);
+            free($2); free($3);
             //hfst::xfst::xfst_fclose(f, $4);
             oss.close();
             CHECK;
@@ -752,7 +756,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
               hfst::xfst::xfst_->print_random_upper(NULL, i, &hfst::xfst::xfst_->get_output_stream());
             else
               hfst::xfst::xfst_->print_random_upper($2, 15, &hfst::xfst::xfst_->get_output_stream());
-            CHECK;
+            free($2); CHECK;
        }
        | PRINT_RANDOM_UPPER END_COMMAND {
             hfst::xfst::xfst_->print_random_upper(NULL, 15, &hfst::xfst::xfst_->get_output_stream()); CHECK;
@@ -767,7 +771,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
               hfst::xfst::xfst_->print_random_upper($2, 15, &oss);
             //hfst::xfst::xfst_fclose(f, $3);
             oss.close();
-            CHECK;
+            free($2); CHECK;
        }
        | PRINT_RANDOM_UPPER REDIRECT_OUT END_COMMAND {
             //std::ofstream oss($2);
@@ -779,13 +783,13 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        }
        | PRINT_WORDS NAMETOKEN NAMETOKEN END_COMMAND {
             hfst::xfst::xfst_->print_words($2, hfst::xfst::nametoken_to_number($3), &hfst::xfst::xfst_->get_output_stream());
-            free($2); CHECK;
+            free($2); free($3); CHECK;
        }
        | PRINT_WORDS NAMETOKEN NAMETOKEN REDIRECT_OUT END_COMMAND {
             //std::ofstream oss($4, "w");
             std::ofstream oss($4);
             hfst::xfst::xfst_->print_words($2, hfst::xfst::nametoken_to_number($3), &oss);
-            free($2);
+            free($2); free($3);
             //hfst::xfst::xfst_fclose(f, $4);
             oss.close();
             CHECK;
@@ -796,7 +800,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
               hfst::xfst::xfst_->print_words(NULL, i, &hfst::xfst::xfst_->get_output_stream());
             else
               hfst::xfst::xfst_->print_words($2, 0, &hfst::xfst::xfst_->get_output_stream());
-            CHECK;
+            free($2); CHECK;
        }
        | PRINT_WORDS END_COMMAND {
             hfst::xfst::xfst_->print_words(NULL, 0, &hfst::xfst::xfst_->get_output_stream()); CHECK;
@@ -811,7 +815,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
               hfst::xfst::xfst_->print_words($2, 0, &oss);
             //hfst::xfst::xfst_fclose(f, $3);
             oss.close();
-            CHECK;
+            free($2); CHECK;
        }
        | PRINT_WORDS REDIRECT_OUT END_COMMAND {
             //std::ofstream oss($2);
@@ -823,13 +827,13 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        }
        | PRINT_RANDOM_WORDS NAMETOKEN NAMETOKEN END_COMMAND {
             hfst::xfst::xfst_->print_random_words($2, hfst::xfst::nametoken_to_number($3), &hfst::xfst::xfst_->get_output_stream());
-            free($2); CHECK;
+            free($2); free($3); CHECK;
        }
        | PRINT_RANDOM_WORDS NAMETOKEN NAMETOKEN REDIRECT_OUT END_COMMAND {
             //std::ofstream oss($4, "w");
             std::ofstream oss($4);
             hfst::xfst::xfst_->print_random_words($2, hfst::xfst::nametoken_to_number($3), &oss);
-            free($2);
+            free($2); free($3);
             //hfst::xfst::xfst_fclose(f, $4);
             oss.close();
             CHECK;
@@ -840,7 +844,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
               hfst::xfst::xfst_->print_random_words(NULL, i, &hfst::xfst::xfst_->get_output_stream());
             else
               hfst::xfst::xfst_->print_random_words($2, 15, &hfst::xfst::xfst_->get_output_stream());
-            CHECK;
+            free($2); CHECK;
        }
        | PRINT_RANDOM_WORDS END_COMMAND {
             hfst::xfst::xfst_->print_random_words(NULL, 15, &hfst::xfst::xfst_->get_output_stream()); CHECK;
@@ -855,7 +859,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
               hfst::xfst::xfst_->print_random_words($2, 15, &oss);
             //hfst::xfst::xfst_fclose(f, $3);
             oss.close();
-            CHECK;
+            free($2); CHECK;
        }
        | PRINT_RANDOM_WORDS REDIRECT_OUT END_COMMAND {
             //std::ofstream oss($2);
@@ -912,6 +916,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        | PRINT_SIGMA_WORD_COUNT NAMETOKEN END_COMMAND {
             if (strcmp($2, "upper") && strcmp($2, "lower"))
             {
+                free($2);
                 hxfsterror("must be upper or lower\n");
                 return EXIT_FAILURE;
             }
@@ -998,7 +1003,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        | SAVE_PROLOG NAMETOKEN END_COMMAND {
             std::ofstream oss($2);
             hfst::xfst::xfst_->write_prolog(&oss);
-            oss.close(); CHECK;
+            oss.close(); free($2); CHECK;
        }
        | SAVE_PROLOG END_COMMAND {
             hfst::xfst::xfst_->write_prolog(&hfst::xfst::xfst_->get_output_stream()); CHECK;
@@ -1031,7 +1036,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        | READ_PROLOG NAMETOKEN END_COMMAND {
             FILE * f = hfst::xfst::xfst_->xfst_fopen($2, "r"); CHECK;
             hfst::xfst::xfst_->read_prolog(f);
-            hfst::xfst::xfst_->xfst_fclose(f, $2); CHECK;
+            hfst::xfst::xfst_->xfst_fclose(f, $2); free($2); CHECK;
        }
        | READ_PROLOG END_COMMAND {
             hfst::xfst::xfst_->read_prolog(stdin); CHECK;
@@ -1082,7 +1087,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             free($2); CHECK;
        }
        | READ_LEXC NAMETOKEN_LIST CTRLD {
-            hfst::xfst::xfst_->read_lexc_from_file(""); CHECK;
+            hfst::xfst::xfst_->read_lexc_from_file(""); free($2); CHECK;
        }
        | READ_ATT NAMETOKEN END_COMMAND {
             hfst::xfst::xfst_->read_att_from_file($2);
@@ -1108,7 +1113,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             std::ofstream oss($2);
             hfst::xfst::xfst_->write_att(&oss);
             oss.close();
-            free($2); CHECK;
+            free($2); free($3); free($4); CHECK;
        }
        // net ops
        | CLEANUP END_COMMAND {
@@ -1232,6 +1237,7 @@ COMMAND_SEQUENCE: COMMAND_SEQUENCE NAMETOKEN {
                         s++;
                     }
                     *r = '\0';
+                    free($2);
                 }
                 | COMMAND_SEQUENCE SEMICOLON {
                     $$ = $1;
@@ -1261,6 +1267,7 @@ NAMETOKEN_LIST: NAMETOKEN_LIST NAMETOKEN {
                     s++;
                 }
                 *r = '\0';
+                free($2);
              }
              | NAMETOKEN {
                 $$ = $1;
@@ -1291,6 +1298,7 @@ QUOTED_NAMETOKEN_LIST: QUOTED_NAMETOKEN_LIST NAMETOKEN {
                 *r = '"';
                 r++;
                 *r = '\0';
+                free($2);
              }
              | NAMETOKEN {
                 $$ = static_cast<char*>(malloc(sizeof(char)*strlen($1)+3));
@@ -1313,6 +1321,7 @@ QUOTED_NAMETOKEN_LIST: QUOTED_NAMETOKEN_LIST NAMETOKEN {
 
 LABEL: NAMETOKEN COLON NAMETOKEN {
                 $$ = strdup((std::string($1) + std::string(":") + std::string($3)).c_str());
+                free($1); free($3);
                 }
                 | NAMETOKEN {
                 $$ = $1;

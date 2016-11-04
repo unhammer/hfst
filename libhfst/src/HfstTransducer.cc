@@ -1492,10 +1492,10 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 ImplementationType HfstTransducer::get_type(void) const {
     return this->type; }
 void HfstTransducer::set_name(const std::string &name) {
-    this->set_property("name", name);
+  this->set_property(std::string("name"), name);
 }
 std::string HfstTransducer::get_name() const {
-    return this->get_property("name"); }
+  return this->get_property(std::string("name")); }
 
 void
 HfstTransducer::set_property(const string& property, const string& name)

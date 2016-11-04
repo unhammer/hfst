@@ -1030,12 +1030,14 @@ REGEXP12: LABEL { }
               char msg [256];
               sprintf(msg, "Error reading transducer file '%s'.", $1);
               xreerror(msg);
+              free($1);
               YYABORT;
             }
         }
         | READ_TEXT {
             FILE * f = NULL;
             f = hfst::hfst_fopen($1, "r");
+            free($1);
             if (f == NULL) {
               xreerror("File cannot be opened.\n");
               YYABORT;
@@ -1060,6 +1062,7 @@ REGEXP12: LABEL { }
         | READ_SPACED {
             FILE * f = NULL;
             f = hfst::hfst_fopen($1, "r");
+            free($1);
             if (f == NULL) {
               xreerror("File cannot be opened.\n");
               YYABORT;
@@ -1084,6 +1087,7 @@ REGEXP12: LABEL { }
         | READ_PROLOG {
             FILE * f = NULL;
             f = hfst::hfst_fopen($1, "r");
+            free($1);
             if (f == NULL) {
               xreerror("File cannot be opened.\n");
               YYABORT;
@@ -1111,12 +1115,14 @@ REGEXP12: LABEL { }
             if (f == NULL) {
               xreerror("File cannot be opened.\n");
               fclose(f);
+              free($1);
               YYABORT;
             }
             else {
               fclose(f);
               // read the regex in a string
               std::ifstream ifs($1);
+              free($1);
               std::stringstream buffer;
               buffer << ifs.rdbuf();
               char * regex_string = strdup(buffer.str().c_str());
@@ -1196,6 +1202,7 @@ LABEL: HALFARC {
         // function call
        | FUNCTION REGEXP_LIST RIGHT_PARENTHESIS {
             if (! hfst::xre::is_valid_function_call($1, $2)) {
+              delete $1; delete $2;
               return EXIT_FAILURE;
             }
             else {
@@ -1208,9 +1215,11 @@ LABEL: HALFARC {
               if (! hfst::xre::define_function_args($1, $2))
               {
                 xreerror("Could not define function args.\n");  // TODO: more informative message
+                delete $1; delete $2;
                 YYABORT;
               }
 
+              delete $2;
               // if we are scanning a function definition for argument symbols,
               // do not include the characters read when evaluating functions inside it
               unsigned int chars_read = hfst::xre::cr;
@@ -1219,6 +1228,7 @@ LABEL: HALFARC {
 
               hfst::xre::cr = chars_read;
               hfst::xre::undefine_function_args($1);
+              delete $1;
 
               xre_delete_buffer(bs,scanner);
               xrelex_destroy(scanner);
