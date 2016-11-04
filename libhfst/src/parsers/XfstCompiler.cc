@@ -688,6 +688,7 @@ namespace xfst {
             tok.add_multichar_symbol(*it);
           }
         StringVector lookup_path = tok.tokenize_one_level(std::string(token));
+        free(token);
 
         size_t cutoff = -1;
         if (t->is_lookup_infinitely_ambiguous(lookup_path, variables_["obey-flags"] == "ON"))
@@ -1755,7 +1756,7 @@ namespace xfst {
           PROMPT_AND_RETURN_THIS;
         }
 
-      stack_.push(definitions_[name]);
+      stack_.push(new HfstTransducer(*(definitions_[name])));
       PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
 
@@ -2168,7 +2169,8 @@ namespace xfst {
         }
       char* num = static_cast<char*>(malloc(sizeof(char)*31));
       sprintf(num, "%u", number);
-      variables_[name] = num;
+      variables_[name] = std::string(num);
+      free(num);
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -4914,6 +4916,7 @@ namespace xfst {
               if (whole_path.size() < 2)  // exit if already in the start state
                 {
                   ignore_history_after_index(ind);
+                  free(line);
                   PROMPT_AND_RETURN_THIS;
                 }
               else if (! return_to_level(whole_path, shortest_path,
@@ -4924,6 +4927,7 @@ namespace xfst {
                   //hfst_fprintf(errorstream_, "FATAL ERROR: could not return to level '%i'\n",
                   //        (int)(whole_path.size() - 1));
                   ignore_history_after_index(ind);
+                  free(line);
                   PROMPT_AND_RETURN_THIS;
                 }
             }
@@ -4933,6 +4937,7 @@ namespace xfst {
               int level = atoi(line+1); // skip '-'
               if (! can_level_be_reached(level, whole_path.size()))
                 {
+                  free(line);
                   continue;
                 }
               else if (! return_to_level(whole_path, shortest_path, level))
@@ -4941,6 +4946,7 @@ namespace xfst {
         flush(&error());
                   //hfst_fprintf(errorstream_, "FATAL ERROR: could not return to level '%i'\n", level);
                   ignore_history_after_index(ind);
+                  free(line);
                   PROMPT_AND_RETURN_THIS;
                 }
             }
@@ -4948,6 +4954,7 @@ namespace xfst {
           else if (strcmp(line, "0\n") == 0 || strcmp(line, "0") == 0)
             {
               ignore_history_after_index(ind);
+              free(line);
               PROMPT_AND_RETURN_THIS;
             }
           // case (4): follow arc

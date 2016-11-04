@@ -658,7 +658,7 @@ LWSP [\t ]*
 
     // CASE 1: no end string found: the rest is input to apply
     if (end_found == std::string::npos) {
-        hxfstlval.text = hxfsttext;
+        hxfstlval.text = strdup(hxfsttext);
         return APPLY_INPUT;
     }
 

@@ -525,6 +525,8 @@ int main(int argc, char** argv)
           if (buf[0] != 0) {
             add_history(expression.c_str()); }
 
+          free(buf);
+
           if (0 != comp.parse_line((expression + "\n").c_str()))
             {
 #ifdef WINDOWS
@@ -547,7 +549,7 @@ int main(int argc, char** argv)
           free(promptline);
           promptline = (!silent) ? comp.get_prompt() : strdup("");
         }
-      free(buf);
+
       free(promptline);
 #else
       fprintf(stderr, "ERROR: missing readline library\n");

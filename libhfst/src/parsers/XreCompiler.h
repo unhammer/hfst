@@ -70,6 +70,8 @@ class XreCompiler
   XreCompiler(hfst::ImplementationType impl);
   // ...
   XreCompiler(const struct XreConstructorArguments & args);
+  // ...
+  ~XreCompiler();
 
   //! @brief Add a definition macro.
   //!        Compilers will replace arcs labeled @a name, with the transducer
