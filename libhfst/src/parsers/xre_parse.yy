@@ -393,7 +393,7 @@ PARALLEL_RULES: PARALLEL_RULES COMMACOMMA RULE
             Rule tmpRule($3->second);
             $1->second.push_back(tmpRule);
             $$ =  new std::pair< ReplaceArrow, std::vector<Rule> > ($3->first, $1->second);
-            delete $3;
+            delete $1; delete $3;
          }
          | RULE
          {
@@ -402,6 +402,7 @@ PARALLEL_RULES: PARALLEL_RULES COMMACOMMA RULE
             ruleVector->push_back($1->second);
             
             $$ =  new std::pair< ReplaceArrow, std::vector<Rule> > ($1->first, *ruleVector);
+            delete ruleVector;
             delete $1;
          }
          ;
@@ -440,7 +441,7 @@ MAPPINGPAIR_VECTOR: MAPPINGPAIR_VECTOR COMMA MAPPINGPAIR
  
          $1->second.push_back($3->second);
          $$ =  new std::pair< ReplaceArrow, HfstTransducerPairVector> ($1->first, $1->second);
-         delete $3;
+         delete $1; delete $3;
             
       }
       
@@ -450,6 +451,7 @@ MAPPINGPAIR_VECTOR: MAPPINGPAIR_VECTOR COMMA MAPPINGPAIR
          HfstTransducerPairVector * mappingPairVector = new HfstTransducerPairVector();
          mappingPairVector->push_back( $1->second );
          $$ =  new std::pair< ReplaceArrow, HfstTransducerPairVector> ($1->first, * mappingPairVector);
+         delete mappingPairVector;
          delete $1;
       }
      
@@ -532,6 +534,7 @@ MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
 CONTEXTS_WITH_MARK:  CONTEXT_MARK CONTEXTS_VECTOR
          {
          $$ =  new std::pair< ReplaceType, HfstTransducerPairVector> ($1, *$2);
+         delete $2;
          }
          ;
 CONTEXTS_VECTOR: CONTEXT
@@ -1014,7 +1017,7 @@ SYMBOL_LIST: HALFARC {
             }
         ;
 
-REGEXP12: LABEL { }
+REGEXP12: LABEL { $$ = $1; }
         | LABEL WEIGHT {
             $$ = & $1->set_final_weights(hfst::double_to_float($2), true);
         }

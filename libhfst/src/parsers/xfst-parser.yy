@@ -1267,7 +1267,7 @@ NAMETOKEN_LIST: NAMETOKEN_LIST NAMETOKEN {
                     s++;
                 }
                 *r = '\0';
-                free($2);
+                free($1); free($2);
              }
              | NAMETOKEN {
                 $$ = $1;
@@ -1298,7 +1298,7 @@ QUOTED_NAMETOKEN_LIST: QUOTED_NAMETOKEN_LIST NAMETOKEN {
                 *r = '"';
                 r++;
                 *r = '\0';
-                free($2);
+                free($1); free($2);
              }
              | NAMETOKEN {
                 $$ = static_cast<char*>(malloc(sizeof(char)*strlen($1)+3));
