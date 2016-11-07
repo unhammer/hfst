@@ -1498,17 +1498,17 @@ std::string HfstTransducer::get_name() const {
   return this->get_property(std::string("name")); }
 
 void
-HfstTransducer::set_property(const string& property, const string& name)
+HfstTransducer::set_property(const std::string& property, const std::string& name)
   {
     HfstTokenizer::check_utf8_correctness(name);
     this->props[property] = name;
-    if (property == "name")
+    if (property == std::string("name"))
       {
         this->name = name;
       }
   }
 
-string HfstTransducer::get_property(const string& property) const
+std::string HfstTransducer::get_property(const std::string& property) const
   {
     if (this->props.find(property) != this->props.end())
       {
@@ -1516,10 +1516,10 @@ string HfstTransducer::get_property(const string& property) const
       }
     else
       {
-        return "";
+        return std::string("");
       }
   }
-const std::map<string,string>&
+const std::map<std::string,std::string>&
 HfstTransducer::get_properties() const
   {
     return this->props;

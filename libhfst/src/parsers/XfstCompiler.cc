@@ -1727,9 +1727,16 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::clear()
     {
-      while (!stack_.empty()) {
-        stack_.pop();
-      }
+      while(!stack_.empty())
+        {
+          delete(stack_.top());
+          stack_.pop();
+        }
+      if (latest_regex_compiled != NULL)
+        {
+          delete latest_regex_compiled;
+          latest_regex_compiled = NULL;
+        }
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -4004,6 +4011,7 @@ namespace xfst {
     if (latest_regex_compiled != NULL)
       {
         delete latest_regex_compiled;
+        latest_regex_compiled = NULL;
       }
     latest_regex_compiled = xre_.compile_first(indata, chars_read);  // XRE
     return *this;

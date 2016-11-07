@@ -1829,6 +1829,7 @@ namespace hfst {
     catch (const std::bad_alloc & e)
       {
         (void)e;
+        delete n_best_fst; delete scaled;
         HFST_THROW_MESSAGE(HfstFatalException, "TropicalWeightTransducer::nbest runs out of memory");
       }
     RmEpsilon(n_best_fst);
@@ -1836,6 +1837,7 @@ namespace hfst {
       {
         add_to_weights(n_best_fst, w);
       }
+    delete scaled;
     return n_best_fst;
   }
 
@@ -2700,6 +2702,8 @@ namespace hfst {
       HfstTwoLevelPath epsilon_path(t->Final(t->Start()).Value(), empty_spv);
       callback(epsilon_path, true /* final*/);
     }
+    if (fd_state_stack != NULL)
+      { delete fd_state_stack; }
   }
 
   static bool is_minimal_and_empty(StdVectorFst *t)

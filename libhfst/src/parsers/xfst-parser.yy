@@ -1348,6 +1348,7 @@ LABEL_LIST: LABEL_LIST LABEL {
                     s++;
                 }
                 *r = '\0';
+                free($1); free($2);
              }
              | LABEL {
                 $$ = $1;

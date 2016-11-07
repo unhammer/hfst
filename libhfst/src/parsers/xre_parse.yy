@@ -171,7 +171,7 @@ int xrelex ( YYSTYPE * , yyscan_t );
 %nonassoc <label> QUOTED_LITERAL QUOTED_MULTICHAR_LITERAL
 %%
 
-XRE: REGEXP1 { }
+XRE: REGEXP1 { $$ = $1; }
      |
      {
        // only comments
@@ -252,6 +252,7 @@ REGEXP2: REPLACE
        | SUB1 HALFARC PAIR_SEPARATOR HALFARC COMMA HALFARC PAIR_SEPARATOR HALFARC RIGHT_BRACKET {
             $1->substitute(StringPair($2,$4), StringPair($6,$8));
             $$ = $1;
+            free($2); free($4); free($6); free($8);
        }
        | SUB1 SUB2 SUB3 {
 
@@ -342,7 +343,7 @@ SUB3: SYMBOL_LIST RIGHT_BRACKET {  $$ = $1;  }  // symbol list
 // Replace operators
 ///////////////////////////
 
-REPLACE : REGEXP3 { }
+REPLACE : REGEXP3 { $$ = $1; }
        |  PARALLEL_RULES
          {
             switch ( $1->first )
@@ -690,7 +691,7 @@ REPLACE_ARROW: REPLACE_RIGHT
          ;
 
 ////////////////
-REGEXP3: REGEXP4 { }
+REGEXP3: REGEXP4 { $$ = $1; }
        | REGEXP3 SHUFFLE REGEXP4 {
             xreerror("No shuffle");
             //$$ = $1;
@@ -708,7 +709,7 @@ REGEXP3: REGEXP4 { }
 
        ;
   
-REGEXP4: REGEXP5 { }
+REGEXP4: REGEXP5 { $$ = $1; }
         // restriction rule
        | REGEXP4 RIGHT_ARROW RESTR_CONTEXTS_VECTOR {
             $$ = new HfstTransducer( restriction(*$1, *$3) ) ;
@@ -779,7 +780,7 @@ RESTR_CONTEXT: REGEXP4 CENTER_MARKER REGEXP4
       ;
 
 
-REGEXP5: REGEXP6 { }
+REGEXP5: REGEXP6 { $$ = $1; }
        | REGEXP5 UNION REGEXP6 {
             $$ = & $1->disjunct(*$3, harmonize_);
             delete $3;
@@ -819,14 +820,14 @@ REGEXP5: REGEXP6 { }
         }
        ;
 
-REGEXP6: REGEXP7 { }
+REGEXP6: REGEXP7 { $$ = $1; }
        | REGEXP6 REGEXP7 {
         $$ = & $1->concatenate(*$2, harmonize_);
         delete $2;
         }
        ;
 
-REGEXP7: REGEXP8 { }
+REGEXP7: REGEXP8 { $$ = $1; }
        | REGEXP7 IGNORING REGEXP8 {
             // this is how ignoring is done in foma and xfst
             $1->harmonize(*$3, true /*force harmonization also for foma type*/);
@@ -847,7 +848,7 @@ REGEXP7: REGEXP8 { }
         }
        ;
 
-REGEXP8: REGEXP9 { }
+REGEXP8: REGEXP9 { $$ = $1; }
        | COMPLEMENT REGEXP8 {
        		// TODO: forbid pair complement (ie ~a:b)
        		HfstTransducer complement = HfstTransducer::identity_pair( hfst::xre::format );
@@ -891,7 +892,7 @@ REGEXP8: REGEXP9 { }
         }
        ;
 
-REGEXP9: REGEXP10 { }
+REGEXP9: REGEXP10 { $$ = $1; }
        | REGEXP9 STAR {
             $$ = & $1->repeat_star();
         }
@@ -926,7 +927,7 @@ REGEXP9: REGEXP10 { }
         }
        ;
 
-REGEXP10: REGEXP11 { }
+REGEXP10: REGEXP11 { $$ = $1; }
        | TERM_COMPLEMENT REGEXP10 {
             HfstTransducer* any = new HfstTransducer(hfst::internal_identity,
                                         hfst::xre::format);
@@ -942,7 +943,7 @@ REGEXP10: REGEXP11 { }
         */
        ;
 
-REGEXP11: REGEXP12 { }
+REGEXP11: REGEXP12 { $$ = $1; }
         | LEFT_BRACKET REGEXP2 RIGHT_BRACKET {
             $$ = & $2->optimize();
         }
@@ -1012,7 +1013,7 @@ SYMBOL_LIST: HALFARC {
 
             $1->disjunct(*tmp, false); // do not harmonize
             $$ = & $1->optimize();
-            delete $2;
+            free($2);
             delete tmp;
             }
         ;
