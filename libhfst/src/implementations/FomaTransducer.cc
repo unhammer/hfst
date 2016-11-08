@@ -236,7 +236,9 @@ namespace hfst { namespace implementations {
 
     struct fsm_construct_handle *h;
     fsm *net;
-    h = fsm_construct_init(strdup(std::string("").c_str()));
+    char * empty = strdup(std::string("").c_str());
+    h = fsm_construct_init(empty);
+    free(empty);
     
     for (StringPairVector::const_iterator it = spv.begin();
          it != spv.end(); it++)
@@ -244,6 +246,7 @@ namespace hfst { namespace implementations {
         char *in = strdup(it->first.c_str());
         char *out = strdup(it->second.c_str());
         fsm_construct_add_arc(h, state_number, state_number+1, in, out);
+        free(in); free(out);
         state_number++;
       }
     
@@ -460,8 +463,12 @@ namespace hfst { namespace implementations {
   bool FomaTransducer::are_equivalent
   (fsm * t1, fsm * t2)
   {
-    return fsm_isempty(fsm_union(fsm_minus(fsm_copy(t1),fsm_copy(t2)),
-                                 fsm_minus(fsm_copy(t2),fsm_copy(t1))));
+    fsm * test =
+      fsm_union(fsm_minus(fsm_copy(t1),fsm_copy(t2)),
+                fsm_minus(fsm_copy(t2),fsm_copy(t1)));
+    int eq = fsm_isempty(test);
+    //fsm_destroy(test);
+    return (eq == 1);
   }
 
   bool FomaTransducer::is_cyclic(fsm * t)

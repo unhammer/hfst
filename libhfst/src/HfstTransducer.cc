@@ -5021,7 +5021,7 @@ convert_to_basic_transducer()
         hfst::implementations::HfstBasicTransducer * net =
       ConversionFunctions::foma_to_hfst_basic_transducer
       (implementation.foma);
-        free(implementation.foma);
+        foma_interface.delete_foma(implementation.foma);
     return net;
       }
 #endif
@@ -5633,7 +5633,7 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
     {
 #if HAVE_FOMA
     case FOMA_TYPE:
-      free(implementation.foma);
+      foma_interface.delete_foma(implementation.foma);
     break;
 #endif
 #if HAVE_SFST

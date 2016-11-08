@@ -180,14 +180,14 @@ XRE: REGEXP1 { $$ = $1; }
      }
      ;
 REGEXP1: REGEXP2 END_OF_EXPRESSION {
-       hfst::xre::last_compiled = & $1->optimize();
+       hfst::xre::last_compiled = $1;
        $$ = hfst::xre::last_compiled;
        if (hfst::xre::allow_extra_text_at_end) {
          return 0;
        }
    }
    | REGEXP2 {
-        hfst::xre::last_compiled = & $1->optimize();
+        hfst::xre::last_compiled = $1;
         $$ = hfst::xre::last_compiled;
    }
 ;
@@ -223,7 +223,7 @@ REGEXP2: REPLACE
             delete $3;
         }
        | REGEXP2 CROSS_PRODUCT REPLACE {
-            $$ = & $1->cross_product(*$3);
+            $$ = & $1->cross_product(*$3).optimize();
             delete $3;
         }
        | REGEXP2 LENIENT_COMPOSITION REPLACE {
@@ -232,7 +232,7 @@ REGEXP2: REPLACE
         }
        | REGEXP2 MERGE_RIGHT_ARROW REPLACE {
           try {
-            $$ = hfst::xre::merge_first_to_second($1, $3);
+            $$ = & hfst::xre::merge_first_to_second($1, $3)->optimize();
           }
           catch (const TransducersAreNotAutomataException & e)
           {
@@ -245,13 +245,13 @@ REGEXP2: REPLACE
           delete $1;
        }
        | REGEXP2 MERGE_LEFT_ARROW REPLACE {
-            $$ = hfst::xre::merge_first_to_second($3, $1);
+            $$ = & hfst::xre::merge_first_to_second($3, $1)->optimize();
             delete $3;
        }
         // substitute
        | SUB1 HALFARC PAIR_SEPARATOR HALFARC COMMA HALFARC PAIR_SEPARATOR HALFARC RIGHT_BRACKET {
             $1->substitute(StringPair($2,$4), StringPair($6,$8));
-            $$ = $1;
+            $$ = & $1->optimize();
             free($2); free($4); free($6); free($8);
        }
        | SUB1 SUB2 SUB3 {
@@ -260,11 +260,11 @@ REGEXP2: REPLACE
             if (hfst::xre::is_definition($2))
             {
                 hfst::xre::warn("warning: using definition as an ordinary label, cannot substitute\n");
-                $$ = $1;
+                $$ = & $1->optimize();
             }
             else if (alpha.find($2) == alpha.end())
             {
-                $$ = $1;
+                $$ = & $1->optimize();
             }
             else
             {

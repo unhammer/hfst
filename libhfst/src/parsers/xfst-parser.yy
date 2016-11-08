@@ -1210,8 +1210,10 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             if ( hfst::xfst::xfst_->unknown_command($1) != 0)
               {
                 hxfsterror("Command not recognized.\n");
+                free($1);
                 YYABORT;
               }
+            free($1);
        }
        ;
 
