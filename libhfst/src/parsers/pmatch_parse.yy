@@ -593,6 +593,17 @@ LIKE: LIKE_LEFT ARGLIST RIGHT_PARENTHESIS {
                                             $2->operator[](1));
     }
     delete($2);
+} |
+LIKE_LEFT ARGLIST RIGHT_PARENTHESIS CATENATE_N {
+    if ($2->size() == 0) {
+        $$ = hfst::pmatch::compile_like_arc("");
+    } else if ($2->size() == 1) {
+        $$ = hfst::pmatch::compile_like_arc($2->operator[](0), "", $4);
+    } else {
+        $$ = hfst::pmatch::compile_like_arc($2->operator[](0),
+                                            $2->operator[](1), $4);
+    }
+    delete($2);
 }
 
 ENDTAG: ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {

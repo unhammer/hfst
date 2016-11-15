@@ -407,7 +407,8 @@ template<typename T> T norm(std::vector<T> v)
     return sqrt(ret);
 }
 
-PmatchObject * compile_like_arc(std::string word1, std::string word2)
+PmatchObject * compile_like_arc(std::string word1, std::string word2,
+                                unsigned int nwords)
 {
     WordVector this_word1;
     WordVector this_word2;
@@ -457,7 +458,7 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2)
     }
     HfstTokenizer tok;
     HfstTransducer * retval = new HfstTransducer(format);
-    for (size_t i = 0; i < word_vectors.size() && i <= 10; ++i) {
+    for (size_t i = 0; i < word_vectors.size() && i <= nwords; ++i) {
         HfstTransducer tmp(word_vectors[i].word, tok, format);
         retval->disjunct(tmp);
     }
