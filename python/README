@@ -82,13 +82,13 @@ structure of the package is
 
  * hfst
     * hfst.exceptions
-    * hfst.rules
-    * hfst.types
+    * hfst.sfst_rules
+    * hfst.xerox_rules
 
-The module hfst.exceptions contains HfstException and its subclasses and the
-module hfst.rules functions that create transducers implementing two-level
-rules. The module hfst.types contains transducer implementation types. All
-other functions and classes are in module hfst.
+The module hfst.exceptions contains HfstException and its subclasses. The
+modules hfst.sfst_rules and hfst.xerox_rules contain functions that create
+transducers implementing replace and two-level rules. All other functions and
+classes are in module hfst.
 
 For documentation and examples, see <https://hfst.github.io/python/index.html>.
 

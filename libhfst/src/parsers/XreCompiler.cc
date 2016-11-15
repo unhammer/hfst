@@ -72,6 +72,14 @@ XreCompiler::XreCompiler(hfst::ImplementationType impl) :
 #endif
 {}
 
+    XreCompiler::~XreCompiler()
+    {
+      for(std::map<std::string,hfst::HfstTransducer*>::iterator it
+            = definitions_.begin(); it != definitions_.end(); it++)
+        {
+          delete it->second;
+        }
+    }
 
     void XreCompiler::set_verbosity(bool verbose)
     {
@@ -213,6 +221,7 @@ XreCompiler::undefine(const std::string& name)
 {
 if (definitions_.find(name) != definitions_.end())
   {
+    delete definitions[name];
     definitions_.erase(name);
   }
 }
@@ -327,6 +336,7 @@ bool XreCompiler::get_positions_of_symbol_in_xre
               xre.c_str(), symbol.c_str());*/
       return false;
     }
+  delete compiled;
   positions_ = positions;
   cr = cr_before;
   return true;

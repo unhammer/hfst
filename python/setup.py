@@ -35,13 +35,13 @@ libhfst_module = Extension('_libhfst',
 # ["libhfst-NN.dll", "libgcc_s_seh-1.dll"] or
 # ["libhfst-NN.dll", "libgcc_s_dw2-1.dll"] or
 setup(name = 'libhfst_swig',
-      version = '3.11.0_beta',
+      version = '3.12.0_beta',
       author = 'HFST team',
       author_email = 'hfst-bugs@helsinki.fi',
       url = 'http://hfst.github.io/',
       description = 'SWIG-bound hfst interface',
       ext_modules = [libhfst_module],
       py_modules = ["libhfst"],
-      packages = ["hfst", "hfst.exceptions", "hfst.rules", "hfst.xerox_rules"],
+      packages = ["hfst", "hfst.exceptions", "hfst.sfst_rules", "hfst.xerox_rules"],
       data_files = []
       )

@@ -5,6 +5,28 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.12.0
+----------------------------
+
+* fixes to memory leaks and efficiency
+
+* fixes to numerous warnings
+
+* changes in Python bindings:
+
+  * rename hfst.rules into hfst.sfst_rules
+
+  * get rid of hfst.types and offer implementation types in class ImplementationType
+
+  * add Xerox-type rules in module hfst.xerox_rules
+
+  * improve documentation
+
+  * tentatively add partial support for pypi installation
+
+* improvements to pmatch tools and hfst-proc
+
+
 Noteworthy changes in 3.11.0
 ----------------------------
 

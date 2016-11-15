@@ -1492,23 +1492,23 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 ImplementationType HfstTransducer::get_type(void) const {
     return this->type; }
 void HfstTransducer::set_name(const std::string &name) {
-    this->set_property("name", name);
+  this->set_property(std::string("name"), name);
 }
 std::string HfstTransducer::get_name() const {
-    return this->get_property("name"); }
+  return this->get_property(std::string("name")); }
 
 void
-HfstTransducer::set_property(const string& property, const string& name)
+HfstTransducer::set_property(const std::string& property, const std::string& name)
   {
     HfstTokenizer::check_utf8_correctness(name);
     this->props[property] = name;
-    if (property == "name")
+    if (property == std::string("name"))
       {
         this->name = name;
       }
   }
 
-string HfstTransducer::get_property(const string& property) const
+std::string HfstTransducer::get_property(const std::string& property) const
   {
     if (this->props.find(property) != this->props.end())
       {
@@ -1516,10 +1516,10 @@ string HfstTransducer::get_property(const string& property) const
       }
     else
       {
-        return "";
+        return std::string("");
       }
   }
-const std::map<string,string>&
+const std::map<std::string,std::string>&
 HfstTransducer::get_properties() const
   {
     return this->props;
@@ -5021,7 +5021,7 @@ convert_to_basic_transducer()
         hfst::implementations::HfstBasicTransducer * net =
       ConversionFunctions::foma_to_hfst_basic_transducer
       (implementation.foma);
-        free(implementation.foma);
+        foma_interface.delete_foma(implementation.foma);
     return net;
       }
 #endif
@@ -5633,7 +5633,7 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
     {
 #if HAVE_FOMA
     case FOMA_TYPE:
-      free(implementation.foma);
+      foma_interface.delete_foma(implementation.foma);
     break;
 #endif
 #if HAVE_SFST

@@ -1214,11 +1214,14 @@ Parameters
 * `obey_flags` :
     Whether flag diacritics are validated (default True).
 * `output` :
-    Output format. Values recognized: 'text' (as a string, separated by
-    newlines), 'raw' (a dictionary that maps each input string into a list of
-    tuples of an output string and a weight), 'dict' (a dictionary that maps
-    each input string into a tuple of tuples of an output string and a weight,
-    the default).
+    Output format. Values recognized: 'text', 'raw', 'dict' (the default). 'text'
+    returns a string where paths are separated by newlines and each path is represented
+    as input_string + ':' + output_string + '\t' + weight. 'raw' yields a tuple of
+    all paths where each path is a 2-tuple consisting of a weight and a tuple of
+    all transition symbol pairs, each symbol pair being a 2-tuple of an input and
+    an output symbol. 'dict' gives a dictionary that maps each input string into a
+    list of possible outputs, each output being a 2-tuple of an output string and
+    a weight.
 * `random` :
     Whether result strings are fetched randomly (default False).
 
@@ -2174,6 +2177,7 @@ todo
 todo
 """
 
+// note: this function is offered as 'replace_left' in package hfst.xerox_rules
 %feature("docstring") hfst::xeroxRules::xerox_replace_left
 """
 todo
@@ -2204,6 +2208,7 @@ todo
 todo
 """
 
+// note: this function is offered as 'restriction' in package hfst.xerox_rules
 %feature("docstring") hfst::xeroxRules::xerox_restriction
 """
 todo

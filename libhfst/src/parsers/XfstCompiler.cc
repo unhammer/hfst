@@ -151,6 +151,7 @@ namespace xfst {
         lexc_(hfst::TROPICAL_OPENFST_TYPE),
         format_(hfst::TROPICAL_OPENFST_TYPE),
         verbose_(false),
+        verbose_prompt_(false),
         latest_regex_compiled(NULL),
         quit_requested_(false),
         fail_flag_(false),
@@ -216,6 +217,7 @@ namespace xfst {
         lexc_(impl),
         format_(impl),
         verbose_(false),
+        verbose_prompt_(false),
         latest_regex_compiled(NULL),
         quit_requested_(false),
         fail_flag_(false),
@@ -272,6 +274,24 @@ namespace xfst {
         initialize_variable_explanations();
         prompt();
       }
+
+  XfstCompiler::~XfstCompiler()
+  {
+    while(!stack_.empty())
+      {
+        delete(stack_.top());
+        stack_.pop();
+      }
+    for (std::map<std::string, hfst::HfstTransducer*>::const_iterator it
+           = definitions_.begin(); it != definitions_.end(); it++)
+      {
+        delete it->second;
+      }
+    if (latest_regex_compiled != NULL)
+      {
+        delete latest_regex_compiled;
+      }
+  }
 
   int XfstCompiler::xfst_fclose(FILE * f, const char * name)
   {
@@ -668,6 +688,7 @@ namespace xfst {
             tok.add_multichar_symbol(*it);
           }
         StringVector lookup_path = tok.tokenize_one_level(std::string(token));
+        free(token);
 
         size_t cutoff = -1;
         if (t->is_lookup_infinitely_ambiguous(lookup_path, variables_["obey-flags"] == "ON"))
@@ -1706,9 +1727,16 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::clear()
     {
-      while (!stack_.empty()) {
-        stack_.pop();
-      }
+      while(!stack_.empty())
+        {
+          delete(stack_.top());
+          stack_.pop();
+        }
+      if (latest_regex_compiled != NULL)
+        {
+          delete latest_regex_compiled;
+          latest_regex_compiled = NULL;
+        }
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -1735,7 +1763,7 @@ namespace xfst {
           PROMPT_AND_RETURN_THIS;
         }
 
-      stack_.push(definitions_[name]);
+      stack_.push(new HfstTransducer(*(definitions_[name])));
       PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
 
@@ -2148,7 +2176,8 @@ namespace xfst {
         }
       char* num = static_cast<char*>(malloc(sizeof(char)*31));
       sprintf(num, "%u", number);
-      variables_[name] = num;
+      variables_[name] = std::string(num);
+      free(num);
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -3982,6 +4011,7 @@ namespace xfst {
     if (latest_regex_compiled != NULL)
       {
         delete latest_regex_compiled;
+        latest_regex_compiled = NULL;
       }
     latest_regex_compiled = xre_.compile_first(indata, chars_read);  // XRE
     return *this;
@@ -4894,6 +4924,7 @@ namespace xfst {
               if (whole_path.size() < 2)  // exit if already in the start state
                 {
                   ignore_history_after_index(ind);
+                  free(line);
                   PROMPT_AND_RETURN_THIS;
                 }
               else if (! return_to_level(whole_path, shortest_path,
@@ -4904,6 +4935,7 @@ namespace xfst {
                   //hfst_fprintf(errorstream_, "FATAL ERROR: could not return to level '%i'\n",
                   //        (int)(whole_path.size() - 1));
                   ignore_history_after_index(ind);
+                  free(line);
                   PROMPT_AND_RETURN_THIS;
                 }
             }
@@ -4913,6 +4945,7 @@ namespace xfst {
               int level = atoi(line+1); // skip '-'
               if (! can_level_be_reached(level, whole_path.size()))
                 {
+                  free(line);
                   continue;
                 }
               else if (! return_to_level(whole_path, shortest_path, level))
@@ -4921,6 +4954,7 @@ namespace xfst {
         flush(&error());
                   //hfst_fprintf(errorstream_, "FATAL ERROR: could not return to level '%i'\n", level);
                   ignore_history_after_index(ind);
+                  free(line);
                   PROMPT_AND_RETURN_THIS;
                 }
             }
@@ -4928,6 +4962,7 @@ namespace xfst {
           else if (strcmp(line, "0\n") == 0 || strcmp(line, "0") == 0)
             {
               ignore_history_after_index(ind);
+              free(line);
               PROMPT_AND_RETURN_THIS;
             }
           // case (4): follow arc

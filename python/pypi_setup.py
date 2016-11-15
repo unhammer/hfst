@@ -208,7 +208,7 @@ libhfst_module = Extension('_libhfst',
                            )
 
 setup(name = 'hfstpy',
-      version = '3.11.0_beta',
+      version = '3.12.0_beta',
       author = 'HFST team',
       author_email = 'hfst-bugs@helsinki.fi',
       url = 'http://hfst.github.io/',
@@ -216,6 +216,6 @@ setup(name = 'hfstpy',
       license = 'GNU GPL3',
       ext_modules = [libhfst_module],
       py_modules = ["libhfst"],
-      packages = ["hfst", "hfst.exceptions", "hfst.rules", "hfst.xerox_rules"],
+      packages = ["hfst", "hfst.exceptions", "hfst.sfst_rules", "hfst.xerox_rules"],
       data_files = []
       )

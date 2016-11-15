@@ -356,19 +356,17 @@ ALL_SRCS=$(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) \
 
 EXTRA_FILES=cat2dog.substitute cat.strings cat.txt cats_and_dogs.xre utf-8.strings latin-1.strings c_a_t.strings dos.strings not-contains-a.xre not-contains-a-comment-emptyline.xre parallel-left-arrow-multicom-emptyline.xre  parallel-left-arrow.xre cat.prolog negative_epsilon_cycles.txt no_negative_epsilon_cycles.txt substituting_transducer.txt substituted_transducer.txt
 
-TOKENIZE_FILES=tokenize-dog-gen.hfst \
-tokenize-dog.hfst \
-tokenize-dog-in.lexc \
+TOKENIZE_FILES=tokenize-dog-in.lexc \
 tokenize-dog-out-cg.strings \
 tokenize-dog-out-giella-cg.strings \
 tokenize-dog-out.strings \
 tokenize-dog-out-xerox.strings \
 tokenize-dog.pmscript \
-tokenize-backtrack-gen.hfst \
-tokenize-backtrack.hfst \
 tokenize-backtrack.lexc \
-tokenize-backtrack-out-gtd.strings \
-tokenize-backtrack.pmscript
+tokenize-backtrack.pmscript \
+tokenize-backtrack-out-giella-cg-spaces.strings \
+tokenize-backtrack-out-giella-cg-contiguous.strings \
+tokenize-backtrack-out-giella-cg.strings
 
 
 RESULT_FILES=basic.cat-dog-bird.lexc.flag.result.prolog \

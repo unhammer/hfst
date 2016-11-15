@@ -49,7 +49,7 @@ TokenIOStream::initialize_escaped_chars()
 void
 TokenIOStream::do_null_flush()
 {
-  std::cout << '\0';
+  os << '\0';
   os.flush();
   if(os.bad())
     std::cerr << "Could not flush file" << std::endl;

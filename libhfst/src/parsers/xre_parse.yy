@@ -171,7 +171,7 @@ int xrelex ( YYSTYPE * , yyscan_t );
 %nonassoc <label> QUOTED_LITERAL QUOTED_MULTICHAR_LITERAL
 %%
 
-XRE: REGEXP1 { }
+XRE: REGEXP1 { $$ = $1; }
      |
      {
        // only comments
@@ -180,14 +180,14 @@ XRE: REGEXP1 { }
      }
      ;
 REGEXP1: REGEXP2 END_OF_EXPRESSION {
-       hfst::xre::last_compiled = & $1->optimize();
+       hfst::xre::last_compiled = $1;
        $$ = hfst::xre::last_compiled;
        if (hfst::xre::allow_extra_text_at_end) {
          return 0;
        }
    }
    | REGEXP2 {
-        hfst::xre::last_compiled = & $1->optimize();
+        hfst::xre::last_compiled = $1;
         $$ = hfst::xre::last_compiled;
    }
 ;
@@ -223,7 +223,7 @@ REGEXP2: REPLACE
             delete $3;
         }
        | REGEXP2 CROSS_PRODUCT REPLACE {
-            $$ = & $1->cross_product(*$3);
+            $$ = & $1->cross_product(*$3).optimize();
             delete $3;
         }
        | REGEXP2 LENIENT_COMPOSITION REPLACE {
@@ -232,7 +232,7 @@ REGEXP2: REPLACE
         }
        | REGEXP2 MERGE_RIGHT_ARROW REPLACE {
           try {
-            $$ = hfst::xre::merge_first_to_second($1, $3);
+            $$ = & hfst::xre::merge_first_to_second($1, $3)->optimize();
           }
           catch (const TransducersAreNotAutomataException & e)
           {
@@ -245,13 +245,14 @@ REGEXP2: REPLACE
           delete $1;
        }
        | REGEXP2 MERGE_LEFT_ARROW REPLACE {
-            $$ = hfst::xre::merge_first_to_second($3, $1);
+            $$ = & hfst::xre::merge_first_to_second($3, $1)->optimize();
             delete $3;
        }
         // substitute
        | SUB1 HALFARC PAIR_SEPARATOR HALFARC COMMA HALFARC PAIR_SEPARATOR HALFARC RIGHT_BRACKET {
             $1->substitute(StringPair($2,$4), StringPair($6,$8));
-            $$ = $1;
+            $$ = & $1->optimize();
+            free($2); free($4); free($6); free($8);
        }
        | SUB1 SUB2 SUB3 {
 
@@ -259,11 +260,11 @@ REGEXP2: REPLACE
             if (hfst::xre::is_definition($2))
             {
                 hfst::xre::warn("warning: using definition as an ordinary label, cannot substitute\n");
-                $$ = $1;
+                $$ = & $1->optimize();
             }
             else if (alpha.find($2) == alpha.end())
             {
-                $$ = $1;
+                $$ = & $1->optimize();
             }
             else
             {
@@ -342,7 +343,7 @@ SUB3: SYMBOL_LIST RIGHT_BRACKET {  $$ = $1;  }  // symbol list
 // Replace operators
 ///////////////////////////
 
-REPLACE : REGEXP3 { }
+REPLACE : REGEXP3 { $$ = $1; }
        |  PARALLEL_RULES
          {
             switch ( $1->first )
@@ -393,7 +394,7 @@ PARALLEL_RULES: PARALLEL_RULES COMMACOMMA RULE
             Rule tmpRule($3->second);
             $1->second.push_back(tmpRule);
             $$ =  new std::pair< ReplaceArrow, std::vector<Rule> > ($3->first, $1->second);
-            delete $3;
+            delete $1; delete $3;
          }
          | RULE
          {
@@ -402,6 +403,7 @@ PARALLEL_RULES: PARALLEL_RULES COMMACOMMA RULE
             ruleVector->push_back($1->second);
             
             $$ =  new std::pair< ReplaceArrow, std::vector<Rule> > ($1->first, *ruleVector);
+            delete ruleVector;
             delete $1;
          }
          ;
@@ -440,7 +442,7 @@ MAPPINGPAIR_VECTOR: MAPPINGPAIR_VECTOR COMMA MAPPINGPAIR
  
          $1->second.push_back($3->second);
          $$ =  new std::pair< ReplaceArrow, HfstTransducerPairVector> ($1->first, $1->second);
-         delete $3;
+         delete $1; delete $3;
             
       }
       
@@ -450,6 +452,7 @@ MAPPINGPAIR_VECTOR: MAPPINGPAIR_VECTOR COMMA MAPPINGPAIR
          HfstTransducerPairVector * mappingPairVector = new HfstTransducerPairVector();
          mappingPairVector->push_back( $1->second );
          $$ =  new std::pair< ReplaceArrow, HfstTransducerPairVector> ($1->first, * mappingPairVector);
+         delete mappingPairVector;
          delete $1;
       }
      
@@ -532,6 +535,7 @@ MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
 CONTEXTS_WITH_MARK:  CONTEXT_MARK CONTEXTS_VECTOR
          {
          $$ =  new std::pair< ReplaceType, HfstTransducerPairVector> ($1, *$2);
+         delete $2;
          }
          ;
 CONTEXTS_VECTOR: CONTEXT
@@ -687,7 +691,7 @@ REPLACE_ARROW: REPLACE_RIGHT
          ;
 
 ////////////////
-REGEXP3: REGEXP4 { }
+REGEXP3: REGEXP4 { $$ = $1; }
        | REGEXP3 SHUFFLE REGEXP4 {
             xreerror("No shuffle");
             //$$ = $1;
@@ -705,7 +709,7 @@ REGEXP3: REGEXP4 { }
 
        ;
   
-REGEXP4: REGEXP5 { }
+REGEXP4: REGEXP5 { $$ = $1; }
         // restriction rule
        | REGEXP4 RIGHT_ARROW RESTR_CONTEXTS_VECTOR {
             $$ = new HfstTransducer( restriction(*$1, *$3) ) ;
@@ -776,7 +780,7 @@ RESTR_CONTEXT: REGEXP4 CENTER_MARKER REGEXP4
       ;
 
 
-REGEXP5: REGEXP6 { }
+REGEXP5: REGEXP6 { $$ = $1; }
        | REGEXP5 UNION REGEXP6 {
             $$ = & $1->disjunct(*$3, harmonize_);
             delete $3;
@@ -816,14 +820,14 @@ REGEXP5: REGEXP6 { }
         }
        ;
 
-REGEXP6: REGEXP7 { }
+REGEXP6: REGEXP7 { $$ = $1; }
        | REGEXP6 REGEXP7 {
         $$ = & $1->concatenate(*$2, harmonize_);
         delete $2;
         }
        ;
 
-REGEXP7: REGEXP8 { }
+REGEXP7: REGEXP8 { $$ = $1; }
        | REGEXP7 IGNORING REGEXP8 {
             // this is how ignoring is done in foma and xfst
             $1->harmonize(*$3, true /*force harmonization also for foma type*/);
@@ -844,7 +848,7 @@ REGEXP7: REGEXP8 { }
         }
        ;
 
-REGEXP8: REGEXP9 { }
+REGEXP8: REGEXP9 { $$ = $1; }
        | COMPLEMENT REGEXP8 {
        		// TODO: forbid pair complement (ie ~a:b)
        		HfstTransducer complement = HfstTransducer::identity_pair( hfst::xre::format );
@@ -888,7 +892,7 @@ REGEXP8: REGEXP9 { }
         }
        ;
 
-REGEXP9: REGEXP10 { }
+REGEXP9: REGEXP10 { $$ = $1; }
        | REGEXP9 STAR {
             $$ = & $1->repeat_star();
         }
@@ -923,7 +927,7 @@ REGEXP9: REGEXP10 { }
         }
        ;
 
-REGEXP10: REGEXP11 { }
+REGEXP10: REGEXP11 { $$ = $1; }
        | TERM_COMPLEMENT REGEXP10 {
             HfstTransducer* any = new HfstTransducer(hfst::internal_identity,
                                         hfst::xre::format);
@@ -939,7 +943,7 @@ REGEXP10: REGEXP11 { }
         */
        ;
 
-REGEXP11: REGEXP12 { }
+REGEXP11: REGEXP12 { $$ = $1; }
         | LEFT_BRACKET REGEXP2 RIGHT_BRACKET {
             $$ = & $2->optimize();
         }
@@ -1009,12 +1013,12 @@ SYMBOL_LIST: HALFARC {
 
             $1->disjunct(*tmp, false); // do not harmonize
             $$ = & $1->optimize();
-            delete $2;
+            free($2);
             delete tmp;
             }
         ;
 
-REGEXP12: LABEL { }
+REGEXP12: LABEL { $$ = $1; }
         | LABEL WEIGHT {
             $$ = & $1->set_final_weights(hfst::double_to_float($2), true);
         }
@@ -1030,12 +1034,14 @@ REGEXP12: LABEL { }
               char msg [256];
               sprintf(msg, "Error reading transducer file '%s'.", $1);
               xreerror(msg);
+              free($1);
               YYABORT;
             }
         }
         | READ_TEXT {
             FILE * f = NULL;
             f = hfst::hfst_fopen($1, "r");
+            free($1);
             if (f == NULL) {
               xreerror("File cannot be opened.\n");
               YYABORT;
@@ -1060,6 +1066,7 @@ REGEXP12: LABEL { }
         | READ_SPACED {
             FILE * f = NULL;
             f = hfst::hfst_fopen($1, "r");
+            free($1);
             if (f == NULL) {
               xreerror("File cannot be opened.\n");
               YYABORT;
@@ -1084,6 +1091,7 @@ REGEXP12: LABEL { }
         | READ_PROLOG {
             FILE * f = NULL;
             f = hfst::hfst_fopen($1, "r");
+            free($1);
             if (f == NULL) {
               xreerror("File cannot be opened.\n");
               YYABORT;
@@ -1111,12 +1119,14 @@ REGEXP12: LABEL { }
             if (f == NULL) {
               xreerror("File cannot be opened.\n");
               fclose(f);
+              free($1);
               YYABORT;
             }
             else {
               fclose(f);
               // read the regex in a string
               std::ifstream ifs($1);
+              free($1);
               std::stringstream buffer;
               buffer << ifs.rdbuf();
               char * regex_string = strdup(buffer.str().c_str());
@@ -1196,6 +1206,7 @@ LABEL: HALFARC {
         // function call
        | FUNCTION REGEXP_LIST RIGHT_PARENTHESIS {
             if (! hfst::xre::is_valid_function_call($1, $2)) {
+              delete $1; delete $2;
               return EXIT_FAILURE;
             }
             else {
@@ -1208,9 +1219,11 @@ LABEL: HALFARC {
               if (! hfst::xre::define_function_args($1, $2))
               {
                 xreerror("Could not define function args.\n");  // TODO: more informative message
+                delete $1; delete $2;
                 YYABORT;
               }
 
+              delete $2;
               // if we are scanning a function definition for argument symbols,
               // do not include the characters read when evaluating functions inside it
               unsigned int chars_read = hfst::xre::cr;
@@ -1219,6 +1232,7 @@ LABEL: HALFARC {
 
               hfst::xre::cr = chars_read;
               hfst::xre::undefine_function_args($1);
+              delete $1;
 
               xre_delete_buffer(bs,scanner);
               xrelex_destroy(scanner);

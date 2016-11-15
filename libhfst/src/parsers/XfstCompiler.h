@@ -67,6 +67,8 @@ class XfstCompiler
   XfstCompiler();
   //! @brief Create compiler for @a impl format transducers
   XfstCompiler(hfst::ImplementationType impl);
+  //! @brief Destructor.
+  ~XfstCompiler();
 
   //! @brief Add properties from file, one property per line
   //! @todo properties cannot be stored in HFST automata
@@ -723,7 +725,6 @@ class XfstCompiler
   std::map<std::string,std::string> variables_;
   std::map<std::string,std::string> properties_;
   std::map<std::string,std::set<std::string> > lists_;
-  hfst::HfstTransducer* last_defined_;
   hfst::ImplementationType format_;
   bool verbose_;
   bool verbose_prompt_;

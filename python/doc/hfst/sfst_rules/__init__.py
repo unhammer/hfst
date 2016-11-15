@@ -1,4 +1,4 @@
-## @package hfst.rules
+## @package hfst.sfst_rules
 # rules...
 
 ## A transducer that obligatorily performs the mappings defined by \a mappings in the context \a context when the alphabet is \a alphabet.

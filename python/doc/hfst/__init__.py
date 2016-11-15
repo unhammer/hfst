@@ -38,7 +38,7 @@
 #
 #   - Create transducers by \link hfst.HfstTokenizer tokenizing\endlink UTF-8 strings with multicharacter symbols
 #
-#   - Apply two-level, replace, restriction and coercion \link hfst.rules.two_level_if rules\endlink
+#   - Apply \link hfst.xerox_rules.replace replace\endlink, \link hfst.sfst_rules.two_level_if two-level\endlink, restriction and coercion rules
 #
 #
 # \section tutorial Tutorial
@@ -1505,7 +1505,7 @@ class HfstTransducer:
     # @param max_cycles Indicates how many times a cycle will be followed, with negative numbers indicating unlimited (default -1 i.e. unlimited).
     # @param max_number The total number of resulting strings is capped at this value, with 0 or negative indicating unlimited (default -1 i.e. unlimited).
     # @param obey_flags Whether flag diacritics are validated (default True).
-    # @param output Output format. Values recognized: 'text' (as a string, separated by newlines), 'raw' (a dictionary that maps each input string into a list of tuples of an output string and a weight), 'dict' (a dictionary that maps each input string into a tuple of tuples of an output string and a weight, the default).
+    # @param output Output format. Values recognized: 'text', 'raw', 'dict' (the default). 'text' returns a string where paths are separated by newlines and each path is represented as input_string + ":" + output_string + "\t" t weight. 'raw' yields a tuple of all paths where each path is a 2-tuple consisting of a weight and a tuple of all transition symbol pairs, each symbol pair being a 2-tuple of an input and an output symbol. 'dict' gives a dictionary that maps each input string into a list of possible outputs, each output being a 2-tuple of an output string and a weight.
     # @param random Whether result strings are fetched randomly (default False).
     # @return The extracted strings. \a output controls how they are represented.
     #
@@ -2347,7 +2347,9 @@ class ImplementationType:
 #
 #    - #hfst.exceptions: #hfst.exceptions.HfstException and its subclasses that are used to handle exceptional situations and errors
 #
-#    - #hfst.rules: Functions for creating transducers that implement two-level rules
+#    - #hfst.xerox_rules: Functions for creating transducers that implement Xerox-type replace rules
+#
+#    - #hfst.sfst_rules: Functions for creating transducers that implement various two-level rules
 #
 # <BR>
 #

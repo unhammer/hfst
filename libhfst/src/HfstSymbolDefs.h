@@ -97,10 +97,10 @@ namespace hfst
   typedef std::set<HfstTwoLevelPath> HfstTwoLevelPaths;
   
 /* The internal representations */
-  const std::string internal_epsilon = "@_EPSILON_SYMBOL_@";
-  const std::string internal_unknown = "@_UNKNOWN_SYMBOL_@";
-  const std::string internal_identity = "@_IDENTITY_SYMBOL_@";
-  const std::string internal_default = "@_DEFAULT_SYMBOL_@";
+  const std::string internal_epsilon("@_EPSILON_SYMBOL_@");
+  const std::string internal_unknown("@_UNKNOWN_SYMBOL_@");
+  const std::string internal_identity("@_IDENTITY_SYMBOL_@");
+  const std::string internal_default("@_DEFAULT_SYMBOL_@");
   
   /* Check whether a string is equal to reserved internal representation. */
   HFSTDLL bool is_epsilon(std::string const & str);

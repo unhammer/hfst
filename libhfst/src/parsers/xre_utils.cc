@@ -687,6 +687,7 @@ void undefine_function_args(const char * name)
       ostringstream os;
       os << arg_number;
       std::string function_arg = "@" + std::string(name) + os.str() + "@";
+      delete definitions[function_arg];
       definitions.erase(function_arg);
       //fprintf(stderr, "undefined function arg: '%s', %i:\n", name, arg_number); // DEBUG
     }
