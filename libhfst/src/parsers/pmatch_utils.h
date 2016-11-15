@@ -21,6 +21,7 @@
 #include <set>
 #include <time.h>
 #include <iomanip>
+#include <cmath>
 #include "HfstTransducer.h"
 #include "HfstXeroxRules.h"
 #include "xre_utils.h"
@@ -122,7 +123,16 @@ HfstTransducer * add_pmatch_delimiters(HfstTransducer * regex);
  */
 PmatchTransducerContainer * epsilon_to_symbol_container(std::string s);
 PmatchTransducerContainer * make_end_tag(std::string tag);
-PmatchObject * make_like_arc(std::string word);
+template<typename T> std::vector<T> pointwise_minus(std::vector<T> l,
+                                                    std::vector<T> r);
+template<typename T> std::vector<T> pointwise_plus(std::vector<T> l,
+                                                   std::vector<T> r);
+template<typename T> std::vector<T> pointwise_multiplication(T,
+                                                             std::vector<T> r);
+template<typename T> T dot_product(std::vector<T> l,
+                                   std::vector<T> r);
+template<typename T> T norm(std::vector<T> v);
+PmatchObject * compile_like_arc(std::string word1, std::string word2 = "");
 PmatchTransducerContainer * make_counter(std::string name);
 HfstTransducer * make_list(HfstTransducer * t,
                            ImplementationType f = format);

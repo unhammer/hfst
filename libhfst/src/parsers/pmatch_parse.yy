@@ -168,9 +168,11 @@ DEFINITION: DEFINE SYMBOL EXPRESSION1 {
  };
 
 ARGLIST:
-SYMBOL COMMA ARGLIST { $$ = $3; $$->push_back(std::string($1));
- } | SYMBOL { $$ = new std::vector<std::string>(1, std::string($1)); }
-| { $$ = new std::vector<std::string>(); };
+SYMBOL COMMA ARGLIST { $$ = $3; $$->push_back(std::string($1)); free($1); } |
+QUOTED_LITERAL COMMA ARGLIST { $$ = $3; $$->push_back(std::string($1)); free($1); } |
+SYMBOL { $$ = new std::vector<std::string>(1, std::string($1)); free($1); } |
+QUOTED_LITERAL { $$ = new std::vector<std::string>(1, std::string($1)); free($1); } |
+{ $$ = new std::vector<std::string>(); };
 
 EXPRESSION1: EXPRESSION2 END_OF_WEIGHTED_EXPRESSION {
      $1->weight += $2;
@@ -581,12 +583,16 @@ INSERTION: INS_LEFT SYMBOL RIGHT_PARENTHESIS {
     free($2);
 };
 
-LIKE: LIKE_LEFT SYMBOL RIGHT_PARENTHESIS {
-    $$ = hfst::pmatch::make_like_arc($2);
-    free($2);
-} | LIKE_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
-    $$ = hfst::pmatch::make_like_arc($2);
-    free($2);
+LIKE: LIKE_LEFT ARGLIST RIGHT_PARENTHESIS {
+    if ($2->size() == 0) {
+        $$ = hfst::pmatch::compile_like_arc("");
+    } else if ($2->size() == 1) {
+        $$ = hfst::pmatch::compile_like_arc($2->operator[](0));
+    } else {
+        $$ = hfst::pmatch::compile_like_arc($2->operator[](0),
+                                            $2->operator[](1));
+    }
+    delete($2);
 }
 
 ENDTAG: ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
