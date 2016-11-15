@@ -62,6 +62,7 @@ namespace hfst_ol {
         RtnVector rtns;
         SymbolNumberVector special_symbols;
         std::map<SymbolNumber, std::string> end_tag_map;
+        std::map<SymbolNumber, std::string> words_like_map;
         RtnNameMap rtn_names;
 // For each symbol, either NO_SYMBOL for "no corresponding list" or an index into symbol_lists
         SymbolNumberVector symbol2lists;
@@ -78,6 +79,7 @@ namespace hfst_ol {
         std::vector<bool> printable_vector;
         bool is_end_tag(const SymbolNumber symbol) const;
         bool is_input_mark(const SymbolNumber symbol) const;
+        bool is_like_arc(const SymbolNumber symbol) const;
         bool is_guard(const SymbolNumber symbol) const;
         bool is_counter(const SymbolNumber symbol) const;
         std::string end_tag(const SymbolNumber symbol);
@@ -91,6 +93,7 @@ namespace hfst_ol {
         ~PmatchAlphabet(void);
         virtual void add_symbol(const std::string & symbol);
         static bool is_end_tag(const std::string & symbol);
+        static bool is_like_arc(const std::string & symbol);
         static bool is_insertion(const std::string & symbol);
         static bool is_guard(const std::string & symbol);
         static bool is_list(const std::string & symbol);
@@ -328,6 +331,8 @@ namespace hfst_ol {
                 }
             }
         }
+
+        void match_like_arc(unsigned int input_pos, unsigned int tape_pos);
 
         // The mutually recursive lookup-handling functions
 

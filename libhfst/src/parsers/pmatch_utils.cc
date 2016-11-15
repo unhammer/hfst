@@ -72,6 +72,7 @@ std::set<std::string> inserted_names;
 std::set<std::string> unsatisfied_insertions;
 std::set<std::string> used_definitions;
 std::set<std::string> function_names;
+std::vector<WordVector> word_vectors;
 char* startptr;
 hfst::ImplementationType format;
 size_t len;
@@ -288,6 +289,181 @@ HfstTransducer * add_pmatch_delimiters(HfstTransducer * regex)
 
 PmatchTransducerContainer * make_end_tag(std::string tag)
 { return epsilon_to_symbol_container("@PMATCH_ENDTAG_" + tag + "@"); }
+
+struct DotProductWithWordVectorComparison {
+    WordVector compare_with_this;
+    DotProductWithWordVectorComparison(WordVector word): compare_with_this(word) {}
+    // if the vectors are normalized, dot product is == cosine similarity
+    bool operator()(WordVector left, WordVector right) {
+        double left_accumulator = 0;
+        double right_accumulator = 0;
+        for (size_t i = 0; i < compare_with_this.vector.size(); ++i) {
+            left_accumulator += compare_with_this.vector[i]*left.vector[i];
+            right_accumulator += compare_with_this.vector[i]*right.vector[i];
+        }
+        return left_accumulator > right_accumulator;
+    }
+};
+
+struct CosineSimilarityWithWordVectorComparison {
+    WordVector compare_with_this;
+    CosineSimilarityWithWordVectorComparison(WordVector word): compare_with_this(word) {}
+    bool operator()(WordVector left, WordVector right) {
+        double left_accumulator = 0.0;
+        double right_accumulator = 0.0;
+        for (size_t i = 0; i < compare_with_this.vector.size(); ++i) {
+            left_accumulator += compare_with_this.vector[i]*left.vector[i];
+            right_accumulator += compare_with_this.vector[i]*right.vector[i];
+        }
+        left_accumulator /= norm(left.vector);
+        right_accumulator /= norm(right.vector);
+        return left_accumulator > right_accumulator;
+    }
+};
+
+struct CosineSimilarityProjectedToPlaneComparison {
+    std::vector<double> plane_vec;
+    std::vector<double> comparison_point;
+    double translation_term;
+    double square_sum;
+    CosineSimilarityProjectedToPlaneComparison(
+        std::vector<double> plane_vec_, std::vector<double> comparison_point_, double translation_term_):
+        plane_vec(plane_vec_), comparison_point(comparison_point_), translation_term(translation_term_)
+        {
+            square_sum = 0.0;
+            for(size_t i = 0; i < plane_vec.size(); ++i) {
+                square_sum += plane_vec[i] * plane_vec[i];
+            }
+        }
+    bool operator()(WordVector left, WordVector right) {
+        /*
+         * First, given a plane "plane_vec = translation term" and a point,
+         * find the multiple of plane_vec which produces a vector going
+         * from point to the nearest point in the plane.
+         */
+        double left_scaler = (translation_term - dot_product(left.vector, plane_vec)) / square_sum;
+        double right_scaler = (translation_term - dot_product(right.vector, plane_vec)) / square_sum;
+        std::vector<double> new_left = pointwise_plus(left.vector, pointwise_multiplication(left_scaler, plane_vec));
+        std::vector<double> new_right = pointwise_plus(right.vector, pointwise_multiplication(right_scaler, plane_vec));
+        // Then calculate cosine similarity
+        double left_accumulator = 0.0;
+        double right_accumulator = 0.0;
+        for (size_t i = 0; i < comparison_point.size(); ++i) {
+            left_accumulator += comparison_point[i]*new_left[i];
+            right_accumulator += comparison_point[i]*new_right[i];
+        }
+        left_accumulator /= norm(new_left);
+        right_accumulator /= norm(new_right);
+        return left_accumulator > right_accumulator;
+    }
+};
+
+template<typename T> std::vector<T> pointwise_minus(std::vector<T> l,
+                                                    std::vector<T> r)
+{
+    std::vector<T> ret(l.size(), 0);
+    for(size_t i = 0; i < l.size(); ++i) {
+        ret[i] = l[i] - r[i];
+    }
+    return ret;
+}
+
+template<typename T> std::vector<T> pointwise_plus(std::vector<T> l,
+                                                   std::vector<T> r)
+{
+    std::vector<T> ret(l.size(), 0);
+    for(size_t i = 0; i < l.size(); ++i) {
+        ret[i] = l[i] + r[i];
+    }
+    return ret;
+}
+
+template<typename T> std::vector<T> pointwise_multiplication(T l,
+                                                             std::vector<T> r)
+{
+    std::vector<T> ret(r.size(), 0);
+    for(size_t i = 0; i < r.size(); ++i) {
+        ret[i] = l * r[i];
+    }
+    return ret;
+}
+
+template<typename T> T dot_product(std::vector<T> l,
+                                   std::vector<T> r)
+{
+    T ret;
+    for(size_t i = 0; i < l.size(); ++i) {
+        ret += l[i] * r[i];
+    }
+    return ret;
+}
+
+template<typename T> T norm(std::vector<T> v)
+{
+    T ret;
+    for(size_t i = 0; i < v.size(); ++i) {
+        ret += v[i] * v[i];
+    }
+    return sqrt(ret);
+}
+
+PmatchObject * compile_like_arc(std::string word1, std::string word2,
+                                unsigned int nwords)
+{
+    WordVector this_word1;
+    WordVector this_word2;
+    for (std::vector<WordVector>::iterator it = word_vectors.begin();
+         (it != word_vectors.end() &&
+          (this_word1.word == "" || this_word2.word == "")); ++it) {
+        if (word1 == it->word) {
+            this_word1 = *it;
+        }
+        if (word2 == it->word) {
+            this_word2 = *it;
+        }
+    }
+    if (this_word1.word == "" && this_word2.word == "") {
+        // got no matches
+        PmatchString * word1_o = new PmatchString(word1);
+        PmatchString * word2_o = new PmatchString(word2);
+        word1_o->multichar = true; word2_o->multichar = true;
+        return new PmatchBinaryOperation(Disjunct, word1_o, word2_o);
+    }
+    if (this_word1.word == "" || this_word2.word == "") {
+        // just one match
+        WordVector this_word = (this_word1.word == "" ? this_word2 : this_word1);
+        CosineSimilarityWithWordVectorComparison comparison_object(this_word);
+        std::sort(word_vectors.begin(), word_vectors.end(), comparison_object);
+    } else {
+        /*
+         * When there are two vectors A and B, we compute the vector A - B that
+         * goes from one to the other, and define a hyperplane orthogonal to that
+         * vector that intersects the vector at the midpoint between the
+         * two. We then add to all vectors a multiple of A - B to move them closer
+         * to the plane, reducing the distance that is due to the difference
+         * between A and B. (This is like projecting the space to the hyperplane
+         * if we go all the way to the plane)
+         *
+         * The hyperplane is defined by the equation |B - A| = d, where d is a
+         * translation term. |B - A| = 0 would be the set of vectors orthogonal to
+         * |B - A|. We set d so that the distance from the hyperplane to A is
+         * half of the norm of |B - A|.
+         */
+        
+        std::vector<double> B_minus_A = pointwise_minus(this_word1.vector, this_word2.vector);
+        std::vector<double> halfway_point = pointwise_plus(this_word1.vector, pointwise_multiplication(0.5, B_minus_A));
+        double hyperplane_translation_term = pow(norm(B_minus_A), 2) * 0.5 - dot_product(B_minus_A, this_word1.vector);
+        CosineSimilarityProjectedToPlaneComparison comparison_object(B_minus_A, halfway_point, hyperplane_translation_term);
+        std::sort(word_vectors.begin(), word_vectors.end(), comparison_object);
+    }
+    HfstTokenizer tok;
+    HfstTransducer * retval = new HfstTransducer(format);
+    for (size_t i = 0; i < word_vectors.size() && i <= nwords; ++i) {
+        HfstTransducer tmp(word_vectors[i].word, tok, format);
+        retval->disjunct(tmp);
+    }
+    return new PmatchTransducerContainer(retval);
+}
 
 PmatchTransducerContainer * make_counter(std::string name)
 { return epsilon_to_symbol_container("@PMATCH_COUNTER_" + name + "@"); }
@@ -897,6 +1073,53 @@ HfstTransducer * read_text(char * filename, ImplementationType type)
     }
     infile.close();
     return retval;
+}
+
+void read_vec(char * filename)
+{
+    if (word_vectors.size() != 0) {
+        word_vectors.clear();
+        std::cerr << "pmatch: vector model file " << filename
+                  << " overrides earlier one\n";
+    }
+    std::ifstream infile;
+    std::string line;
+    size_t linenumber = 0;
+    infile.open(filename);
+    if(!infile.good()) {
+        std::cerr << "pmatch: could not open vector file " << filename <<
+            " for reading\n";
+        return;
+    } else {
+        while(infile.good()) {
+            std::getline(infile, line);
+            ++linenumber;
+            if (line.empty()) { continue; }
+            size_t pos = line.find('\t');
+            if (pos == std::string::npos) {
+                std::cerr << "pmatch warning: vector file " << filename <<
+                    " doesn't appear to be tab-separated\n  (reading line " << linenumber << ")\n";
+                continue;
+            }
+            std::string word = line.substr(0, pos);
+            std::vector<double> components;
+            size_t nextpos;
+            while (std::string::npos != (nextpos = line.find('\t', pos + 1))) {
+                components.push_back(strtod(line.substr(pos, nextpos).c_str(), NULL));
+                pos = nextpos;
+            }
+            if (word_vectors.size() != 0 && word_vectors[0].vector.size() != components.size()) {
+                std::cerr << "pmatch warning: vector file " << filename <<
+                    " appears malformed\n  (reading line " << linenumber << ")\n";
+                continue;
+            }
+            WordVector wv;
+            wv.word = word;
+            wv.vector = components;
+            word_vectors.push_back(wv);
+        }
+    }
+    infile.close();
 }
 
 std::vector<std::vector<std::string> > read_args(char * filename, unsigned int argcount)

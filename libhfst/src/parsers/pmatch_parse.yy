@@ -69,7 +69,7 @@
 %type <restrictionContext> RESTR_CONTEXT
 %type <restrictionContexts> RESTR_CONTEXTS
 %type <replType> CONTEXT_MARK
-%type <pmatchObject> INSERTION FUNCALL EXPLODE IMPLODE ENDTAG READ_FROM CONTEXT_CONDITION PMATCH_CONTEXT PMATCH_OR_CONTEXT PMATCH_AND_CONTEXT
+%type <pmatchObject> INSERTION FUNCALL EXPLODE IMPLODE ENDTAG LIKE READ_FROM CONTEXT_CONDITION PMATCH_CONTEXT PMATCH_OR_CONTEXT PMATCH_AND_CONTEXT
 PMATCH_RIGHT_CONTEXT PMATCH_LEFT_CONTEXT PMATCH_NEGATIVE_RIGHT_CONTEXT PMATCH_NEGATIVE_LEFT_CONTEXT
 %type <pmatchObject_vector> PMATCH_CONTEXTS
 
@@ -90,7 +90,7 @@ LTR_LONGEST_MATCH LTR_SHORTEST_MATCH
        
 %nonassoc SUBSTITUTE_LEFT TERM_COMPLEMENT COMPLEMENT CONTAINMENT CONTAINMENT_ONCE CONTAINMENT_OPT
 %nonassoc STAR PLUS REVERSE INVERT UPPER_PROJECT LOWER_PROJECT
-%nonassoc <label> READ_BIN READ_TEXT READ_SPACED READ_PROLOG READ_RE READ_LEXC
+%nonassoc <label> READ_BIN READ_TEXT READ_SPACED READ_PROLOG READ_RE READ_VEC READ_LEXC
 %nonassoc <values> CATENATE_N_TO_K
 %nonassoc <value> CATENATE_N CATENATE_N_PLUS CATENATE_N_MINUS
 
@@ -102,7 +102,7 @@ LTR_LONGEST_MATCH LTR_SHORTEST_MATCH
 //  MAP_LEFT
 %right DEFINE SET_VARIABLE
 LIT_LEFT INS_LEFT REGEX DEFINS DEFINED_LIST CAP_LEFT OPTCAP_LEFT OPT_TOLOWER_LEFT TOLOWER_LEFT
-OPT_TOUPPER_LEFT TOUPPER_LEFT ANY_CASE_LEFT IMPLODE_LEFT EXPLODE_LEFT DEFINE_LEFT ENDTAG_LEFT LC_LEFT RC_LEFT NLC_LEFT NRC_LEFT OR_LEFT AND_LEFT
+OPT_TOUPPER_LEFT TOUPPER_LEFT ANY_CASE_LEFT IMPLODE_LEFT EXPLODE_LEFT DEFINE_LEFT ENDTAG_LEFT LIKE_LEFT LC_LEFT RC_LEFT NLC_LEFT NRC_LEFT OR_LEFT AND_LEFT
 TAG_LEFT LST_LEFT EXC_LEFT INTERPOLATE_LEFT SIGMA_LEFT COUNTER_LEFT
 %%
 
@@ -133,7 +133,10 @@ PMATCH: //empty
      // epsilon, so we detect that possibility here
      hfst::pmatch::variables[$3] = "0";
      free($3);
- };
+ } | PMATCH READ_VEC {
+     hfst::pmatch::read_vec($2);
+     free($2);
+   };
 
 DEFINITION: DEFINE SYMBOL EXPRESSION1 {
     $$ = new std::pair<std::string, PmatchObject*>($2, $3);
@@ -165,9 +168,11 @@ DEFINITION: DEFINE SYMBOL EXPRESSION1 {
  };
 
 ARGLIST:
-SYMBOL COMMA ARGLIST { $$ = $3; $$->push_back(std::string($1));
- } | SYMBOL { $$ = new std::vector<std::string>(1, std::string($1)); }
-| { $$ = new std::vector<std::string>(); };
+SYMBOL COMMA ARGLIST { $$ = $3; $$->push_back(std::string($1)); free($1); } |
+QUOTED_LITERAL COMMA ARGLIST { $$ = $3; $$->push_back(std::string($1)); free($1); } |
+SYMBOL { $$ = new std::vector<std::string>(1, std::string($1)); free($1); } |
+QUOTED_LITERAL { $$ = new std::vector<std::string>(1, std::string($1)); free($1); } |
+{ $$ = new std::vector<std::string>(); };
 
 EXPRESSION1: EXPRESSION2 END_OF_WEIGHTED_EXPRESSION {
      $1->weight += $2;
@@ -396,6 +401,7 @@ IMPLODE { } |
 FUNCALL { } |
 //MAP { } |
 INSERTION { } |
+LIKE { } |
 ALPHA { $$ = new PmatchAcceptor(Alpha); } |
 LOWERALPHA { $$ = new PmatchAcceptor(LowercaseAlpha); } |
 UPPERALPHA { $$ = new PmatchAcceptor(UppercaseAlpha); } |
@@ -577,6 +583,29 @@ INSERTION: INS_LEFT SYMBOL RIGHT_PARENTHESIS {
     free($2);
 };
 
+LIKE: LIKE_LEFT ARGLIST RIGHT_PARENTHESIS {
+    if ($2->size() == 0) {
+        $$ = hfst::pmatch::compile_like_arc("");
+    } else if ($2->size() == 1) {
+        $$ = hfst::pmatch::compile_like_arc($2->operator[](0));
+    } else {
+        $$ = hfst::pmatch::compile_like_arc($2->operator[](0),
+                                            $2->operator[](1));
+    }
+    delete($2);
+} |
+LIKE_LEFT ARGLIST RIGHT_PARENTHESIS CATENATE_N {
+    if ($2->size() == 0) {
+        $$ = hfst::pmatch::compile_like_arc("");
+    } else if ($2->size() == 1) {
+        $$ = hfst::pmatch::compile_like_arc($2->operator[](0), "", $4);
+    } else {
+        $$ = hfst::pmatch::compile_like_arc($2->operator[](0),
+                                            $2->operator[](1), $4);
+    }
+    delete($2);
+}
+
 ENDTAG: ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
     $$ = hfst::pmatch::make_end_tag($2);
     free($2);
@@ -665,6 +694,7 @@ READ_FROM: READ_BIN {
     }
     hfst::xre::XreCompiler xre_compiler;
     $$ = new PmatchTransducerContainer(xre_compiler.compile(regex));
+
     };
 
 CONTEXT_CONDITION:

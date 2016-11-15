@@ -21,6 +21,7 @@
 #include <set>
 #include <time.h>
 #include <iomanip>
+#include <cmath>
 #include "HfstTransducer.h"
 #include "HfstXeroxRules.h"
 #include "xre_utils.h"
@@ -34,6 +35,7 @@ struct PmatchObject;
 struct PmatchTransducerContainer;
 
 typedef std::pair<std::string, std::string> StringPair;
+struct WordVector;
 
 extern char* data;
 extern char* startptr;
@@ -46,6 +48,7 @@ extern std::set<std::string> inserted_names;
 extern std::set<std::string> unsatisfied_insertions;
 extern std::set<std::string> used_definitions;
 extern std::set<std::string> function_names;
+extern std::vector<WordVector> word_vectors;
 extern ImplementationType format;
 extern bool verbose;
 extern bool flatten;
@@ -120,6 +123,17 @@ HfstTransducer * add_pmatch_delimiters(HfstTransducer * regex);
  */
 PmatchTransducerContainer * epsilon_to_symbol_container(std::string s);
 PmatchTransducerContainer * make_end_tag(std::string tag);
+template<typename T> std::vector<T> pointwise_minus(std::vector<T> l,
+                                                    std::vector<T> r);
+template<typename T> std::vector<T> pointwise_plus(std::vector<T> l,
+                                                   std::vector<T> r);
+template<typename T> std::vector<T> pointwise_multiplication(T,
+                                                             std::vector<T> r);
+template<typename T> T dot_product(std::vector<T> l,
+                                   std::vector<T> r);
+template<typename T> T norm(std::vector<T> v);
+PmatchObject * compile_like_arc(std::string word1, std::string word2 = "",
+    unsigned int nwords = 10);
 PmatchTransducerContainer * make_counter(std::string name);
 HfstTransducer * make_list(HfstTransducer * t,
                            ImplementationType f = format);
@@ -175,6 +189,18 @@ void print_size_info(HfstTransducer * net);
  */
 HfstTransducer * read_text(char * filename,
                            ImplementationType type = TROPICAL_OPENFST_TYPE);
+
+struct WordVector
+{
+    std::string word;
+    std::vector<double> vector;
+};
+
+/**
+ * @brief Given a list of words and their vector representations, parse it into
+ * hfst::pmatch::word_vectors
+ */
+void read_vec(char * filename);
 
 /**
  * @brief Given a text file, read it line by line and return a tokenized
