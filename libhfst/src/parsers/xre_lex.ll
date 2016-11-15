@@ -65,7 +65,7 @@ A7 [\x00-\x7e]
 /* special meaning in xre testing " */
 A7RESTRICTED [- |<>%!,^:";@0~\\&?$+*/_(){}\]\[-]
 /* non-restricted ASCII testing " */
-A7UNRESTRICTED [\x21-\x7e]{-}[- |<>%!,^:";@0~\\&?$+*/_(){}\]\[-]
+A7UNRESTRICTED [\x21-\x7e]{-}[- |<>%!,.^:";@0~\\&?$+*/_(){}\]\[-]
 
 WEIGHT (-|\+)?[0-9]+(\.[0-9]+)?
 
@@ -273,6 +273,17 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 }
 
 {NAME_CH}({NAME_CH}|"0")+ {
+    if (hfst::xre::position_symbol != NULL) {
+      if (strcmp(hfst::xre::position_symbol, yytext) == 0) {
+        hfst::xre::positions.insert(hfst::xre::cr);
+      }
+    }
+    yylval->label = hfst::xre::strip_percents(yytext);
+    CR;
+    return MULTICHAR_SYMBOL;
+}
+
+".#." {
     if (hfst::xre::position_symbol != NULL) {
       if (strcmp(hfst::xre::position_symbol, yytext) == 0) {
         hfst::xre::positions.insert(hfst::xre::cr);
