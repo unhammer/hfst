@@ -142,6 +142,11 @@ UNICODE_ESCAPE ("\\u"{HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR})|("\\U00"{HEXCHAR}{HEX
     return VARIABLE_NAME;
 }
 
+"vector-similarity-projection-factor" {
+    pmatchlval.label = strcpy((char *) malloc(strlen("vector-similarity-projection-factor") + 1), "vector-similarity-projection-factor");
+    return VARIABLE_NAME;
+}
+
 "~"   { return COMPLEMENT; }
 "\\"  { return TERM_COMPLEMENT; }
 "&"   { return INTERSECTION; }

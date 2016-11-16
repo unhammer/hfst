@@ -55,6 +55,7 @@ extern bool flatten;
 extern clock_t timer;
 extern int minimization_guard_count;
 extern bool need_delimiters;
+extern double vector_similarity_projection_factor;
 
 struct PmatchUtilityTransducers;
 const std::string RC_ENTRY_SYMBOL = "@PMATCH_RC_ENTRY@";

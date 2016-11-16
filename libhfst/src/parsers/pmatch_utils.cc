@@ -81,6 +81,7 @@ bool flatten;
 clock_t timer;
 int minimization_guard_count;
 bool need_delimiters;
+double vector_similarity_projection_factor;
 
 std::map<std::string, hfst::HfstTransducer> named_transducers;
 PmatchUtilityTransducers* utils=NULL;
@@ -343,6 +344,8 @@ struct CosineSimilarityProjectedToPlaneComparison {
          */
         double left_scaler = (translation_term - dot_product(left.vector, plane_vec)) / square_sum;
         double right_scaler = (translation_term - dot_product(right.vector, plane_vec)) / square_sum;
+        left_scaler *= vector_similarity_projection_factor;
+        right_scaler *= vector_similarity_projection_factor;
         std::vector<double> new_left = pointwise_plus(left.vector, pointwise_multiplication(left_scaler, plane_vec));
         std::vector<double> new_right = pointwise_plus(right.vector, pointwise_multiplication(right_scaler, plane_vec));
         // Then calculate cosine similarity
@@ -435,6 +438,10 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
         CosineSimilarityWithWordVectorComparison comparison_object(this_word);
         std::sort(word_vectors.begin(), word_vectors.end(), comparison_object);
     } else {
+        if(variables["vector-similarity-projection-factor"] != "1.0") {
+            vector_similarity_projection_factor =
+                strtod(variables["vector-similarity-projection-factor"].c_str(), NULL);
+        }
         /*
          * When there are two vectors A and B, we compute the vector A - B that
          * goes from one to the other, and define a hyperplane orthogonal to that
@@ -889,6 +896,7 @@ void init_globals(void)
     variables["max-context-length"] = "254";
     variables["max-recursion"] =  "5000";
     variables["need-separators"] = "on";
+    variables["vector-similarity-projection-factor"] = "1.0";
     def_insed_expressions.clear();
     inserted_names.clear();
     unsatisfied_insertions.clear();
@@ -909,6 +917,7 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     len = strlen(data);
     verbose = be_verbose;
     flatten = do_flatten;
+    vector_similarity_projection_factor = 1.0;
     for (map<string, HfstTransducer*>::iterator it = defs.begin();
          it != defs.end(); ++it) {
         definitions[it->first] = new PmatchTransducerContainer(it->second);
