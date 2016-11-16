@@ -11,8 +11,10 @@
 #  include <config.h>
 #endif
 
-#include "back-ends/sfst/interface.h"
-#include "back-ends/sfst/fst.h"
+#if HAVE_SFST
+  #include "back-ends/sfst/interface.h"
+  #include "back-ends/sfst/fst.h"
+#endif
 
 #include "ConvertTransducerFormat.h"
 #include "HfstBasicTransducer.h"

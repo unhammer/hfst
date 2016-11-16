@@ -14,3 +14,9 @@ for type in [hfst.ImplementationType.SFST_TYPE, hfst.ImplementationType.TROPICAL
         TR = comp.compile('FooStar a FooPlus Bar')
         TR1 = hfst.regex('[foo* a foo+ Bar]')
         assert TR1.compare(TR)
+
+        tr = hfst.regex('foo:bar')
+        comp.define_transducer('FooBar', tr)
+        TR = comp.compile('FooBar.l')
+        TR1 = hfst.regex('bar')
+        assert TR1.compare(TR)

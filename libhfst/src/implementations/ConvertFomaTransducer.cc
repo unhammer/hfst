@@ -11,9 +11,11 @@
 #  include <config.h>
 #endif
 
-#ifndef _FOMALIB_H_
-#define _FOMALIB_H_
-#include "back-ends/foma/fomalib.h"
+#if HAVE_FOMA
+  #ifndef _FOMALIB_H_
+    #define _FOMALIB_H_
+    #include "back-ends/foma/fomalib.h"
+  #endif
 #endif
 
 #include "ConvertTransducerFormat.h"
