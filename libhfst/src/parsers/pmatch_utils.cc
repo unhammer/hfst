@@ -1085,6 +1085,7 @@ void read_vec(char * filename)
     std::ifstream infile;
     std::string line;
     size_t linenumber = 0;
+    char separator = '\t';
     infile.open(filename);
     if(!infile.good()) {
         std::cerr << "pmatch: could not open vector file " << filename <<
@@ -1094,17 +1095,22 @@ void read_vec(char * filename)
         while(infile.good()) {
             std::getline(infile, line);
             ++linenumber;
+            if (linenumber == 1) { continue; } // first line is metadata
             if (line.empty()) { continue; }
-            size_t pos = line.find('\t');
+            size_t pos = line.find(separator);
             if (pos == std::string::npos) {
-                std::cerr << "pmatch warning: vector file " << filename <<
-                    " doesn't appear to be tab-separated\n  (reading line " << linenumber << ")\n";
-                continue;
+                separator = ' ';
+                pos = line.find(separator);
+                if (pos == std::string::npos) {
+                    std::cerr << "pmatch warning: vector file " << filename <<
+                        " doesn't appear to be tab- or space-separated\n  (reading line " << linenumber << ")\n";
+                    break;
+                }
             }
             std::string word = line.substr(0, pos);
             std::vector<double> components;
             size_t nextpos;
-            while (std::string::npos != (nextpos = line.find('\t', pos + 1))) {
+            while (std::string::npos != (nextpos = line.find(separator, pos + 1))) {
                 components.push_back(strtod(line.substr(pos, nextpos).c_str(), NULL));
                 pos = nextpos;
             }
@@ -1120,6 +1126,12 @@ void read_vec(char * filename)
         }
     }
     infile.close();
+    if (verbose) {
+        if (word_vectors.size() == 0) {
+            std::cerr << "Tried to read word vector file, empty result\n";
+        }
+        std::cerr << "Read " << word_vectors.size() << " vectors of dimensionality " << word_vectors[0].vector.size() << std::endl;
+    }
 }
 
 std::vector<std::vector<std::string> > read_args(char * filename, unsigned int argcount)
