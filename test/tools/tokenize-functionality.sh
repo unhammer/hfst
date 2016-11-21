@@ -65,5 +65,16 @@ if ! diff test.strings $srcdir/tokenize-dog-out-xerox.strings ; then
 fi
 
 
+# --giella-cg superblanks
+if ! printf 'dog[\\\n<\\\\>]cat !and \ndogs[][\n]' | $TOOLDIR/hfst-tokenize --giella-cg $srcdir/tokenize-dog.pmhfst > test.strings ; then
+    echo tokenize --giella-cg superblank fail:
+    cat test.strings
+    exit 1
+fi
+if ! diff test.strings $srcdir/tokenize-dog-out-giella-cg-superblank.strings ; then
+    echo diff test.strings $srcdir/tokenize-dog-out-giella-cg-superblank.strings 
+    exit 1
+fi
+
 rm test.strings tokenize-dog.pmhfst tokenize-dog.hfst tokenize-dog-gen.hfst
 exit 0
