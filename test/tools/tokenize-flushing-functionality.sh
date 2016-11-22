@@ -50,7 +50,7 @@ for _ in test a couple times; do
            exit 1
            ;;
     esac
-    timeout 1 awk '{print} /^<STREAMCMD:FLUSH>$/{exit}' <&4 >test.strings
+    timeout 1 sed '/^<STREAMCMD:FLUSH>$/{q}' <&4 >test.strings
     case $? in
         0) : ;;
         124) echo tokenize --giella-cg flushing read timed out
