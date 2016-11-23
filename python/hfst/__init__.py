@@ -47,6 +47,8 @@ CLASSES:
 
 """
 
+__version__ = "3.12.0.2b0"
+
 import hfst.exceptions
 import hfst.sfst_rules
 import hfst.xerox_rules

@@ -207,8 +207,8 @@ libhfst_module = Extension('_libhfst',
                            extra_objects = foma_object_files
                            )
 
-setup(name = 'hfstpy',
-      version = '3.12.0_beta',
+setup(name = 'hfst',
+      version = '3.12.0.2_beta',
       author = 'HFST team',
       author_email = 'hfst-bugs@helsinki.fi',
       url = 'http://hfst.github.io/',
