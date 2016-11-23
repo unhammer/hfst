@@ -22,15 +22,18 @@ fi
 #fi
 
 # copy python stuff
-for file in docstrings.i libhfst.i MANIFEST.in README setup.cfg \
+for file in docstrings.i libhfst.i \
 hfst_extensions.cc hfst_file_extensions.cc hfst_lexc_extensions.cc hfst_lookup_extensions.cc \
 hfst_pmatch_extensions.cc hfst_prolog_extensions.cc hfst_regex_extensions.cc \
-hfst_rules_extensions.cc hfst_xfst_extensions.cc config.h;
+hfst_rules_extensions.cc hfst_xfst_extensions.cc ;
 do
     cp python/$file $1/
 done
 
-cp python/pypi_setup.py $1/setup.py
+for file in setup.py MANIFEST.in README setup.cfg config.h COPYING ;
+do
+    cp python/pypi/$file $1/
+done
 
 mkdir $1/hfst
 mkdir $1/hfst/exceptions
