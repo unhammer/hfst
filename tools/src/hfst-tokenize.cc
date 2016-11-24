@@ -923,6 +923,9 @@ int process_input_superblanks(hfst_ol::PmatchContainer & container,
         }
         free(line);
         line = NULL;
+        if(std::feof(inputfile)) {
+            break;
+        }
     }
     if(in_blank) {
         print_nonmatching_sequence(cur.str(), outstream);
