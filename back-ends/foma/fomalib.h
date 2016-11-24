@@ -150,8 +150,8 @@ struct medlookup {
 /** Array of states */
 struct fsm_state {
     int state_no; /* State number */
-    short in ;
-    short out ;
+    short int in ;
+    short int out ;
     int target;
     char final_state ;
     char start_state ;

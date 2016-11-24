@@ -20,8 +20,8 @@ struct state_array {
 };
 
 struct fsm_trans_list {
-    short in;
-    short out;
+    short int in;
+    short int out;
     int target;
     struct fsm_trans_list *next;
 };
@@ -41,7 +41,7 @@ struct fsm_state_list {
     Boolean used;
     Boolean is_final;
     Boolean is_initial;
-    short num_trans;
+    short int num_trans;
     int state_number;
     struct fsm_trans_list *fsm_trans_list;
 };
@@ -52,7 +52,7 @@ struct fsm_sigma_list {
 
 struct fsm_sigma_hash {
     char *symbol;
-    short sym;
+    short int sym;
     struct fsm_sigma_hash *next;
 };
 
@@ -74,11 +74,11 @@ struct fsm_construct_handle {
 
 struct apply_med_handle {
     struct astarnode {
-        short wordpos;
+        short int wordpos;
         int fsmstate;
-        short f;
-        short g;
-        short h;
+        short int f;
+        short int g;
+        short int h;
         int in;
         int out;
         int parent;
@@ -189,7 +189,7 @@ struct apply_handle {
     struct flag_list {
         char *name;
         char *value;
-        short neg;
+        short int neg;
         struct flag_list *next;
     } *flag_list;
 
@@ -230,7 +230,7 @@ void fsm_state_set_current_state(int state_no, int final_state, int start_state)
 void fsm_state_add_arc(int state_no, int in, int out, int target, int final_state, int start_state);
 
 /* Call fsm_state_close() when done with arcs to a state */
-void fsm_state_close();
+void fsm_state_close(struct fsm *net);
 
 /* Call this when done with entire FSM */
 void fsm_state_end_state();

@@ -31,7 +31,7 @@ static Boolean *finals;
 
 struct statesym {
     int target;
-    unsigned short symbol;
+    unsigned short int symbol;
     struct state_list *states;
     struct statesym *next;
 };
