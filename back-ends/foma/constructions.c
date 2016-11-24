@@ -3015,9 +3015,6 @@ struct fsm *fsm_mark_fsm_tail(struct fsm *net, struct fsm *marker) {
     return(newnet);
 }
 
-#ifndef ORIGINAL
-struct fsm *fsm_context_restrict(struct fsm *X, struct fsmcontexts *LR);
-#else
 struct fsm *fsm_context_restrict(struct fsm *X, struct fsmcontexts *LR) {
 
     struct fsm *Var, *Notvar, *UnionL, *UnionP, *Result, *Word;
@@ -3085,7 +3082,6 @@ struct fsm *fsm_context_restrict(struct fsm *X, struct fsmcontexts *LR) {
     fsm_clear_contexts(pairs);
     return(Result);
 }
-#endif
 
 struct fsm *fsm_flatten(struct fsm *net, struct fsm *epsilon) {
     struct fsm *newnet;

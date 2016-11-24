@@ -63,6 +63,7 @@ extern "C" {
 #define OP_RIGHTWARD_REPLACE 2
 #define OP_LEFTWARD_REPLACE 3
 #define OP_DOWNWARD_REPLACE 4
+#define OP_TWO_LEVEL_REPLACE 5
 
 /* Arrow types in fsmrules */
 #define ARROW_RIGHT 1
@@ -285,6 +286,7 @@ FEXPORT struct fsm *fsm_add_loop(struct fsm *net, struct fsm *marker, int finals
 FEXPORT struct fsm *fsm_add_sink(struct fsm *net, int final);
 FEXPORT struct fsm *fsm_left_rewr(struct fsm *net, struct fsm *rewr);
 FEXPORT struct fsm *fsm_flatten(struct fsm *net, struct fsm *epsilon);
+FEXPORT struct fsm *fsm_unflatten(struct fsm *net, char *epsilon_sym, char *repeat_sym);
 FEXPORT struct fsm *fsm_close_sigma(struct fsm *net, int mode);
 FEXPORT char *fsm_network_to_char(struct fsm *net);
 
