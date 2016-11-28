@@ -52,6 +52,7 @@ extern std::vector<WordVector> word_vectors;
 extern ImplementationType format;
 extern bool verbose;
 extern bool flatten;
+extern std::string includedir;
 extern clock_t timer;
 extern int minimization_guard_count;
 extern bool need_delimiters;
@@ -180,7 +181,8 @@ std::map<std::string, HfstTransducer*>
     compile(const std::string& pmatch,
             std::map<std::string,hfst::HfstTransducer*>& defs,
             hfst::ImplementationType type,
-            bool be_verbose, bool do_flatten);
+            bool be_verbose = false, bool do_flatten = false,
+            std::string includedir = "");
 
 void print_size_info(HfstTransducer * net);
 
@@ -188,8 +190,18 @@ void print_size_info(HfstTransducer * net);
  * @brief Given a text file, read it line by line and return an acceptor
  * of a disjunction of the lines
  */
-HfstTransducer * read_text(char * filename,
-                           ImplementationType type = TROPICAL_OPENFST_TYPE);
+HfstTransducer * read_text(std::string filename,
+                           ImplementationType type = TROPICAL_OPENFST_TYPE,
+                           bool spaced_text = false);
+
+HfstTransducer * read_spaced_text(std::string filename,
+                                  ImplementationType type = TROPICAL_OPENFST_TYPE);
+
+/**
+ * @brief Concatenate include directory with filename to get a real path
+ * (unless the filename is already an absolute path)
+ */
+std::string path_from_filename(char * filename);
 
 struct WordVector
 {
@@ -201,7 +213,7 @@ struct WordVector
  * @brief Given a list of words and their vector representations, parse it into
  * hfst::pmatch::word_vectors
  */
-void read_vec(char * filename);
+void read_vec(std::string filename);
 
 /**
  * @brief Given a text file, read it line by line and return a tokenized

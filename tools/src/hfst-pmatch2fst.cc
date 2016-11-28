@@ -25,6 +25,9 @@
 #include <io.h>
 #endif
 
+#ifndef WINDOWS
+#include <unistd.h>
+#endif
 
 #include <iostream>
 #include <fstream>
@@ -176,6 +179,30 @@ process_stream(HfstOutputStream& outstream)
                 "outside ascii range are supported only if input comes from a file.");
       }
 #endif
+
+    std::string includedir = "";
+#ifndef _MSC_VER
+    std::string inputfilename_str(inputfilename);
+    if (inputfile != stdin && inputfilename_str.size() > 0) {
+        if (inputfilename_str[0] == '/') {
+            // absolute path
+            includedir = inputfilename_str;
+        } else {
+            char * pwd = get_current_dir_name();
+            std::string tmp(pwd);
+            includedir = tmp + "/" + inputfilename_str;
+            free(pwd);
+        }
+        size_t slashpos = includedir.rfind('/');
+        if (slashpos == std::string::npos) {
+            // mysterious, we'll just use the working dir
+            includedir = "";
+        } else {
+            includedir = includedir.substr(0, slashpos + 1);
+        }
+    }
+#endif
+    comp.set_include_path(includedir);
 
     while ((c = fgetc(inputfile)) != EOF) {
         file_contents.push_back(c);

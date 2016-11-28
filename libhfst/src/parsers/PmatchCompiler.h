@@ -40,6 +40,7 @@ class PmatchCompiler
 private:
     bool flatten;
     bool verbose;
+    std::string includedir;
   public:
   //! @brief Construct compiler for unknown format transducers.
   PmatchCompiler();
@@ -58,6 +59,7 @@ private:
   //!        May return a pointer to @e empty transducer on non-fatal error.
   //!        A null pointer is returned on fatal error, if abort is not called.
   std::map<std::string, HfstTransducer*> compile(const std::string& pmatch);
+  void set_include_path(std::string path);
 
   private:
   std::map<std::string,hfst::HfstTransducer*> definitions_;

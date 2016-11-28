@@ -78,6 +78,7 @@ hfst::ImplementationType format;
 size_t len;
 bool verbose;
 bool flatten;
+std::string includedir;
 clock_t timer;
 int minimization_guard_count;
 bool need_delimiters;
@@ -908,7 +909,8 @@ void init_globals(void)
 
 std::map<std::string, HfstTransducer*>
 compile(const string& pmatch, map<string,HfstTransducer*>& defs,
-        ImplementationType impl, bool be_verbose, bool do_flatten)
+        ImplementationType impl, bool be_verbose, bool do_flatten,
+        std::string includedir_)
 {
     // lock here?
     init_globals();
@@ -917,6 +919,7 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     len = strlen(data);
     verbose = be_verbose;
     flatten = do_flatten;
+    includedir = includedir_;
     vector_similarity_projection_factor = 1.0;
     for (map<string, HfstTransducer*>::iterator it = defs.begin();
          it != defs.end(); ++it) {
@@ -1059,7 +1062,8 @@ void print_size_info(HfstTransducer * net)
         " states and " << arcs << " arcs" << std::endl;
 }
 
-HfstTransducer * read_text(char * filename, ImplementationType type)
+HfstTransducer * read_text(std::string filename, ImplementationType type,
+                           bool spaced_text)
 {
     std::ifstream infile;
     std::string line;
@@ -1075,8 +1079,12 @@ HfstTransducer * read_text(char * filename, ImplementationType type)
             std::getline(infile, line);
             if(!line.empty()) {
                 ++n;
-                StringPairVector spv = tok.tokenize(line);
-                retval->disjunct(spv);
+                if (spaced_text) {
+                    StringPairVector spv = tok.tokenize_space_separated(line);
+                } else {
+                    StringPairVector spv = tok.tokenize(line);
+                    retval->disjunct(spv);
+                }
             }
         }
     }
@@ -1084,7 +1092,23 @@ HfstTransducer * read_text(char * filename, ImplementationType type)
     return retval;
 }
 
-void read_vec(char * filename)
+HfstTransducer * read_spaced_text(std::string filename, ImplementationType type)
+{ return read_text(filename, type, true); }
+
+std::string path_from_filename(char * filename)
+{
+    std::string retval(filename);
+    if (includedir.size() > 0 && retval.size() > 0) {
+        // includedir won't be > 0 under Windows until this mechanism is ported
+        if (retval[0] != '/') {
+            // not an absolute dir
+            retval.insert(0, includedir);
+        }
+    }
+    return retval;
+}
+
+void read_vec(std::string filename)
 {
     if (word_vectors.size() != 0) {
         word_vectors.clear();

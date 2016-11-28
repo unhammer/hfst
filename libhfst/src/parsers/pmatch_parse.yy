@@ -134,8 +134,9 @@ PMATCH: //empty
      hfst::pmatch::variables[$3] = "0";
      free($3);
  } | PMATCH READ_VEC {
-     hfst::pmatch::read_vec($2);
+     std::string filepath = hfst::pmatch::path_from_filename($2);
      free($2);
+     hfst::pmatch::read_vec(filepath);
    };
 
 DEFINITION: DEFINE SYMBOL EXPRESSION1 {
@@ -615,49 +616,36 @@ ENDTAG: ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
 };
 
 READ_FROM: READ_BIN {
+    std::string filepath = hfst::pmatch::path_from_filename($1);
+    free($1);
     HfstTransducer * read = NULL;
     try {
-        hfst::HfstInputStream instream($1);
+        hfst::HfstInputStream instream(filepath);
         read = new HfstTransducer(instream);
         instream.close();
     } catch(HfstException) {
         std::string ermsg =
             std::string("Couldn't read transducer from ") +
-            std::string($1);
-        free($1);
+            filepath;
         pmatcherror(ermsg.c_str());
     }
     if (read->get_type() != hfst::pmatch::format) {
         read->convert(hfst::pmatch::format);
     }
     $$ = new PmatchTransducerContainer(read);
-    free($1);
 } | READ_TEXT {
-    $$ = new PmatchTransducerContainer(hfst::pmatch::read_text($1));
+    std::string filepath = hfst::pmatch::path_from_filename($1);
     free($1);
+    $$ = new PmatchTransducerContainer(hfst::pmatch::read_text(filepath));
 } | READ_SPACED {
-    FILE * f = NULL;
-    f = hfst::hfst_fopen($1, "r");
-    if (f == NULL) {
-        pmatcherror("File cannot be opened.\n");
-    } else {
-        HfstTokenizer tok;
-        HfstBasicTransducer tmp;
-        char line [1000];
-        while( fgets(line, 1000, f) != NULL )
-        {
-            hfst::pmatch::strip_newline(line);
-            StringPairVector spv = HfstTokenizer::tokenize_space_separated(line);
-            tmp.disjunct(spv, 0);
-        }
-        fclose(f);
-        HfstTransducer * t = new HfstTransducer(tmp, hfst::pmatch::format);
-        t->minimize();
-        $$ = new PmatchTransducerContainer(t);
-    }
+    std::string filepath = hfst::pmatch::path_from_filename($1);
+    free($1);
+    $$ = new PmatchTransducerContainer(hfst::pmatch::read_spaced_text(filepath));
 } | READ_PROLOG {
+    std::string filepath = hfst::pmatch::path_from_filename($1);
+    free($1);
     FILE * f = NULL;
-    f = hfst::hfst_fopen($1, "r");
+    f = hfst::hfst_fopen(filepath.c_str(), "r");
     if (f == NULL) {
         pmatcherror("File cannot be opened.\n");
     } else {
@@ -676,12 +664,15 @@ READ_FROM: READ_BIN {
         }
     }
 } | READ_LEXC {
-    $$ = new PmatchTransducerContainer(hfst::HfstTransducer::read_lexc_ptr($1, format, hfst::pmatch::verbose));
+    std::string filepath = hfst::pmatch::path_from_filename($1);
     free($1);
+    $$ = new PmatchTransducerContainer(hfst::HfstTransducer::read_lexc_ptr(filepath, format, hfst::pmatch::verbose));
 } | READ_RE {
+    std::string filepath = hfst::pmatch::path_from_filename($1);
+    free($1);
     std::string regex;
     std::string tmp;
-    std::ifstream regexfile($1);
+    std::ifstream regexfile(filepath);
     if (regexfile.is_open()) {
         while (getline(regexfile, tmp)) {
             regex.append(tmp);
@@ -689,12 +680,11 @@ READ_FROM: READ_BIN {
     }
     if (regex.size() == 0) {
         std::stringstream err;
-        err << "Failed to read regex from " << $1 << ".\n";
+        err << "Failed to read regex from " << filepath << ".\n";
         pmatcherror(err.str().c_str());
     }
     hfst::xre::XreCompiler xre_compiler;
     $$ = new PmatchTransducerContainer(xre_compiler.compile(regex));
-
     };
 
 CONTEXT_CONDITION:
