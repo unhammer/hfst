@@ -17,3 +17,5 @@ include libhfst/src/parsers/*.hh
 include back-ends/foma/*.h
 include back-ends/openfst/src/include/fst/*.h
 include config.h
+include setup.cfg
+include COPYING

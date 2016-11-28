@@ -533,8 +533,8 @@ struct fsm *fsm_compose(struct fsm *net1, struct fsm *net2) {
     /* The global variable g_compose_tristate is set to OFF by default                  */
 
     struct outarray {
-        short symin;
-        short symout;
+        short int symin;
+        short int symout;
         int target;
         int mainloop;
     } *outarray, *iptr, *currtail;
@@ -840,7 +840,7 @@ struct fsm *fsm_compose(struct fsm *net1, struct fsm *net2) {
     return(fsm_coaccessible(net1));
 }
 
-struct mergesigma *add_to_mergesigma(struct mergesigma *msigma, struct sigma *sigma, short presence) {
+struct mergesigma *add_to_mergesigma(struct mergesigma *msigma, struct sigma *sigma, short int presence) {
   int number = 0;
 
   if (msigma->number == -1) {
@@ -1403,7 +1403,7 @@ struct fsm *fsm_union(struct fsm *net1, struct fsm *net2) {
 struct fsm *fsm_completes(struct fsm *net, int operation) {
   struct fsm_state *fsm, *new_fsm;
   int i, j, offset, statecount, sigsize, *state_table, sink_state, target, last_sigma = 0, arccount = 0, incomplete;
-  short *starts, *finals, *sinks;
+  short int *starts, *finals, *sinks;
   
   /* TODO: this currently relies on that the sigma is gap-free in its numbering  */
   /* which can't always be counted on, especially when reading external machines */
@@ -2376,7 +2376,7 @@ struct fsm *fsm_quotient_right(struct fsm *net1, struct fsm *net2) {
 struct fsm *fsm_ignore(struct fsm *net1, struct fsm *net2, int operation) {
   struct fsm_state *fsm1, *fsm2, *new_fsm;
   struct fsm *Result;
-  short *handled_states1, *handled_states2;
+  short int *handled_states1, *handled_states2;
   int i, j, k, state_add_counter = 0, malloc_size, splices = 0, returns, target, splice_size, start_splice, states1, states2, lines1, lines2, *return_state;
 
   net1 = fsm_minimize(net1);
@@ -3015,9 +3015,6 @@ struct fsm *fsm_mark_fsm_tail(struct fsm *net, struct fsm *marker) {
     return(newnet);
 }
 
-#ifndef ORIGINAL
-struct fsm *fsm_context_restrict(struct fsm *X, struct fsmcontexts *LR);
-#else
 struct fsm *fsm_context_restrict(struct fsm *X, struct fsmcontexts *LR) {
 
     struct fsm *Var, *Notvar, *UnionL, *UnionP, *Result, *Word;
@@ -3085,7 +3082,6 @@ struct fsm *fsm_context_restrict(struct fsm *X, struct fsmcontexts *LR) {
     fsm_clear_contexts(pairs);
     return(Result);
 }
-#endif
 
 struct fsm *fsm_flatten(struct fsm *net, struct fsm *epsilon) {
     struct fsm *newnet;

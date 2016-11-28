@@ -182,7 +182,7 @@ namespace hfst_ol {
         void process(const std::string & input);
         std::string match(const std::string & input,
                           double time_cutoff = 0.0);
-        LocationVectorVector locate(std::string & input,
+        LocationVectorVector locate(const std::string & input,
                                     double time_cutoff = 0.0);
         std::string get_profiling_info(void);
         std::string get_pattern_count_info(void);

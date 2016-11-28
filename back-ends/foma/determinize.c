@@ -118,7 +118,7 @@ int fsm_isstarfree(struct fsm *net) {
     struct state_array *state_array;
     struct fsm_state *curr_ptr;
     int v, vp, is_star_free;
-    short in;
+    short int in;
     char *dfs_map;
 
     sfnet = fsm_subset(net, SUBSET_TEST_STAR_FREE);

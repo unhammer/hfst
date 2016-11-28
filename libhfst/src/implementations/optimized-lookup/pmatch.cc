@@ -848,7 +848,7 @@ std::string PmatchContainer::match(const std::string & input,
     return stringify_output();
 }
 
-LocationVectorVector PmatchContainer::locate(std::string & input,
+LocationVectorVector PmatchContainer::locate(const std::string & input,
                                              double time_cutoff)
 {
     max_time = time_cutoff;

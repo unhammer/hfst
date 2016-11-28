@@ -163,7 +163,7 @@ if WANT_PROC
 TESTS += proc-functionality.sh
 endif
 if WANT_TOKENIZE
-TESTS += tokenize-functionality.sh tokenize-backtrack-functionality.sh
+TESTS += tokenize-functionality.sh tokenize-backtrack-functionality.sh tokenize-flushing-functionality.sh
 endif
 
 TESTS += $(STRESSES)

@@ -4,7 +4,7 @@
 # python bindings in a directory given as first argument.
 
 # In the destination directory, run:
-# C:\PythonXY\python.exe pypi_setup.py [ARGS]
+# C:\PythonXY\python.exe setup.py [ARGS]
 
 if [ -d "$1" ]; then
     echo "Directory $1 exists"
@@ -22,12 +22,17 @@ fi
 #fi
 
 # copy python stuff
-for file in docstrings.i libhfst.i MANIFEST.in pypi_setup.py README setup.cfg setup.py \
+for file in docstrings.i libhfst.i \
 hfst_extensions.cc hfst_file_extensions.cc hfst_lexc_extensions.cc hfst_lookup_extensions.cc \
 hfst_pmatch_extensions.cc hfst_prolog_extensions.cc hfst_regex_extensions.cc \
-hfst_rules_extensions.cc hfst_xfst_extensions.cc;
+hfst_rules_extensions.cc hfst_xfst_extensions.cc ;
 do
     cp python/$file $1/
+done
+
+for file in setup.py MANIFEST.in README setup.cfg config.h COPYING ;
+do
+    cp python/pypi/$file $1/
 done
 
 mkdir $1/hfst

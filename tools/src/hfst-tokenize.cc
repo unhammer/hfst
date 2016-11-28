@@ -57,7 +57,8 @@ using hfst::HfstTransducer;
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
 
-static bool blankline_separated = true;
+static bool superblanks = false; // Input is apertium-style superblanks (overrides blankline_separated)
+static bool blankline_separated = true; // Input is separated by blank lines (as opposed to single newlines)
 static bool keep_newlines = false;
 static bool print_all = false;
 static bool print_weights = false;
@@ -324,7 +325,7 @@ const LocationVector keep_n_best_weight(LocationVector const & locations)
 /**
  * Return empty string if it wasn't a tag, otherwise the tag without the initial/final +
  */
-const std::string as_cg_tag(const std::string & str) {
+const string as_cg_tag(const string & str) {
     size_t len = str.size();
     if(len > 1) {
         if (str.at(0) == '+') {
@@ -833,12 +834,8 @@ void print_location_vector(hfst_ol::PmatchContainer & container,
 
 void match_and_print(hfst_ol::PmatchContainer & container,
                      std::ostream & outstream,
-                     std::string & input_text)
+                     const string & input_text)
 {
-    if (input_text.size() > 0 && input_text.at(input_text.size() - 1) == '\n') {
-        // Remove final newline
-        input_text.erase(input_text.size() -1, 1);
-    }
     LocationVectorVector locations = container.locate(input_text, time_cutoff);
     if (locations.size() == 0 && print_all) {
         print_no_output(input_text, outstream);
@@ -863,16 +860,103 @@ void match_and_print(hfst_ol::PmatchContainer & container,
     }
 }
 
+// TODO: lambda this when C++11 available everywhere
+inline void process_input_superblanks_print(hfst_ol::PmatchContainer & container,
+                                            std::ostream & outstream,
+                                            std::ostringstream& cur)
+{
+    string input_text(cur.str());
+    if(!input_text.empty()) {
+        match_and_print(container, outstream, input_text);
+    }
+    cur.clear();
+    cur.str(string());
+}
+
+int process_input_superblanks(hfst_ol::PmatchContainer & container,
+                              std::ostream & outstream)
+{
+    char * line = NULL;
+    size_t bufsize = 0;
+    bool in_blank = false;
+    std::ostringstream cur;
+    ssize_t len = -1;
+    while ((len = hfst_getdelim(&line, &bufsize, '\0', inputfile)) > 0) {
+        bool escaped = false; // beginning of line is necessarily unescaped
+        for(size_t i = 0; i < len; ++i) {
+            if(escaped) {
+                cur << line[i];
+                escaped = false;
+                continue;
+            }
+            else if(!in_blank && line[i] == '[') {
+                process_input_superblanks_print(container, outstream, cur);
+                cur << line[i];
+                in_blank = true;
+            }
+            else if(in_blank && line[i] == ']') {
+                cur << line[i];
+                if(i+1 < len && line[i+1] == '[') {
+                    // Join consecutive superblanks
+                    ++i;
+                    cur << line[i];
+                }
+                else {
+                    in_blank = false;
+                    print_nonmatching_sequence(cur.str(), outstream);
+                    cur.clear();
+                    cur.str(string());
+                }
+            }
+            else if(line[i] == '\0') {
+                process_input_superblanks_print(container, outstream, cur);
+                outstream << "<STREAMCMD:FLUSH>" << std::endl; // CG format uses this instead of \0
+                outstream.flush();
+                if(outstream.bad()) {
+                    std::cerr << "hfst-tokenize: Could not flush file" << std::endl;
+                }
+            }
+            else {
+                cur << line[i];
+            }
+            escaped = (line[i] == '\\');
+        }
+        free(line);
+        line = NULL;
+        if(std::feof(inputfile)) {
+            break;
+        }
+    }
+    if(in_blank) {
+        print_nonmatching_sequence(cur.str(), outstream);
+    }
+    else {
+        process_input_superblanks_print(container, outstream, cur);
+    }
+    return EXIT_SUCCESS;
+}
+
+inline void maybe_erase_newline(string& input_text)
+{
+    if(!keep_newlines && input_text.size() > 0 && input_text.at(input_text.size() - 1) == '\n') {
+        // Remove final newline
+        input_text.erase(input_text.size() -1, 1);
+    }
+}
 
 int process_input(hfst_ol::PmatchContainer & container,
                   std::ostream & outstream)
 {
-    std::string input_text;
+    if(superblanks) {
+        return process_input_superblanks(container, outstream);
+    }
+    string input_text;
     char * line = NULL;
-    size_t len = 0;
+    size_t bufsize = 0;
     if(blankline_separated) {
-        while (hfst_getline(&line, &len, inputfile) > 0) {
+        while (hfst_getline(&line, &bufsize, inputfile) > 0) {
             if (line[0] == '\n') {
+                maybe_erase_newline(input_text);
                 match_and_print(container, outstream, input_text);
                 input_text.clear();
             } else {
@@ -882,16 +966,15 @@ int process_input(hfst_ol::PmatchContainer & container,
             line = NULL;
         }
         if (!input_text.empty()) {
+            maybe_erase_newline(input_text);
             match_and_print(container, outstream, input_text);
         }
     }
     else {
         // newline or non-separated
-        while (hfst_getline(&line, &len, inputfile) > 0) {
+        while (hfst_getline(&line, &bufsize, inputfile) > 0) {
             input_text = line;
-            if(keep_newlines) {
-                input_text += "\n";
-            }
+            maybe_erase_newline(input_text);
             match_and_print(container, outstream, input_text);
             free(line);
             line = NULL;
@@ -991,8 +1074,8 @@ int parse_options(int argc, char** argv)
             print_weights = true;
             print_all = true;
             dedupe = true;
-            keep_newlines = true;
-            blankline_separated = false;
+            superblanks = true;
+
             if(max_weight_classes == std::numeric_limits<int>::max()) {
                 max_weight_classes = 2;
             }
