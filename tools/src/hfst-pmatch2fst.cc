@@ -162,6 +162,31 @@ parse_options(int argc, char** argv)
     return EXIT_CONTINUE;
 }
 
+#ifndef _GNU_SOURCE
+char * get_current_dir_name()
+{
+    size_t PATH_BUFSIZE = 1024;
+    size_t PATH_BUFSIZE_MAX = PATH_BUFSIZE * 8; // sanity
+    char * retval = (char *) NULL;
+    while(retval == NULL) {
+        retval = (char *) realloc(retval, PATH_BUFSIZE);
+        if(getcwd(retval, PATH_BUFSIZE) != 0) {
+            return retval;
+        }
+        if(errno == ERANGE && PATH_BUFSIZE < PATH_BUFSIZE_MAX) {
+            PATH_BUFSIZE *= 2;
+            continue;
+        }
+        if (errno == EACCES) {
+            throw std::runtime_error("Unable to access working directory");
+        }
+        // something else went wrong, just forget about it and try to go on
+        retval[0] = '\0';
+        return retval;
+    }
+}
+#endif
+
 int
 process_stream(HfstOutputStream& outstream)
 {
