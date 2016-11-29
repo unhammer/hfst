@@ -2015,7 +2015,6 @@ HfstTransducer &HfstTransducer::eliminate_flags()
 
 HfstTransducer &HfstTransducer::eliminate_flag(const std::string & flag)
 {
-
   HfstBasicTransducer basic(*this);
   StringSet flags = basic.get_flags();
   bool feature_found = false;
@@ -2062,7 +2061,7 @@ HfstTransducer &HfstTransducer::eliminate_flag(const std::string & flag)
     }
   else
     {
-      flag_purge(*this, "");
+      flag_purge(*this, flag);
     }
 
   return this->optimize();
