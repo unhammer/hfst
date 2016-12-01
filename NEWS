@@ -5,6 +5,26 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.12.1
+----------------------------
+
+* Fix flag elimination bug (reported in issue #342)
+
+* Do not allow unescaped dots in regular expressions
+
+* Improvements to pmatch and tokenization tools:
+
+  * Search for included files under scriptdir, not working dir
+
+  * Add experimental two-vector model for word sense
+
+  * Handle Apertium-style superblanks in --giella-cg format
+
+* Rename the PyPI package to 'hfst' (currently available at testpypi.python.org)
+
+* Update foma back-end
+
+
 Noteworthy changes in 3.12.0
 ----------------------------
 

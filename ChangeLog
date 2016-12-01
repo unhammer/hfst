@@ -1,4 +1,28 @@
-42df833 (HEAD -> master, origin/master, origin/HEAD) Small fixes to memory leaks and efficiency.
+77c845d (HEAD -> master, origin/master, origin/HEAD) Fix flag elimination bug (reported in issue #342).
+c827bb6 Do not call fsm_destroy until issue with 'double free or corruption' has been fixed.
+3b0e58a Provide a get_current_dir_name() for platforms without one
+b0fb7a6 Merge branch 'master' of https://github.com/hfst/hfst
+65a4d79 Search for included files under scriptdir, not working dir. If an included filename is non-absolute, prefix it with the directory the script was in when trying to read it. This only happens in non-Windows environments for now.
+f5e94d7 Free allocated memory.
+6144e75 tokenise -g: check for eof
+cf46e69 Apply more changes from latest release of foma.
+a9f8397 Apply some changes from newest release of foma.
+cc8c96b Make a separate directory python/pypi for creating pypi packages.
+479789e Rename the pypi package to 'hfst' and use a four-number versioning scheme. Also define '__version__'. Add an empty config file as hfst c++ headers include it.
+eb304f0 tests: trying sed instead of awk for exit on <STREAMCMD:FLUSH>
+798383d tokenize: handle Apertium-style superblanks in --giella-cg format
+7922399 Provide a way to scale the vector similarity calculations via variable
+166d418 Merge branch 'master' of https://github.com/hfst/hfst
+9bc5315 parse word2vec -style text format and assume first line is info
+5d3f6b8 Do not allow unescaped dots in regular expressions.
+ce5e2a5 Merge branch 'master' of https://github.com/hfst/hfst
+a8f21f0 Observe HAVE_SFST and HAVE_FOMA when including back-end header files.
+8a9c0de nwords catenate-style argument for Like() function
+1433e45 Merge branch 'master' of https://github.com/hfst/hfst
+1ec8e03 Add experimental two-vector model for word sense
+72d4f72 (tag: v3.12.0) Ready for release 3.12.0.
+da86647 Read vector models and do simple ranking
+42df833 Small fixes to memory leaks and efficiency.
 e2abd89 Fix some memory leaks.
 da54acc Fix leaks reported by valgrind.
 92cf4dc Fix more memory leaks.
@@ -13,6 +37,7 @@ e4c1304 Rename hfst.rules into hfst.sfst_rules. Fix hfst.types into hfst.Impleme
 52a9d75 Add test for hfst.xerox_rules.
 00b020c Rename xerox_replace_left and xerox_restriction back to replace_left and restriction in package hfst.xerox_rules.
 d1556dd Fix documentation of parameter 'output' of function 'extract_paths'.
+3df4a48 Sentence separation for finnpos-mode
 d3058c7 Issue a warning if automake is too old, which can make build fail if pre-generated yacc files are modified.
 9166cdc Move ImplementationTypes and ReplaceTypes to their own classes and get rid of package hfst.types.
 6d6c631 Fix datatypes used in for loops.
