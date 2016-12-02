@@ -14,4 +14,5 @@ copy hfst\exceptions\__init__.py %1\hfst\exceptions\__init__.py
 copy hfst\sfst_rules\__init__.py %1\hfst\sfst_rules\__init__.py
 copy hfst\xerox_rules\__init__.py %1\hfst\xerox_rules\__init__.py
 
-"C:\Program Files\7-Zip\7z.exe" a %1".zip" %1
+"C:\Program Files\7-Zip\7z.exe" a -t7z %1".7z" %1
+"C:\Program Files\7-Zip\7z.exe" a -tzip %1".zip" %1
