@@ -209,7 +209,9 @@ sed -i 's/hxfstwrap( )/hxfstwrap(void)/' $1/libhfst/src/parsers/xfst-lexer.cpp
 
 
 cp scripts/windows/make-python-bindings.bat $1/libhfst/src/
-cp scripts/windows/make-python-package.bat $1/libhfst/src/
+cp scripts/windows/make-python-package.bat $1/make-python-package.bat
+cp scripts/readmes/README_python_win.txt $1/README_python_win.txt
+unix2dos $1/README_python_win.txt
 
 for file in libhfst.i docstrings.i hfst_extensions.cc \
 hfst_file_extensions.cc hfst_lexc_extensions.cc hfst_lookup_extensions.cc \
