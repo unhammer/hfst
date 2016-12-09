@@ -2022,8 +2022,11 @@ def start_xfst(**kvargs):
     comp.setOutputToConsole(to_console)
     comp.set('quit-on-fail', quit_on_fail)
 
-    expression=""
+    import readline
+    rl_length_1 = readline.get_current_history_length()
+
     import sys
+    expression=""
     while True:
         expression += input(comp.get_prompt()).rstrip().lstrip()
         if len(expression) == 0:
@@ -2038,8 +2041,7 @@ def start_xfst(**kvargs):
         else:
             # interactive command
             if expression == "apply down" or expression == "apply up":
-               import readline
-               length = readline.get_current_history_length()
+               rl_length_2 = readline.get_current_history_length()
                while True:
                   try:
                      line = input().rstrip().lstrip()
@@ -2049,8 +2051,8 @@ def start_xfst(**kvargs):
                      comp.apply_down(line)
                   elif expression == "apply up":
                      comp.apply_up(line)
-               for foo in range(readline.get_current_history_length() - length):
-                  readline.remove_history_item(length)
+               for foo in range(readline.get_current_history_length() - rl_length_2):
+                  readline.remove_history_item(rl_length_2)
                retval = 0
             elif expression == "inspect" or expression == "inspect net":
                print('inspect net not supported')
@@ -2064,6 +2066,9 @@ def start_xfst(**kvargs):
         if comp.quit_requested():
            break
         expression = ""
+
+    for foo in range(readline.get_current_history_length() - rl_length_1):
+       readline.remove_history_item(rl_length_1)
 
 def compile_xfst_file(filename, **kvargs):
     """
