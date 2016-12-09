@@ -2022,8 +2022,14 @@ def start_xfst(**kvargs):
     comp.setOutputToConsole(to_console)
     comp.set('quit-on-fail', quit_on_fail)
 
-    import readline
-    rl_length_1 = readline.get_current_history_length()
+    rl_length_1 = 0
+    rl_found = False
+    try:
+      import readline
+      rl_found = True
+      rl_length_1 = readline.get_current_history_length()
+    except ImportError:
+      pass
 
     import sys
     expression=""
@@ -2040,7 +2046,7 @@ def start_xfst(**kvargs):
             stdout.write(_libhfst.get_hfst_xfst_string_one())
         else:
             # interactive command
-            if expression == "apply down" or expression == "apply up":
+            if (expression == "apply down" or expression == "apply up") and rl_found:
                rl_length_2 = readline.get_current_history_length()
                while True:
                   try:
@@ -2067,8 +2073,9 @@ def start_xfst(**kvargs):
            break
         expression = ""
 
-    for foo in range(readline.get_current_history_length() - rl_length_1):
-       readline.remove_history_item(rl_length_1)
+    if rl_found:
+      for foo in range(readline.get_current_history_length() - rl_length_1):
+         readline.remove_history_item(rl_length_1)
 
 def compile_xfst_file(filename, **kvargs):
     """
