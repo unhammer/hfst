@@ -1497,9 +1497,12 @@ namespace xfst {
       XfstCompiler(hfst::ImplementationType impl);
       XfstCompiler& setOutputToConsole(bool value);
       XfstCompiler& setReadInteractiveTextFromStdin(bool Value);
+      XfstCompiler& setReadline(bool value);
       XfstCompiler& setVerbosity(bool verbosity);
       XfstCompiler& set(const char* name, const char* text);
       char * get_prompt() const;
+      XfstCompiler& apply_up(const char* indata);
+      XfstCompiler& apply_down(const char* indata);
       int parse_line(std::string line);
       bool quit_requested() const;
   };
@@ -2011,6 +2014,7 @@ def start_xfst(**kvargs):
 
     comp = XfstCompiler(type)
     comp.setReadInteractiveTextFromStdin(True)
+    comp.setReadline(False) # do not mix python and c++ readline
 
     if to_console and idle:
         print('Cannot output to console when running libhfst from IDLE.')
@@ -2021,7 +2025,7 @@ def start_xfst(**kvargs):
     expression=""
     import sys
     while True:
-        expression += input(comp.get_prompt()).rstrip()
+        expression += input(comp.get_prompt()).rstrip().lstrip()
         if len(expression) == 0:
            continue
         if expression[-1] == '\\':
@@ -2032,7 +2036,27 @@ def start_xfst(**kvargs):
             retval = _libhfst.hfst_compile_xfst_to_string_one(comp, expression)
             stdout.write(_libhfst.get_hfst_xfst_string_one())
         else:
-            retval = comp.parse_line(expression + "\n")
+            # interactive command
+            if expression == "apply down" or expression == "apply up":
+               import readline
+               length = readline.get_current_history_length()
+               while True:
+                  try:
+                     line = input().rstrip().lstrip()
+                  except EOFError:
+                     break
+                  if expression == "apply down":
+                     comp.apply_down(line)
+                  elif expression == "apply up":
+                     comp.apply_up(line)
+               for foo in range(readline.get_current_history_length() - length):
+                  readline.remove_history_item(length)
+               retval = 0
+            elif expression == "inspect" or expression == "inspect net":
+               print('inspect net not supported')
+               retval = 0
+            else:
+               retval = comp.parse_line(expression + "\n")
         if retval != 0:
            print("expression '%s' could not be parsed" % expression)
            if comp.get("quit-on-fail") == "ON":
