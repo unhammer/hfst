@@ -214,6 +214,7 @@ def regex(regexp, **kwargs):
 # @param verbosity The verbosity of the compiler, defaults to 0 (silent). Possible values are: 0, 1, 2.
 # @param with_flags Whether lexc flags are used when compiling, defaults to False.
 # @param output Where output is printed. Possible values are sys.stdout, sys.stderr, a StringIO, sys.stderr being the default?
+# @return On success the resulting transducer, else None.
 def compile_lexc_file(filename, **kwargs):
     pass
 
@@ -224,6 +225,7 @@ def compile_lexc_file(filename, **kwargs):
 # @param quit_on_fail Whether the script is exited on any error, defaults to True.
 # @param output Where output is printed. Possible values are sys.stdout, sys.stderr, a StringIO, sys.stderr being the default?
 # @param type Implementation type of the compiler, defaults to hfst.get_default_fst_type().
+# @return On success 0, else an integer greater than 0.
 def compile_xfst_file(filename, **kwargs):
     pass
 

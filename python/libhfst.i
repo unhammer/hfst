@@ -2062,6 +2062,10 @@ def compile_xfst_file(filename, **kvargs):
     * `type` :
         Implementation type of the compiler, defaults to
         hfst.get_default_fst_type().
+
+    Returns
+    -------
+    On success 0, else an integer greater than 0.
     """
     verbosity=0
     quit_on_fail='ON'
@@ -2175,6 +2179,10 @@ def compile_lexc_file(filename, **kvargs):
     * `output` :
         Where output is printed. Possible values are sys.stdout, sys.stderr, a
         StringIO, sys.stderr being the default
+
+    Returns
+    -------
+    On success the resulting transducer, else None.
     """
     verbosity=0
     withflags=False
