@@ -28,6 +28,10 @@ import os
 from setuptools import setup, Extension
 from sys import platform
 
+def readme():
+    with open('README.rst') as f:
+        return f.read()
+
 # HFST C++ headers needed by swig when creating the python/c++ interface
 swig_include_dir = "libhfst/src/"
 
@@ -212,7 +216,8 @@ setup(name = 'hfst',
       author = 'HFST team',
       author_email = 'hfst-bugs@helsinki.fi',
       url = 'http://hfst.github.io/',
-      description = 'SWIG-bound hfst interface',
+      description = 'Python interface for HFST',
+      long_description = readme(),
       license = 'GNU GPL3',
       ext_modules = [libhfst_module],
       py_modules = ["libhfst"],

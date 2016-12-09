@@ -19,3 +19,4 @@ include back-ends/openfst/src/include/fst/*.h
 include config.h
 include setup.cfg
 include COPYING
+include README.rst
