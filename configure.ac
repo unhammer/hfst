@@ -146,6 +146,15 @@ AC_ARG_WITH([readline],
             [with_readline=$withval],
             [with_readline=no])
 AM_CONDITIONAL([WANT_READLINE], [test x$with_readline != xno])
+# make it possible to disable loading entries from shared object (openfst back-end feature),
+# since this adds a dependecy on dl library
+AC_ARG_ENABLE([load_so_entries],
+              [AS_HELP_STRING([--enable-load-so-entries],
+                              [enable loading entries from shared objects (openfst feature) @<:@default=yes@:>@])],
+              [enable_load_so_entries=$withval],
+              [enable_load_so_entries=yes])
+AS_IF([test "x$enable_load_so_entries" != xno], [AC_DEFINE([ENABLE_LOAD_SO_ENTRIES], [1],
+                                              [Define to compile with so entry loading enabled])])
 
 AC_ARG_ENABLE([all_tools],
 			  [AS_HELP_STRING([--enable-all-tools],
@@ -598,7 +607,7 @@ AM_CONDITIONAL([CAN_DOXYGEN], [test x$DOXYGEN != xno])
 # Checks for libraries
 
 AC_LANG_PUSH([C++])
-AS_IF([test "x$with_openfst" != "xno" -a "x$enable_mingw" == "xno"],
+AS_IF([test "x$with_openfst" != "xno" -a "x$enable_mingw" == "xno" -a "x$enable_load_so_entries" != "xno"],
       [AC_CHECK_LIB([dl], [main])])
 
 AS_IF([test "x$with_openfst" != "xno"],
@@ -635,6 +644,10 @@ fi
        AC_DEFINE([USE_GLIB_UNICODE], 1, [if using glib for unicode string handling])])
 AS_IF([test "x$with_unicode_handler" = "xicu"],
       [AC_MSG_FAILURE([ICU not yet implemented (--with-unicode-handler=hfst to disable)])])
+AS_IF([test "x$with_unicode_handler" = "xyes"],
+      [AC_MSG_FAILURE([--with-unicode-handler=yes; unicode handler 'yes' not recognized])])
+AS_IF([test "x$with_unicode_handler" = "xno"],
+      [AC_MSG_FAILURE([--with-unicode-handler=no; unicode handler 'no' not recognized])])
 AS_IF([test "x$with_readline" = "xyes"],
       [AC_SEARCH_LIBS([readline], [readline editline],
                       [AC_DEFINE([HAVE_READLINE], 1, [if readline can be used])],
@@ -819,6 +832,8 @@ dnl HFST's case mapping in corpus tools is mainly MES-2 set with other character
 dnl added as we go
 AS_IF([test "x$with_unicode_handler" = "xhfst"],
       [AC_MSG_WARN([HFST only supports basic unicode handling with limited case mapping tables etc.; for better support consider using glib or ICU --with-unicode-handler])])
+AS_IF([test "x$with_readline" == "xno"],
+      [AC_MSG_WARN([HFST tools will be compiled without readline; editing user input on command line is not supported; for better support consider using --with-readline])])
 dnl warn about missing "important" tools
 AS_IF([test "x$enable_lexc" == "xno"],
       [AC_MSG_WARN([hfst-lexc is not enabled; enable with --enable-lexc])])
