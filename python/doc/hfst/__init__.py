@@ -49,14 +49,12 @@
 #
 # \section download_hfst Download
 #
-#   - <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstDownloads">Download and install</a> the HFST interface and command line tools
+#   - <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstPython">Download and install</a> HFST Python API
 #
 #
 #\section links Links
 #
-#   - <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstCommandLineToolFunctionalities">Examples</a> of programs implemented using the HFST interface
-#
-#   - <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome">Documentation</a> of the HFST project
+#   - <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome">Documentation</a> for the HFST project
 #
 #   <br>
 
@@ -2082,22 +2080,22 @@ class HfstTokenizer:
   #def printConnectedness():
   #    pass
 
-## A compiler holding information needed to compile XREs.
+## A regular expression compiler.
 class XreCompiler:
 
-  ## Construct compiler for unknown format transducers.
+  ## Construct compiler for OpenFst format (the default) transducers.
   def __init__(self):
       pass
 
-  ## Create compiler for \a impl format transducers
+  ## Create compiler for \a impl format transducers.
   def __init__(self, impl):
       pass
 
-  ## Add a definition macro. Compilers will replace arcs labeled \a name, with a transducer defined by regular expression \a xre in later phases of compilation.
+  ## Add a definition macro. Compiler will replace arcs labeled \a name with a transducer defined by regular expression \a xre in later phases of compilation (if set_expand_definitions(True) has been called).
   def define_xre(self, name, xre):
       pass
 
-  ## Add a definition macro. Compilers will replace arcs labeled \a name, with a transducer \a transducer in later phases of compilation.
+  ## Add a definition macro. Compiler will replace arcs labeled \a name with a transducer \a transducer in later phases of compilation (if set_expand_definitions(True) has been called).
   def define_transducer(self, name, transducer):
       pass
 
@@ -2307,7 +2305,7 @@ class ImplementationType:
 #
 # \section using_hfst Using HFST in your own code
 #
-# After <a href="InstallHfst.html">installing</a> HFST on your computer, start python and execute <code>import hfst</code>.
+# After <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstPython">installing</a> HFST on your computer, start python and execute <code>import hfst</code>.
 #
 # For example, the following simple program
 #
@@ -2592,6 +2590,3 @@ class ImplementationType:
 #    hfst-sometool transducer.foma
 # \endverbatim
 
-## @page InstallHfst.html Installing the HFST API library and Swig/Python bindings
-#
-# TODO
