@@ -56,6 +56,8 @@
 #
 #   - <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome">Documentation</a> for the HFST project
 #
+#   - Documentation for releases <a href="https://hfst.github.io/python/next_release/index.html">3.12.2 (upcoming)</a>, <a href="https://hfst.github.io/python/3.12.1/index.html">3.12.1</a>, <a href="https://hfst.github.io/python/3.12.0/index.html">3.12.0</a> and <a href="https://hfst.github.io/python/3.11.0/index.html">3.11.0</a>.
+#
 #   <br>
 
 # An SFST transducer, unweighted.
