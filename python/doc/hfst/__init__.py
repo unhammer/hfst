@@ -60,41 +60,6 @@
 #
 #   <br>
 
-# An SFST transducer, unweighted.
-#SFST_TYPE = _libhfst.SFST_TYPE
-#
-# An OpenFst transducer with tropical weights.
-#TROPICAL_OPENFST_TYPE = _libhfst.TROPICAL_OPENFST_TYPE
-#
-# An OpenFst transducer with logarithmic weights (limited support).
-#LOG_OPENFST_TYPE = _libhfst.LOG_OPENFST_TYPE
-#
-# A foma transducer, unweighted.
-#FOMA_TYPE = _libhfst.FOMA_TYPE
-#
-# An HFST optimized lookup transducer, unweighted.
-#HFST_OL_TYPE = _libhfst.HFST_OL_TYPE
-#
-# An HFST optimized lookup transducer with weights.
-#HFST_OLW_TYPE = _libhfst.HFST_OLW_TYPE
-#
-# HFST2 header present, conversion required.
-#HFST2_TYPE = _libhfst.HFST2_TYPE
-#
-# Format left open by e.g. default constructor.
-#UNSPECIFIED_TYPE = _libhfst.UNSPECIFIED_TYPE
-#
-# Type not recognised. This type might be returned by a function if an error occurs.
-#ERROR_TYPE = _libhfst.ERROR_TYPE
-
-# Push weights toward initial state.
-# @see #hfst.HfstTransducer.push_weights
-# TO_INITIAL_STATE = _libhfst.TO_INITIAL_STATE
-#
-# Push weights toward final state(s).
-# @see #hfst.HfstTransducer.push_weights
-# TO_FINAL_STATE = _libhfst.TO_FINAL_STATE
-
 ## Set the default implementation type.
 # @param impl An hfst.ImplementationType.
 #
@@ -2198,31 +2163,31 @@ def is_diacritic(symbol):
 ## Back-end implementations.
 class ImplementationType:
     ## An SFST transducer, unweighted.
-    SFST_TYPE = _libhfst.SFST_TYPE
+    SFST_TYPE = libhfst.SFST_TYPE
 
     ## An OpenFst transducer with tropical weights.
-    TROPICAL_OPENFST_TYPE = _libhfst.TROPICAL_OPENFST_TYPE
+    TROPICAL_OPENFST_TYPE = libhfst.TROPICAL_OPENFST_TYPE
 
     ## An OpenFst transducer with logarithmic weights (limited support).
-    LOG_OPENFST_TYPE = _libhfst.LOG_OPENFST_TYPE
+    LOG_OPENFST_TYPE = libhfst.LOG_OPENFST_TYPE
 
     ## A foma transducer, unweighted.
-    FOMA_TYPE = _libhfst.FOMA_TYPE
+    FOMA_TYPE = libhfst.FOMA_TYPE
 
     ## An HFST optimized lookup transducer, unweighted.
-    HFST_OL_TYPE = _libhfst.HFST_OL_TYPE
+    HFST_OL_TYPE = libhfst.HFST_OL_TYPE
 
     ## An HFST optimized lookup transducer with weights.
-    HFST_OLW_TYPE = _libhfst.HFST_OLW_TYPE
+    HFST_OLW_TYPE = libhfst.HFST_OLW_TYPE
 
     ## HFST2 header present, conversion required.
-    HFST2_TYPE = _libhfst.HFST2_TYPE
+    HFST2_TYPE = libhfst.HFST2_TYPE
 
     ## Format left open by e.g. default constructor.
-    UNSPECIFIED_TYPE = _libhfst.UNSPECIFIED_TYPE
+    UNSPECIFIED_TYPE = libhfst.UNSPECIFIED_TYPE
 
     ## Type not recognised. This type might be returned by a function if an error occurs.
-    ERROR_TYPE = _libhfst.ERROR_TYPE
+    ERROR_TYPE = libhfst.ERROR_TYPE
 
 
 ## @page Symbols.html Symbols in HFST

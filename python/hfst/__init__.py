@@ -54,10 +54,8 @@ import hfst.sfst_rules
 import hfst.xerox_rules
 from libhfst import is_diacritic, compile_pmatch_expression, HfstTransducer, HfstOutputStream, HfstInputStream, \
 HfstTokenizer, HfstBasicTransducer, HfstBasicTransition, XreCompiler, LexcCompiler, \
-XfstCompiler, set_default_fst_type, get_default_fst_type, fst_type_to_string, PmatchContainer, \
-ImplementationType, hfst_compile_xfst_to_string_one, get_hfst_xfst_string_one, get_hfst_xfst_string_two, \
-get_hfst_lexc_output, get_hfst_regex_error_message, hfst_regex, parse_prolog_network_line, \
-parse_prolog_arc_line, parse_prolog_symbol_line, parse_prolog_final_line, hfst_compile_lexc
+XfstCompiler, set_default_fst_type, get_default_fst_type, fst_type_to_string, PmatchContainer
+import libhfst
 
 EPSILON='@_EPSILON_SYMBOL_@'
 UNKNOWN='@_UNKNOWN_SYMBOL_@'
@@ -144,8 +142,8 @@ def start_xfst(**kvargs):
            continue
         retval = -1
         if idle:
-            retval = hfst_compile_xfst_to_string_one(comp, expression)
-            stdout.write(get_hfst_xfst_string_one())
+            retval = libhfst.hfst_compile_xfst_to_string_one(comp, expression)
+            stdout.write(libhfst.get_hfst_xfst_string_one())
         else:
             # interactive command
             if (expression == "apply down" or expression == "apply up") and rl_found:
@@ -213,14 +211,14 @@ def regex(re, **kvargs):
     comp.setOutputToConsole(to_console)
 
     if err == None:
-       return hfst_regex(comp, re, "")
+       return libhfst.hfst_regex(comp, re, "")
     elif err == sys.stdout:
-       return hfst_regex(comp, re, "cout")
+       return libhfst.hfst_regex(comp, re, "cout")
     elif err == sys.stderr:
-       return hfst_regex(comp, re, "cerr")
+       return libhfst.hfst_regex(comp, re, "cerr")
     else:
-       retval = hfst_regex(comp, re, "")
-       err.write(get_hfst_regex_error_message())
+       retval = libhfst.hfst_regex(comp, re, "")
+       err.write(libhfst.get_hfst_regex_error_message())
        return retval
 
 def _replace_symbols(symbol, epsilonstr=EPSILON):
@@ -425,7 +423,7 @@ def read_prolog_transducer(f, linecount=[0]):
         else:
             break
 
-    if not parse_prolog_network_line(line, fsm):
+    if not libhfst.parse_prolog_network_line(line, fsm):
         raise hfst.exceptions.NotValidPrologFormatException(line,"",linecount[0] + linecount_)
 
     while(True):
@@ -442,11 +440,11 @@ def read_prolog_transducer(f, linecount=[0]):
             retval.set_name(fsm.name)
             linecount[0] = linecount[0] + linecount_
             return retval
-        if parse_prolog_arc_line(line, fsm):
+        if libhfst.parse_prolog_arc_line(line, fsm):
             pass
-        elif parse_prolog_final_line(line, fsm):
+        elif libhfst.parse_prolog_final_line(line, fsm):
             pass
-        elif parse_prolog_symbol_line(line, fsm):
+        elif libhfst.parse_prolog_symbol_line(line, fsm):
             pass
         else:
             raise hfst.exceptions.NotValidPrologFormatException(line,"",linecount[0] + linecount_)
@@ -608,8 +606,8 @@ def compile_xfst_file(filename, **kvargs):
 
     # check special case
     if isinstance(output, StringIO) and isinstance(error, StringIO) and output == error:
-       retval = hfst_compile_xfst_to_string_one(xfstcomp, data)
-       output.write(get_hfst_xfst_string_one())
+       retval = libhfst.hfst_compile_xfst_to_string_one(xfstcomp, data)
+       output.write(libhfst.get_hfst_xfst_string_one())
     else:
        arg1 = ""
        arg2 = ""
@@ -625,9 +623,9 @@ def compile_xfst_file(filename, **kvargs):
        retval = hfst_compile_xfst(xfstcomp, data, arg1, arg2)
 
        if isinstance(output, StringIO):
-          output.write(get_hfst_xfst_string_one())
+          output.write(libhfst.get_hfst_xfst_string_one())
        if isinstance(error, StringIO):
-          error.write(get_hfst_xfst_string_two())
+          error.write(libhfst.get_hfst_xfst_string_two())
 
     if verbosity > 1:
       print('Parsed file with return value %i (0 indicating succesful parsing).' % retval)
@@ -712,14 +710,14 @@ def compile_lexc_file(filename, **kvargs):
     retval=-1
     import sys
     if output == None:
-       retval = hfst_compile_lexc(lexccomp, filename, "")
+       retval = libhfst.hfst_compile_lexc(lexccomp, filename, "")
     elif output == sys.stdout:
-       retval = hfst_compile_lexc(lexccomp, filename, "cout")
+       retval = libhfst.hfst_compile_lexc(lexccomp, filename, "cout")
     elif output == sys.stderr:
-       retval = hfst_compile_lexc(lexccomp, filename, "cerr")
+       retval = libhfst.hfst_compile_lexc(lexccomp, filename, "cerr")
     else:
-       retval = hfst_compile_lexc(lexccomp, filename, "")
-       output.write(get_hfst_lexc_output())
+       retval = libhfst.hfst_compile_lexc(lexccomp, filename, "")
+       output.write(libhfst.get_hfst_lexc_output())
 
     return retval
 
@@ -920,3 +918,33 @@ def intersect(transducers):
         retval.intersect(tr)
     retval.minimize()
     return retval
+
+class ImplementationType:
+    """
+    Back-end implementation.
+
+    Attributes:
+
+        SFST_TYPE:               SFST type, unweighted
+        TROPICAL_OPENFST_TYPE:   OpenFst type with tropical weights
+        LOG_OPENFST_TYPE:        OpenFst type with logarithmic weights (limited support)
+        FOMA_TYPE:               FOMA type, unweighted
+        XFSM_TYPE:               XFST type, unweighted (limited support)
+        HFST_OL_TYPE:            HFST optimized-lookup type, unweighted
+        HFST_OLW_TYPE:           HFST optimized-lookup type, weighted
+        HFST2_TYPE:              HFST version 2 legacy type
+        UNSPECIFIED_TYPE:        type not specified
+        ERROR_TYPE:              (something went wrong)
+
+    """
+    SFST_TYPE = libhfst.SFST_TYPE
+    TROPICAL_OPENFST_TYPE = libhfst.TROPICAL_OPENFST_TYPE    
+    LOG_OPENFST_TYPE = libhfst.LOG_OPENFST_TYPE
+    FOMA_TYPE = libhfst.FOMA_TYPE
+    XFSM_TYPE = libhfst.XFSM_TYPE
+    HFST_OL_TYPE = libhfst.HFST_OL_TYPE
+    HFST_OLW_TYPE = libhfst.HFST_OLW_TYPE
+    HFST2_TYPE = libhfst.HFST2_TYPE
+    UNSPECIFIED_TYPE = libhfst.UNSPECIFIED_TYPE
+    ERROR_TYPE = libhfst.ERROR_TYPE
+

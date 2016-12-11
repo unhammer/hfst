@@ -1588,11 +1588,6 @@ namespace hfst_ol {
 
 }; // class PmatchContainer
 } // namespace hfst_ol
-
-
-// ******************************** //
-// *** Actual python extensions *** //
-// ******************************** //
  
 %pythoncode %{
 
