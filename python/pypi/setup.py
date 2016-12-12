@@ -18,8 +18,8 @@ osx, readline and getline must be available and the c++ compiler
 must support flag 'std=c++0x'.
 
 The setup script has been tested on linux with gcc 4.6.3 and
-swig 2.0.4 (with python 3.2mu and 3.4m) and on windows with
-msvc 10.0 and swig 3.0.5 (with python 3.3. and 3.4).
+swig 2.0.4 (with python 3.2mu) and swig 3.0 (with python 3.4m)
+and on windows with msvc 10.0 and swig 3.0.5 (with python 3.3. and 3.4).
 
 """
 
