@@ -172,6 +172,7 @@ TransliterateOutputFormatter::print_word(const TokenVector& surface_form,
       token_stream.ostream() << "/" ;
     }
     token_stream.ostream() << *it;
+    first = false;
   }
 
   for(size_t i=0;i<superblanks.size();i++)
