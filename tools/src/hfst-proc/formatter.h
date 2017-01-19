@@ -68,6 +68,20 @@ class OutputFormatter
   virtual bool preserve_nonalphabetic() const = 0;
 };
 
+class TransliterateOutputFormatter: public OutputFormatter
+{
+ public:
+  TransliterateOutputFormatter(TokenIOStream& s, bool f): OutputFormatter(s,f) {}
+  
+  ProcResult process_finals(const LookupPathSet& finals,
+                                          CapitalizationState state) const;
+  void print_word(const TokenVector& surface_form,
+                  ProcResult const &analyzed_forms) const;
+  void print_unknown_word(const TokenVector& surface_form) const;
+  
+  bool preserve_nonalphabetic() const {return true;}
+};
+
 class ApertiumOutputFormatter: public OutputFormatter
 {
  public:
