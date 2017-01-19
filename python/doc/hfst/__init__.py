@@ -2374,7 +2374,8 @@ class ImplementationType:
 # rule = hfst.regex('bar (->) baz || foo _ foo')
 #
 # # Apply the rule transducer to the lexicon.
-# words.compose(rule).minimize()
+# words.compose(rule)
+# words.minimize()
 #
 # # Extract all string pairs from the result and print them to standard output.
 # results = 0
