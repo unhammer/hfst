@@ -30,7 +30,7 @@ do
     cp python/$file $1/
 done
 
-for file in setup.py MANIFEST.in README setup.cfg config.h COPYING ;
+for file in setup.py MANIFEST.in README README.rst setup.cfg config.h COPYING ;
 do
     cp python/pypi/$file $1/
 done
