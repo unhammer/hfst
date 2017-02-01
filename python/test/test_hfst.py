@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+from __future__ import print_function
 import hfst
 import os.path
 from inspect import currentframe
@@ -5,6 +7,11 @@ from inspect import currentframe
 def get_linenumber():
     cf = currentframe()
     return cf.f_back.f_lineno
+
+from sys import version
+if int(version[0]) > 2:
+    def unicode(s, c):
+        return s
 
 types = []
 if hfst.HfstTransducer.is_implementation_type_available(hfst.ImplementationType.TROPICAL_OPENFST_TYPE):
@@ -401,10 +408,10 @@ for type in types:
     # regex compiler
     import io
     msg = io.StringIO()
-    msg.write('This is the error message:\n')
+    msg.write(unicode('This is the error message:\n', 'utf-8'))
     tr = hfst.regex('foo\\', error=msg)
     if (tr == None):
-        msg.write('This was the error message.\n')
+        msg.write(unicode('This was the error message.\n', 'utf-8'))
         # print(msg.getvalue())
     import sys
     msg = sys.stdout
