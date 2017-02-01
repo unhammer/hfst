@@ -23,8 +23,6 @@ and on windows with msvc 10.0 and swig 3.0.5 (with python 3.3. and 3.4).
 
 """
 
-import os
-# from distutils.core import setup, Extension
 from setuptools import setup, Extension
 from sys import platform
 
@@ -36,10 +34,10 @@ def readme():
 swig_include_dir = "libhfst/src/"
 
 ext_swig_opts = ["-c++", "-I" + swig_include_dir, "-Wall"]
-if platform == "win32":
-    ext_swig_opts = ["-c++", "-I" + swig_include_dir, "-Wall", 
-                     "-IC:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v7.0A\\Include"]
-# todo: see if SDK directory is needed
+import sys
+# for python3.3 and python3.4 on windows, add SDK include directory
+if platform == "win32" and sys.version_info[0] == 3 and (sys.version_info[1] == 3 or sys.version_info[1] == 4):
+    ext_swig_opts.extend(["-IC:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v7.0A\\Include"])
 
 # readline is needed for hfst.start_xfst(), on windows the shell where HFST
 # python bindings are run from has its own readline which will do
@@ -62,7 +60,8 @@ if platform == "linux" or platform == "linux2" or platform == "darwin":
     ext_define_macros.append(('HAVE_READLINE', None))
     ext_define_macros.append(('HAVE_GETLINE', None))
 if platform == "win32":
-    for macro in ["HFSTEXPORT", "OPENFSTEXPORT", "_MSC_VER", "WINDOWS", "WIN32", "_CRT_SECURE_NO_WARNINGS"]:
+    # MSC_VER_ should already be defined
+    for macro in ["HFSTEXPORT", "OPENFSTEXPORT", "WINDOWS", "WIN32", "_CRT_SECURE_NO_WARNINGS"]:
         ext_define_macros.append((macro, None))
 
 # use c++0x standard, if possible
@@ -178,11 +177,6 @@ openfst_source_files =  [ "back-ends/" + openfstdir + "/src/lib/compat" + cpp,
                           "back-ends/" + openfstdir + "/src/lib/symbol-table-ops" + cpp,
                           "back-ends/" + openfstdir + "/src/lib/util" + cpp ]
 
-# todo: see what files are actually needed...
-# if platform == "linux" or platform == "linux2" or platform == "darwin":
-#    foma_source_files.append("back-ends/foma/lexcread.c")
-#    foma_source_files.append("back-ends/foma/lex.lexc.c")
-
 libhfst_source_files = libhfst_source_files + openfst_source_files
 
 if platform == "linux" or platform == "linux2" or platform == "win32":
@@ -190,11 +184,13 @@ if platform == "linux" or platform == "linux2" or platform == "win32":
 
 # clang doesn't accept "-std=c++0x" flag when compiling C,
 # so foma back-end must be compiled separately
+# it seems that subprocess doesn't always work, so you must sometimes compile them manually:
+# for file in back-ends/foma/*.c; do clang -fPIC -std=c99 -arch i386 -arch x86_64 -DHAVE_FOMA -c $file ; done
 foma_object_files = []
 if platform == "darwin":
-    import subprocess
+    # import subprocess
     for file in foma_source_files:
-        subprocess.call(["gcc", "-fPIC", "-std=c99", "-c", file])
+        # subprocess.call(["gcc", "-fPIC", "-std=c99", "-c", file])
         foma_object_files.append(file.replace('back-ends/foma/','').replace('.c','.o'))
 
 # The HFST c++ extension
