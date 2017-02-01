@@ -1,8 +1,8 @@
 #!/bin/sh
 
-cp -R ../../back-ends back-ends
-cp -R ../../libhfst libhfst
-cp -R ../hfst hfst
+cp -R ../../back-ends/* -t back-ends
+cp -R ../../libhfst/* -t libhfst
+cp -R ../hfst/* -t hfst
 
 for file in hfst_extensions.cc hfst_file_extensions.cc hfst_lexc_extensions.cc \
 hfst_lookup_extensions.cc hfst_pmatch_extensions.cc hfst_prolog_extensions.cc \
