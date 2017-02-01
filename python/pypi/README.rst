@@ -38,13 +38,20 @@ usually named ``pip3`` (plain ``pip`` being used for python version 2).
 Starting from python 3.4, pip is included by default and can be called with
 ``python3 -m pip``.
 
-Basic installation with ``pip3``:
+Basic installation with ``pip3`` on command line:
 
 ``pip3 install [--upgrade] hfst``
 
-Or, starting from python version 3.4, directly via python:
+or, starting from python version 3.4, directly via python:
 
 ``python3 -m pip install [--upgrade] hfst``
+
+The commands above are run in a shell/terminal/command prompt, but they can
+also be run on python command line or via a graphical user interface 
+(e.g. IDLE) with pip.main that takes arguments in a list:
+
+| ``import pip``
+| ``pip.main(['install','--upgrade','hfst'])``
 
 
 Alternative `installation instructions <https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstPython>`_
@@ -78,7 +85,19 @@ the corresponding wheel for the given environment. Report this via our
 `issue tracker <https://github.com/hfst/hfst/issues/>`_ so a fresh wheel
 will be created.
 
-*Using flag -std=c++0x causes an error by the C++/C compiler:*
+*Error message "command ... failed with error code ...":*
+
+Try rerunning pip in verbose mode with
+``pip3 install --verbose [--upgrade] hfst`` to get more information.
+
+*Error message "error: could not delete ... : permission denied":*
+
+You do not have sufficient rights to install packages. On Mac and Linux, try
+installing as super user with ``sudo pip3 install [--upgrade] hfst``.
+On Windows, reopen Command Prompt/Python command line/IDLE by right-clicking
+and choose "Run as administrator", then run pip again.
+
+*Using flag -std=c++0x causes an error in the C++/C compiler:*
 
 This is a known issue on OS X when compiling from source. The flag must be
 set globally in setup.py but is not accepted when the source is pure C, as
