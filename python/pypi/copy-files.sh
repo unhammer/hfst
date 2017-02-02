@@ -1,8 +1,12 @@
 #!/bin/sh
 
-cp -R ../../back-ends/* -t back-ends
-cp -R ../../libhfst/* -t libhfst
-cp -R ../hfst/* -t hfst
+if ! [ -d "back-ends" ]; then mkdir back-ends; fi
+if ! [ -d "libhfst" ]; then mkdir libhfst; fi
+if ! [ -d "hfst" ]; then mkdir hfst; fi
+
+cp -R ../../back-ends/* back-ends/
+cp -R ../../libhfst/* libhfst/
+cp -R ../hfst/* hfst/
 
 for file in hfst_extensions.cc hfst_file_extensions.cc hfst_lexc_extensions.cc \
 hfst_lookup_extensions.cc hfst_pmatch_extensions.cc hfst_prolog_extensions.cc \
