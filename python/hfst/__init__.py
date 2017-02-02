@@ -47,7 +47,7 @@ CLASSES:
 
 """
 
-__version__ = "3.12.1"
+__version__ = "3.12.1.0"
 
 import hfst.exceptions
 import hfst.sfst_rules
@@ -569,6 +569,10 @@ def compile_xfst_file(filename, **kvargs):
     -------
     On success 0, else an integer greater than 0.
     """
+    if int(version[0]) > 2:
+      pass
+    else:
+      raise RuntimeError('hfst.compile_xfst_file not supported for python version 2')
     verbosity=0
     quit_on_fail='ON'
     type = get_default_fst_type()
@@ -599,8 +603,7 @@ def compile_xfst_file(filename, **kvargs):
     xfstcomp.set('quit-on-fail', quit_on_fail)
     if verbosity > 1:
       print('Opening xfst file %s...' % filename)
-#    f = open(filename, 'r', encoding='utf-8')
-    f = open(filename, 'rb')
+    f = open(filename, 'r', encoding='utf-8')
     data = f.read()
     f.close()
     if verbosity > 1:

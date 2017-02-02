@@ -396,14 +396,15 @@ for type in types:
         raise RuntimeError(get_linenumber())
 
     # XfstCompiler
-    import io
-    msg = io.StringIO()
-    if hfst.compile_xfst_file('test_pass.xfst', verbosity=0, output=msg, error=msg) != 0:
-        raise RuntimeError(get_linenumber())
-    if hfst.compile_xfst_file('test_fail.xfst', verbosity=0, output=msg, error=msg) == 0:
-        raise RuntimeError(get_linenumber())
-    if hfst.compile_xfst_file('test_fail.xfst', quit_on_fail=False, verbosity=0, output=msg, error=msg) != 0:
-        raise RuntimeError(get_linenumber())
+    if int(version[0]) > 2:
+        import io
+        msg = io.StringIO()
+        if hfst.compile_xfst_file('test_pass.xfst', verbosity=0, output=msg, error=msg) != 0:
+            raise RuntimeError(get_linenumber())
+        if hfst.compile_xfst_file('test_fail.xfst', verbosity=0, output=msg, error=msg) == 0:
+            raise RuntimeError(get_linenumber())
+        if hfst.compile_xfst_file('test_fail.xfst', quit_on_fail=False, verbosity=0, output=msg, error=msg) != 0:
+            raise RuntimeError(get_linenumber())
 
     # regex compiler
     import io

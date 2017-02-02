@@ -73,7 +73,7 @@ if platform == "win32":
 # use c++0x standard, if possible
 ext_extra_compile_args = []
 if platform == "linux" or platform == "linux2" or platform == "darwin":
-    ext_extra_compile_args = ["-std=c++11", "-Wno-sign-compare", "-Wno-strict-prototypes"]
+    ext_extra_compile_args = ["-std=c++0x", "-Wno-sign-compare", "-Wno-strict-prototypes"]
 if platform == "darwin":
     ext_extra_compile_args.extend(["-stdlib=libc++", "-mmacosx-version-min=10.7"])
 # define error handling mechanism on windows
