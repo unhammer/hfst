@@ -556,14 +556,14 @@ class HfstBasicTransducer:
     # @return A tuple of state numbers.
     #
     # An example:
-    # /verbatim
+    # \verbatim
     # for state in fsm.states():
     # for arc in fsm.transitions(state):
     #     print('%i ' % (state), end='')
     #     print(arc)
     # if fsm.is_final_state(state):
     #    print('%i %f' % (state, fsm.get_final_weight(state)) )
-    # /endverbatim
+    # \endverbatim
     def states(self):
         pass
 
