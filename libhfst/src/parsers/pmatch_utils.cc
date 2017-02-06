@@ -1144,8 +1144,13 @@ void read_vec(std::string filename)
             std::vector<double> components;
             size_t nextpos;
             while (std::string::npos != (nextpos = line.find(separator, pos + 1))) {
-                components.push_back(strtod(line.substr(pos, nextpos).c_str(), NULL));
+                components.push_back(strtod(line.substr(pos + 1, nextpos - pos).c_str(), NULL));
                 pos = nextpos;
+            }
+            // there can be one more from pos to the newline if there isn't a
+            // separator at the end
+            if (line.back() != separator) {
+                components.push_back(strtof(line.substr(pos + 1).c_str(), NULL));
             }
             if (word_vectors.size() != 0 && word_vectors[0].vector.size() != components.size()) {
                 std::cerr << "pmatch warning: vector file " << filename <<
