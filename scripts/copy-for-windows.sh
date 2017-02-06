@@ -1,5 +1,17 @@
 #!/bin/sh
 
+if [ "$1" = "--help" -o "$1" = "-h" ]; then
+    echo ""
+    echo "Copy winopenfst and foma back-ends, libhfst/src and python bindings to a directory."
+    echo "The directory can be used for creating python bindings on Windows."
+    echo ""
+    echo "Usage: copy-for-windows.sh [DESTDIR]"
+    echo ""
+    echo "DESTDIR: name of the directory where files are copied"
+    echo ""
+    exit 0
+fi
+
 # A script for copying winopenfst and foma backends, libhfst/src and
 # python bindings in a directory given as first argument.
 
