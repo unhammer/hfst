@@ -2,6 +2,18 @@
 PYTHON="python3"
 PYTHONPATH=""
 
+if [ "$1" = "--help" -o "$1" = "-h" ]; then
+    echo ""
+    echo "Run all tests in this folder."
+    echo ""
+    echo "Usage: test.sh [--python PYTHON] [--pythonpath PATH]"
+    echo ""
+    echo "PYTHON: the python to be used for testing, defaults to 'python3'"
+    echo "PATH:   insert PATH to sys.path before running each test"
+    echo ""
+    exit 0
+fi
+
 if [ "$1" = "--python" ]; then
     PYTHON=$2
 fi
