@@ -35,6 +35,7 @@ struct PmatchObject;
 struct PmatchTransducerContainer;
 
 typedef std::pair<std::string, std::string> StringPair;
+typedef double WordVecFloat;
 struct WordVector;
 
 extern char* data;
@@ -56,7 +57,7 @@ extern std::string includedir;
 extern clock_t timer;
 extern int minimization_guard_count;
 extern bool need_delimiters;
-extern double vector_similarity_projection_factor;
+extern WordVecFloat vector_similarity_projection_factor;
 
 struct PmatchUtilityTransducers;
 const std::string RC_ENTRY_SYMBOL = "@PMATCH_RC_ENTRY@";
@@ -133,6 +134,7 @@ template<typename T> std::vector<T> pointwise_multiplication(T,
                                                              std::vector<T> r);
 template<typename T> T dot_product(std::vector<T> l,
                                    std::vector<T> r);
+template<typename T> T square_sum(std::vector<T> v);
 template<typename T> T norm(std::vector<T> v);
 PmatchObject * compile_like_arc(std::string word1, std::string word2 = "",
     unsigned int nwords = 10);
@@ -206,7 +208,7 @@ std::string path_from_filename(char * filename);
 struct WordVector
 {
     std::string word;
-    std::vector<double> vector;
+    std::vector<WordVecFloat> vector;
 };
 
 /**

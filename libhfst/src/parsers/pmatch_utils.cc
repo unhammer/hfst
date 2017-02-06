@@ -82,7 +82,7 @@ std::string includedir;
 clock_t timer;
 int minimization_guard_count;
 bool need_delimiters;
-double vector_similarity_projection_factor;
+WordVecFloat vector_similarity_projection_factor;
 
 std::map<std::string, hfst::HfstTransducer> named_transducers;
 PmatchUtilityTransducers* utils=NULL;
@@ -297,8 +297,8 @@ struct DotProductWithWordVectorComparison {
     DotProductWithWordVectorComparison(WordVector word): compare_with_this(word) {}
     // if the vectors are normalized, dot product is == cosine similarity
     bool operator()(WordVector left, WordVector right) {
-        double left_accumulator = 0;
-        double right_accumulator = 0;
+        WordVecFloat left_accumulator = 0;
+        WordVecFloat right_accumulator = 0;
         for (size_t i = 0; i < compare_with_this.vector.size(); ++i) {
             left_accumulator += compare_with_this.vector[i]*left.vector[i];
             right_accumulator += compare_with_this.vector[i]*right.vector[i];
@@ -311,8 +311,8 @@ struct CosineSimilarityWithWordVectorComparison {
     WordVector compare_with_this;
     CosineSimilarityWithWordVectorComparison(WordVector word): compare_with_this(word) {}
     bool operator()(WordVector left, WordVector right) {
-        double left_accumulator = 0.0;
-        double right_accumulator = 0.0;
+        WordVecFloat left_accumulator = 0.0;
+        WordVecFloat right_accumulator = 0.0;
         for (size_t i = 0; i < compare_with_this.vector.size(); ++i) {
             left_accumulator += compare_with_this.vector[i]*left.vector[i];
             right_accumulator += compare_with_this.vector[i]*right.vector[i];
@@ -324,18 +324,15 @@ struct CosineSimilarityWithWordVectorComparison {
 };
 
 struct CosineSimilarityProjectedToPlaneComparison {
-    std::vector<double> plane_vec;
-    std::vector<double> comparison_point;
-    double translation_term;
-    double square_sum;
+    std::vector<WordVecFloat> plane_vec;
+    std::vector<WordVecFloat> comparison_point;
+    WordVecFloat translation_term;
+    WordVecFloat plane_vec_square_sum;
     CosineSimilarityProjectedToPlaneComparison(
-        std::vector<double> plane_vec_, std::vector<double> comparison_point_, double translation_term_):
+        std::vector<WordVecFloat> plane_vec_, std::vector<WordVecFloat> comparison_point_, WordVecFloat translation_term_):
         plane_vec(plane_vec_), comparison_point(comparison_point_), translation_term(translation_term_)
         {
-            square_sum = 0.0;
-            for(size_t i = 0; i < plane_vec.size(); ++i) {
-                square_sum += plane_vec[i] * plane_vec[i];
-            }
+            plane_vec_square_sum = square_sum(plane_vec_);
         }
     bool operator()(WordVector left, WordVector right) {
         /*
@@ -343,15 +340,15 @@ struct CosineSimilarityProjectedToPlaneComparison {
          * find the multiple of plane_vec which produces a vector going
          * from point to the nearest point in the plane.
          */
-        double left_scaler = (translation_term - dot_product(left.vector, plane_vec)) / square_sum;
-        double right_scaler = (translation_term - dot_product(right.vector, plane_vec)) / square_sum;
+        WordVecFloat left_scaler = (translation_term - dot_product(left.vector, plane_vec)) / plane_vec_square_sum;
+        WordVecFloat right_scaler = (translation_term - dot_product(right.vector, plane_vec)) / plane_vec_square_sum;
         left_scaler *= vector_similarity_projection_factor;
         right_scaler *= vector_similarity_projection_factor;
-        std::vector<double> new_left = pointwise_plus(left.vector, pointwise_multiplication(left_scaler, plane_vec));
-        std::vector<double> new_right = pointwise_plus(right.vector, pointwise_multiplication(right_scaler, plane_vec));
+        std::vector<WordVecFloat> new_left = pointwise_plus(left.vector, pointwise_multiplication(left_scaler, plane_vec));
+        std::vector<WordVecFloat> new_right = pointwise_plus(right.vector, pointwise_multiplication(right_scaler, plane_vec));
         // Then calculate cosine similarity
-        double left_accumulator = 0.0;
-        double right_accumulator = 0.0;
+        WordVecFloat left_accumulator = 0.0;
+        WordVecFloat right_accumulator = 0.0;
         for (size_t i = 0; i < comparison_point.size(); ++i) {
             left_accumulator += comparison_point[i]*new_left[i];
             right_accumulator += comparison_point[i]*new_right[i];
@@ -395,20 +392,25 @@ template<typename T> std::vector<T> pointwise_multiplication(T l,
 template<typename T> T dot_product(std::vector<T> l,
                                    std::vector<T> r)
 {
-    T ret;
+    T ret = 0;
     for(size_t i = 0; i < l.size(); ++i) {
         ret += l[i] * r[i];
     }
     return ret;
 }
 
-template<typename T> T norm(std::vector<T> v)
+template<typename T> T square_sum(std::vector<T> v)
 {
-    T ret;
+    T ret = 0;
     for(size_t i = 0; i < v.size(); ++i) {
         ret += v[i] * v[i];
     }
-    return sqrt(ret);
+    return ret;
+}
+
+template<typename T> T norm(std::vector<T> v)
+{
+    return sqrt(square_sum(v));
 }
 
 PmatchObject * compile_like_arc(std::string word1, std::string word2,
@@ -451,17 +453,22 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
          * to the plane, reducing the distance that is due to the difference
          * between A and B. (This is like projecting the space to the hyperplane
          * if we go all the way to the plane)
-         *
+         
          * The hyperplane is defined by the equation |B - A| = d, where d is a
          * translation term. |B - A| = 0 would be the set of vectors orthogonal to
          * |B - A|. We set d so that the distance from the hyperplane to A is
          * half of the norm of |B - A|.
          */
         
-        std::vector<double> B_minus_A = pointwise_minus(this_word1.vector, this_word2.vector);
-        std::vector<double> halfway_point = pointwise_plus(this_word1.vector, pointwise_multiplication(0.5, B_minus_A));
-        double hyperplane_translation_term = pow(norm(B_minus_A), 2) * 0.5 - dot_product(B_minus_A, this_word1.vector);
-        CosineSimilarityProjectedToPlaneComparison comparison_object(B_minus_A, halfway_point, hyperplane_translation_term);
+        std::vector<WordVecFloat> B_minus_A = pointwise_minus(
+            this_word1.vector, this_word2.vector);
+        std::vector<WordVecFloat> halfway_point = pointwise_plus(
+            this_word2.vector, pointwise_multiplication(
+                static_cast<WordVecFloat>(0.5), B_minus_A));
+        WordVecFloat hyperplane_translation_term = pow(norm(B_minus_A), 2) * -0.5
+            + dot_product(B_minus_A, this_word1.vector);
+        CosineSimilarityProjectedToPlaneComparison comparison_object(
+            B_minus_A, halfway_point, hyperplane_translation_term);
         std::sort(word_vectors.begin(), word_vectors.end(), comparison_object);
     }
     HfstTokenizer tok;
@@ -1141,7 +1148,7 @@ void read_vec(std::string filename)
                 }
             }
             std::string word = line.substr(0, pos);
-            std::vector<double> components;
+            std::vector<WordVecFloat> components;
             size_t nextpos;
             while (std::string::npos != (nextpos = line.find(separator, pos + 1))) {
                 components.push_back(strtod(line.substr(pos + 1, nextpos - pos).c_str(), NULL));
