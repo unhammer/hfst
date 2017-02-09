@@ -830,6 +830,67 @@ def fst(arg):
        return retval
     return fsa(arg)
 
+def fst_to_fsa(fst, separator=''):
+    """
+    NOT YET IMPLEMENTED.
+
+    Get a transducer (automaton) where each transition symbol pair isymbol:osymbol of *fst* is replaced
+    with a transition isymbolosymbol:isymbolosymbol, adding *separator* between isymbol and osymbol.
+
+    Parameters
+    ----------
+    * `fst` :
+        The transducer.
+    * `separator` :
+        The separator symbol inserted between input and output symbols.
+
+    Examples:
+
+        import hfst
+        foo2bar = hfst.fst({'foo':'bar'})
+
+    creates a transducer [f:b o:a o:r]. Calling
+
+        foobar = hfst.fst_to_fsa(foo2bar)
+        
+    will create the transducer [fb:fb oa:oa or:or] and
+
+        foobar = hfst.fst_to_fsa(foo2bar, '^')
+
+    the transducer [f^b:f^b o^a:o^a o^r:o^r].
+
+    """
+    raise RuntimeError('Function fst_to_fsa has not yet been implemented.')
+
+def fsa_to_fst(fsa, separator):
+    """
+    NOT YET IMPLEMENTED.
+
+    Get a transducer where each transition isymbolSosymbol:isymbolSosymbol of *fsa* is replaced
+    a transition isymbol:osymbol, if separator is S.
+
+    Parameters
+    ----------
+    * `fsa` :
+        The transducer. Must be an automaton, i.e. for each transition, the input and output
+        symbols must be the same. Else, a TransducerIsNotAutomatonException is thrown.
+    * `separator` :
+        The symbol separating input and output symbol parts in *fsa*.
+
+    Examples:
+
+        import hfst
+        foo2bar = hfst.fst({'foo':'bar'})  # creates transducer [f:b o:a o:r]
+        foobar = hfst.fst_to_fsa(foo2bar, '^')
+
+    creates the transducer [f^b:f^b o^a:o^a o^r:o^r]. The calling
+
+        foo2bar = hfst.fsa_to_fst(foobar, '^')
+
+    will create again the original transducer [f:b o:a o:r].
+    """
+    raise RuntimeError('Function fsa_to_fst has not yet been implemented.')
+
 def tokenized_fst(arg, weight=0):
     """
     Get a transducer that recognizes the concatenation of symbols or symbol pairs in
