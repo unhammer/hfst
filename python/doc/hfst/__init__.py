@@ -868,6 +868,11 @@ class HfstBasicTransition:
     def get_weight(self):
         pass
 
+    ## Set the weight of the transition to \a weight.
+    # @param weight The weight.
+    def set_weight(self, weight):
+        pass
+
     ## A string representation of the transition.
     #
     # @return "target_state input_symbol output_symbol, weight"

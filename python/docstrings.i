@@ -697,6 +697,17 @@ Get the input symbol of the transition.
 Get the weight of the transition.
 """
 
+%feature("docstring") hfst::HfstBasicTransition::set_weight
+"""
+
+Set the weight of the transition.
+
+Parameters
+----------
+* `weight` :
+    Weight of the transition.
+"""
+
 %feature("docstring") hfst::HfstBasicTransition::get_output_symbol
 """
 
