@@ -448,6 +448,17 @@ f = open('foo_basic', 'r')
 fsm2 = hfst.HfstBasicTransducer(hfst.read_att_transducer(f, hfst.EPSILON))
 f.close()
 
+# Modify weights of a basic transducer
+fsm = hfst.HfstBasicTransducer()
+fsm.add_state(0)
+fsm.add_state(1)
+fsm.set_final_weight(1, 0.3)
+fsm.add_transition(0, 0, 'baz', 'baz')
+arcs = fsm.transitions(0)
+arcs[0].set_weight(0.5)
+arcs = fsm.transitions(0)
+assert(arcs[0].get_weight() == 0.5)
+
 # comparison can fail because of rounding
 #for type in types:
 #    FSM = hfst.HfstTransducer(fsm, type)

@@ -1114,7 +1114,7 @@ class HfstBasicTransducer {
     bool is_final_state(HfstState s) const;
     float get_final_weight(HfstState s) const throw(StateIsNotFinalException, StateIndexOutOfBoundsException);
     void set_final_weight(HfstState s, const float & weight);
-    const std::vector<HfstBasicTransition> & transitions(HfstState s) const;
+    std::vector<HfstBasicTransition> & transitions(HfstState s) const;
     bool is_infinitely_ambiguous();
     bool is_lookup_infinitely_ambiguous(const StringVector & s);
     int longest_path_size();
@@ -1417,6 +1417,7 @@ class HfstBasicTransition {
     std::string get_input_symbol() const;
     std::string get_output_symbol() const;
     float get_weight() const;
+    void set_weight(float f);
   
 %extend{
     char *__str__() {
