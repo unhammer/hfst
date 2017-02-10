@@ -259,7 +259,7 @@ namespace hfst { namespace implementations
          it != net->end(); it++)
       {
         // Go through the set of transitions in each state
-        for (HfstBasicTransducer::HfstBasicTransitions::const_iterator tr_it
+        for (HfstBasicTransitions::const_iterator tr_it
                = it->begin();
              tr_it != it->end(); tr_it++)
           {

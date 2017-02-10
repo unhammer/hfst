@@ -248,7 +248,7 @@ HfstState get_target(const std::string &isymbol,
 {
   HfstState identity_target = -1;
 
-  for (HfstBasicTransducer::HfstBasicTransitions::const_iterator it = t[s].begin();
+  for (hfst::implementations::HfstBasicTransitions::const_iterator it = t[s].begin();
        it != t[s].end();
        ++it)
     {
@@ -467,7 +467,7 @@ void get_symbols(HfstBasicTransducer &t,SymbolSet &known_symbols)
 {
   for (HfstBasicTransducer::const_iterator it = t.begin(); it != t.end(); ++it)
     {
-      for (HfstBasicTransducer::HfstBasicTransitions::const_iterator jt =
+      for (hfst::implementations::HfstBasicTransitions::const_iterator jt =
          it->begin();
        jt != it->end();
        ++jt)

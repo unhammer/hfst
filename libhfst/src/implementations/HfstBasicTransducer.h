@@ -53,8 +53,12 @@
      typedef std::pair<HfstState, std::vector<std::pair<std::string, std::string> > > HfstReplacement;
      typedef std::vector<HfstReplacement> HfstReplacements;
      typedef std::map<HfstState, HfstReplacements > HfstReplacementsMap;
-     
+
+     /** @brief Datatype for the states of a transition in a graph. */
      typedef std::vector<hfst::implementations::HfstBasicTransition> HfstBasicTransitions;
+     /* Datatype for the states of a graph and their transitions.
+        Each index of the vector is a state and the transitions
+        on that index are the transitions of that state. */
      typedef std::vector<hfst::implementations::HfstBasicTransitions> HfstBasicStates;
      
      /** @brief A simple transition graph format that consists of
@@ -144,16 +148,8 @@
        /** @brief Datatype for the alphabet of a graph. */
        typedef std::set<HfstSymbol> HfstAlphabet;
        
-       /** @brief Datatype for the states of a transition in a graph. */
-       typedef std::vector<HfstBasicTransition> HfstBasicTransitions;
-       
-       /* Datatype for the states of a graph and their transitions.
-          Each index of the vector is a state and the transitions
-          on that index are the transitions of that state. */
-       typedef std::vector<HfstBasicTransitions> HfstStates;
-       
        /* States of the graph and their transitions. */
-       HfstStates state_vector;
+       HfstBasicStates state_vector;
        
      protected:
        /* The initial state number. */
@@ -177,13 +173,13 @@
        /* @brief An iterator type that points to a state in a graph.
           
           The value pointed by the iterator is of type HfstBasicTransitions. */
-       typedef HfstStates::iterator iterator;
+       typedef HfstBasicStates::iterator iterator;
        
      public:
        /** @brief A const iterator type that points a state in a graph.
            
            The value pointed by the iterator is of type HfstBasicTransitions. */
-       typedef HfstStates::const_iterator const_iterator;
+       typedef HfstBasicStates::const_iterator const_iterator;
 
        /** @brief The name of the graph. */
        std::string name;

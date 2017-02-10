@@ -229,7 +229,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                                             weight);
                   repl->add_transition(guess_state, x_arc);
                 }
-              for (HfstBasicTransducer::HfstBasicTransitions::const_iterator arc =
+              for (hfst::implementations::HfstBasicTransitions::const_iterator arc =
                    i->begin();
                    arc != i->end();
                    ++arc)

@@ -90,11 +90,11 @@ void SequenceModelComponent::add_transitions_from
 {
   for (State s = 0; s <= static_cast<int>(fst.get_max_state()); ++s)
     {
-      const HfstBasicTransducer::HfstBasicTransitions transitions = fst[s];
+      const hfst::implementations::HfstBasicTransitions transitions = fst[s];
 
       Symbol2TransitionDataMap &symbol_to_transition = transition_map[s];
 
-      for (HfstBasicTransducer::HfstBasicTransitions::const_iterator it =
+      for (hfst::implementations::HfstBasicTransitions::const_iterator it =
 	     transitions.begin();
 	   it != transitions.end();
 	   ++it)

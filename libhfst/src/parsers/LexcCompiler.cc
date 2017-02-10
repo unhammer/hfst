@@ -937,7 +937,7 @@ LexcCompiler::compileLexical()
         it != fsm.end(); it++ )
         {
             // Go through all transitions
-            for (HfstBasicTransducer::HfstBasicTransitions::const_iterator tr_it
+          for (hfst::implementations::HfstBasicTransitions::const_iterator tr_it
              = it->begin(); tr_it != it->end(); tr_it++)
             {
                 String alph2 = tr_it->get_output_symbol();

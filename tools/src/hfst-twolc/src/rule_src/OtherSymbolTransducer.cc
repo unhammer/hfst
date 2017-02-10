@@ -203,7 +203,7 @@ OtherSymbolTransducer &OtherSymbolTransducer::harmonize_diacritics
        it != basic.end();
        ++it)
     {
-     for (HfstBasicTransducer::HfstBasicTransitions::const_iterator jt
+      for (hfst::implementations::HfstBasicTransitions::const_iterator jt
         = it->begin();
       jt != it->end();
       ++jt)
@@ -527,7 +527,7 @@ OtherSymbolTransducer OtherSymbolTransducer::get_inverse_of_upper_projection
       new_fst.add_state(state);
       if (fst.is_final_state(state))
     { new_fst.set_final_weight(state,fst.get_final_weight(state)); }
-      for (HfstBasicTransducer::HfstBasicTransitions::const_iterator jt
+      for (hfst::implementations::HfstBasicTransitions::const_iterator jt
          = it->begin();
        jt != it->end();
        ++jt)
@@ -636,7 +636,7 @@ void OtherSymbolTransducer::get_initial_transition_pairs
 
   HfstBasicTransducer fst(this->transducer);
   HfstBasicTransducer::const_iterator start_state_it = fst.begin();
-  for (HfstBasicTransducer::HfstBasicTransitions::const_iterator jt
+  for (hfst::implementations::HfstBasicTransitions::const_iterator jt
      = start_state_it->begin();
        jt != start_state_it->end();
        ++jt)
@@ -656,11 +656,11 @@ bool have_common_string(HfstState state1,HfstState state2,
   if (fst1.is_final_state(state1) && fst2.is_final_state(state2))
     { return true; }
 
-  const HfstBasicTransducer::HfstBasicTransitions &fst1_transitions = fst1[state1];
-  const HfstBasicTransducer::HfstBasicTransitions &fst2_transitions = fst2[state2];
+  const hfst::implementations::HfstBasicTransitions &fst1_transitions = fst1[state1];
+  const hfst::implementations::HfstBasicTransitions &fst2_transitions = fst2[state2];
 
   HandyMap<SymbolPair,HfstState> fst1_transition_map;
-  for (HfstBasicTransducer::HfstBasicTransitions::const_iterator it =
+  for (hfst::implementations::HfstBasicTransitions::const_iterator it =
      fst1_transitions.begin();
        it != fst1_transitions.end();
        ++it)
@@ -668,7 +668,7 @@ bool have_common_string(HfstState state1,HfstState state2,
                      it->get_output_symbol())] =
     it->get_target_state(); }
 
-  for (HfstBasicTransducer::HfstBasicTransitions::const_iterator it =
+  for (hfst::implementations::HfstBasicTransitions::const_iterator it =
      fst2_transitions.begin();
        it != fst2_transitions.end();
        ++it)

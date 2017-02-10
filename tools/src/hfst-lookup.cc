@@ -1781,7 +1781,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
             for (HfstBasicTransducer::const_iterator it = basic.begin();
                  it != basic.end(); it++)
               {
-                for (HfstBasicTransducer::HfstBasicTransitions::const_iterator
+                for (hfst::implementations::HfstBasicTransitions::const_iterator
                        tr_it = it->begin(); tr_it != it->end(); tr_it++)
                   {
                     std::string mcs = tr_it->get_input_symbol();

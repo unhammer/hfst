@@ -852,7 +852,7 @@ namespace hfst
       for (HfstBasicTransducer::const_iterator it = t.begin();
        it != t.end(); it++)
     {
-      for (HfstBasicTransducer::HfstBasicTransitions::const_iterator tr_it
+      for (hfst::implementations::HfstBasicTransitions::const_iterator tr_it
          = it->begin();
            tr_it != it->end(); tr_it++)
         {

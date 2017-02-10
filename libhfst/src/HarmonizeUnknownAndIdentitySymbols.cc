@@ -160,7 +160,7 @@ void HarmonizeUnknownAndIdentitySymbols::populate_symbol_set
 {
   for (HfstBasicTransducer::const_iterator it = t.begin(); it != t.end(); ++it)
     {
-      for (HfstBasicTransducer::HfstBasicTransitions::const_iterator jt =
+      for (hfst::implementations::HfstBasicTransitions::const_iterator jt =
          it->begin();
        jt != it->end();
        ++jt)
@@ -195,9 +195,9 @@ void HarmonizeUnknownAndIdentitySymbols::harmonize_identity_symbols
   for (HfstBasicTransducer::iterator it = t.begin(); it != t.end(); ++it)
     {
 
-      HfstBasicTransducer::HfstBasicTransitions added_transitions;
+      hfst::implementations::HfstBasicTransitions added_transitions;
 
-      for (HfstBasicTransducer::HfstBasicTransitions::const_iterator jt =
+      for (hfst::implementations::HfstBasicTransitions::const_iterator jt =
          it->begin();
        jt != it->end();
        ++jt)
@@ -230,9 +230,9 @@ void HarmonizeUnknownAndIdentitySymbols::harmonize_unknown_symbols
 
   for (HfstBasicTransducer::iterator it = t.begin(); it != t.end(); ++it)
     {
-      HfstBasicTransducer::HfstBasicTransitions added_transitions;
+      hfst::implementations::HfstBasicTransitions added_transitions;
 
-      for (HfstBasicTransducer::HfstBasicTransitions::const_iterator jt =
+      for (hfst::implementations::HfstBasicTransitions::const_iterator jt =
          it->begin();
        jt != it->end();
        ++jt)

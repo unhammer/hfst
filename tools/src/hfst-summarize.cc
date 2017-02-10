@@ -251,7 +251,7 @@ process_stream(HfstInputStream& instream)
           map<string,unsigned int> input_ambiguity;
           map<string,unsigned int> output_ambiguity;
 
-      for (HfstBasicTransducer::HfstBasicTransitions::const_iterator tr_it
+      for (hfst::implementations::HfstBasicTransitions::const_iterator tr_it
            = it->begin();
            tr_it != it->end(); tr_it++)
         {
