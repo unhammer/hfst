@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
+import sys
+if len(sys.argv) > 1:
+    sys.path.insert(0, sys.argv[1])
 import hfst
 import os.path
 from inspect import currentframe

@@ -34,7 +34,7 @@ for file in test_dir_hfst.py test_dir_hfst_exceptions.py test_dir_hfst_sfst_rule
     test_tokenizer.py test_exceptions.py test_xre.py \
     test_read_att_transducer.py test_prolog.py \
     test_att_reader.py test_prolog_reader.py \
-    test_hfst.py test_examples.py test_pmatch.py test_xerox_rules.py;
+    test_pmatch.py test_xerox_rules.py;
 do
     if ! [ "$PYTHONPATH" = "" ]; then
         echo 'import sys' > tmp
@@ -44,6 +44,17 @@ do
         cat $file > tmp
     fi
     if ( $PYTHON tmp 2> /dev/null > /dev/null ); then
+        echo $file" passed"
+    else
+        echo $file" failed"
+        exit 1
+    fi
+done
+
+# give pythonpath as argument, from __future__ statement must come first
+for file in test_hfst.py test_examples.py;
+do
+    if ( $PYTHON $file $PYTHONPATH 2> /dev/null > /dev/null ); then
         echo $file" passed"
     else
         echo $file" failed"
