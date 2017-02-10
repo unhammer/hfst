@@ -160,7 +160,7 @@ int main(int argc, char **argv)
     for (HfstBasicTransducer::const_iterator it = t.begin();
      it != t.end(); it++ )
       {
-    for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
+    for (HfstBasicTransducer::HfstBasicTransitions::const_iterator tr_it
            = it->begin(); tr_it != it->end(); tr_it++)
       {
         std::cerr << source_state << "\t"

@@ -199,7 +199,7 @@ main_loop(HfstBasicTransducer trans)
                 fprintf(message_out,
                         "<Nothing, you've hit a dead end here>\n");
               }
-            for (HfstBasicTransducer::HfstTransitions::const_iterator arc = trans[p->second].begin();
+            for (HfstBasicTransducer::HfstBasicTransitions::const_iterator arc = trans[p->second].begin();
                  arc != trans[p->second].end();
                  ++arc)
               {
@@ -219,7 +219,7 @@ main_loop(HfstBasicTransducer trans)
              p != paths.end();
              ++p)
           {
-            for (HfstBasicTransducer::HfstTransitions::const_iterator arc = trans[p->second].begin();
+            for (HfstBasicTransducer::HfstBasicTransitions::const_iterator arc = trans[p->second].begin();
                  arc != trans[p->second].end();
                  ++arc)
               {

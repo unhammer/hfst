@@ -27,7 +27,11 @@
          }
 
          /** @brief The states of the graph and their transitions. */
-         HfstBasicStates HfstBasicTransducer::states_and_transitions() const {
+         const HfstBasicStates & HfstBasicTransducer::states_and_transitions() const {
+           return state_vector;
+         }
+
+         HfstBasicStates & HfstBasicTransducer::states_and_transitions() {
            return state_vector;
          }
 
@@ -39,14 +43,14 @@
              zero and is not a final state, i.e. create an empty graph. */
        HfstBasicTransducer::HfstBasicTransducer(void) {
            initialize_alphabet(alphabet);
-           HfstBasicTransducer::HfstTransitions tr;
+           HfstBasicTransducer::HfstBasicTransitions tr;
            state_vector.push_back(tr);
            name = std::string("");
          }
 
        HfstBasicTransducer::HfstBasicTransducer(FILE *file) {
          initialize_alphabet(alphabet);
-         HfstBasicTransducer::HfstTransitions tr;
+         HfstBasicTransducer::HfstBasicTransitions tr;
          state_vector.push_back(tr);
          unsigned int linecount=0;
          this->assign(read_in_att_format(file, "@0@", linecount));
@@ -113,7 +117,7 @@
      {
            for (iterator it = begin(); it != end(); it++)
              {
-               for (HfstBasicTransducer::HfstTransitions::iterator tr_it
+               for (HfstBasicTransducer::HfstBasicTransitions::iterator tr_it
                       = it->begin();
                     tr_it != it->end(); tr_it++)
                  {
@@ -235,7 +239,7 @@
        // Go through all transitions
        for (iterator it = begin(); it != end(); it++)
          {
-           for (HfstBasicTransducer::HfstTransitions::iterator tr_it
+           for (HfstBasicTransducer::HfstBasicTransitions::iterator tr_it
                   = it->begin();
                 tr_it != it->end(); tr_it++)
              {
@@ -261,7 +265,7 @@
        HfstBasicTransducer::HfstAlphabet retval;
        for (iterator it = begin(); it != end(); it++)
          {
-           for (HfstBasicTransducer::HfstTransitions::iterator tr_it
+           for (HfstBasicTransducer::HfstBasicTransitions::iterator tr_it
                   = it->begin();
                 tr_it != it->end(); tr_it++)
              {
@@ -339,7 +343,7 @@
            StringPairSet retval;
            for (const_iterator it = begin(); it != end(); it++)
              {
-               for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
+               for (HfstBasicTransducer::HfstBasicTransitions::const_iterator tr_it
                       = it->begin();
                     tr_it != it->end(); tr_it++)
                  {
@@ -361,7 +365,7 @@
 
              @return The next (smallest) free state number. */
          HfstState HfstBasicTransducer::add_state(void) {
-       HfstBasicTransducer::HfstTransitions tr;
+       HfstBasicTransducer::HfstBasicTransitions tr;
        state_vector.push_back(tr);
        return (HfstState)(state_vector.size()-1);
      }
@@ -374,7 +378,7 @@
              @return \a s*/
          HfstState HfstBasicTransducer::add_state(HfstState s) {
        while(state_vector.size() <= s) {
-         HfstBasicTransducer::HfstTransitions tr;
+         HfstBasicTransducer::HfstBasicTransitions tr;
          state_vector.push_back(tr);
        }
            return s;
@@ -416,14 +420,14 @@
            return;
          }
 
-       HfstBasicTransducer::HfstTransitions & transitions = state_vector[s];
+       HfstBasicTransducer::HfstBasicTransitions & transitions = state_vector[s];
        // iterators to transitions to be removed
        // transitions must be removed in reverse order so that iterators
        // are not invalidated
-       std::stack<HfstBasicTransducer::HfstTransitions::iterator> elements_to_remove;
+       std::stack<HfstBasicTransducer::HfstBasicTransitions::iterator> elements_to_remove;
 
        // find the transitions to be removed
-       for (HfstBasicTransducer::HfstTransitions::iterator it = transitions.begin();
+       for (HfstBasicTransducer::HfstBasicTransitions::iterator it = transitions.begin();
             it != transitions.end(); it++)
          {
            // weight is ignored
@@ -485,8 +489,8 @@
           it != state_vector.end();
           ++it)
            {
-         HfstBasicTransducer::HfstTransitions &transitions = *it;
-         std::sort<HfstBasicTransducer::HfstTransitions::iterator>
+         HfstBasicTransducer::HfstBasicTransitions &transitions = *it;
+         std::sort<HfstBasicTransducer::HfstBasicTransitions::iterator>
            (transitions.begin(),transitions.end());
            }
          return *this;
@@ -516,7 +520,7 @@
              If the state does not exist, a @a StateIndexOutOfBoundsException
              is thrown.
          */
-         const HfstBasicTransducer::HfstTransitions & HfstBasicTransducer::operator[](HfstState s) const
+         const HfstBasicTransducer::HfstBasicTransitions & HfstBasicTransducer::operator[](HfstState s) const
          {
            if (s >= state_vector.size()) {
          HFST_THROW(StateIndexOutOfBoundsException); }
@@ -529,14 +533,14 @@
 
              @see operator[]
           */
-         const HfstBasicTransducer::HfstTransitions & HfstBasicTransducer::transitions(HfstState s) const
+         const HfstBasicTransducer::HfstBasicTransitions & HfstBasicTransducer::transitions(HfstState s) const
          {
            return this->operator[](s);
          }
 
          /** @brief Get mutable transitions.
           */
-         HfstBasicTransducer::HfstTransitions & HfstBasicTransducer::transitions(HfstState s)
+         HfstBasicTransducer::HfstBasicTransitions & HfstBasicTransducer::transitions(HfstState s)
          {
            if (s >= state_vector.size()) {
              HFST_THROW(StateIndexOutOfBoundsException); }
@@ -551,7 +555,7 @@
          /* Change state numbers s1 to s2 and vice versa. */
          void HfstBasicTransducer::swap_state_numbers(HfstState s1, HfstState s2) {
 
-           HfstBasicTransducer::HfstTransitions s1_copy = state_vector[s1];
+           HfstBasicTransducer::HfstBasicTransitions s1_copy = state_vector[s1];
            state_vector[s1] = state_vector[s2];
            state_vector[s2] = s1_copy;
 
@@ -737,7 +741,7 @@
                  }
                else
                  {
-                   for (HfstBasicTransducer::HfstTransitions::iterator tr_it
+                   for (HfstBasicTransducer::HfstBasicTransitions::iterator tr_it
                           = it->begin();
                         tr_it != it->end(); tr_it++)
                      {
@@ -854,7 +858,7 @@
            // Print arcs.
            for (iterator it = begin(); it != end(); it++)
              {
-               for (HfstBasicTransducer::HfstTransitions::iterator tr_it
+               for (HfstBasicTransducer::HfstBasicTransitions::iterator tr_it
                       = it->begin();
                     tr_it != it->end(); tr_it++)
                  {
@@ -916,7 +920,7 @@
            // Print arcs.
            for (iterator it = begin(); it != end(); it++)
              {
-               for (HfstBasicTransducer::HfstTransitions::iterator tr_it
+               for (HfstBasicTransducer::HfstBasicTransitions::iterator tr_it
                       = it->begin();
                     tr_it != it->end(); tr_it++)
                  {
@@ -1355,7 +1359,7 @@
                  }
                else
                  {
-                   for (HfstBasicTransducer::HfstTransitions::iterator tr_it
+                   for (HfstBasicTransducer::HfstBasicTransitions::iterator tr_it
                           = it->begin();
                         tr_it != it->end(); tr_it++)
                      {
@@ -1386,7 +1390,7 @@
            unsigned int source_state=0;
            for (iterator it = begin(); it != end(); it++)
              {
-               for (HfstBasicTransducer::HfstTransitions::iterator tr_it
+               for (HfstBasicTransducer::HfstBasicTransitions::iterator tr_it
                       = it->begin();
                     tr_it != it->end(); tr_it++)
                  {
@@ -1433,7 +1437,7 @@
            unsigned int source_state=0;
            for (iterator it = begin(); it != end(); it++)
              {
-               for (HfstBasicTransducer::HfstTransitions::iterator tr_it
+               for (HfstBasicTransducer::HfstBasicTransitions::iterator tr_it
                       = it->begin();
                     tr_it != it->end(); tr_it++)
                  {
@@ -1481,7 +1485,7 @@
        size_t cw = 0; // characters written in latest call to sprintf
            for (iterator it = begin(); it != end(); it++)
              {
-               for (HfstBasicTransducer::HfstTransitions::iterator tr_it
+               for (HfstBasicTransducer::HfstBasicTransitions::iterator tr_it
                       = it->begin();
                     tr_it != it->end(); tr_it++)
                  {
@@ -1536,7 +1540,7 @@
            unsigned int source_state=0;
            for (iterator it = begin(); it != end(); it++)
              {
-               for (HfstBasicTransducer::HfstTransitions::iterator tr_it
+               for (HfstBasicTransducer::HfstBasicTransitions::iterator tr_it
                       = it->begin();
                     tr_it != it->end(); tr_it++)
                  {
@@ -1957,7 +1961,7 @@
            for (iterator it = begin(); it != end(); it++)
              {
                // The transitions to be added to the current state
-               HfstBasicTransducer::HfstTransitions new_transitions;
+               HfstBasicTransducer::HfstBasicTransitions new_transitions;
 
                // Go through all transitions of the current state
                for (unsigned int i=0; i < it->size(); i++)
@@ -2004,7 +2008,7 @@
                  } // (all transitions of a state gone through)
                
                // Add the new transitions to the current state
-               for (HfstBasicTransducer::HfstTransitions
+               for (HfstBasicTransducer::HfstBasicTransitions
                       ::const_iterator NIT = new_transitions.begin();
                     NIT != new_transitions.end(); NIT++)
                  {
@@ -2044,7 +2048,7 @@
            for (iterator it = begin(); it != end(); it++)
              {
            // The transitions to be added to the current state.
-           HfstBasicTransducer::HfstTransitions new_transitions;
+           HfstBasicTransducer::HfstBasicTransitions new_transitions;
 
            // Go through all transitions.
                for (unsigned int i=0; i < it->size(); i++)
@@ -2120,7 +2124,7 @@
          } // All transitions gone through.
 
            // Add the new transitions.
-           for (HfstBasicTransducer::HfstTransitions
+           for (HfstBasicTransducer::HfstBasicTransitions
               ::const_iterator NIT = new_transitions.begin();
             NIT != new_transitions.end(); NIT++)
          {
@@ -2342,11 +2346,11 @@
              {
 
                // The transitions that are substituted, i.e. removed
-               std::vector<HfstBasicTransducer::HfstTransitions::iterator>
+               std::vector<HfstBasicTransducer::HfstBasicTransitions::iterator>
                  old_transitions;
 
                // Go through all transitions
-               for (HfstBasicTransducer::HfstTransitions::iterator tr_it
+               for (HfstBasicTransducer::HfstBasicTransitions::iterator tr_it
                       = it->begin();
                     tr_it != it->end(); tr_it++)
                  {
@@ -2372,7 +2376,7 @@
 
                // Remove the substituted transitions
                for (std::vector<
-                      HfstBasicTransducer::HfstTransitions::iterator>::iterator IT =
+                      HfstBasicTransducer::HfstBasicTransitions::iterator>::iterator IT =
                       old_transitions.begin();
                     IT != old_transitions.end(); IT++) {
                  it->erase(*IT);
@@ -2413,7 +2417,7 @@
        for (const_iterator it = graph->begin();
             it != graph->end(); it++)
          {
-           for (HfstTransitions::const_iterator tr_it
+           for (HfstBasicTransitions::const_iterator tr_it
                   = it->begin();
                 tr_it != it->end(); tr_it++)
              {
@@ -2457,13 +2461,13 @@
            for (size_t state = 0; state < limit; state++)
              {
                // The transitions that are substituted
-               std::stack<HfstBasicTransducer::HfstTransitions::iterator>
+               std::stack<HfstBasicTransducer::HfstBasicTransitions::iterator>
                  old_transitions;
                // The transitions that will substitute
                std::vector<HfstBasicTransition> new_transitions;
 
                // Go through all transitions
-               for (HfstBasicTransducer::HfstTransitions::iterator tr_it
+               for (HfstBasicTransducer::HfstBasicTransitions::iterator tr_it
                       = state_vector[state].begin();
                     tr_it != state_vector[state].end(); tr_it++)
                  {
@@ -2584,11 +2588,11 @@
              {
 
                // The transitions that are substituted, i.e. removed
-               std::stack<HfstBasicTransducer::HfstTransitions::iterator>
+               std::stack<HfstBasicTransducer::HfstBasicTransitions::iterator>
                  old_transitions;
 
                // Go through all transitions
-               for (HfstBasicTransducer::HfstTransitions::iterator tr_it
+               for (HfstBasicTransducer::HfstBasicTransitions::iterator tr_it
                       = it->begin();
                     tr_it != it->end(); tr_it++)
                  {
@@ -2694,13 +2698,13 @@
            for (size_t state = 0; state < limit; state++)
              {
                // The transitions that are substituted
-               std::stack<HfstBasicTransducer::HfstTransitions::iterator>
+               std::stack<HfstBasicTransducer::HfstBasicTransitions::iterator>
                  old_transitions;
                // The transitions that will substitute
                std::vector<HfstBasicTransition> new_transitions;
 
                // Go through all transitions
-               for (HfstBasicTransducer::HfstTransitions::iterator tr_it
+               for (HfstBasicTransducer::HfstBasicTransitions::iterator tr_it
                       = state_vector[state].begin();
                     tr_it != state_vector[state].end(); tr_it++)
                  {
@@ -2933,14 +2937,14 @@
              return s;
            }
 
-           HfstBasicTransducer::HfstTransitions tr = state_vector[s];
+           HfstBasicTransducer::HfstBasicTransitions tr = state_vector[s];
            bool transition_found=false;
            /* The target state of the transition followed or added */
            HfstState next_state;
 
            // Find the transition
            // (Searching is slow?)
-           for (HfstBasicTransducer::HfstTransitions::iterator tr_it = tr.begin();
+           for (HfstBasicTransducer::HfstBasicTransitions::iterator tr_it = tr.begin();
                 tr_it != tr.end(); tr_it++)
              {
                HfstTropicalTransducerTransitionData data = tr_it->get_transition_data();
@@ -3023,7 +3027,7 @@
                {
                  std::set<HfstSymbol> symbols_present;
 
-                 for (HfstBasicTransducer::HfstTransitions::iterator tr_it
+                 for (HfstBasicTransducer::HfstBasicTransitions::iterator tr_it
                         = it->begin();
                       tr_it != it->end(); tr_it++)
                    {
@@ -3152,9 +3156,9 @@
                      state_it != states.end(); state_it++)
                   {
                     // go through all transitions of each state
-                    const HfstBasicTransducer::HfstTransitions & transitions
+                    const HfstBasicTransducer::HfstBasicTransitions & transitions
                       = this->state_vector.at(*state_it);
-                    for (HfstBasicTransducer::HfstTransitions::const_iterator transition_it
+                    for (HfstBasicTransducer::HfstBasicTransitions::const_iterator transition_it
                            = transitions.begin();
                          transition_it != transitions.end(); transition_it++)
                       {
@@ -3259,9 +3263,9 @@
            state_weights[state] = total_weight;
            
            // Go through all transitions in this state
-           const HfstBasicTransducer::HfstTransitions &transitions
+           const HfstBasicTransducer::HfstBasicTransitions &transitions
              = this->operator[](state);
-           for (HfstBasicTransducer::HfstTransitions::const_iterator it
+           for (HfstBasicTransducer::HfstBasicTransitions::const_iterator it
                   = transitions.begin();
                 it != transitions.end(); it++)
              {
@@ -3281,7 +3285,7 @@
            bool has_negative_epsilon_transitions = false;
            for (iterator it = begin(); it != end(); it++)
              {
-               for (HfstBasicTransducer::HfstTransitions::iterator tr_it
+               for (HfstBasicTransducer::HfstBasicTransitions::iterator tr_it
                       = it->begin();
                     tr_it != it->end(); tr_it++)
                  {
@@ -3315,9 +3319,9 @@
              return false;
 
            // Go through all transitions in this state
-           const HfstBasicTransducer::HfstTransitions &transitions
+           const HfstBasicTransducer::HfstBasicTransitions &transitions
              = this->operator[](state);
-           for (HfstBasicTransducer::HfstTransitions::const_iterator it
+           for (HfstBasicTransducer::HfstBasicTransitions::const_iterator it
                   = transitions.begin();
                 it != transitions.end(); it++)
              {
@@ -3391,9 +3395,9 @@
              }
            
            // Go through all transitions in this state
-           const HfstBasicTransducer::HfstTransitions &transitions
+           const HfstBasicTransducer::HfstBasicTransitions &transitions
              = this->operator[](state);
-           for (HfstBasicTransducer::HfstTransitions::const_iterator it
+           for (HfstBasicTransducer::HfstBasicTransitions::const_iterator it
                   = transitions.begin();
                 it != transitions.end(); it++)
              {
@@ -3629,9 +3633,9 @@
            
            // Whether there are more symbols in lookup_path or not,
            // go through all transitions in the current state.
-           const HfstBasicTransducer::HfstTransitions &transitions
+           const HfstBasicTransducer::HfstBasicTransitions &transitions
              = this->operator[](state);
-           for (HfstBasicTransducer::HfstTransitions::const_iterator it
+           for (HfstBasicTransducer::HfstBasicTransitions::const_iterator it
                   = transitions.begin();
                 it != transitions.end(); it++)
              {
@@ -3789,9 +3793,9 @@
              states_visited.insert(s);
 
              // go through all transitions
-             const HfstBasicTransducer::HfstTransitions &transitions
+             const HfstBasicTransducer::HfstBasicTransitions &transitions
                = this->operator[](s);
-             for (HfstBasicTransducer::HfstTransitions::const_iterator it
+             for (HfstBasicTransducer::HfstBasicTransitions::const_iterator it
                     = transitions.begin();
                   it != transitions.end(); it++)
                {
@@ -3837,9 +3841,9 @@
             bool input_side)
          {
            // go through all transitions
-           const HfstBasicTransducer::HfstTransitions &transitions
+           const HfstBasicTransducer::HfstBasicTransitions &transitions
              = this->operator[](s);
-             for (HfstBasicTransducer::HfstTransitions::const_iterator it
+             for (HfstBasicTransducer::HfstBasicTransitions::const_iterator it
                     = transitions.begin();
                   it != transitions.end(); it++)
                {
@@ -3895,7 +3899,7 @@
            for (const_iterator it = graph.begin();
                 it != graph.end(); it++)
              {
-               for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
+               for (HfstBasicTransducer::HfstBasicTransitions::const_iterator tr_it
                     = it->begin();
                   tr_it != it->end(); tr_it++)
                {
@@ -3999,8 +4003,8 @@
               HfstBasicTransducer & intersection, HfstState state, StateMap & state_map, std::set<HfstState> & agenda)
            {
              agenda.insert(state);  // do not handle \a state twice
-             HfstBasicTransducer::HfstTransitions & tr1 = graph1.state_vector[state1]; // transitions of graph1
-             HfstBasicTransducer::HfstTransitions & tr2 = graph2.state_vector[state2]; // transitions of graph2
+             HfstBasicTransducer::HfstBasicTransitions & tr1 = graph1.state_vector[state1]; // transitions of graph1
+             HfstBasicTransducer::HfstBasicTransitions & tr2 = graph2.state_vector[state2]; // transitions of graph2
 
              if (tr1.size() == 0 || tr2.size() == 0)
                {
@@ -4207,8 +4211,8 @@
               const std::map<std::string, std::set<std::string> > & list_symbols, std::set<std::string> & markers_added)
            {
              agenda.insert(result_state);  // do not handle \a result_state twice
-             HfstBasicTransducer::HfstTransitions & graph_transitions = graph.state_vector[graph_state]; // transitions of graph
-             HfstBasicTransducer::HfstTransitions & merger_transitions = merger.state_vector[merger_state]; // transitions of merger
+             HfstBasicTransducer::HfstBasicTransitions & graph_transitions = graph.state_vector[graph_state]; // transitions of graph
+             HfstBasicTransducer::HfstBasicTransitions & merger_transitions = merger.state_vector[merger_state]; // transitions of merger
 
              if (graph_transitions.size() == 0)
                {

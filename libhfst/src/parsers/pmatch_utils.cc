@@ -1053,7 +1053,7 @@ void print_size_info(HfstTransducer * net)
     for(HfstBasicTransducer::const_iterator state_it = tmp.begin();
         state_it != tmp.end(); ++state_it) {
         ++states;
-        for(HfstBasicTransducer::HfstTransitions::const_iterator tr_it =
+        for(HfstBasicTransducer::HfstBasicTransitions::const_iterator tr_it =
                 state_it->begin(); tr_it != state_it->end(); ++tr_it) {
             ++arcs;
         }

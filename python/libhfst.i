@@ -1082,14 +1082,13 @@ namespace implementations {
   typedef unsigned int HfstState;
 
   typedef std::vector<std::vector<hfst::implementations::HfstBasicTransition> > HfstBasicStates;
+  typedef std::vector<hfst::implementations::HfstBasicTransition> HfstBasicTransitions;
 
 // *** HfstBasicTransducer *** //
 
 class HfstBasicTransducer {
 
   public:
-
-    typedef std::vector<HfstBasicTransition> HfstTransitions;
 
     HfstBasicTransducer(void);
     HfstBasicTransducer(const HfstBasicTransducer &graph);
@@ -1114,11 +1113,11 @@ class HfstBasicTransducer {
     bool is_final_state(HfstState s) const;
     float get_final_weight(HfstState s) const throw(StateIsNotFinalException, StateIndexOutOfBoundsException);
     void set_final_weight(HfstState s, const float & weight);
-    std::vector<HfstBasicTransition> & transitions(HfstState s) const;
+    hfst::implementations::HfstBasicTransitions & transitions(HfstState s);
     bool is_infinitely_ambiguous();
     bool is_lookup_infinitely_ambiguous(const StringVector & s);
     int longest_path_size();
-    hfst::implementations::HfstBasicStates states_and_transitions() const;
+    hfst::implementations::HfstBasicStates & states_and_transitions();
 
 
 
@@ -1415,7 +1414,9 @@ class HfstBasicTransition {
     ~HfstBasicTransition();
     HfstState get_target_state() const;
     std::string get_input_symbol() const;
+    void set_input_symbol(const std::string & symbol);
     std::string get_output_symbol() const;
+    void set_output_symbol(const std::string & symbol);
     float get_weight() const;
     void set_weight(float f);
   

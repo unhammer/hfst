@@ -77,9 +77,9 @@ void ModelBuilder::complete_model
  StateVector::const_iterator default_state_vector_it,
  float penalty_weight)
 {
-  const HfstBasicTransducer::HfstTransitions &transitions = model_fst[s];
+  const HfstBasicTransducer::HfstBasicTransitions &transitions = model_fst[s];
   
-  for (HfstBasicTransducer::HfstTransitions::const_iterator it =
+  for (HfstBasicTransducer::HfstBasicTransitions::const_iterator it =
 	 transitions.begin();
        it != transitions.end();
        ++it)

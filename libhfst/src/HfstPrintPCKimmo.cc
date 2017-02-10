@@ -25,7 +25,7 @@ print_pckimmo(FILE* out, HfstTransducer& t)
          state != mutt->end();
          ++state)
       {
-        for (HfstBasicTransducer::HfstTransitions::const_iterator arc =
+        for (HfstBasicTransducer::HfstBasicTransitions::const_iterator arc =
              state->begin();
              arc != state->end();
              ++arc)
@@ -104,7 +104,7 @@ print_pckimmo(FILE* out, HfstTransducer& t)
           {
             transitions[*p] = -1;
           }
-        for (HfstBasicTransducer::HfstTransitions::const_iterator arc =
+        for (HfstBasicTransducer::HfstBasicTransitions::const_iterator arc =
              state->begin();
              arc != state->end();
              ++arc)

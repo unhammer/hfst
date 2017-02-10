@@ -83,9 +83,15 @@ namespace hfst {
         /** @brief Get the input symbol of the transition. */
         HFSTDLL HfstTropicalTransducerTransitionData::SymbolType get_input_symbol() const;
         
+        /** @brief Set the input symbol of the transition. */
+        HFSTDLL void set_input_symbol(const HfstTropicalTransducerTransitionData::SymbolType & symbol);
+
         /** @brief Get the output symbol of the transition. */
         HFSTDLL HfstTropicalTransducerTransitionData::SymbolType get_output_symbol() const;
         
+        /** @brief Set the output symbol of the transition. */
+        HFSTDLL void set_output_symbol(const HfstTropicalTransducerTransitionData::SymbolType & symbol);
+
         /* Get the internal input number of the transition. */
         HFSTDLL unsigned int get_input_number() const;
         
@@ -94,7 +100,7 @@ namespace hfst {
         
         /** @brief Get the weight of the transition. */
         HFSTDLL HfstTropicalTransducerTransitionData::WeightType get_weight() const;
-        
+
         /** @brief Set the weight of the transition. */
         HFSTDLL void set_weight(HfstTropicalTransducerTransitionData::WeightType w);
         

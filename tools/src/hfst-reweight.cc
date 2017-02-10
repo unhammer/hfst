@@ -372,7 +372,7 @@ do_reweight(HfstTransducer& trans)
                 rebuilt[source_state] = state_count;
                 state_count++;
               }
-            for (HfstBasicTransducer::HfstTransitions::const_iterator arc =
+            for (HfstBasicTransducer::HfstBasicTransitions::const_iterator arc =
                  state->begin();
                  arc != state->end();
                  ++arc)
