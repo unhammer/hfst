@@ -42,6 +42,7 @@
 #include "parsers/XreCompiler.h"
 #include "parsers/LexcCompiler.h"
 #include "parsers/XfstCompiler.h"
+#include "implementations/HfstBasicTransition.h"
 #include "implementations/HfstBasicTransducer.h"
 #include "implementations/optimized-lookup/pmatch.h"
 namespace hfst { typedef std::vector<hfst::xeroxRules::Rule> HfstRuleVector; }
@@ -66,8 +67,7 @@ namespace hfst { typedef std::vector<hfst::xeroxRules::Rule> HfstRuleVector; }
 // Note that templating order matters; simple templates used as part of
 // more complex templates must be defined first, e.g. StringPair must be
 // defined before StringPairSet. Also templates that are not used as such
-// but are used as part of other templates must be defined, e.g.
-// HfstBasicTransitions which is needed for HfstBasicStates.
+// but are used as part of other templates must be defined.
 
 %include "typemaps.i"
 
@@ -83,9 +83,7 @@ namespace std {
 %template(HfstSymbolPairSubstitutions) map<pair<string, string>, pair<string, string> >;
 // needed for HfstBasicTransducer.states()
 %template(BarBazFoo) vector<unsigned int>;
-// HfstBasicTransitions is needed for templating HfstBasicStates:
 %template(HfstBasicTransitions) vector<hfst::implementations::HfstBasicTransition>;
-%template(HfstBasicStates) vector<vector<hfst::implementations::HfstBasicTransition> >;
 %template(HfstOneLevelPath) pair<float, vector<string> >;
 %template(HfstOneLevelPaths) set<pair<float, vector<string> > >;
 %template(HfstTwoLevelPath) pair<float, vector<pair<string, string > > >;
@@ -1081,8 +1079,8 @@ namespace implementations {
   class HfstBasicTransition;
   typedef unsigned int HfstState;
 
-  typedef std::vector<std::vector<hfst::implementations::HfstBasicTransition> > HfstBasicStates;
   typedef std::vector<hfst::implementations::HfstBasicTransition> HfstBasicTransitions;
+
 
 // *** HfstBasicTransducer *** //
 
@@ -1113,13 +1111,11 @@ class HfstBasicTransducer {
     bool is_final_state(HfstState s) const;
     float get_final_weight(HfstState s) const throw(StateIsNotFinalException, StateIndexOutOfBoundsException);
     void set_final_weight(HfstState s, const float & weight);
+%rename("_transitions") transitions(HfstState s);
     hfst::implementations::HfstBasicTransitions & transitions(HfstState s);
     bool is_infinitely_ambiguous();
     bool is_lookup_infinitely_ambiguous(const StringVector & s);
     int longest_path_size();
-    hfst::implementations::HfstBasicStates & states_and_transitions();
-
-
 
 %extend {
 
@@ -1179,6 +1175,25 @@ class HfstBasicTransducer {
   }
 
 %pythoncode %{
+  def transitions(self, s):
+      """
+      ...
+      """
+      tr = self._transitions(s)
+      retval = []
+      for i in range(0, len(tr)):
+          retval.append(tr[i])
+      return retval
+
+  def states_and_transitions(self):
+      """
+      ...
+      """
+      retval = []
+      for s in self.states():
+          retval.append(self.transitions(s))
+      return retval
+
   def __iter__(self):
       """
       Return states and transitions of the transducer.

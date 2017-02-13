@@ -860,7 +860,19 @@ def fst_to_fsa(fst, separator=''):
     the transducer [f^b:f^b o^a:o^a o^r:o^r].
 
     """
-    raise RuntimeError('Function fst_to_fsa has not yet been implemented.')
+    retval = hfst.HfstBasicTransducer(fst)
+    for state in retval.states():
+        arcs = retval.transitions(state)
+        for arc in arcs:
+            input = arc.get_input_symbol()
+            output = arc.get_output_symbol()
+            if (input == hfst.EPSILON and output == hfst.EPSILON):
+                continue
+            symbol = input + separator + output
+            arc.set_input_symbol(symbol)
+            arc.set_output_symbol(symbol)
+    return retval
+    # raise RuntimeError('Function fst_to_fsa has not yet been implemented.')
 
 def fsa_to_fst(fsa, separator):
     """
@@ -889,7 +901,25 @@ def fsa_to_fst(fsa, separator):
 
     will create again the original transducer [f:b o:a o:r].
     """
-    raise RuntimeError('Function fsa_to_fst has not yet been implemented.')
+    retval = hfst.HfstBasicTransducer(fsa)
+    for state in retval.states():
+        arcs = retval.transitions(state)
+        for arc in arcs:
+            input = arc.get_input_symbol()
+            output = arc.get_output_symbol()
+            if (input == hfst.EPSILON and output == hfst.EPSILON):
+                continue
+            if not (input == output):
+                raise RuntimeError('Transition input and output symbols differ.')
+            symbols = input.split(separator)
+            if (len(symbols) < 2):
+                raise RuntimeError('No symbol separator found.')
+            if (len(symbols) > 2):
+                raise RuntimeError('Symbol separator found more than once.')
+            arc.set_input_symbol(symbols[0])
+            arc.set_output_symbol(symbols[1])
+    return retval
+    # raise RuntimeError('Function fsa_to_fst has not yet been implemented.')
 
 def tokenized_fst(arg, weight=0):
     """
