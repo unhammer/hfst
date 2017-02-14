@@ -517,3 +517,36 @@ f.close()
 tr = hfst.HfstBasicTransducer(hfst.regex('foo'))
 tr.substitute({'foo':'bar'})
 tr.substitute({('foo','foo'):('bar','bar')})
+
+tr = hfst.fst({'foo':'bar'})
+fst = hfst.HfstBasicTransducer(tr)
+fsa = hfst.fst_to_fsa(fst, '^')
+fst = hfst.fsa_to_fst(fsa, '^')
+TR = hfst.HfstTransducer(fst)
+assert(TR.compare(tr))
+
+tr = hfst.regex('{foo}:{bar}|{FOO}:{BAR}')
+fsm = hfst.HfstBasicTransducer(tr)
+net = fsm.states_and_transitions()
+for state in net:
+    for arc in state:
+        arc.set_input_symbol(arc.get_input_symbol() + '>')
+        arc.set_output_symbol('<' + arc.get_output_symbol())
+        arc.set_weight(arc.get_weight() - 0.5)
+
+for state, arcs in enumerate(fsm):
+    for arc in arcs:
+        arc.set_input_symbol('<' + arc.get_input_symbol())
+        arc.set_output_symbol(arc.get_output_symbol() + '>')
+        arc.set_weight(arc.get_weight() - 1.5)
+
+for state in fsm:
+    for arc in state:
+        arc.set_input_symbol('' + arc.get_input_symbol() + '')
+        arc.set_output_symbol('' + arc.get_output_symbol() + '')
+        arc.set_weight(arc.get_weight() - 0.5)
+
+tr = hfst.regex('[["<f>" "<o>" "<o>"]:["<b>" "<a>" "<r>"]|["<F>" "<O>" "<O>"]:["<B>" "<A>" "<R>"]]::-7.5')
+assert(not (tr == None))
+TR = hfst.HfstTransducer(fsm)
+assert(TR.compare(tr))
