@@ -832,8 +832,6 @@ def fst(arg):
 
 def fst_to_fsa(fst, separator=''):
     """
-    NOT YET IMPLEMENTED.
-
     Get a transducer (automaton) where each transition symbol pair isymbol:osymbol of *fst* is replaced
     with a transition isymbolosymbol:isymbolosymbol, adding *separator* between isymbol and osymbol.
 
@@ -872,12 +870,9 @@ def fst_to_fsa(fst, separator=''):
             arc.set_input_symbol(symbol)
             arc.set_output_symbol(symbol)
     return retval
-    # raise RuntimeError('Function fst_to_fsa has not yet been implemented.')
 
-def fsa_to_fst(fsa, separator):
+def fsa_to_fst(fsa, separator=''):
     """
-    NOT YET IMPLEMENTED.
-
     Get a transducer where each transition isymbolSosymbol:isymbolSosymbol of *fsa* is replaced
     a transition isymbol:osymbol, if separator is S.
 
@@ -887,7 +882,9 @@ def fsa_to_fst(fsa, separator):
         The transducer. Must be an automaton, i.e. for each transition, the input and output
         symbols must be the same. Else, a TransducerIsNotAutomatonException is thrown.
     * `separator` :
-        The symbol separating input and output symbol parts in *fsa*.
+        The symbol separating input and output symbol parts in *fsa*. If it is the empty string,
+        length of each symbol in \a fsa (excluding special symbols of form "@...@") must be
+        exactly 2. Else, a RuntimeError is thrown.
 
     Examples:
 
@@ -895,7 +892,7 @@ def fsa_to_fst(fsa, separator):
         foo2bar = hfst.fst({'foo':'bar'})  # creates transducer [f:b o:a o:r]
         foobar = hfst.fst_to_fsa(foo2bar, '^')
 
-    creates the transducer [f^b:f^b o^a:o^a o^r:o^r]. The calling
+    creates the transducer [f^b:f^b o^a:o^a o^r:o^r]. Then calling
 
         foo2bar = hfst.fsa_to_fst(foobar, '^')
 
@@ -907,19 +904,42 @@ def fsa_to_fst(fsa, separator):
         for arc in arcs:
             input = arc.get_input_symbol()
             output = arc.get_output_symbol()
+            symbols = []
             if (input == hfst.EPSILON and output == hfst.EPSILON):
                 continue
             if not (input == output):
                 raise RuntimeError('Transition input and output symbols differ.')
-            symbols = input.split(separator)
-            if (len(symbols) < 2):
-                raise RuntimeError('No symbol separator found.')
-            if (len(symbols) > 2):
-                raise RuntimeError('Symbol separator found more than once.')
+            if len(separator) > 0:
+                symbols = input.split(separator)
+                if (len(symbols) < 2):
+                    raise RuntimeError('No symbol separator found.')
+                if (len(symbols) > 2):
+                    raise RuntimeError('Symbol separator found more than once.')
+            else:
+                if len(input) == 2:
+                    symbols = [input[0], input[1]]
+                elif len(input) < 2:
+                    raise RuntimeError('Symbol length must be 2, if the separator is the empty string.')
+                else:
+                    at_pos = []
+                    for pos, char in enumerate(input):
+                        if char == '@':
+                            at_pos.append(pos)
+                    if len(at_pos) == 2:
+                        if at_pos[0] == 0:
+                            symbols.append(input[at_pos[0]:at_pos[1]+1])
+                            symbols.append(input[at_pos[1]+1:])
+                        else:
+                            symbols.append(input[:at_pos[0]])
+                            symbols.append(input[at_pos[0]:])
+                    elif len(at_pos) == 4:
+                        symbols.append(input[at_pos[0]:at_pos[1]+1])
+                        symbols.append(input[at_pos[2]:])
+                    else:
+                        raise RuntimeError('Symbol length must be 2, if the separator is the empty string.')
             arc.set_input_symbol(symbols[0])
             arc.set_output_symbol(symbols[1])
     return retval
-    # raise RuntimeError('Function fsa_to_fst has not yet been implemented.')
 
 def tokenized_fst(arg, weight=0):
     """

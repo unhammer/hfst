@@ -140,6 +140,49 @@ IDENTITY='@_IDENTITY_SYMBOL_@'
 def fst(arg):
     pass
 
+## Get a transducer (automaton) where each transition symbol pair isymbol:osymbol of \a fst is replaced with a transition isymbolosymbol:isymbolosymbol, adding \a separator between isymbol and osymbol.
+# @param fst The transducer.
+# @param separator The separator symbol inserted between input and output symbols.
+#
+# Examples
+# \verbatim
+# import hfst
+# foo2bar = hfst.fst({'foo':'bar'})
+# \endverbatim
+# creates a transducer [f:b o:a o:r]. Calling
+# \verbatim
+# foobar = hfst.fst_to_fsa(foo2bar)
+# \endverbatim
+# will create the transducer [fb:fb oa:oa or:or] and
+# \verbatim
+# foobar = hfst.fst_to_fsa(foo2bar, '^')
+# \endverbatim
+# the transducer [f^b:f^b o^a:o^a o^r:o^r].
+# @see hfst.fsa_to_fst
+def fst_to_fsa(fst, separator=''):
+    pass
+
+
+## Get a transducer where each transition isymbolSosymbol:isymbolSosymbol of \a fsa is replaced a transition isymbol:osymbol, if \a separator is S.
+# @param fsa The transducer. Must be an automaton, i.e. for each transition, the input and output symbols must be the same. Else, a TransducerIsNotAutomatonException is thrown.
+# @param separator The symbol separating input and output symbol parts in \a fsa. If it is the empty string, length of each symbol in \a fsa (excluding special symbols of form "@...@") must be exactly 2. Else, a RuntimeError is thrown.
+
+#
+# Examples:
+# \verbatim
+# import hfst
+# foo2bar = hfst.fst({'foo':'bar'})  # creates transducer [f:b o:a o:r]
+# foobar = hfst.fst_to_fsa(foo2bar, '^')
+# \endverbatim
+# creates the transducer [f^b:f^b o^a:o^a o^r:o^r]. Then calling
+# \verbatim
+# foo2bar = hfst.fsa_to_fst(foobar, '^')
+# \endverbatim
+# will create again the original transducer [f:b o:a o:r].
+# @see hfst.fst_to_fsa
+def fsa_to_fst(fsa, separator=''):
+    pass
+
 ## Get a transducer that recognizes the concatenation of symbols or symbol pairs in \a arg.
 # @param arg The symbols or symbol pairs that form the path to be recognized.
 #
