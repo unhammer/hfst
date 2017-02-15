@@ -832,8 +832,14 @@ def fst(arg):
 
 def fst_to_fsa(fst, separator=''):
     """
-    Get a transducer (automaton) where each transition symbol pair isymbol:osymbol of *fst* is replaced
-    with a transition isymbolosymbol:isymbolosymbol, adding *separator* between isymbol and osymbol.
+    Encode a transducer into an automaton, i.e. get a transducer where each
+    transition <in:out> of *fst* is replaced with a transition <inSout:inSout>
+    where 'S' is *separator*, if 'in' and 'out' differ.
+
+    If 'in' and 'out' are the same, the transition is copied as such. All
+    states and weights of transitions and end states are always copied as such.
+    The alphabet is copied, inserting new symbols that are created when
+    encoding transitions.
 
     Parameters
     ----------
@@ -858,33 +864,48 @@ def fst_to_fsa(fst, separator=''):
     the transducer [f^b:f^b o^a:o^a o^r:o^r].
 
     """
+    encoded_symbols = libhfst.StringSet()
     retval = hfst.HfstBasicTransducer(fst)
     for state in retval.states():
         arcs = retval.transitions(state)
         for arc in arcs:
             input = arc.get_input_symbol()
             output = arc.get_output_symbol()
-            if (input == hfst.EPSILON and output == hfst.EPSILON):
+            if (input == output) and not (input == hfst.UNKNOWN):
                 continue
             symbol = input + separator + output
             arc.set_input_symbol(symbol)
             arc.set_output_symbol(symbol)
+            encoded_symbols.insert(symbol)
+    retval.add_symbols_to_alphabet(encoded_symbols)
     return retval
 
 def fsa_to_fst(fsa, separator=''):
     """
-    Get a transducer where each transition isymbolSosymbol:isymbolSosymbol of *fsa* is replaced
-    a transition isymbol:osymbol, if separator is S.
+    Decode an automaton into a transducer, i.e. get a transducer where each
+    transition <inSout:inSout> of *fsa*, where 'S' is *separator*, is replaced
+    with a transition <in:out>.
+
+    If *separator* is not found in the symbol, transition is copied as such.
+    All states and weights of transitions and end states are always copied as
+    such. The alphabet is copied, omitting encoded symbols that contain
+    *separator* and adding input and output symbols extracted from encoded
+    symbols.
+
+    If *separator* is the empty string, 'in' and 'out' must each be either a
+    single-character symbol or a special symbol of form "@...@".
 
     Parameters
     ----------
     * `fsa` :
-        The transducer. Must be an automaton, i.e. for each transition, the input and output
-        symbols must be the same. Else, a TransducerIsNotAutomatonException is thrown.
+        The transducer. Must be an automaton, i.e. for each transition, the
+        input and output symbols must be the same. Else, a
+        TransducerIsNotAutomatonException is thrown.
     * `separator` :
-        The symbol separating input and output symbol parts in *fsa*. If it is the empty string,
-        length of each symbol in \a fsa (excluding special symbols of form "@...@") must be
-        exactly 2. Else, a RuntimeError is thrown.
+        The symbol separating input and output symbol parts in *fsa*. If it is
+        the empty string, each symbol in \a fsa must consist of an input and
+        output symbol that must each be either a single-character symbol or a
+        special symbol of form "@...@". Else, a RuntimeError is thrown.
 
     Examples:
 
@@ -899,46 +920,57 @@ def fsa_to_fst(fsa, separator=''):
     will create again the original transducer [f:b o:a o:r].
     """
     retval = hfst.HfstBasicTransducer(fsa)
+    encoded_symbols = libhfst.StringSet()
     for state in retval.states():
         arcs = retval.transitions(state)
         for arc in arcs:
             input = arc.get_input_symbol()
             output = arc.get_output_symbol()
             symbols = []
-            if (input == hfst.EPSILON and output == hfst.EPSILON):
-                continue
             if not (input == output):
                 raise RuntimeError('Transition input and output symbols differ.')
+            # separator given, split into one symbol (input and output are the same) 
+            # or two symbols (input and output differ)
             if len(separator) > 0:
                 symbols = input.split(separator)
-                if (len(symbols) < 2):
-                    raise RuntimeError('No symbol separator found.')
                 if (len(symbols) > 2):
                     raise RuntimeError('Symbol separator found more than once.')
+            # no separator given, possible cases:
             else:
-                if len(input) == 2:
+                # identity transition with single-character symbol
+                if len(input) == 1:
+                    symbols = [input]
+                # non-identity transition with single-character symbols
+                elif len(input) == 2:
                     symbols = [input[0], input[1]]
-                elif len(input) < 2:
-                    raise RuntimeError('Symbol length must be 2, if the separator is the empty string.')
+                # transition with special characters of form "@...@"
                 else:
+                    # indixes of "@" characters
                     at_pos = []
                     for pos, char in enumerate(input):
                         if char == '@':
                             at_pos.append(pos)
                     if len(at_pos) == 2:
-                        if at_pos[0] == 0:
-                            symbols.append(input[at_pos[0]:at_pos[1]+1])
-                            symbols.append(input[at_pos[1]+1:])
+                        # identity transition
+                        if at_pos[0] == 0 and at_pos[1] == (len(input) - 1):
+                            symbols = [input]
+                        # special symbol to single-character symbol
+                        elif at_pos[0] == 0:
+                            symbols = [input[at_pos[0]:at_pos[1]+1], input[at_pos[1]+1:]]
+                        # single-character symbol to special symbol
                         else:
-                            symbols.append(input[:at_pos[0]])
-                            symbols.append(input[at_pos[0]:])
+                            symbols = [input[:at_pos[0]], input[at_pos[0]:]]
+                    # special symbol to special symbol
                     elif len(at_pos) == 4:
-                        symbols.append(input[at_pos[0]:at_pos[1]+1])
-                        symbols.append(input[at_pos[2]:])
+                        symbols = [input[:at_pos[2]], input[at_pos[2]:]]
                     else:
-                        raise RuntimeError('Symbol length must be 2, if the separator is the empty string.')
+                        raise RuntimeError('Only single-character and special symbols are allowed, if the separator is the empty string.')
             arc.set_input_symbol(symbols[0])
-            arc.set_output_symbol(symbols[1])
+            arc.set_output_symbol(symbols[-1])
+            # encoded symbol to be removed from alphabet of result
+            if len(symbols) > 1:
+                encoded_symbols.insert(input)
+    retval.remove_symbols_from_alphabet(encoded_symbols)
     return retval
 
 def tokenized_fst(arg, weight=0):
