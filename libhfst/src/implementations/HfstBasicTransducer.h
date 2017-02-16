@@ -53,8 +53,13 @@
      typedef std::pair<HfstState, std::vector<std::pair<std::string, std::string> > > HfstReplacement;
      typedef std::vector<HfstReplacement> HfstReplacements;
      typedef std::map<HfstState, HfstReplacements > HfstReplacementsMap;
-     
-     typedef std::vector<std::vector<hfst::implementations::HfstBasicTransition> > HfstBasicStates;
+
+     /** @brief Datatype for the states of a transition in a graph. */
+     typedef std::vector<hfst::implementations::HfstBasicTransition> HfstBasicTransitions;
+     /* Datatype for the states of a graph and their transitions.
+        Each index of the vector is a state and the transitions
+        on that index are the transitions of that state. */
+     typedef std::vector<hfst::implementations::HfstBasicTransitions> HfstBasicStates;
      
      /** @brief A simple transition graph format that consists of
          states and transitions between those states.
@@ -143,16 +148,8 @@
        /** @brief Datatype for the alphabet of a graph. */
        typedef std::set<HfstSymbol> HfstAlphabet;
        
-       /** @brief Datatype for the states of a transition in a graph. */
-       typedef std::vector<HfstBasicTransition> HfstTransitions;
-       
-       /* Datatype for the states of a graph and their transitions.
-          Each index of the vector is a state and the transitions
-          on that index are the transitions of that state. */
-       typedef std::vector<HfstTransitions> HfstStates;
-       
        /* States of the graph and their transitions. */
-       HfstStates state_vector;
+       HfstBasicStates state_vector;
        
      protected:
        /* The initial state number. */
@@ -175,14 +172,14 @@
      protected:
        /* @brief An iterator type that points to a state in a graph.
           
-          The value pointed by the iterator is of type HfstTransitions. */
-       typedef HfstStates::iterator iterator;
+          The value pointed by the iterator is of type HfstBasicTransitions. */
+       typedef HfstBasicStates::iterator iterator;
        
      public:
        /** @brief A const iterator type that points a state in a graph.
            
-           The value pointed by the iterator is of type HfstTransitions. */
-       typedef HfstStates::const_iterator const_iterator;
+           The value pointed by the iterator is of type HfstBasicTransitions. */
+       typedef HfstBasicStates::const_iterator const_iterator;
 
        /** @brief The name of the graph. */
        std::string name;
@@ -191,8 +188,11 @@
        std::vector<HfstState> states() const;
        
        /** @brief The states of the graph and their transitions. */
-       HfstBasicStates states_and_transitions() const;
-       
+       const HfstBasicStates & states_and_transitions() const;
+
+       /** @brief The states of the graph and their transitions, mutable. */
+       HfstBasicStates & states_and_transitions();  
+
        // --------------------------------------------------------
        // --- Construction, assignment, copying and conversion ---
        // --------------------------------------------------------
@@ -377,7 +377,7 @@
              If the state does not exist, a @a StateIndexOutOfBoundsException
              is thrown.
      */
-     HFSTDLL const HfstTransitions & operator[](HfstState s) const;
+     HFSTDLL const HfstBasicTransitions & operator[](HfstState s) const;
      
      /** @brief Alternative name for operator[].
          
@@ -385,11 +385,11 @@
          
          @see operator[]
      */
-     HFSTDLL const HfstTransitions & transitions(HfstState s) const;
+     HFSTDLL const HfstBasicTransitions & transitions(HfstState s) const;
      
      /** @brief Get mutable transitions.
       */
-     HFSTDLL HfstTransitions & transitions(HfstState s);
+     HFSTDLL HfstBasicTransitions & transitions(HfstState s);
      
      // --------------------------------------------------
      // -----   Reading and writing in AT&T format   -----

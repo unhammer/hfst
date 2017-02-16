@@ -184,7 +184,7 @@ void get_states_and_symbols(
                                          first_transition,
                                          final_w));
         ++first_transition; // there's a padding entry between states
-        for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
+        for (HfstBasicTransitions::const_iterator tr_it
                  = it->begin();
              tr_it != it->end(); ++tr_it) {
             ++first_transition;
@@ -266,7 +266,7 @@ void get_states_and_symbols(
     state_number = 0;
     for (HfstBasicTransducer::const_iterator it = t->begin();
          it != t->end(); ++it) {
-        for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
+        for (HfstBasicTransitions::const_iterator tr_it
                = it->begin();
              tr_it != it->end(); ++tr_it) {
             // add input in case we're seeing it the first time

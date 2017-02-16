@@ -49,51 +49,16 @@
 #
 # \section download_hfst Download
 #
-#   - <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstDownloads">Download and install</a> the HFST interface and command line tools
+#   - <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstPython">Download and install</a> HFST Python API
 #
 #
 #\section links Links
 #
-#   - <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstCommandLineToolFunctionalities">Examples</a> of programs implemented using the HFST interface
+#   - <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome">Documentation</a> for the HFST project
 #
-#   - <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome">Documentation</a> of the HFST project
+#   - Documentation for releases <a href="https://hfst.github.io/python/next_release/index.html">3.12.2 (upcoming)</a>, <a href="https://hfst.github.io/python/3.12.1/index.html">3.12.1</a>, <a href="https://hfst.github.io/python/3.12.0/index.html">3.12.0</a> and <a href="https://hfst.github.io/python/3.11.0/index.html">3.11.0</a>.
 #
 #   <br>
-
-# An SFST transducer, unweighted.
-#SFST_TYPE = _libhfst.SFST_TYPE
-#
-# An OpenFst transducer with tropical weights.
-#TROPICAL_OPENFST_TYPE = _libhfst.TROPICAL_OPENFST_TYPE
-#
-# An OpenFst transducer with logarithmic weights (limited support).
-#LOG_OPENFST_TYPE = _libhfst.LOG_OPENFST_TYPE
-#
-# A foma transducer, unweighted.
-#FOMA_TYPE = _libhfst.FOMA_TYPE
-#
-# An HFST optimized lookup transducer, unweighted.
-#HFST_OL_TYPE = _libhfst.HFST_OL_TYPE
-#
-# An HFST optimized lookup transducer with weights.
-#HFST_OLW_TYPE = _libhfst.HFST_OLW_TYPE
-#
-# HFST2 header present, conversion required.
-#HFST2_TYPE = _libhfst.HFST2_TYPE
-#
-# Format left open by e.g. default constructor.
-#UNSPECIFIED_TYPE = _libhfst.UNSPECIFIED_TYPE
-#
-# Type not recognised. This type might be returned by a function if an error occurs.
-#ERROR_TYPE = _libhfst.ERROR_TYPE
-
-# Push weights toward initial state.
-# @see #hfst.HfstTransducer.push_weights
-# TO_INITIAL_STATE = _libhfst.TO_INITIAL_STATE
-#
-# Push weights toward final state(s).
-# @see #hfst.HfstTransducer.push_weights
-# TO_FINAL_STATE = _libhfst.TO_FINAL_STATE
 
 ## Set the default implementation type.
 # @param impl An hfst.ImplementationType.
@@ -175,6 +140,49 @@ IDENTITY='@_IDENTITY_SYMBOL_@'
 def fst(arg):
     pass
 
+## Get a transducer (automaton) where each transition symbol pair isymbol:osymbol of \a fst is replaced with a transition isymbolosymbol:isymbolosymbol, adding \a separator between isymbol and osymbol.
+# @param fst The transducer.
+# @param separator The separator symbol inserted between input and output symbols.
+#
+# Examples
+# \verbatim
+# import hfst
+# foo2bar = hfst.fst({'foo':'bar'})
+# \endverbatim
+# creates a transducer [f:b o:a o:r]. Calling
+# \verbatim
+# foobar = hfst.fst_to_fsa(foo2bar)
+# \endverbatim
+# will create the transducer [fb:fb oa:oa or:or] and
+# \verbatim
+# foobar = hfst.fst_to_fsa(foo2bar, '^')
+# \endverbatim
+# the transducer [f^b:f^b o^a:o^a o^r:o^r].
+# @see hfst.fsa_to_fst
+def fst_to_fsa(fst, separator=''):
+    pass
+
+
+## Get a transducer where each transition isymbolSosymbol:isymbolSosymbol of \a fsa is replaced a transition isymbol:osymbol, if \a separator is S.
+# @param fsa The transducer. Must be an automaton, i.e. for each transition, the input and output symbols must be the same. Else, a TransducerIsNotAutomatonException is thrown.
+# @param separator The symbol separating input and output symbol parts in \a fsa. If it is the empty string, length of each symbol in \a fsa (excluding special symbols of form "@...@") must be exactly 2. Else, a RuntimeError is thrown.
+
+#
+# Examples:
+# \verbatim
+# import hfst
+# foo2bar = hfst.fst({'foo':'bar'})  # creates transducer [f:b o:a o:r]
+# foobar = hfst.fst_to_fsa(foo2bar, '^')
+# \endverbatim
+# creates the transducer [f^b:f^b o^a:o^a o^r:o^r]. Then calling
+# \verbatim
+# foo2bar = hfst.fsa_to_fst(foobar, '^')
+# \endverbatim
+# will create again the original transducer [f:b o:a o:r].
+# @see hfst.fst_to_fsa
+def fsa_to_fst(fsa, separator=''):
+    pass
+
 ## Get a transducer that recognizes the concatenation of symbols or symbol pairs in \a arg.
 # @param arg The symbols or symbol pairs that form the path to be recognized.
 #
@@ -214,6 +222,7 @@ def regex(regexp, **kwargs):
 # @param verbosity The verbosity of the compiler, defaults to 0 (silent). Possible values are: 0, 1, 2.
 # @param with_flags Whether lexc flags are used when compiling, defaults to False.
 # @param output Where output is printed. Possible values are sys.stdout, sys.stderr, a StringIO, sys.stderr being the default?
+# @return On success the resulting transducer, else None.
 def compile_lexc_file(filename, **kwargs):
     pass
 
@@ -224,6 +233,7 @@ def compile_lexc_file(filename, **kwargs):
 # @param quit_on_fail Whether the script is exited on any error, defaults to True.
 # @param output Where output is printed. Possible values are sys.stdout, sys.stderr, a StringIO, sys.stderr being the default?
 # @param type Implementation type of the compiler, defaults to hfst.get_default_fst_type().
+# @return On success 0, else an integer greater than 0.
 def compile_xfst_file(filename, **kwargs):
     pass
 
@@ -589,14 +599,14 @@ class HfstBasicTransducer:
     # @return A tuple of state numbers.
     #
     # An example:
-    # /verbatim
+    # \verbatim
     # for state in fsm.states():
     # for arc in fsm.transitions(state):
     #     print('%i ' % (state), end='')
     #     print(arc)
     # if fsm.is_final_state(state):
     #    print('%i %f' % (state, fsm.get_final_weight(state)) )
-    # /endverbatim
+    # \endverbatim
     def states(self):
         pass
 
@@ -899,6 +909,11 @@ class HfstBasicTransition:
         
     ## Get the weight of the transition.
     def get_weight(self):
+        pass
+
+    ## Set the weight of the transition to \a weight.
+    # @param weight The weight.
+    def set_weight(self, weight):
         pass
 
     ## A string representation of the transition.
@@ -2082,22 +2097,22 @@ class HfstTokenizer:
   #def printConnectedness():
   #    pass
 
-## A compiler holding information needed to compile XREs.
+## A regular expression compiler.
 class XreCompiler:
 
-  ## Construct compiler for unknown format transducers.
+  ## Construct compiler for OpenFst format (the default) transducers.
   def __init__(self):
       pass
 
-  ## Create compiler for \a impl format transducers
+  ## Create compiler for \a impl format transducers.
   def __init__(self, impl):
       pass
 
-  ## Add a definition macro. Compilers will replace arcs labeled \a name, with a transducer defined by regular expression \a xre in later phases of compilation.
+  ## Add a definition macro. Compiler will replace arcs labeled \a name with a transducer defined by regular expression \a xre in later phases of compilation (if set_expand_definitions(True) has been called).
   def define_xre(self, name, xre):
       pass
 
-  ## Add a definition macro. Compilers will replace arcs labeled \a name, with a transducer \a transducer in later phases of compilation.
+  ## Add a definition macro. Compiler will replace arcs labeled \a name with a transducer \a transducer in later phases of compilation (if set_expand_definitions(True) has been called).
   def define_transducer(self, name, transducer):
       pass
 
@@ -2196,31 +2211,31 @@ def is_diacritic(symbol):
 ## Back-end implementations.
 class ImplementationType:
     ## An SFST transducer, unweighted.
-    SFST_TYPE = _libhfst.SFST_TYPE
+    SFST_TYPE = libhfst.SFST_TYPE
 
     ## An OpenFst transducer with tropical weights.
-    TROPICAL_OPENFST_TYPE = _libhfst.TROPICAL_OPENFST_TYPE
+    TROPICAL_OPENFST_TYPE = libhfst.TROPICAL_OPENFST_TYPE
 
     ## An OpenFst transducer with logarithmic weights (limited support).
-    LOG_OPENFST_TYPE = _libhfst.LOG_OPENFST_TYPE
+    LOG_OPENFST_TYPE = libhfst.LOG_OPENFST_TYPE
 
     ## A foma transducer, unweighted.
-    FOMA_TYPE = _libhfst.FOMA_TYPE
+    FOMA_TYPE = libhfst.FOMA_TYPE
 
     ## An HFST optimized lookup transducer, unweighted.
-    HFST_OL_TYPE = _libhfst.HFST_OL_TYPE
+    HFST_OL_TYPE = libhfst.HFST_OL_TYPE
 
     ## An HFST optimized lookup transducer with weights.
-    HFST_OLW_TYPE = _libhfst.HFST_OLW_TYPE
+    HFST_OLW_TYPE = libhfst.HFST_OLW_TYPE
 
     ## HFST2 header present, conversion required.
-    HFST2_TYPE = _libhfst.HFST2_TYPE
+    HFST2_TYPE = libhfst.HFST2_TYPE
 
     ## Format left open by e.g. default constructor.
-    UNSPECIFIED_TYPE = _libhfst.UNSPECIFIED_TYPE
+    UNSPECIFIED_TYPE = libhfst.UNSPECIFIED_TYPE
 
     ## Type not recognised. This type might be returned by a function if an error occurs.
-    ERROR_TYPE = _libhfst.ERROR_TYPE
+    ERROR_TYPE = libhfst.ERROR_TYPE
 
 
 ## @page Symbols.html Symbols in HFST
@@ -2307,7 +2322,7 @@ class ImplementationType:
 #
 # \section using_hfst Using HFST in your own code
 #
-# After <a href="InstallHfst.html">installing</a> HFST on your computer, start python and execute <code>import hfst</code>.
+# After <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstPython">installing</a> HFST on your computer, start python and execute <code>import hfst</code>.
 #
 # For example, the following simple program
 #
@@ -2407,7 +2422,8 @@ class ImplementationType:
 # rule = hfst.regex('bar (->) baz || foo _ foo')
 #
 # # Apply the rule transducer to the lexicon.
-# words.compose(rule).minimize()
+# words.compose(rule)
+# words.minimize()
 #
 # # Extract all string pairs from the result and print them to standard output.
 # results = 0
@@ -2592,6 +2608,3 @@ class ImplementationType:
 #    hfst-sometool transducer.foma
 # \endverbatim
 
-## @page InstallHfst.html Installing the HFST API library and Swig/Python bindings
-#
-# TODO

@@ -2,6 +2,14 @@
 This folder contains source code for SWIG bindings for using HFST library with
 Python. The bindings work with Python version 3.
 
+============
+REQUIREMENTS
+============
+
+The requirements for HFST C++ library are given in README of parent directory.
+The setup script has been tested with the following version combinations of
+swig and python: swig2.0.4/python3.2mu and swig3.0/python 3.4m.
+
 
 =====================
 BUILDING THE BINDINGS
@@ -109,3 +117,6 @@ If this is the case, run
 
 after build/installation to be able to use HfstException and its subclasses in
 Python.
+
+Python version 3.4 requires swig 3.0, else HFST exception classes will not be
+handled correctly by Python.

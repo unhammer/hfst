@@ -47,9 +47,9 @@ bool FstBuilder::has_target(HfstState s, const std::string &symbol)
   if (s == START_STATE)
     { return start_state_targets.count(symbol) != 0; }
 
-  const HfstBasicTransducer::HfstTransitions &transitions = model_fst[s];
+  const hfst::implementations::HfstBasicTransitions &transitions = model_fst[s];
 
-  for (HfstBasicTransducer::HfstTransitions::const_iterator it =
+  for (hfst::implementations::HfstBasicTransitions::const_iterator it =
 	 transitions.begin();
        it != transitions.end();
        ++it)
@@ -83,9 +83,9 @@ HfstState FstBuilder::get_target(HfstState s,
     }
   else
     {
-      const HfstBasicTransducer::HfstTransitions &transitions = model_fst[s];
+      const hfst::implementations::HfstBasicTransitions &transitions = model_fst[s];
 
-      for (HfstBasicTransducer::HfstTransitions::const_iterator it =
+      for (hfst::implementations::HfstBasicTransitions::const_iterator it =
 	     transitions.begin();
 	   it != transitions.end();
 	   ++it)

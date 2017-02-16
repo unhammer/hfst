@@ -366,7 +366,9 @@ tokenize-backtrack.lexc \
 tokenize-backtrack.pmscript \
 tokenize-backtrack-out-giella-cg-spaces.strings \
 tokenize-backtrack-out-giella-cg-contiguous.strings \
-tokenize-backtrack-out-giella-cg.strings
+tokenize-backtrack-out-giella-cg.strings \
+tokenize-dog-out-giella-cg-superblank.strings \
+tokenize-dog-out-giella-cg-flushing.strings
 
 
 RESULT_FILES=basic.cat-dog-bird.lexc.flag.result.prolog \

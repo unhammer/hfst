@@ -15,33 +15,41 @@ files before copying:
 Compiling the extensions requires python, swig and a c++ compiler, 
 all located on a directory listed on system PATH. On linux and mac 
 osx, readline and getline must be available and the c++ compiler
-must support flag 'std=c++0x'.
+must support flag 'std=c++11'.
 
-The setup script has been tested on linux with gcc 4.6.3 and
-swig 2.0.4 (with python 3.2mu and 3.4m) and on windows with
-msvc 10.0 and swig 3.0.5 (with python 3.3. and 3.4).
+The setup script has been tested on linux with gcc 4.6.3, swig 3.0.12 and
+python 3.4 and on windows with msvc 10.0 and swig 3.0.5 (with python 3.3.
+and 3.4) and with msvc 14.0 (with python 3.5 and 3.6).
 
 """
 
-import os
-# from distutils.core import setup, Extension
 from setuptools import setup, Extension
+
 from sys import platform
+if platform == "darwin":
+    import os
+    os.environ["_PYTHON_HOST_PLATFORM"] = 'macosx-10.7-x86_64'
+
+def readme():
+    with open('README.rst') as f:
+        return f.read()
 
 # HFST C++ headers needed by swig when creating the python/c++ interface
 swig_include_dir = "libhfst/src/"
 
 ext_swig_opts = ["-c++", "-I" + swig_include_dir, "-Wall"]
-if platform == "win32":
-    ext_swig_opts = ["-c++", "-I" + swig_include_dir, "-Wall", 
-                     "-IC:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v7.0A\\Include"]
-# todo: see if SDK directory is needed
+import sys
+# for python3.3 and python3.4 on windows, add SDK include directory
+if platform == "win32" and sys.version_info[0] == 3 and (sys.version_info[1] == 3 or sys.version_info[1] == 4):
+    ext_swig_opts.extend(["-IC:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v7.0A\\Include"])
 
 # readline is needed for hfst.start_xfst(), on windows the shell where HFST
 # python bindings are run from has its own readline which will do
 ext_extra_link_args = []
 if platform == "linux" or platform == "linux2" or platform == "darwin":
     ext_extra_link_args = ['-lreadline']
+if platform == "darwin":
+    ext_extra_link_args.extend(['-mmacosx-version-min=10.7'])
 
 # HFST headers needed when compiling the actual c++ extension
 ext_include_dirs = [".", "libhfst/src/", "back-ends/foma", "back-ends",
@@ -58,13 +66,16 @@ if platform == "linux" or platform == "linux2" or platform == "darwin":
     ext_define_macros.append(('HAVE_READLINE', None))
     ext_define_macros.append(('HAVE_GETLINE', None))
 if platform == "win32":
-    for macro in ["HFSTEXPORT", "OPENFSTEXPORT", "_MSC_VER", "WINDOWS", "WIN32", "_CRT_SECURE_NO_WARNINGS"]:
+    # MSC_VER_ should already be defined
+    for macro in ["HFSTEXPORT", "OPENFSTEXPORT", "WINDOWS", "WIN32", "_CRT_SECURE_NO_WARNINGS"]:
         ext_define_macros.append((macro, None))
 
 # use c++0x standard, if possible
-ext_extra_compile_args = ['']
+ext_extra_compile_args = []
 if platform == "linux" or platform == "linux2" or platform == "darwin":
     ext_extra_compile_args = ["-std=c++0x", "-Wno-sign-compare", "-Wno-strict-prototypes"]
+if platform == "darwin":
+    ext_extra_compile_args.extend(["-stdlib=libc++", "-mmacosx-version-min=10.7"])
 # define error handling mechanism on windows
 if platform == "win32":
     ext_extra_compile_args = ["/EHsc"]
@@ -174,23 +185,18 @@ openfst_source_files =  [ "back-ends/" + openfstdir + "/src/lib/compat" + cpp,
                           "back-ends/" + openfstdir + "/src/lib/symbol-table-ops" + cpp,
                           "back-ends/" + openfstdir + "/src/lib/util" + cpp ]
 
-# todo: see what files are actually needed...
-# if platform == "linux" or platform == "linux2" or platform == "darwin":
-#    foma_source_files.append("back-ends/foma/lexcread.c")
-#    foma_source_files.append("back-ends/foma/lex.lexc.c")
-
 libhfst_source_files = libhfst_source_files + openfst_source_files
 
 if platform == "linux" or platform == "linux2" or platform == "win32":
     libhfst_source_files = libhfst_source_files + foma_source_files
 
-# clang doesn't accept "-std=c++0x" flag when compiling C,
+# clang doesn't accept "-std=c++11" flag when compiling C,
 # so foma back-end must be compiled separately
+# it seems that subprocess doesn't work, so you must compile them manually before running setup.py:
+# for file in back-ends/foma/*.c; do clang -fPIC -std=c99 -arch i386 -arch x86_64 -mmacosx-version-min=10.7 -DHAVE_FOMA -c $file ; done
 foma_object_files = []
 if platform == "darwin":
-    import subprocess
     for file in foma_source_files:
-        subprocess.call(["gcc", "-fPIC", "-std=c99", "-c", file])
         foma_object_files.append(file.replace('back-ends/foma/','').replace('.c','.o'))
 
 # The HFST c++ extension
@@ -208,11 +214,12 @@ libhfst_module = Extension('_libhfst',
                            )
 
 setup(name = 'hfst',
-      version = '3.12.0.2_beta',
+      version = '3.12.1.0_beta',
       author = 'HFST team',
       author_email = 'hfst-bugs@helsinki.fi',
       url = 'http://hfst.github.io/',
-      description = 'SWIG-bound hfst interface',
+      description = 'Python interface for HFST',
+      long_description = readme(),
       license = 'GNU GPL3',
       ext_modules = [libhfst_module],
       py_modules = ["libhfst"],

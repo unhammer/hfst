@@ -629,7 +629,7 @@ class XfstCompiler
 
   bool can_arc_be_followed(int number, unsigned int number_of_arcs);
 
-  unsigned int print_arcs(const HfstBasicTransducer::HfstTransitions & transitions);
+  unsigned int print_arcs(const hfst::implementations::HfstBasicTransitions & transitions);
 
   //! @brief Perform lookup on the top transducer using strings in \a infile.
   //! \a direction specifies whether apply is done on input (up) or output (down)

@@ -169,7 +169,7 @@ std::string check_all_symbols(const HfstTransducer &lexicon,
 
   for (HfstState s = 0; s <= rule_b.get_max_state(); ++s)
     {
-      for (HfstBasicTransducer::HfstTransitions::const_iterator it =
+      for (hfst::implementations::HfstBasicTransitions::const_iterator it =
              rule_b[s].begin();
            it != rule_b[s].end();
            ++it)
@@ -186,7 +186,7 @@ std::string check_all_symbols(const HfstTransducer &lexicon,
 
   for (HfstState s = 0; s <= lexicon_b.get_max_state(); ++s)
     {
-      for (HfstBasicTransducer::HfstTransitions::const_iterator it =
+      for (hfst::implementations::HfstBasicTransitions::const_iterator it =
              lexicon_b[s].begin();
            it != lexicon_b[s].end();
            ++it)
@@ -213,7 +213,7 @@ std::string check_multi_char_symbols
 
   for (HfstState s = 0; s <= rule_b.get_max_state(); ++s)
     {
-      for (HfstBasicTransducer::HfstTransitions::const_iterator it =
+      for (hfst::implementations::HfstBasicTransitions::const_iterator it =
              rule_b[s].begin();
            it != rule_b[s].end();
            ++it)
@@ -225,7 +225,7 @@ std::string check_multi_char_symbols
 
   for (HfstState s = 0; s <= lexicon_b.get_max_state(); ++s)
     {
-      for (HfstBasicTransducer::HfstTransitions::const_iterator it =
+      for (hfst::implementations::HfstBasicTransitions::const_iterator it =
              lexicon_b[s].begin();
            it != lexicon_b[s].end();
            ++it)

@@ -66,8 +66,16 @@ namespace hfst {
       return transition_data.get_input_symbol();
     }
     
+    void HfstBasicTransition::set_input_symbol(const HfstTropicalTransducerTransitionData::SymbolType & symbol) {
+      transition_data.set_input_symbol(symbol);
+    }
+
     HfstTropicalTransducerTransitionData::SymbolType HfstBasicTransition::get_output_symbol() const {
       return transition_data.get_output_symbol();
+    }
+
+    void HfstBasicTransition::set_output_symbol(const HfstTropicalTransducerTransitionData::SymbolType & symbol) {
+      transition_data.set_output_symbol(symbol);
     }
     
     unsigned int HfstBasicTransition::get_input_number() const {

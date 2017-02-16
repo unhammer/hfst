@@ -189,6 +189,7 @@ int main(int argc, char **argv)
       {"non-marked-gen", no_argument,       0, 'n'},
       {"debugged-gen",   no_argument,       0, 'd'},
       {"tokenize",       no_argument,       0, 't'},
+      {"transliterate",  no_argument,       0, 'j'},
       {"apertium",       no_argument,       0, 'p'},
       {"xerox",          no_argument,       0, 'x'},
       {"cg",             no_argument,       0, 'C'},
@@ -207,7 +208,7 @@ int main(int argc, char **argv)
     };
     
     int option_index = 0;
-    int c = getopt_long(argc, argv, "hVvqsagndtpxCkeWrN:l:cwzX", long_options, &option_index);
+    int c = getopt_long(argc, argv, "hVvqjsagndtpxCkeWrN:l:cwzX", long_options, &option_index);
 
     if (c == -1) // no more options to look at
       break;
@@ -263,6 +264,7 @@ int main(int argc, char **argv)
     case 'p':
     case 'C':
     case 'x':
+    case 'j':
       if(output_type == 0)
         output_type = c;
       else
@@ -453,6 +455,9 @@ int main(int argc, char **argv)
             break;
           case 'x':
             output_formatter = (OutputFormatter*)new XeroxOutputFormatter(token_stream, filter_compound_analyses);
+            break;
+          case 'j':
+            output_formatter = (OutputFormatter*)new TransliterateOutputFormatter(token_stream, filter_compound_analyses);
             break;
           default:
             output_formatter = (OutputFormatter*)new ApertiumOutputFormatter(token_stream, filter_compound_analyses);

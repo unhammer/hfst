@@ -697,6 +697,17 @@ Get the input symbol of the transition.
 Get the weight of the transition.
 """
 
+%feature("docstring") hfst::HfstBasicTransition::set_weight
+"""
+
+Set the weight of the transition.
+
+Parameters
+----------
+* `weight` :
+    Weight of the transition.
+"""
+
 %feature("docstring") hfst::HfstBasicTransition::get_output_symbol
 """
 
@@ -2047,13 +2058,13 @@ Exceptions
 %feature("docstring") hfst::XreCompiler
 """
 
-A compiler holding information needed to compile XREs.
+A regular expression compiler.
 """
 
 %feature("docstring") hfst::XreCompiler::__init__
 """
 
-Construct compiler for unknown format transducers.
+Construct compiler for OpenFst format (the default) transducers.
 """
 
 %feature("docstring") hfst::XreCompiler::__init__
@@ -2130,7 +2141,8 @@ Whether definitions are expanded.
 Add a definition macro.
 
 Compilers will replace arcs labeled *name*, with a transducer defined by regular
-expression *xre* in later phases of compilation.
+expression *xre* in later phases of compilation (if set_expand_definitions(True)
+has been called).
 """
 
 %feature("docstring") hfst::XreCompiler::define_transducer
@@ -2139,7 +2151,7 @@ expression *xre* in later phases of compilation.
 Add a definition macro.
 
 Compilers will replace arcs labeled *name*, with a transducer *transducer* in
-later phases of compilation.
+later phases of compilation (if set_expand_definitions(True) has been called).
 """
 
 %feature("docstring") hfst::XreCompiler::define_function

@@ -4,13 +4,13 @@
 ## Type of Xerox-type replace rules.
 class ReplaceType:
     ## Match contexts of replace rules on input level.
-    REPL_UP = _libhfst.REPL_UP
+    REPL_UP = libhfst.REPL_UP
     ## Match contexts of replace rules on output level.
-    REPL_DOWN = _libhfst.REPL_DOWN
+    REPL_DOWN = libhfst.REPL_DOWN
     ## Match left context of replace rules on output level and right context on input level.
-    REPL_LEFT = _libhfst.REPL_LEFT
+    REPL_LEFT = libhfst.REPL_LEFT
     ## Match left context of replace rules on input level and right context on output level.
-    REPL_RIGHT = _libhfst.REPL_RIGHT
+    REPL_RIGHT = libhfst.REPL_RIGHT
         
 ## A rule that contains mapping and context and replace type (if any).
 # If rule is A -> B || L _ R , than mapping is cross product of transducers A and B,

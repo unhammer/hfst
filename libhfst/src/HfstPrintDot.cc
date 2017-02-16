@@ -100,7 +100,7 @@ print_dot(FILE* out, HfstTransducer& t)
          ++state)
       {
         std::map<HfstState, std::string> target_labels;
-        for (HfstBasicTransducer::HfstTransitions::const_iterator arc =
+        for (hfst::implementations::HfstBasicTransitions::const_iterator arc =
              state->begin();
              arc != state->end();
              ++arc)
@@ -298,7 +298,7 @@ print_dot(std::ostream & out, HfstTransducer& t)
          ++state)
       {
         std::map<HfstState, std::string> target_labels;
-        for (HfstBasicTransducer::HfstTransitions::const_iterator arc =
+        for (hfst::implementations::HfstBasicTransitions::const_iterator arc =
              state->begin();
              arc != state->end();
              ++arc)

@@ -40,3 +40,39 @@ regex a "@P.FOO.ON@" "@P.BAR.ON@" "@D.FOO.ON@";
 eliminate flags
 regex 0 - 0;
 equivalent
+#
+#
+clear stack
+#
+#
+regex "@U.FOO.ON@" a:b "@U.BAR.ON@";
+eliminate flag FOO
+regex a:b "@U.BAR.ON@";
+equivalent
+#
+#
+clear stack
+#
+#
+regex "@U.FOO.ON@" a:b "@U.BAR.ON@";
+eliminate flag BAR
+regex "@U.FOO.ON@" a:b;
+equivalent
+#
+#
+clear stack
+#
+#
+regex "@U.FOO.ON@" a:b "@U.BAR.ON@" c:d "@U.FOO.OFF@" e:f "@U.BAR.ON@";
+eliminate flag FOO
+regex 0 - 0;
+equivalent
+#
+#
+clear stack
+#
+#
+regex "@U.FOO.ON@" a:b "@U.BAR.ON@" c:d "@U.FOO.OFF@" e:f "@U.BAR.ON@";
+eliminate flag BAR
+regex "@U.FOO.ON@" a:b c:d "@U.FOO.OFF@" e:f;
+equivalent

@@ -2603,7 +2603,7 @@ namespace xfst {
       for (HfstBasicTransducer::const_iterator it = fsm.begin();
            it != fsm.end(); it++ )
         {
-          for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
+          for (hfst::implementations::HfstBasicTransitions::const_iterator tr_it
                  = it->begin(); tr_it != it->end(); tr_it++)
             {
               std::string isymbol = tr_it->get_input_symbol();
@@ -2680,7 +2680,7 @@ namespace xfst {
           for (HfstBasicTransducer::const_iterator it = fsm.begin();
                it != fsm.end() && !target_label_found; it++ )
             {
-              for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
+              for (hfst::implementations::HfstBasicTransitions::const_iterator tr_it
                      = it->begin(); tr_it != it->end(); tr_it++)
                 {
                   if (target_label.first == tr_it->get_input_symbol() &&
@@ -2909,7 +2909,7 @@ namespace xfst {
       for (HfstBasicTransducer::const_iterator it = fsm.begin();
            it != fsm.end(); it++ )
         {
-          for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
+          for (hfst::implementations::HfstBasicTransitions::const_iterator tr_it
                  = it->begin(); tr_it != it->end(); tr_it++)
             {
               std::pair<std::string, std::string> label_pair
@@ -2959,7 +2959,7 @@ namespace xfst {
       for (HfstBasicTransducer::const_iterator it = fsm.begin();
            it != fsm.end(); it++ )
         {
-          for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
+          for (hfst::implementations::HfstBasicTransitions::const_iterator tr_it
                  = it->begin(); tr_it != it->end(); tr_it++)
             {
               std::pair<std::string, std::string> label_pair
@@ -3640,7 +3640,7 @@ namespace xfst {
     for (HfstBasicTransducer::const_iterator it = fsm.begin();
          it != fsm.end(); it++ )
       {
-        for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
+        for (hfst::implementations::HfstBasicTransitions::const_iterator tr_it
                = it->begin(); tr_it != it->end(); tr_it++)
           {
             std::string istr = tr_it->get_input_symbol();
@@ -4448,7 +4448,7 @@ namespace xfst {
       for (HfstBasicTransducer::const_iterator it = fsm.begin();
            it != fsm.end(); it++ )
         {
-          for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
+          for (hfst::implementations::HfstBasicTransitions::const_iterator tr_it
                  = it->begin(); tr_it != it->end(); tr_it++)
             {
               std::pair<std::string, std::string> label_pair
@@ -4625,11 +4625,11 @@ namespace xfst {
   // For 'inspect_net': print to outstream_ all arcs in
   // \a transitions. Return the number of arcs.
   unsigned int XfstCompiler::print_arcs
-  (const HfstBasicTransducer::HfstTransitions & transitions)
+  (const hfst::implementations::HfstBasicTransitions & transitions)
   {
     bool first_loop = true;
     unsigned int arc_number = 1;
-    for (HfstBasicTransducer::HfstTransitions::const_iterator it
+    for (hfst::implementations::HfstBasicTransitions::const_iterator it
            = transitions.begin(); it != transitions.end(); it++)
       {
         if (first_loop)
@@ -4907,7 +4907,7 @@ namespace xfst {
       flush(&output());
 
       // transitions of current state
-      HfstBasicTransducer::HfstTransitions transitions = net[0];
+      hfst::implementations::HfstBasicTransitions transitions = net[0];
       // number of arcs in current state
       unsigned int number_of_arcs = print_arcs(transitions);
 

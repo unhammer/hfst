@@ -1,5 +1,8 @@
 # The examples given in doxygen documentation
-
+from __future__ import print_function
+import sys
+if len(sys.argv) > 1:
+    sys.path.insert(0, sys.argv[1])
 import hfst
 
 types = []

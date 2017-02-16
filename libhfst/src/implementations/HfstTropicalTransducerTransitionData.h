@@ -142,8 +142,14 @@ namespace hfst {
       /** @brief Get the input symbol. */
       HFSTDLL const SymbolType &get_input_symbol() const;
 
+      /** @brief Set the input symbol. */
+      HFSTDLL void set_input_symbol(const SymbolType & symbol);
+
       /** @brief Get the output symbol. */
       HFSTDLL const SymbolType &get_output_symbol() const;
+
+      /** @brief Set the output symbol. */
+      HFSTDLL void set_output_symbol(const SymbolType & symbol);
 
       HFSTDLL unsigned int get_input_number() const;
 

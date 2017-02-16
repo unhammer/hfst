@@ -1,5 +1,17 @@
 #!/bin/sh
 
+if [ "$1" = "--help" -o "$1" = "-h" ]; then
+    echo ""
+    echo "Copy winopenfst and foma back-ends, libhfst/src and python bindings to a directory."
+    echo "The directory can be used for creating python bindings on Windows."
+    echo ""
+    echo "Usage: copy-for-windows.sh [DESTDIR]"
+    echo ""
+    echo "DESTDIR: name of the directory where files are copied"
+    echo ""
+    exit 0
+fi
+
 # A script for copying winopenfst and foma backends, libhfst/src and
 # python bindings in a directory given as first argument.
 
@@ -30,7 +42,7 @@ do
     cp python/$file $1/
 done
 
-for file in setup.py MANIFEST.in README setup.cfg config.h COPYING ;
+for file in setup.py MANIFEST.in README README.rst setup.cfg config.h COPYING ;
 do
     cp python/pypi/$file $1/
 done
@@ -209,6 +221,9 @@ sed -i 's/hxfstwrap( )/hxfstwrap(void)/' $1/libhfst/src/parsers/xfst-lexer.cpp
 
 
 cp scripts/windows/make-python-bindings.bat $1/libhfst/src/
+cp scripts/windows/make-python-package.bat $1/make-python-package.bat
+cp scripts/readmes/README_python_win.txt $1/README_python_win.txt
+unix2dos $1/README_python_win.txt
 
 for file in libhfst.i docstrings.i hfst_extensions.cc \
 hfst_file_extensions.cc hfst_lexc_extensions.cc hfst_lookup_extensions.cc \

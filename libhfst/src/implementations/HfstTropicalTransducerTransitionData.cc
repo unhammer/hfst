@@ -167,8 +167,16 @@ namespace hfst {
       return get_symbol(input_number);
     }
 
+    void HfstTropicalTransducerTransitionData::set_input_symbol(const HfstTropicalTransducerTransitionData::SymbolType & symbol) {
+      input_number = get_number(symbol);
+    }
+
     const HfstTropicalTransducerTransitionData::SymbolType & HfstTropicalTransducerTransitionData::get_output_symbol() const {
       return get_symbol(output_number);
+    }
+
+    void HfstTropicalTransducerTransitionData::set_output_symbol(const HfstTropicalTransducerTransitionData::SymbolType & symbol) {
+      output_number = get_number(symbol);
     }
 
     unsigned int HfstTropicalTransducerTransitionData::get_input_number() const {

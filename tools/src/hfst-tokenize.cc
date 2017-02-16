@@ -467,7 +467,7 @@ print_reading_giellacg(const Location *loc,
             out_end = out_beg;
             in_end = in_beg;
             if(sub_found) {
-                out_end--; // skip the subreading separator symbol
+                --out_end; // skip the subreading separator symbol
             }
         }
     }
@@ -623,7 +623,7 @@ void print_location_vector_giellacg(hfst_ol::PmatchContainer & container,
             // (ignore splitpoints of splitpoints)
             const size_t new_indent = print_reading_giellacg(&loc, indent, true, out.at(depth)).second;
             if(depth == bottom) {
-                for(vector<std::ostringstream>::const_iterator it = out.begin(); it != out.end(); it++) {
+                for(vector<std::ostringstream>::const_iterator it = out.begin(); it != out.end(); ++it) {
                     outstream << it->str();
                 }
             }

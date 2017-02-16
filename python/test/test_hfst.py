@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+from __future__ import print_function
+import sys
+if len(sys.argv) > 1:
+    sys.path.insert(0, sys.argv[1])
 import hfst
 import os.path
 from inspect import currentframe
@@ -5,6 +10,11 @@ from inspect import currentframe
 def get_linenumber():
     cf = currentframe()
     return cf.f_back.f_lineno
+
+from sys import version
+if int(version[0]) > 2:
+    def unicode(s, c):
+        return s
 
 types = []
 if hfst.HfstTransducer.is_implementation_type_available(hfst.ImplementationType.TROPICAL_OPENFST_TYPE):
@@ -389,22 +399,23 @@ for type in types:
         raise RuntimeError(get_linenumber())
 
     # XfstCompiler
-    import io
-    msg = io.StringIO()
-    if hfst.compile_xfst_file('test_pass.xfst', verbosity=0, output=msg, error=msg) != 0:
-        raise RuntimeError(get_linenumber())
-    if hfst.compile_xfst_file('test_fail.xfst', verbosity=0, output=msg, error=msg) == 0:
-        raise RuntimeError(get_linenumber())
-    if hfst.compile_xfst_file('test_fail.xfst', quit_on_fail=False, verbosity=0, output=msg, error=msg) != 0:
-        raise RuntimeError(get_linenumber())
+    if int(version[0]) > 2:
+        import io
+        msg = io.StringIO()
+        if hfst.compile_xfst_file('test_pass.xfst', verbosity=0, output=msg, error=msg) != 0:
+            raise RuntimeError(get_linenumber())
+        if hfst.compile_xfst_file('test_fail.xfst', verbosity=0, output=msg, error=msg) == 0:
+            raise RuntimeError(get_linenumber())
+        if hfst.compile_xfst_file('test_fail.xfst', quit_on_fail=False, verbosity=0, output=msg, error=msg) != 0:
+            raise RuntimeError(get_linenumber())
 
     # regex compiler
     import io
     msg = io.StringIO()
-    msg.write('This is the error message:\n')
+    msg.write(unicode('This is the error message:\n', 'utf-8'))
     tr = hfst.regex('foo\\', error=msg)
     if (tr == None):
-        msg.write('This was the error message.\n')
+        msg.write(unicode('This was the error message.\n', 'utf-8'))
         # print(msg.getvalue())
     import sys
     msg = sys.stdout
@@ -439,6 +450,17 @@ f.close()
 f = open('foo_basic', 'r')
 fsm2 = hfst.HfstBasicTransducer(hfst.read_att_transducer(f, hfst.EPSILON))
 f.close()
+
+# Modify weights of a basic transducer
+fsm = hfst.HfstBasicTransducer()
+fsm.add_state(0)
+fsm.add_state(1)
+fsm.set_final_weight(1, 0.3)
+fsm.add_transition(0, 0, 'baz', 'baz')
+arcs = fsm.transitions(0)
+arcs[0].set_weight(0.5)
+arcs = fsm.transitions(0)
+assert(arcs[0].get_weight() == 0.5)
 
 # comparison can fail because of rounding
 #for type in types:
@@ -495,3 +517,36 @@ f.close()
 tr = hfst.HfstBasicTransducer(hfst.regex('foo'))
 tr.substitute({'foo':'bar'})
 tr.substitute({('foo','foo'):('bar','bar')})
+
+tr = hfst.fst({'foo':'bar'})
+fst = hfst.HfstBasicTransducer(tr)
+fsa = hfst.fst_to_fsa(fst, '^')
+fst = hfst.fsa_to_fst(fsa, '^')
+TR = hfst.HfstTransducer(fst)
+assert(TR.compare(tr))
+
+tr = hfst.regex('{foo}:{bar}|{FOO}:{BAR}')
+fsm = hfst.HfstBasicTransducer(tr)
+net = fsm.states_and_transitions()
+for state in net:
+    for arc in state:
+        arc.set_input_symbol(arc.get_input_symbol() + '>')
+        arc.set_output_symbol('<' + arc.get_output_symbol())
+        arc.set_weight(arc.get_weight() - 0.5)
+
+for state, arcs in enumerate(fsm):
+    for arc in arcs:
+        arc.set_input_symbol('<' + arc.get_input_symbol())
+        arc.set_output_symbol(arc.get_output_symbol() + '>')
+        arc.set_weight(arc.get_weight() - 1.5)
+
+for state in fsm:
+    for arc in state:
+        arc.set_input_symbol('' + arc.get_input_symbol() + '')
+        arc.set_output_symbol('' + arc.get_output_symbol() + '')
+        arc.set_weight(arc.get_weight() - 0.5)
+
+tr = hfst.regex('[["<f>" "<o>" "<o>"]:["<b>" "<a>" "<r>"]|["<F>" "<O>" "<O>"]:["<B>" "<A>" "<R>"]]::-7.5')
+assert(not (tr == None))
+TR = hfst.HfstTransducer(fsm)
+assert(TR.compare(tr))

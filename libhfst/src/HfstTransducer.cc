@@ -2015,7 +2015,6 @@ HfstTransducer &HfstTransducer::eliminate_flags()
 
 HfstTransducer &HfstTransducer::eliminate_flag(const std::string & flag)
 {
-
   HfstBasicTransducer basic(*this);
   StringSet flags = basic.get_flags();
   bool feature_found = false;
@@ -2062,7 +2061,7 @@ HfstTransducer &HfstTransducer::eliminate_flag(const std::string & flag)
     }
   else
     {
-      flag_purge(*this, "");
+      flag_purge(*this, flag);
     }
 
   return this->optimize();
@@ -3001,7 +3000,7 @@ void rename_flag_diacritics(HfstTransducer &fst,const std::string &suffix)
        it != basic_fst.end();
        ++it)
     {
-      for (HfstBasicTransducer::HfstTransitions::const_iterator jt =
+      for (hfst::implementations::HfstBasicTransitions::const_iterator jt =
              it->begin();
            jt != it->end();
            ++jt)
@@ -3042,7 +3041,7 @@ void HfstTransducer::twosided_flag_diacritics()
        it != basic_fst.end();
        ++it)
     {
-      for (HfstBasicTransducer::HfstTransitions::const_iterator jt =
+      for (hfst::implementations::HfstBasicTransitions::const_iterator jt =
              it->begin();
            jt != it->end();
            ++jt)
@@ -3127,7 +3126,7 @@ void encode_flag_diacritics(HfstTransducer &fst)
        it != basic_fst.end();
        it++)
     {
-      for (HfstBasicTransducer::HfstTransitions::const_iterator jt =
+      for (hfst::implementations::HfstBasicTransitions::const_iterator jt =
              it->begin();
            jt != it->end();
            jt++)
@@ -3194,7 +3193,7 @@ void decode_flag_diacritics(HfstTransducer &fst)
        it != basic_fst.end();
        it++)
     {
-      for (HfstBasicTransducer::HfstTransitions::const_iterator jt =
+      for (hfst::implementations::HfstBasicTransitions::const_iterator jt =
              it->begin();
            jt != it->end();
            jt++)

@@ -30,7 +30,7 @@ using hfst::implementations::HfstBasicTransducer;
 using hfst::implementations::HfstState;
 using hfst::implementations::HfstBasicTransition;
 
-typedef HfstBasicTransducer::HfstTransitions HfstBasicTransitions;
+typedef hfst::implementations::HfstBasicTransitions HfstBasicTransitions;
 
 using hfst::internal_default;
 using hfst::internal_epsilon;
