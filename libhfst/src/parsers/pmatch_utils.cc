@@ -453,7 +453,7 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
          * to the plane, reducing the distance that is due to the difference
          * between A and B. (This is like projecting the space to the hyperplane
          * if we go all the way to the plane)
-         
+         *
          * The hyperplane is defined by the equation |B - A| = d, where d is a
          * translation term. |B - A| = 0 would be the set of vectors orthogonal to
          * |B - A|. We set d so that the distance from the hyperplane to A is
@@ -465,8 +465,8 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
         std::vector<WordVecFloat> halfway_point = pointwise_plus(
             this_word2.vector, pointwise_multiplication(
                 static_cast<WordVecFloat>(0.5), B_minus_A));
-        WordVecFloat hyperplane_translation_term = pow(norm(B_minus_A), 2) * -0.5
-            + dot_product(B_minus_A, this_word1.vector);
+        WordVecFloat hyperplane_translation_term = dot_product(B_minus_A, this_word1.vector)
+            - square_sum(B_minus_A) * 0.5;
         CosineSimilarityProjectedToPlaneComparison comparison_object(
             B_minus_A, halfway_point, hyperplane_translation_term);
         std::sort(word_vectors.begin(), word_vectors.end(), comparison_object);

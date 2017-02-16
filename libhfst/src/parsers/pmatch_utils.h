@@ -35,7 +35,7 @@ struct PmatchObject;
 struct PmatchTransducerContainer;
 
 typedef std::pair<std::string, std::string> StringPair;
-typedef double WordVecFloat;
+typedef float WordVecFloat;
 struct WordVector;
 
 extern char* data;
