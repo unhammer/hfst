@@ -12,7 +12,12 @@ std::vector<hfst::HfstTransducer> compile_pmatch_expression(const std::string & 
     hfst::pmatch::PmatchCompiler comp(hfst::TROPICAL_OPENFST_TYPE);
     comp.set_verbose(false/*verbose*/);
     comp.set_flatten(false/*flatten*/);
-    std::map<std::string, hfst::HfstTransducer*> definitions = comp.compile(pmatch);
+    std::map<std::string, hfst::HfstTransducer*> definitions;
+    try {
+      definitions = comp.compile(pmatch);
+    } catch(...) {
+      throw HfstException(); // TODO
+    }
 
     // A dummy transducer with an alphabet with all the symbols
     hfst::HfstTransducer harmonizer(hfst::TROPICAL_OPENFST_TYPE);

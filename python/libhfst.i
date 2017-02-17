@@ -229,7 +229,7 @@ enum ImplementationType
 // *** Some other functions *** //
 
 bool is_diacritic(const std::string & symbol);
-hfst::HfstTransducerVector compile_pmatch_expression(const std::string & pmatch);
+hfst::HfstTransducerVector compile_pmatch_expression(const std::string & pmatch) throw(HfstException);
 
 // internal functions
 %pythoncode %{
@@ -1447,8 +1447,6 @@ class HfstBasicTransition {
 
 } // namespace implementations
 
-
-// *** PmatchCompiler class is not visible via python, compile_pmatch_expression and compile_pmatch_file are enough. *** //
 
 // *** XreCompiler: offer only a limited set of functions ***
 
