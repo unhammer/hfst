@@ -193,10 +193,12 @@ def regex(re, **kvargs):
     * `re` :
         The regular expression defined with Xerox transducer notation.
     * `kvargs` :
-        Arguments recognized are: 'error'.
+        Arguments recognized are: 'error' and 'definitions'.
     * `error` :
         Where warnings and errors are printed. Possible values are sys.stdout,
         sys.stderr (the default), a StringIO or None, indicating a quiet mode.
+    * `definitions` :
+        A dictionary mapping variable names into transducers.
 
 
     Regular expression operators:
@@ -302,21 +304,32 @@ def regex(re, **kvargs):
     !   starts a comment until end of line
     #   starts a comment until end of line    
     """
-    type = get_default_fst_type()
+    type_ = get_default_fst_type()
     to_console=get_output_to_console()
     import sys
     err=None
+    defs=None
 
     for k,v in kvargs.items():
       if k == 'output_to_console':
           to_console=v
       if k == 'error':
           err=v
+      if k == 'definitions':
+          defs=v;
       else:
         print('Warning: ignoring unknown argument %s.' % (k))
 
-    comp = XreCompiler(type)
+    comp = XreCompiler(type_)
     comp.setOutputToConsole(to_console)
+    if not defs == None:
+        for k,v in defs.items():
+            vtype = str(type(v))
+            if "HfstTransducer" in vtype:
+                comp.define_transducer(k,v)
+                print('defining transducer')
+            else:
+                pass
 
     if err == None:
        return libhfst.hfst_regex(comp, re, "")
