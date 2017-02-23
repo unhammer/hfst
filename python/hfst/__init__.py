@@ -198,42 +198,60 @@ def regex(re, **kvargs):
         Where warnings and errors are printed. Possible values are sys.stdout,
         sys.stderr (the default), a StringIO or None, indicating a quiet mode.
 
-    ~  complement
-    \  term complement
-    &  intersection
-    -  minus
 
-    $. contains once
-    $? contains optionally
-    $  contains once or more
+    Regular expression operators:
 
-    + Kleene plus
-    * Kleene star
+    ~   complement
+    \   term complement
+    &   intersection
+    -   minus
 
-    ./. ignore internally (not implemented)
+    $.  contains once
+    $?  contains optionally
+    $   contains once or more
+    ( ) optionality
+
+    +   Kleene plus
+    *   Kleene star
+
+    ./. ignore internally (not yet implemented)
     /   ignoring
 
-    |  union
+    |   union
 
     <>  shuffle
     <   before
     >   after
 
-    .o.  composition
-    .O.  lenient composition
-    .m>. merge right
-    .<m. merge left
-    .x.  cross product
-    .P.  input priority union
-    .p.  output priority union
-    .-u. input minus
-    .-l. output minus
-    `    substitute left
+    .o.   composition
+    .O.   lenient composition
+    .m>.  merge right
+    .<m.  merge left
+    .x.   cross product
+    .P.   input priority union
+    .p.   output priority union
+    .-u.  input minus
+    .-l.  output minus
+    `[ ]  substitute
 
-    \<=  left restriction
-    <=>  left right arrow
-    <=   left arrow
-    =>   right arrow
+    ^n,k  catenate from n to k times, inclusive
+    ^>n   catenate more than n times
+    ^>n   catenate less than n times
+    ^n    catenate n times
+
+    .r   reverse
+    .i   invert
+    .u   input side
+    .l   output side
+
+    \\\\\\  left quotient
+
+    Two-level rules:
+
+     \<=   left restriction
+     <=>   left and right arrow
+     <=    left arrow
+     =>    right arrow
 
     Replace rules:
 
@@ -243,66 +261,46 @@ def regex(re, **kvargs):
      (<-)  optionally replace left
      <->   replace left and right
      (<->) optionally replace left and right
-     @->   ltr longest match
-     @>    ltr shortest match
-     ->@   rtl longest match
-     >@    rtl shortest match
+     @->   left-to-right longest match
+     @>    left-to-right shortest match
+     ->@   right-to-left longest match
+     >@    right-to-left shortest match
 
-     ||   replace context, match contexts on input sides
-     //   replace context, match left context on output side and right context on input side
-     \\   replace context, match left context on input side and right context on output side
-     \/   replace context, match contexts on output sides
+    Rule contexts, markers and separators:
+
+     ||   match contexts on input sides
+     //   match left context on output side and right context on input side
+     \\   match left context on input side and right context on output side
+     \/   match contexts on output sides
      _    center marker
      ...  markup marker
-
-    \\\   left quotient
-
-    Catenate:
-
-     ^n,k catenate from n to k times, inclusive
-     ^>n  catenate more than n times
-     ^>n  catenate less than n times
-     ^n   catenate n times
-
-     .r   reverse
-     .i   invert
-     .u   input side
-     .l   output side
-
+     ,,   rule separator in parallel rules
+     ,    context separator
+     [. .]  match epsilons only once
 
     Read from file:
 
-     @bin"filename"  read binary transducer
-     @txt"filename"  read transducer in att text format
-     @stxt"filename" read spaced text
-     @pl"filename"   read transducer in prolog text format
-     @re"filename"   read regular expression
+     @bin" "  read binary transducer
+     @txt" "  read transducer in att text format
+     @stxt" " read spaced text
+     @pl" "   read transducer in prolog text format
+     @re" "   read regular expression
 
-
-    Special symbols:
+    Symbols:
 
      .#.  word boundary symbol in replacements, restrictions
      0    the epsilon
      ?    any token
-
-    [. .] single-epsilon control in replacement rules
-    ( )   optionality
-    { }   concatenate symbols
-    " "   quoted symbol
-
-    %     escaped character
+     %    escape character
+     { }  concatenate symbols
+     " "  quote symbol
 
     :    pair separator
-    ::w  weight
+    ::   weight
 
-    ,,  parallel rule separator
-    ,   context separator
-
-    function name?
-
-    ;  end of expression
-    !  starts a comment until end of line
-    #  starts a comment until end of line    
+    ;   end of expression
+    !   starts a comment until end of line
+    #   starts a comment until end of line    
     """
     type = get_default_fst_type()
     to_console=get_output_to_console()
