@@ -431,6 +431,12 @@ for type in types:
     tr = hfst.HfstTransducer()
     assert(tr.compare(hfst.empty_fst()))
 
+    defs = {'foo':hfst.regex('Foo'), 'bar':hfst.regex('Bar')}
+    tr = hfst.regex('foo bar', definitions=defs)
+    assert(tr.compare(hfst.regex('Foo Bar')))
+    tr = hfst.regex('foo bar')
+    assert(tr.compare(hfst.regex('foo bar')))
+
 # print('\n--- Testing HfstBasicTransducer ---\n')
 
 # Create basic transducer, write it to file, read it, and test equivalence
