@@ -1,8 +1,8 @@
 %{
 /*******************************************************************/
 /*                                                                 */
-/*  FILE     hfst-compiler.yy                                       */
-/*  MODULE   hfst-compiler                                          */
+/*  FILE     sfst-compiler.yy                                       */
+/*  MODULE   sfst-compiler                                          */
 /*  PROGRAM  HFST                                                  */
 /*                                                                 */
 /*******************************************************************/
@@ -12,7 +12,7 @@
 #endif
 
 #include <stdio.h>
-#include "HfstCompiler.h"
+#include "SfstCompiler.h"
 #include "HfstTransducer.h"
 
 #include <cstdio>
@@ -45,7 +45,7 @@ int yylex( void );
 int yyparse( void );
 
 static int Switch=0;
-HfstCompiler * compiler;
+SfstCompiler * compiler;
 HfstTransducer * Result;
 
 static hfst::ImplementationType output_format = hfst::ERROR_TYPE; // = hfst::UNSPECIFIED_TYPE;
@@ -466,7 +466,7 @@ int main( int argc, char *argv[] )
   // Unknown symbols cannot be used in SFST-PL syntax.
   // If the HFST library is aware of this, some optimization can be done.
   hfst::set_unknown_symbols_in_use(false);
-  compiler = new HfstCompiler(output_format, Verbose);
+  compiler = new SfstCompiler(output_format, Verbose);
 
   char * strarg = NULL;
   try {

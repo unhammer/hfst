@@ -13,7 +13,7 @@
 /*
 
    This file contains functions that are needed by the SFST programming
-   language parser defined in the file 'hfst-compiler.yy'. The parser is
+   language parser defined in the file 'sfst-compiler.yy'. The parser is
    used by the command line program 'hfst-calculate'.
 
    This file is based on SFST's file 'interface.C'. Some functions are
@@ -22,7 +22,7 @@
 
  */
 
-#include "HfstCompiler.h"
+#include "SfstCompiler.h"
 #include "HfstUtf8.h"
 #include "HfstBasic.h"
 #include "HfstTransducer.h"
@@ -43,7 +43,7 @@ namespace hfst
   typedef std::set<NumberPair> NumberPairSet;
   typedef std::vector<NumberPair> NumberPairVector;
  
-  HfstTransducer * HfstCompiler::make_transducer
+  HfstTransducer * SfstCompiler::make_transducer
   (Range *r1, Range *r2, ImplementationType type)
   {
     StringPairSet sps;
@@ -86,7 +86,7 @@ namespace hfst
     return new HfstTransducer(sps, type);
   }
   
-  HfstTransducer * HfstCompiler::new_transducer( Range *r1, Range *r2, ImplementationType type )
+  HfstTransducer * SfstCompiler::new_transducer( Range *r1, Range *r2, ImplementationType type )
   {
     HfstTransducer * t = make_transducer(r1, r2, type);
     if (r1 != r2)
@@ -95,36 +95,36 @@ namespace hfst
     return t;
   }
   
-  Character HfstCompiler::character_code( unsigned int uc ) {
+  Character SfstCompiler::character_code( unsigned int uc ) {
     // UTF-8 is always used
     return symbol_code(basic::fst_strdup(hfst_utf8::int2utf8(uc)));
   }
 
-  void HfstCompiler::free_values( Range *r ) {
+  void SfstCompiler::free_values( Range *r ) {
     if (r) {
       free_values(r->next);
       delete r;
     }
   }
 
-  void HfstCompiler::free_values( Ranges *r ) {
+  void SfstCompiler::free_values( Ranges *r ) {
     if (r) {
       free_values(r->next);
       delete r;
     }
   }
 
-  void HfstCompiler::error( const char *message ) {
+  void SfstCompiler::error( const char *message ) {
     std::cerr << "\nError: " << message << "\naborted.\n";
     exit(1);
   }
 
-  void HfstCompiler::error2( const char *message, char *input ) {
+  void SfstCompiler::error2( const char *message, char *input ) {
     std::cerr << "\nError: " << message << ": " << input << "\naborted.\n";
     exit(1);
   }
   
-  Character HfstCompiler::symbol_code( char *symbol )
+  Character SfstCompiler::symbol_code( char *symbol )
   { // In SFST programming language epsilon is denoted as "<>"
     // but in HFST as "@_EPSILON_SYMBOL_@". That is why it must be
     // treated separately here.
@@ -137,11 +137,11 @@ namespace hfst
     return (Character)c;
   }
   
-  unsigned int HfstCompiler::utf8toint( char *s ) {
+  unsigned int SfstCompiler::utf8toint( char *s ) {
     return hfst_utf8::utf8toint(s);
   }
 
-  bool HfstCompiler::in_range( unsigned int c, Range *r ) {
+  bool SfstCompiler::in_range( unsigned int c, Range *r ) {
     while (r) {
       if (r->character == c)
     return true;
@@ -150,33 +150,33 @@ namespace hfst
     return false;
   }
 
-  Range * HfstCompiler::add_value( Character c, Range *r) {
+  Range * SfstCompiler::add_value( Character c, Range *r) {
     Range *result=new Range;
     result->character = c;
     result->next = r;
     return result;
   }
 
-  Range * HfstCompiler::add_values( unsigned int c1, unsigned int c2, Range *r) {
+  Range * SfstCompiler::add_values( unsigned int c1, unsigned int c2, Range *r) {
     for( unsigned int c=c2; c>=c1; c-- )
       r = add_value(character_code(c), r);
     return r;
   }
 
-  Range * HfstCompiler::append_values( Range *r2, Range *r ) {
+  Range * SfstCompiler::append_values( Range *r2, Range *r ) {
     if (r2 == NULL)
       return r;
     return add_value(r2->character, append_values(r2->next, r));
   }
 
-  Ranges * HfstCompiler::add_range( Range *r, Ranges *l ) {
+  Ranges * SfstCompiler::add_range( Range *r, Ranges *l ) {
     Ranges *result = new Ranges;
     result->range = r;
     result->next = l;
     return result;
   }
 
-  Range * HfstCompiler::complement_range( Range *r ) {
+  Range * SfstCompiler::complement_range( Range *r ) {
     std::vector<Character> sym;
     for( Range *p=r; p; p=p->next)
       sym.push_back( p->character );
@@ -198,7 +198,7 @@ namespace hfst
     return result;
   }
   
-  bool HfstCompiler::def_var( char *name, HfstTransducer *t ) {
+  bool SfstCompiler::def_var( char *name, HfstTransducer *t ) {
     // delete the old value of the variable
     VarMap::iterator it=VM.find(name);
     if (it != VM.end()) {
@@ -217,13 +217,13 @@ namespace hfst
     return false;
   }
 
-  bool HfstCompiler::def_rvar( char *name, HfstTransducer *t ) {
+  bool SfstCompiler::def_rvar( char *name, HfstTransducer *t ) {
     if (t->is_cyclic())
       error2("cyclic transducer assigned to", name);
     return def_var( name, t );
   }
   
-  HfstTransducer * HfstCompiler::var_value( char *name ) {
+  HfstTransducer * SfstCompiler::var_value( char *name ) {
     VarMap::iterator it=VM.find(name);
     if (it == VM.end()) {
       printf("undefined variable %s\n", name);
@@ -233,14 +233,14 @@ namespace hfst
     return new HfstTransducer(*(it->second));
   }
 
-  HfstTransducer * HfstCompiler::rvar_value( char *name, ImplementationType type ) {
+  HfstTransducer * SfstCompiler::rvar_value( char *name, ImplementationType type ) {
     if (RS.find(name) == RS.end())
       RS.insert(basic::fst_strdup(name));
     Range *r=add_value(symbol_code(name), NULL);
     return new_transducer(r,r,type);
   }
 
-  bool HfstCompiler::def_svar( char *name, Range *r ) {
+  bool SfstCompiler::def_svar( char *name, Range *r ) {
     // delete the old value of the variable
     SVarMap::iterator it=SVM.find(name);
     if (it != SVM.end()) {
@@ -254,13 +254,13 @@ namespace hfst
     return r == NULL;
   }
 
-  Range *HfstCompiler::copy_values( const Range *r ) {
+  Range *SfstCompiler::copy_values( const Range *r ) {
     if (r == NULL)
       return NULL;
     return add_value( r->character, copy_values(r->next));
   }
 
-  Range *HfstCompiler::svar_value( char *name ) {
+  Range *SfstCompiler::svar_value( char *name ) {
     SVarMap::iterator it=SVM.find(name);
     if (it == SVM.end())
       error2("undefined variable", name);
@@ -268,7 +268,7 @@ namespace hfst
     return copy_values(it->second);
   }
 
-  Range *HfstCompiler::rsvar_value( char *name ) {
+  Range *SfstCompiler::rsvar_value( char *name ) {
     if (RSS.find(name) == RSS.end())
       RSS.insert(basic::fst_strdup(name));
     return add_value(symbol_code(name), NULL);
@@ -276,17 +276,17 @@ namespace hfst
 
   // HERE...
 
-  HfstTransducer * HfstCompiler::insert_freely(HfstTransducer *t, Character input, Character output) {
+  HfstTransducer * SfstCompiler::insert_freely(HfstTransducer *t, Character input, Character output) {
     t->insert_freely(hfst::StringPair(TheAlphabet.code2symbol(input), TheAlphabet.code2symbol(output)));
     return t;
   }
 
-  HfstTransducer * HfstCompiler::substitute(HfstTransducer *t, Character old_char, Character new_char) {
+  HfstTransducer * SfstCompiler::substitute(HfstTransducer *t, Character old_char, Character new_char) {
     t->substitute(std::string(TheAlphabet.code2symbol(old_char)), std::string(TheAlphabet.code2symbol(new_char)));
     return t;
   }
 
-  HfstTransducer * HfstCompiler::substitute(HfstTransducer *t, Character old_char_in, Character old_char_out,
+  HfstTransducer * SfstCompiler::substitute(HfstTransducer *t, Character old_char_in, Character old_char_out,
                         Character new_char_in, Character new_char_out) {
     t->substitute( hfst::StringPair(TheAlphabet.code2symbol(old_char_in),
                     TheAlphabet.code2symbol(old_char_out)),
@@ -295,18 +295,18 @@ namespace hfst
     return t;
   }
 
-  HfstTransducer * HfstCompiler::substitute(HfstTransducer *t, Character old_char_in, Character old_char_out,
+  HfstTransducer * SfstCompiler::substitute(HfstTransducer *t, Character old_char_in, Character old_char_out,
                         HfstTransducer *tr) {
     t->substitute( hfst::StringPair(TheAlphabet.code2symbol(old_char_in),
                     TheAlphabet.code2symbol(old_char_out)), *tr );
     return t;
   }
 
-  Contexts *HfstCompiler::make_context( HfstTransducer *l, HfstTransducer *r )
+  Contexts *SfstCompiler::make_context( HfstTransducer *l, HfstTransducer *r )
   {
     if (l != NULL && r != NULL) {
       if (l->get_type() != r->get_type()) {
-    fprintf(stderr, "ERROR: in hfst-compiler.yy:"
+    fprintf(stderr, "ERROR: in sfst-compiler.yy:"
         " context transducers do not have the same type.\n");
     exit(1);
       }
@@ -331,11 +331,11 @@ namespace hfst
     return c;
   }
 
-  Contexts *HfstCompiler::add_context( Contexts *nc, Contexts *c )
+  Contexts *SfstCompiler::add_context( Contexts *nc, Contexts *c )
   {
     if (nc->left->get_type() != c->left->get_type() ||
     nc->right->get_type() != c->right->get_type() ) {
-      fprintf(stderr, "ERROR: in hfst-compiler.yy:"
+      fprintf(stderr, "ERROR: in sfst-compiler.yy:"
           " context transducers do not have the same type.\n");
       exit(1);
     }
@@ -343,11 +343,11 @@ namespace hfst
     return nc;
   }
 
-  void HfstCompiler::warn(const char *msg) {
+  void SfstCompiler::warn(const char *msg) {
     std::cerr << "\nWarning: " << msg << "!\n";
   }
 
-  HfstTransducer * HfstCompiler::negation( HfstTransducer *t )
+  HfstTransducer * SfstCompiler::negation( HfstTransducer *t )
   {
     if (RS.size() > 0 || RSS.size() > 0)
       warn("agreement operation inside of negation");
@@ -370,7 +370,7 @@ namespace hfst
   }
 
 
-  HfstTransducer * HfstCompiler::explode( HfstTransducer *t ) {
+  HfstTransducer * SfstCompiler::explode( HfstTransducer *t ) {
 
     //fprintf(stderr,"explode...\n");
     if (RS.size() == 0 && RSS.size() == 0) {
@@ -476,7 +476,7 @@ namespace hfst
     return t;
   }
 
-  HfstTransducer * HfstCompiler::restriction( HfstTransducer * t, Twol_Type type, Contexts *c, int direction ) {
+  HfstTransducer * SfstCompiler::restriction( HfstTransducer * t, Twol_Type type, Contexts *c, int direction ) {
 
     StringPairSet sps;
     for( HfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
@@ -499,7 +499,7 @@ namespace hfst
          (hfst::rules::TwolType)type, direction ) );
   }
 
-  HfstTransducer * HfstCompiler::make_rule( HfstTransducer * lc, Range * lower_range, Twol_Type type,
+  HfstTransducer * SfstCompiler::make_rule( HfstTransducer * lc, Range * lower_range, Twol_Type type,
                         Range * upper_range, HfstTransducer * rc, ImplementationType implementation_type ) {
 
     if (RS.size() > 0 || RSS.size() > 0)
@@ -577,7 +577,7 @@ namespace hfst
 
   }
 
-  HfstTransducer * HfstCompiler::read_words(const char *folder, char *filename,
+  HfstTransducer * SfstCompiler::read_words(const char *folder, char *filename,
                         ImplementationType type) {
 
     std::string filestr("");
@@ -658,7 +658,7 @@ namespace hfst
     }
   }
 
-  HfstTransducer * HfstCompiler::read_transducer(const char *folder, char *filename, ImplementationType type) {
+  HfstTransducer * SfstCompiler::read_transducer(const char *folder, char *filename, ImplementationType type) {
 
     std::string filestr("");
     if (NULL != folder) {
@@ -680,7 +680,7 @@ namespace hfst
     return t;
   }
 
-  void HfstCompiler::write_to_file(HfstTransducer *t, const char* folder, char* filename) {
+  void SfstCompiler::write_to_file(HfstTransducer *t, const char* folder, char* filename) {
 
     std::string filestr("");
     if (NULL != folder) {
@@ -696,7 +696,7 @@ namespace hfst
     return;
   }
 
-  HfstTransducer * HfstCompiler::replace_in_context(HfstTransducer * mapping, Repl_Type repl_type, Contexts *contexts, bool optional) {
+  HfstTransducer * SfstCompiler::replace_in_context(HfstTransducer * mapping, Repl_Type repl_type, Contexts *contexts, bool optional) {
     
     HfstTransducerPair tr_pair(*(contexts->left), *(contexts->right));
     StringPairSet sps;
@@ -723,7 +723,7 @@ namespace hfst
     return NULL;
   }
 
-  HfstTransducer * HfstCompiler::replace(HfstTransducer * mapping, Repl_Type repl_type, bool optional) {
+  HfstTransducer * SfstCompiler::replace(HfstTransducer * mapping, Repl_Type repl_type, bool optional) {
     
     StringPairSet sps;
     for( HfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
@@ -743,11 +743,11 @@ namespace hfst
     fprintf(stderr, "ERROR: invalid replace type requested\n");
     exit(1);
       }
-    fprintf(stderr, "ERROR: in function HfstCompiler::replace\n");
+    fprintf(stderr, "ERROR: in function SfstCompiler::replace\n");
     exit(1);
   }
 
-  HfstTransducer * HfstCompiler::make_mapping( Ranges *list1, Ranges *list2, ImplementationType type ) {
+  HfstTransducer * SfstCompiler::make_mapping( Ranges *list1, Ranges *list2, ImplementationType type ) {
 
     Ranges *l1=list1;
     Ranges *l2=list2;
@@ -791,7 +791,7 @@ namespace hfst
   }
 
   
-  HfstTransducer * HfstCompiler::result( HfstTransducer *t, bool switch_flag) {
+  HfstTransducer * SfstCompiler::result( HfstTransducer *t, bool switch_flag) {
 
     t = explode(t);
 
@@ -814,7 +814,7 @@ namespace hfst
     return t;
   }
 
-  void HfstCompiler::def_alphabet( HfstTransducer *tr )
+  void SfstCompiler::def_alphabet( HfstTransducer *tr )
   {
     tr = explode(tr);
     tr->minimize();

@@ -47,7 +47,7 @@ namespace hfst
        and the HFST library and contains some extra functions needed by the parser.
        Most of these functions either directly use the SFST interface or are generalized
        versions of corresponding SFST functions that work on all types of HfstTransducers. */
-    class HfstCompiler {
+    class SfstCompiler {
       
       struct ltstr {
     bool operator()(const char* s1, const char* s2) const
@@ -76,7 +76,7 @@ namespace hfst
       ImplementationType compiler_type;
 
       
-    HfstCompiler( ImplementationType type, bool verbose=false ) :
+    SfstCompiler( ImplementationType type, bool verbose=false ) :
       Verbose(verbose), Alphabet_Defined(false), compiler_type(type)
       {}
       

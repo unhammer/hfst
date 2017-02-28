@@ -1,5 +1,5 @@
 %option 8Bit batch yylineno nounput noyywrap
-/*header-file="hfst-scanner.h"*/
+/*header-file="sfst-scanner.h"*/
 
 /* the "incl" state is used to pick up the name of an include file */
 %x incl
@@ -15,12 +15,12 @@
 
 #include <string.h>
 
-#include "HfstCompiler.h"
+#include "SfstCompiler.h"
 
 #ifdef YACC_USE_PARSER_H_EXTENSION
-  #include "hfst-compiler.h"
+  #include "sfst-compiler.h"
 #else
-  #include "hfst-compiler.hh"
+  #include "sfst-compiler.hh"
 #endif
 
 #include "HfstBasic.h"
@@ -88,7 +88,7 @@ FN	[A-Za-z0-9._/\-*+]
 
 #include           BEGIN(incl);
 <incl>[ \t]*       /* eat the whitespace */
-<incl>{FN}+        { HfstCompiler::error2("Missing quotes",yytext); }
+<incl>{FN}+        { SfstCompiler::error2("Missing quotes",yytext); }
 <incl>\"{FN}+\"    { /* got the include file name */
                      FILE *file;
                      char *name=fst_strdup(yytext+1);
@@ -100,7 +100,7 @@ FN	[A-Za-z0-9._/\-*+]
 		     if (Verbose) fputc('\n', stderr);
 		     file = fopen( name, "rt" );
 		     if (!file)
-                       HfstCompiler::error2("Can't open include file", name);
+                       SfstCompiler::error2("Can't open include file", name);
                      else {
                        Name_Stack[Include_Stack_Ptr] = FileName;
                        FileName = name;
