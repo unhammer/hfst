@@ -1,4 +1,4 @@
-%option 8Bit batch yylineno nounput noyywrap
+%option 8Bit batch yylineno nounput noyywrap prefix="sfst"
 /*header-file="sfst-scanner.h"*/
 
 /* the "incl" state is used to pick up the name of an include file */
@@ -65,10 +65,10 @@ static void print_lineno() {
   fputc('\r',stderr);
   for( int i=0; i<Include_Stack_Ptr; i++ )
     fputs("  ", stderr);
-  fprintf(stderr,"%s: %d", FileName, yylineno);
+  fprintf(stderr,"%s: %d", FileName, sfstlineno);
 }
 
-extern void yyerror(char *text);
+extern void sfsterror(char *text);
 
 %}
 
@@ -88,10 +88,10 @@ FN	[A-Za-z0-9._/\-*+]
 
 #include           BEGIN(incl);
 <incl>[ \t]*       /* eat the whitespace */
-<incl>{FN}+        { SfstCompiler::error2("Missing quotes",yytext); }
+<incl>{FN}+        { SfstCompiler::error2("Missing quotes",sfsttext); }
 <incl>\"{FN}+\"    { /* got the include file name */
                      FILE *file;
-                     char *name=fst_strdup(yytext+1);
+                     char *name=fst_strdup(sfsttext+1);
 		     name[strlen(name)-1] = 0;
                      if ( Include_Stack_Ptr >= MAX_INCLUDE_DEPTH ) {
 		       fprintf( stderr, "Includes nested too deeply" );
@@ -104,11 +104,11 @@ FN	[A-Za-z0-9._/\-*+]
                      else {
                        Name_Stack[Include_Stack_Ptr] = FileName;
                        FileName = name;
-                       Lineno_Stack[Include_Stack_Ptr] = yylineno;
-		       yylineno = 1;
+                       Lineno_Stack[Include_Stack_Ptr] = sfstlineno;
+		       sfstlineno = 1;
 		       Include_Stack[Include_Stack_Ptr++]=YY_CURRENT_BUFFER;
-		       yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
-                       yyin = file;
+		       sfst_switch_to_buffer(sfst_create_buffer(sfstin, YY_BUF_SIZE));
+                       sfstin = file;
 		       print_lineno();
 		       BEGIN(INITIAL);
                      }
@@ -121,9 +121,9 @@ FN	[A-Za-z0-9._/\-*+]
 		     else {
                        free(FileName);
                        FileName = Name_Stack[Include_Stack_Ptr];
-                       yylineno = Lineno_Stack[Include_Stack_Ptr];
-		       yy_delete_buffer( YY_CURRENT_BUFFER );
-		       yy_switch_to_buffer(Include_Stack[Include_Stack_Ptr]);
+                       sfstlineno = Lineno_Stack[Include_Stack_Ptr];
+		       sfst_delete_buffer( YY_CURRENT_BUFFER );
+		       sfst_switch_to_buffer(Include_Stack[Include_Stack_Ptr]);
                      }
                   }
 
@@ -138,40 +138,40 @@ FN	[A-Za-z0-9._/\-*+]
 ^[ \t]*ALPHABET[ \t]*= { return ALPHA; }
 
 \|\|              { return COMPOSE; }
-"<=>"             { yylval.type = twol_both; return ARROW; }
-"=>"              { yylval.type = twol_right;return ARROW; }
-"<="              { yylval.type = twol_left; return ARROW; }
-"^->"             { yylval.rtype = repl_up;   return REPLACE; }
-"_->"             { yylval.rtype = repl_down; return REPLACE; }
-"/->"             { yylval.rtype = repl_right;return REPLACE; }
-"\\->"            { yylval.rtype = repl_left; return REPLACE; }
+"<=>"             { sfstlval.type = twol_both; return ARROW; }
+"=>"              { sfstlval.type = twol_right;return ARROW; }
+"<="              { sfstlval.type = twol_left; return ARROW; }
+"^->"             { sfstlval.rtype = repl_up;   return REPLACE; }
+"_->"             { sfstlval.rtype = repl_down; return REPLACE; }
+"/->"             { sfstlval.rtype = repl_right;return REPLACE; }
+"\\->"            { sfstlval.rtype = repl_left; return REPLACE; }
 ">>"              { return PRINT; }
 "<<"              { return INSERT; }
 "<<<"             { return SUBSTITUTE; }
 "__"              { return POS; }
 "^_"              { return SWITCH; }
 
-[.,{}\[\]()&!?|*+:=_\^\-] { return yytext[0]; }
+[.,{}\[\]()&!?|*+:=_\^\-] { return sfsttext[0]; }
 
-\$=({C3}|(\\.))+\$ { yylval.name = fst_strdup(yytext); return RVAR; }
+\$=({C3}|(\\.))+\$ { sfstlval.name = fst_strdup(sfsttext); return RVAR; }
 
-\$({C3}|(\\.))+\$ { yylval.name = fst_strdup(yytext); return VAR; }
+\$({C3}|(\\.))+\$ { sfstlval.name = fst_strdup(sfsttext); return VAR; }
 
-#=({C4}|(\\.))+# { yylval.name = fst_strdup(yytext); return RSVAR; }
+#=({C4}|(\\.))+# { sfstlval.name = fst_strdup(sfsttext); return RSVAR; }
 
-#({C4}|(\\.))+# { yylval.name = fst_strdup(yytext); return SVAR; }
+#({C4}|(\\.))+# { sfstlval.name = fst_strdup(sfsttext); return SVAR; }
 
-\<({C5}|\\.)*\>   { yylval.name = unquote(yytext,false); return SYMBOL; }
+\<({C5}|\\.)*\>   { sfstlval.name = unquote(sfsttext,false); return SYMBOL; }
 
 \"<{FN}+>\" {
-                    yylval.value = fst_strdup(yytext+2);
-		    yylval.value[strlen(yylval.value)-2] = 0;
+                    sfstlval.value = fst_strdup(sfsttext+2);
+		    sfstlval.value[strlen(sfstlval.value)-2] = 0;
                     return STRING2;
                   }
 
 \"{FN}+\" {
-                    yylval.value = fst_strdup(yytext+1);
-		    yylval.value[strlen(yylval.value)-1] = 0;
+                    sfstlval.value = fst_strdup(sfsttext+1);
+		    sfstlval.value[strlen(sfstlval.value)-1] = 0;
                     return STRING;
                   }
 
@@ -179,16 +179,16 @@ FN	[A-Za-z0-9._/\-*+]
 \\[ \t]*([ \t]\%.*)?\r?\n { print_lineno(); /* ignored */ }
 \r?\n             { print_lineno(); return NEWLINE; }
 
-\\[0-9]+          { long l=atol(yytext+1);
-		    if (l <= 1114112) { yylval.value=fst_strdup(hfst_utf8::int2utf8((unsigned)l)); return UTF8CHAR; }
-		    yyerror(strdup("invalid expression"));
+\\[0-9]+          { long l=atol(sfsttext+1);
+		    if (l <= 1114112) { sfstlval.value=fst_strdup(hfst_utf8::int2utf8((unsigned)l)); return UTF8CHAR; }
+		    sfsterror(strdup("invalid expression"));
                   }
 
 
-\\.                { yylval.value=fst_strdup(yytext+1); return UTF8CHAR; }
-[\x00-\x7f]        { yylval.value=fst_strdup(yytext); return UTF8CHAR; }
-[\xc0-\xdf]{CC}    { yylval.value=fst_strdup(yytext); return UTF8CHAR; }
-[\xe0-\xef]{CC}{2} { yylval.value=fst_strdup(yytext); return UTF8CHAR; }
-[\xf0-\xff]{CC}{3} { yylval.value=fst_strdup(yytext); return UTF8CHAR; }
+\\.                { sfstlval.value=fst_strdup(sfsttext+1); return UTF8CHAR; }
+[\x00-\x7f]        { sfstlval.value=fst_strdup(sfsttext); return UTF8CHAR; }
+[\xc0-\xdf]{CC}    { sfstlval.value=fst_strdup(sfsttext); return UTF8CHAR; }
+[\xe0-\xef]{CC}{2} { sfstlval.value=fst_strdup(sfsttext); return UTF8CHAR; }
+[\xf0-\xff]{CC}{3} { sfstlval.value=fst_strdup(sfsttext); return UTF8CHAR; }
 
 %%
