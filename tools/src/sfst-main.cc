@@ -18,52 +18,23 @@
 #include "inc/globals-unary.h"
 
 extern char* FileName;
-extern bool Verbose;
+//extern bool Verbose;
+bool verbose_ = false;
 
 char * folder = NULL;
 
 using std::cerr;
 using namespace hfst;
 
-extern int  sfstlineno;
-extern char *sfsttext;
-
-void sfsterror(char *text);
-void warn(char *text);
-void warn2(const char *text, char *text2);
-int sfstlex( void );
-int sfstparse( void );
-
 int Switch=0;
 SfstCompiler * compiler;
-extern HfstTransducer * Result;
+//extern HfstTransducer * Result;
 
 hfst::ImplementationType output_format = hfst::ERROR_TYPE;
 
-extern FILE  *sfstin;
+
 int Compact=0;
 int LowMem=0;
-
-void sfsterror(char *text)
-
-{
-  cerr << "\n" << FileName << ":" << sfstlineno << ": " << text << " at: ";
-  cerr << sfsttext << "\naborted.\n";
-  exit(1);
-}
-
-void warn(char *text)
-
-{
-  cerr << "\n" << FileName << ":" << sfstlineno << ": warning: " << text << "!\n";
-}
-
-void warn2(const char *text, char *text2)  // HFST: added const
-
-{
-  cerr << "\n" << FileName << ":" << sfstlineno << ": warning: " << text << ": ";
-  cerr << text2 << "\n";
-}
 
 void
 print_usage()
@@ -148,7 +119,7 @@ parse_options(int argc, char** argv)
 
 #include "inc/check-params-common.h"
 #include "inc/check-params-unary.h"
-    Verbose = verbose;
+    verbose_ = verbose;
     if (output_format == hfst::ERROR_TYPE)
       {
         verbose_printf("Output format not specified, "
@@ -181,7 +152,7 @@ void get_flags( int *argc, char **argv )
       argv[i] = NULL;
     }
     else if (strcmp(argv[i],"-q") == 0) {
-      Verbose = 0;
+      verbose_ = 0;
       argv[i] = NULL;
     }
     else if (strcmp(argv[i],"-h") == 0 || strcmp(argv[i],"--help") == 0) {
@@ -234,34 +205,34 @@ int main( int argc, char *argv[] )
   if (retval != EXIT_CONTINUE)
     return retval;
 
-  sfstin = inputfile;
   if (strcmp(outfilename,"<stdout>") != 0)
     fclose(outfile); // stream is used when writing the result
 
   // Unknown symbols cannot be used in SFST-PL syntax.
   // If the HFST library is aware of this, some optimization can be done.
   hfst::set_unknown_symbols_in_use(false);
-  compiler = new SfstCompiler(output_format, Verbose);
+  compiler = new SfstCompiler(output_format, verbose_);
+  compiler->set_input(inputfile);
 
   char * strarg = NULL;
   try {
-    sfstparse();
+    compiler->parse();
     fclose(inputfile);
       try {
         if (strcmp(outfilename,"<stdout>") == 0)
         {
           strarg = strdup("");
-          compiler->write_to_file(Result, NULL, strarg);
+          compiler->write_to_file(compiler->get_result(), NULL, strarg);
         }
 	else
         {
           strarg = strdup(outfilename);
-          compiler->write_to_file(Result, NULL, strarg);
+          compiler->write_to_file(compiler->get_result(), NULL, strarg);
         }
       } catch (HfstException e) {
           printf("\nAn error happened when writing to file \"%s\"\n", outfilename); }
 
-    delete Result;
+      delete compiler->get_result();
 
   }
   catch(const char* p) {

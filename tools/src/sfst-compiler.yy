@@ -14,34 +14,47 @@
 #include "SfstCompiler.h"
 #include "HfstTransducer.h"
 
-extern char* FileName;
-extern bool Verbose;
-
 extern char * folder;
-
-using namespace hfst;
+extern char * FileName;
 
 extern int  sfstlineno;
 extern char *sfsttext;
-
-void sfsterror(char *text);
-void warn(char *text);
-void warn2(const char *text, char *text2);
 int sfstlex( void );
-int sfstparse( void );
+
+using namespace hfst;
+using std::cerr;
+
+void sfsterror(char *text)
+
+{
+  cerr << "\n" << FileName << ":" << sfstlineno << ": " << text << " at: ";
+  cerr << sfsttext << "\naborted.\n";
+  exit(1);
+}
+
+void warn(char *text)
+
+{
+  cerr << "\n" << FileName << ":" << sfstlineno << ": warning: " << text << "!\n";
+}
+
+void warn2(const char *text, char *text2)
+
+{
+  cerr << "\n" << FileName << ":" << sfstlineno << ": warning: " << text << ": ";
+  cerr << text2 << "\n";
+}
 
 extern int Switch;
 extern SfstCompiler * compiler;
-HfstTransducer * Result;
+//HfstTransducer * Result;
 
-extern hfst::ImplementationType output_format;
 bool DEBUG = false;
 
 %}
 
 %name-prefix="sfst"
 
-/* Slight Hfst addition SFST::... */
 %union {
   int        number;
   hfst::Twol_Type  type;
@@ -83,7 +96,7 @@ bool DEBUG = false;
 %left '*' '+'
 %%
 
-ALL:        ASSIGNMENTS RE NEWLINES { Result=compiler->result($2, Switch); }
+ALL:        ASSIGNMENTS RE NEWLINES { compiler->set_result(compiler->result($2, Switch)); }
           ;
 
 ASSIGNMENTS: ASSIGNMENTS ASSIGNMENT {}
@@ -106,23 +119,23 @@ RE:         RE ARROW CONTEXTS2      { $$ = compiler->restriction($1,$2,$3,0); }
           | RE REPLACE '?' CONTEXT2 { $1 = compiler->explode($1); $1->minimize(); $$ = compiler->replace_in_context($1, $2, $4, true); }
           | RE REPLACE '(' ')'      { $1 = compiler->explode($1); $1->minimize(); $$ = compiler->replace($1, $2, false); }
           | RE REPLACE '?' '(' ')'  { $1 = compiler->explode($1); $1->minimize(); $$ = compiler->replace($1, $2, true); }
-          | RE RANGE ARROW RANGE RE { $$ = compiler->make_rule($1,$2,$3,$4,$5, output_format); }
-          | RE RANGE ARROW RANGE    { $$ = compiler->make_rule($1,$2,$3,$4,NULL, output_format); }
-          | RANGE ARROW RANGE RE    { $$ = compiler->make_rule(NULL,$1,$2,$3,$4, output_format); }
-          | RANGE ARROW RANGE       { $$ = compiler->make_rule(NULL,$1,$2,$3,NULL, output_format); }
+          | RE RANGE ARROW RANGE RE { $$ = compiler->make_rule($1,$2,$3,$4,$5, compiler->compiler_type); }
+          | RE RANGE ARROW RANGE    { $$ = compiler->make_rule($1,$2,$3,$4,NULL, compiler->compiler_type); }
+          | RANGE ARROW RANGE RE    { $$ = compiler->make_rule(NULL,$1,$2,$3,$4, compiler->compiler_type); }
+          | RANGE ARROW RANGE       { $$ = compiler->make_rule(NULL,$1,$2,$3,NULL, compiler->compiler_type); }
           | RE COMPOSE RE    { $1->compose(*$3); delete $3; $$ = $1; }
-          | '{' RANGES '}' ':' '{' RANGES '}' { $$ = compiler->make_mapping($2,$6,output_format); }
-          | RANGE ':' '{' RANGES '}' { $$ = compiler->make_mapping(compiler->add_range($1,NULL),$4,output_format); }
-          | '{' RANGES '}' ':' RANGE { $$ = compiler->make_mapping($2,compiler->add_range($5,NULL),output_format); }
+          | '{' RANGES '}' ':' '{' RANGES '}' { $$ = compiler->make_mapping($2,$6,compiler->compiler_type); }
+          | RANGE ':' '{' RANGES '}' { $$ = compiler->make_mapping(compiler->add_range($1,NULL),$4,compiler->compiler_type); }
+          | '{' RANGES '}' ':' RANGE { $$ = compiler->make_mapping($2,compiler->add_range($5,NULL),compiler->compiler_type); }
           | RE INSERT CODE ':' CODE  { $$ = compiler->insert_freely($1,$3,$5); }
           | RE INSERT CODE           { $$ = compiler->insert_freely($1,$3,$3); }
 	  | RE SUBSTITUTE CODE ':' CODE  { $$ = compiler->substitute($1,$3,$5); }
 	  | RE SUBSTITUTE CODE ':' CODE ':' CODE ':' CODE { $$ = compiler->substitute($1,$3,$5,$7,$9); }
 	  | RE SUBSTITUTE CODE ':' CODE '(' RE ')' { $$ = compiler->substitute($1,$3,$5,$7); }
-          | RANGE ':' RANGE  { $$ = compiler->new_transducer($1,$3,output_format); }
-          | RANGE            { $$ = compiler->new_transducer($1,$1,output_format); }
+          | RANGE ':' RANGE  { $$ = compiler->new_transducer($1,$3,compiler->compiler_type); }
+          | RANGE            { $$ = compiler->new_transducer($1,$1,compiler->compiler_type); }
           | VAR              { if (DEBUG) { printf("calling transducer variable \"%s\"\n", $1); }; $$ = compiler->var_value($1); }
-          | RVAR             { if (DEBUG) { printf("calling agreement transducer variable \"%s\"\n", $1); }; $$ = compiler->rvar_value($1,output_format); }
+          | RVAR             { if (DEBUG) { printf("calling agreement transducer variable \"%s\"\n", $1); }; $$ = compiler->rvar_value($1,compiler->compiler_type); }
           | RE '*'           { $1->repeat_star(); $$ = $1; }
           | RE '+'           { $1->repeat_plus(); $$ = $1; }
           | RE '?'           { $1->optionalize(); $$ = $1; }
@@ -135,8 +148,8 @@ RE:         RE ARROW CONTEXTS2      { $$ = compiler->restriction($1,$2,$3,0); }
           | RE '-' RE        { $1->subtract(*$3); delete $3; $$ = $1; }
           | RE '|' RE        { $1->disjunct(*$3); delete $3; $$ = $1; }
           | '(' RE ')'       { $$ = $2; }
-          | STRING           { $$ = compiler->read_words(folder, $1, output_format); }
-          | STRING2          { try { $$ = compiler->read_transducer(folder, $1, output_format); } catch (HfstException e) { printf("\nAn error happened when reading file \"%s\"\n", $1); exit(1); } }
+          | STRING           { $$ = compiler->read_words(folder, $1, compiler->compiler_type); }
+          | STRING2          { try { $$ = compiler->read_transducer(folder, $1, compiler->compiler_type); } catch (HfstException e) { printf("\nAn error happened when reading file \"%s\"\n", $1); exit(1); } }
           ;
 
 RANGES:     RANGE RANGES     { $$ = compiler->add_range($1,$2); }

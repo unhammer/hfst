@@ -36,13 +36,36 @@ using hfst::implementations::HfstState;
 
 using std::cerr;
 
+extern FILE  *sfstin;
+int sfstparse( void );
+
 namespace hfst
 {
 
   typedef std::pair<unsigned int, unsigned int> NumberPair;
   typedef std::set<NumberPair> NumberPairSet;
   typedef std::vector<NumberPair> NumberPairVector;
+
+  void SfstCompiler::set_result(HfstTransducer * tr)
+  {
+    result_ = tr;
+  }
  
+  HfstTransducer * SfstCompiler::get_result()
+  {
+    return result_;
+  }
+
+  void SfstCompiler::set_input(FILE * input)
+  {
+    sfstin = input;
+  }
+
+  void SfstCompiler::parse()
+  {
+    sfstparse();
+  }
+
   HfstTransducer * SfstCompiler::make_transducer
   (Range *r1, Range *r2, ImplementationType type)
   {

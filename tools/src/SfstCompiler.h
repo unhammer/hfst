@@ -68,19 +68,24 @@ namespace hfst
       SVarMap SVM;
       RVarSet RS;
       RVarSet RSS;
+      HfstTransducer * result_;
       
     public:
       bool Verbose;
       bool Alphabet_Defined;
       HfstAlphabet TheAlphabet;
       ImplementationType compiler_type;
-
       
     SfstCompiler( ImplementationType type, bool verbose=false ) :
-      Verbose(verbose), Alphabet_Defined(false), compiler_type(type)
+      result_(NULL), Verbose(verbose), Alphabet_Defined(false), compiler_type(type)
       {}
       
     public:
+      void set_result(HfstTransducer * tr);
+      HfstTransducer * get_result();
+      void set_input(FILE * input);
+      void parse();
+
       HfstTransducer * make_transducer(Range *r1, Range *r2, ImplementationType type);
       static void warn(const char *msg);
       HfstTransducer *new_transducer( Range*, Range*, ImplementationType );
