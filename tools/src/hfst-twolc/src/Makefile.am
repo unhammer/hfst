@@ -1,7 +1,7 @@
 AM_YFLAGS= -d -o y.tab.c
 AM_CXXFLAGS= -Wcast-qual -Wno-deprecated -Wfatal-errors
 bin_PROGRAMS=htwolcpre1 htwolcpre2 htwolcpre3 hfst-twolc-system
-bin_SCRIPTS=hfst-twolc$(EXEEXT) hfst-twolc-loc$(EXEEXT)
+bin_SCRIPTS=hfst-twolc hfst-twolc-loc
 EXTRA_DIST=hfst-twolc.sh hfst-twolc.bat common_globals.h
 IO_SRC=$(srcdir)/io_src
 STRING_SRC=$(srcdir)/string_src
