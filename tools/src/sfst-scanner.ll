@@ -37,8 +37,7 @@ YY_BUFFER_STATE Include_Stack[MAX_INCLUDE_DEPTH];
 char *Name_Stack[MAX_INCLUDE_DEPTH];
 int  Lineno_Stack[MAX_INCLUDE_DEPTH];
 
-bool Verbose=true;
-char *FileName=NULL;
+extern SfstCompiler * compiler;
 bool UTF8=true;
 
 static char *unquote(char *string, bool del_quote=true) {
@@ -60,12 +59,12 @@ static char *unquote(char *string, bool del_quote=true) {
 }
 
 static void print_lineno() {
-  if (!Verbose)
+  if (!compiler->Verbose)
     return;
   fputc('\r',stderr);
   for( int i=0; i<Include_Stack_Ptr; i++ )
     fputs("  ", stderr);
-  fprintf(stderr,"%s: %d", FileName, sfstlineno);
+  fprintf(stderr,"%s: %d", compiler->filename.c_str(), sfstlineno);
 }
 
 extern void sfsterror(char *text);
@@ -97,13 +96,13 @@ FN	[A-Za-z0-9._/\-*+]
 		       fprintf( stderr, "Includes nested too deeply" );
 		       exit( 1 );
 		     }
-		     if (Verbose) fputc('\n', stderr);
+		     if (compiler->Verbose) fputc('\n', stderr);
 		     file = fopen( name, "rt" );
 		     if (!file)
                        SfstCompiler::error2("Can't open include file", name);
                      else {
-                       Name_Stack[Include_Stack_Ptr] = FileName;
-                       FileName = name;
+                       Name_Stack[Include_Stack_Ptr] = strdup(compiler->filename.c_str());
+                       compiler->set_filename(std::string(name));
                        Lineno_Stack[Include_Stack_Ptr] = sfstlineno;
 		       sfstlineno = 1;
 		       Include_Stack[Include_Stack_Ptr++]=YY_CURRENT_BUFFER;
@@ -114,13 +113,13 @@ FN	[A-Za-z0-9._/\-*+]
                      }
                   }
 <<EOF>>           {
-                     if (Verbose)
+                     if (compiler->Verbose)
 		       fputc('\n', stderr);
                      if ( --Include_Stack_Ptr < 0 )
 		       yyterminate();
 		     else {
-                       free(FileName);
-                       FileName = Name_Stack[Include_Stack_Ptr];
+                       //free(FileName);
+                       compiler->set_filename(std::string(Name_Stack[Include_Stack_Ptr]));
                        sfstlineno = Lineno_Stack[Include_Stack_Ptr];
 		       sfst_delete_buffer( YY_CURRENT_BUFFER );
 		       sfst_switch_to_buffer(Include_Stack[Include_Stack_Ptr]);

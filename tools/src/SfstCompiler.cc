@@ -61,6 +61,21 @@ namespace hfst
     sfstin = input;
   }
 
+  void SfstCompiler::set_filename(const std::string & name)
+  {
+    filename = name;
+  }
+
+  void SfstCompiler::set_foldername(const std::string & name)
+  {
+    foldername = name;
+  }
+
+  void SfstCompiler::set_switch(int value)
+  {
+    switch_ = value;
+  }
+
   void SfstCompiler::parse()
   {
     sfstparse();

@@ -75,15 +75,21 @@ namespace hfst
       bool Alphabet_Defined;
       HfstAlphabet TheAlphabet;
       ImplementationType compiler_type;
+      std::string filename;
+      std::string foldername;
+      int switch_;
       
     SfstCompiler( ImplementationType type, bool verbose=false ) :
-      result_(NULL), Verbose(verbose), Alphabet_Defined(false), compiler_type(type)
+      result_(NULL), Verbose(verbose), Alphabet_Defined(false), compiler_type(type), filename(""), foldername(""), switch_(0)
       {}
       
     public:
       void set_result(HfstTransducer * tr);
       HfstTransducer * get_result();
       void set_input(FILE * input);
+      void set_filename(const std::string & name);
+      void set_foldername(const std::string & name);
+      void set_switch(int value);
       void parse();
 
       HfstTransducer * make_transducer(Range *r1, Range *r2, ImplementationType type);

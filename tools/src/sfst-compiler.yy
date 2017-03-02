@@ -14,9 +14,6 @@
 #include "SfstCompiler.h"
 #include "HfstTransducer.h"
 
-extern char * folder;
-extern char * FileName;
-
 extern int  sfstlineno;
 extern char *sfsttext;
 int sfstlex( void );
@@ -24,10 +21,14 @@ int sfstlex( void );
 using namespace hfst;
 using std::cerr;
 
+extern SfstCompiler * compiler;
+
+bool DEBUG = false;
+
 void sfsterror(char *text)
 
 {
-  cerr << "\n" << FileName << ":" << sfstlineno << ": " << text << " at: ";
+  cerr << "\n" << compiler->filename << ":" << sfstlineno << ": " << text << " at: ";
   cerr << sfsttext << "\naborted.\n";
   exit(1);
 }
@@ -35,21 +36,15 @@ void sfsterror(char *text)
 void warn(char *text)
 
 {
-  cerr << "\n" << FileName << ":" << sfstlineno << ": warning: " << text << "!\n";
+  cerr << "\n" << compiler->filename << ":" << sfstlineno << ": warning: " << text << "!\n";
 }
 
 void warn2(const char *text, char *text2)
 
 {
-  cerr << "\n" << FileName << ":" << sfstlineno << ": warning: " << text << ": ";
+  cerr << "\n" << compiler->filename << ":" << sfstlineno << ": warning: " << text << ": ";
   cerr << text2 << "\n";
 }
-
-extern int Switch;
-extern SfstCompiler * compiler;
-//HfstTransducer * Result;
-
-bool DEBUG = false;
 
 %}
 
@@ -96,7 +91,7 @@ bool DEBUG = false;
 %left '*' '+'
 %%
 
-ALL:        ASSIGNMENTS RE NEWLINES { compiler->set_result(compiler->result($2, Switch)); }
+ALL:        ASSIGNMENTS RE NEWLINES { compiler->set_result(compiler->result($2, compiler->switch_)); }
           ;
 
 ASSIGNMENTS: ASSIGNMENTS ASSIGNMENT {}
@@ -108,7 +103,7 @@ ASSIGNMENT: VAR '=' RE              { if (DEBUG) { printf("defining transducer v
           | RVAR '=' RE             { if (DEBUG) { printf("defining agreement transducer variable \"%s\"..\n", $1); }; if (compiler->def_rvar($1,$3)) warn2("assignment of empty transducer to",$1); }
           | SVAR '=' VALUES         { if (DEBUG) { printf("defining range variable \"%s\"..\n", $1); }; if (compiler->def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
           | RSVAR '=' VALUES        { if (DEBUG) { printf("defining agreement range variable \"%s\"..\n", $1); }; if (compiler->def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
-          | RE PRINT STRING         { compiler->write_to_file($1, folder, $3); }
+          | RE PRINT STRING         { compiler->write_to_file($1, compiler->foldername.c_str(), $3); }
           | ALPHA RE                { if (DEBUG) { printf("defining alphabet..\n"); }; compiler->def_alphabet($2); delete $2; }
           ;
 
@@ -148,8 +143,8 @@ RE:         RE ARROW CONTEXTS2      { $$ = compiler->restriction($1,$2,$3,0); }
           | RE '-' RE        { $1->subtract(*$3); delete $3; $$ = $1; }
           | RE '|' RE        { $1->disjunct(*$3); delete $3; $$ = $1; }
           | '(' RE ')'       { $$ = $2; }
-          | STRING           { $$ = compiler->read_words(folder, $1, compiler->compiler_type); }
-          | STRING2          { try { $$ = compiler->read_transducer(folder, $1, compiler->compiler_type); } catch (HfstException e) { printf("\nAn error happened when reading file \"%s\"\n", $1); exit(1); } }
+          | STRING           { $$ = compiler->read_words(compiler->foldername.c_str(), $1, compiler->compiler_type); }
+          | STRING2          { try { $$ = compiler->read_transducer(compiler->foldername.c_str(), $1, compiler->compiler_type); } catch (HfstException e) { printf("\nAn error happened when reading file \"%s\"\n", $1); exit(1); } }
           ;
 
 RANGES:     RANGE RANGES     { $$ = compiler->add_range($1,$2); }

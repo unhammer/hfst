@@ -17,18 +17,15 @@
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
 
-extern char* FileName;
-//extern bool Verbose;
 bool verbose_ = false;
-
-char * folder = NULL;
+std::string filename = "";
+std::string foldername = "";
 
 using std::cerr;
 using namespace hfst;
 
-int Switch=0;
+int switch_=0;
 SfstCompiler * compiler;
-//extern HfstTransducer * Result;
 
 hfst::ImplementationType output_format = hfst::ERROR_TYPE;
 
@@ -126,14 +123,14 @@ parse_options(int argc, char** argv)
              "defaulting to openfst tropical\n");
         output_format = hfst::TROPICAL_OPENFST_TYPE;
       }
-    FileName = strdup(inputfilename);
+    filename = std::string(inputfilename);
 
     if (NULL != inputfilename && strcmp(inputfilename, "<stdin>") != 0)
     {
 	std::string str(inputfilename);
 	size_t found = str.find_last_of("/\\");
 	if (found != std::string::npos)
-  	  folder = strdup(str.substr(0,found).c_str());
+  	  foldername = std::string(str.substr(0,found).c_str());
     }
 
     return EXIT_CONTINUE;
@@ -164,7 +161,7 @@ void get_flags( int *argc, char **argv )
       exit(0);
     }
     else if (strcmp(argv[i],"-s") == 0) {
-      Switch = 1;
+      switch_ = 1;
       argv[i] = NULL;
     }
     // hfst addition
@@ -213,6 +210,9 @@ int main( int argc, char *argv[] )
   hfst::set_unknown_symbols_in_use(false);
   compiler = new SfstCompiler(output_format, verbose_);
   compiler->set_input(inputfile);
+  compiler->set_filename(filename);
+  compiler->set_foldername(foldername);
+  compiler->set_switch(switch_);
 
   char * strarg = NULL;
   try {
@@ -240,8 +240,6 @@ int main( int argc, char *argv[] )
       if (strarg != NULL) { free(strarg); }
       exit(1);
   }
-  if (NULL != folder)
-    free(folder);
 
   if (strarg != NULL) { free(strarg); }
   exit(0);
