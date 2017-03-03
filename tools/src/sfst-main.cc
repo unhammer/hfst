@@ -25,10 +25,7 @@ using std::cerr;
 using namespace hfst;
 
 int switch_=0;
-SfstCompiler * compiler;
-
-hfst::ImplementationType output_format = hfst::ERROR_TYPE;
-
+hfst::ImplementationType output_format = hfst::ImplementationType::ERROR_TYPE;
 
 int Compact=0;
 int LowMem=0;
@@ -208,7 +205,7 @@ int main( int argc, char *argv[] )
   // Unknown symbols cannot be used in SFST-PL syntax.
   // If the HFST library is aware of this, some optimization can be done.
   hfst::set_unknown_symbols_in_use(false);
-  compiler = new SfstCompiler(output_format, verbose_);
+  SfstCompiler * compiler = new SfstCompiler(output_format, verbose_);
   compiler->set_input(inputfile);
   compiler->set_filename(filename);
   compiler->set_foldername(foldername);

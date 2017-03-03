@@ -42,6 +42,20 @@ int sfstparse( void );
 namespace hfst
 {
 
+  SfstCompiler * sfst_compiler = NULL;
+
+  SfstCompiler::SfstCompiler( ImplementationType type, bool verbose /*=false*/ )
+  {
+    result_ = NULL;
+    Verbose = verbose;
+    Alphabet_Defined = false;
+    compiler_type = type;
+    filename = "";
+    foldername = "";
+    switch_ = 0;
+    sfst_compiler = this;
+  };
+  
   typedef std::pair<unsigned int, unsigned int> NumberPair;
   typedef std::set<NumberPair> NumberPairSet;
   typedef std::vector<NumberPair> NumberPairVector;

@@ -79,9 +79,7 @@ namespace hfst
       std::string foldername;
       int switch_;
       
-    SfstCompiler( ImplementationType type, bool verbose=false ) :
-      result_(NULL), Verbose(verbose), Alphabet_Defined(false), compiler_type(type), filename(""), foldername(""), switch_(0)
-      {}
+      SfstCompiler( ImplementationType type, bool verbose=false );
       
     public:
       void set_result(HfstTransducer * tr);
