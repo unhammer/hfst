@@ -1,6 +1,6 @@
 #include "SfstAlphabet.h"
-#include "HfstBasic.h"
-#include "HfstUtf8.h"
+#include "SfstBasic.h"
+#include "SfstUtf8.h"
 #include "HfstSymbolDefs.h"
 #include <cstdlib>
 
@@ -18,10 +18,10 @@ namespace hfst {
     SfstAlphabet::SfstAlphabet(const SfstAlphabet &alpha)
     {
       for (CharMap::const_iterator it = alpha.cm.begin(); it != alpha.cm.end(); it++) {
-    cm[it->first] = basic::fst_strdup(it->second);
+    cm[it->first] = sfst_basic::fst_strdup(it->second);
       }
       for (SymbolMap::const_iterator it = alpha.sm.begin(); it != alpha.sm.end(); it++) {
-    sm[basic::fst_strdup(it->first)] = it->second;
+    sm[sfst_basic::fst_strdup(it->first)] = it->second;
       }
       for (NumberPairSet::const_iterator it = alpha.pairs.begin(); it != alpha.pairs.end(); it++) {
     pairs.insert(NumberPair(it->first, it->second));
@@ -67,7 +67,7 @@ namespace hfst {
     SfstAlphabet::CharMap SfstAlphabet::get_char_map() { return cm; };
 
     void SfstAlphabet::add( const char *symbol, unsigned int c ) {
-      char *s = basic::fst_strdup(symbol);
+      char *s = sfst_basic::fst_strdup(symbol);
       cm[c] = s;
       sm[s] = c;
     }
@@ -218,8 +218,8 @@ namespace hfst {
       
       //if (utf8) {
       {
-    unsigned int c = hfst_utf8::utf8toint( &string );
-    return (int)add_symbol(hfst_utf8::int2utf8(c));
+    unsigned int c = sfst_utf8::utf8toint( &string );
+    return (int)add_symbol(sfst_utf8::int2utf8(c));
       }
       //}
       /*else {
