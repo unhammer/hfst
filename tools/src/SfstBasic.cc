@@ -1,10 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "HfstBasic.h"
+#include "SfstBasic.h"
 
-namespace hfst {
-  namespace basic {
+  namespace sfst_basic {
 
   bool Switch_Bytes=false;
 
@@ -73,4 +72,4 @@ namespace hfst {
   }
 
   }
-}
+

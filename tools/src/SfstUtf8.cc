@@ -11,10 +11,9 @@
 
 #include "string.h"
 
-#include "HfstUtf8.h"
+#include "SfstUtf8.h"
 
-namespace hfst {
-namespace hfst_utf8 {
+namespace sfst_utf8 {
 
   const unsigned char get3LSbits=7;
   const unsigned char get4LSbits=15;
@@ -149,4 +148,4 @@ namespace hfst_utf8 {
   }
 
 }
-}
+

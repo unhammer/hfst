@@ -23,8 +23,8 @@
  */
 
 #include "SfstCompiler.h"
-#include "HfstUtf8.h"
-#include "HfstBasic.h"
+#include "SfstUtf8.h"
+#include "SfstBasic.h"
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
@@ -109,7 +109,7 @@ namespace hfst
       }
       
       // one of the ranges was '.'
-      for(HfstAlphabet::const_iterator it=TheAlphabet.begin();
+      for(SfstAlphabet::const_iterator it=TheAlphabet.begin();
       it!=TheAlphabet.end(); it++) {
     if ((r1 == NULL || in_range(it->first, r1)) &&
         (r2 == NULL || in_range(it->second, r2))) {
@@ -149,7 +149,7 @@ namespace hfst
   
   Character SfstCompiler::character_code( unsigned int uc ) {
     // UTF-8 is always used
-    return symbol_code(basic::fst_strdup(hfst_utf8::int2utf8(uc)));
+    return symbol_code(sfst_basic::fst_strdup(sfst_utf8::int2utf8(uc)));
   }
 
   void SfstCompiler::free_values( Range *r ) {
@@ -190,7 +190,7 @@ namespace hfst
   }
   
   unsigned int SfstCompiler::utf8toint( char *s ) {
-    return hfst_utf8::utf8toint(s);
+    return sfst_utf8::utf8toint(s);
   }
 
   bool SfstCompiler::in_range( unsigned int c, Range *r ) {
@@ -287,7 +287,7 @@ namespace hfst
 
   HfstTransducer * SfstCompiler::rvar_value( char *name, ImplementationType type ) {
     if (RS.find(name) == RS.end())
-      RS.insert(basic::fst_strdup(name));
+      RS.insert(sfst_basic::fst_strdup(name));
     Range *r=add_value(symbol_code(name), NULL);
     return new_transducer(r,r,type);
   }
@@ -322,7 +322,7 @@ namespace hfst
 
   Range *SfstCompiler::rsvar_value( char *name ) {
     if (RSS.find(name) == RSS.end())
-      RSS.insert(basic::fst_strdup(name));
+      RSS.insert(sfst_basic::fst_strdup(name));
     return add_value(symbol_code(name), NULL);
   }
 
@@ -408,8 +408,8 @@ namespace hfst
 
     // go through all symbol pairs in TheAlphabet and copy them to sps
     StringPairSet sps;
-    for( HfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
-      HfstAlphabet::NumberPair l=*it;
+    for( SfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
+      SfstAlphabet::NumberPair l=*it;
       sps.insert(StringPair( TheAlphabet.code2symbol(l.first),
                  TheAlphabet.code2symbol(l.second)) );
     }
@@ -531,8 +531,8 @@ namespace hfst
   HfstTransducer * SfstCompiler::restriction( HfstTransducer * t, Twol_Type type, Contexts *c, int direction ) {
 
     StringPairSet sps;
-    for( HfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
-      HfstAlphabet::NumberPair l=*it;
+    for( SfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
+      SfstAlphabet::NumberPair l=*it;
       sps.insert(StringPair( TheAlphabet.code2symbol(l.first),
                  TheAlphabet.code2symbol(l.second)) );
     }
@@ -571,8 +571,8 @@ namespace hfst
     HfstTransducerPair tr_pair(*(lc), *(rc));
 
     StringPairSet sps;
-    for( HfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
-      HfstAlphabet::NumberPair l=*it;
+    for( SfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
+      SfstAlphabet::NumberPair l=*it;
       sps.insert(StringPair( TheAlphabet.code2symbol(l.first),
                  TheAlphabet.code2symbol(l.second)) );
     }
@@ -589,7 +589,7 @@ namespace hfst
       }
       
       // one of the ranges was '.'
-      for(HfstAlphabet::const_iterator it=TheAlphabet.begin();
+      for(SfstAlphabet::const_iterator it=TheAlphabet.begin();
       it!=TheAlphabet.end(); it++) {
     if ((r1 == NULL || in_range(it->first, r1)) &&
         (r2 == NULL || in_range(it->second, r2))) {
@@ -752,8 +752,8 @@ namespace hfst
     
     HfstTransducerPair tr_pair(*(contexts->left), *(contexts->right));
     StringPairSet sps;
-    for( HfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
-      HfstAlphabet::NumberPair l=*it;
+    for( SfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
+      SfstAlphabet::NumberPair l=*it;
       sps.insert(StringPair( TheAlphabet.code2symbol(l.first),
                  TheAlphabet.code2symbol(l.second)) );
     }
@@ -778,8 +778,8 @@ namespace hfst
   HfstTransducer * SfstCompiler::replace(HfstTransducer * mapping, Repl_Type repl_type, bool optional) {
     
     StringPairSet sps;
-    for( HfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
-      HfstAlphabet::NumberPair l=*it;
+    for( SfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
+      SfstAlphabet::NumberPair l=*it;
       sps.insert(StringPair( TheAlphabet.code2symbol(l.first),
                  TheAlphabet.code2symbol(l.second)) );
     }
@@ -892,7 +892,7 @@ namespace hfst
         else
           onumber = TheAlphabet.symbol2code(it->second.c_str());
 
-        TheAlphabet.insert(HfstAlphabet::NumberPair(inumber,onumber));
+        TheAlphabet.insert(SfstAlphabet::NumberPair(inumber,onumber));
       }
     Alphabet_Defined = 1;
       }
@@ -908,7 +908,7 @@ namespace hfst
          = it->begin();
            tr_it != it->end(); tr_it++)
         {
-          TheAlphabet.insert(HfstAlphabet::NumberPair
+          TheAlphabet.insert(SfstAlphabet::NumberPair
                   (
                    TheAlphabet.symbol2code
                    (tr_it->get_input_symbol().c_str())

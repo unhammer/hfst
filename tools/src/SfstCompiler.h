@@ -14,13 +14,13 @@
 #define _HFST_COMPILER_H_
 
 #include "HfstDataTypes.h"
-#include "HfstAlphabet.h"
+#include "SfstAlphabet.h"
 #include <iostream>
 #include <fstream>
 
 namespace hfst
 {
-  using implementations::HfstAlphabet;
+  using implementations::SfstAlphabet;
 
   typedef unsigned int Character;
 
@@ -73,7 +73,7 @@ namespace hfst
     public:
       bool Verbose;
       bool Alphabet_Defined;
-      HfstAlphabet TheAlphabet;
+      SfstAlphabet TheAlphabet;
       ImplementationType compiler_type;
       std::string filename;
       std::string foldername;

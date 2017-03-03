@@ -9,19 +9,17 @@
 /*                                                                 */
 /*******************************************************************/
 
-#ifndef _HFST_UTF8_H_
-#define _HFST_UTF8_H_
+#ifndef _SFST_UTF8_H_
+#define _SFST_UTF8_H_
 
 /* @file HfstUtf8.h
    \brief Functions for handling utf-8 strings. */
 
-namespace hfst {
-namespace hfst_utf8 {
+namespace sfst_utf8 {
   
   unsigned int utf8toint( char *s );
   unsigned int utf8toint( char **s );
   char *int2utf8( unsigned int );
   
-}
 }
 #endif

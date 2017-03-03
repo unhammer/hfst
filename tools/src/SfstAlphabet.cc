@@ -1,4 +1,4 @@
-#include "HfstAlphabet.h"
+#include "SfstAlphabet.h"
 #include "HfstBasic.h"
 #include "HfstUtf8.h"
 #include "HfstSymbolDefs.h"
@@ -9,13 +9,13 @@
 namespace hfst {
   namespace implementations {
     
-    HfstAlphabet::HfstAlphabet() {
+    SfstAlphabet::SfstAlphabet() {
       add(hfst::internal_epsilon.c_str(),0);
       add(hfst::internal_unknown.c_str(),1);
       add(hfst::internal_identity.c_str(),2);
     }
     
-    HfstAlphabet::HfstAlphabet(const HfstAlphabet &alpha)
+    SfstAlphabet::SfstAlphabet(const SfstAlphabet &alpha)
     {
       for (CharMap::const_iterator it = alpha.cm.begin(); it != alpha.cm.end(); it++) {
     cm[it->first] = basic::fst_strdup(it->second);
@@ -28,7 +28,7 @@ namespace hfst {
       }
     }
 
-    HfstAlphabet::~HfstAlphabet() {
+    SfstAlphabet::~SfstAlphabet() {
       char **s=new char*[cm.size()];
       pairs.clear();
       sm.clear();
@@ -43,42 +43,42 @@ namespace hfst {
       delete[] s;
     }
     
-    HfstAlphabet::const_iterator HfstAlphabet::begin() const { return pairs.begin(); }
-    HfstAlphabet::const_iterator HfstAlphabet::end() const { return pairs.end(); };
-    size_t HfstAlphabet::size() const { return pairs.size(); };
+    SfstAlphabet::const_iterator SfstAlphabet::begin() const { return pairs.begin(); }
+    SfstAlphabet::const_iterator SfstAlphabet::end() const { return pairs.end(); };
+    size_t SfstAlphabet::size() const { return pairs.size(); };
     
-    //bool HfstAlphabet::contains_special_symbols(StringPair sp);
+    //bool SfstAlphabet::contains_special_symbols(StringPair sp);
 
-    void HfstAlphabet::print_pairs(FILE *file) {
+    void SfstAlphabet::print_pairs(FILE *file) {
       for (NumberPairSet::const_iterator it = pairs.begin(); it != pairs.end(); it++)
     fprintf(file, "%s:%s\n", code2symbol(it->first), code2symbol(it->second));
     }
 
-    void HfstAlphabet::print() {
+    void SfstAlphabet::print() {
       printf("alphabet..\n");
       for( CharMap::iterator it=cm.begin(); it!=cm.end(); it++ )
     printf("%i\t%s\n",it->first,it->second);
       printf("..alphabet\n");
     }
     
-    void HfstAlphabet::insert(NumberPair sp) {
+    void SfstAlphabet::insert(NumberPair sp) {
       /* check special symbols */ pairs.insert(sp); };
-    void HfstAlphabet::clear_pairs() { pairs.clear(); };
-    HfstAlphabet::CharMap HfstAlphabet::get_char_map() { return cm; };
+    void SfstAlphabet::clear_pairs() { pairs.clear(); };
+    SfstAlphabet::CharMap SfstAlphabet::get_char_map() { return cm; };
 
-    void HfstAlphabet::add( const char *symbol, unsigned int c ) {
+    void SfstAlphabet::add( const char *symbol, unsigned int c ) {
       char *s = basic::fst_strdup(symbol);
       cm[c] = s;
       sm[s] = c;
     }
     
-    int HfstAlphabet::symbol2code( const char * s ) const {
+    int SfstAlphabet::symbol2code( const char * s ) const {
       SymbolMap::const_iterator p = sm.find(s);
       if (p != sm.end()) return p->second;
       return EOF;
     }
     
-    const char *HfstAlphabet::code2symbol( unsigned int c ) const {
+    const char *SfstAlphabet::code2symbol( unsigned int c ) const {
       CharMap::const_iterator p=cm.find(c);
       if (p == cm.end())
     return NULL;
@@ -86,7 +86,7 @@ namespace hfst {
     return p->second;
     }
     
-    unsigned int HfstAlphabet::add_symbol(const char * symbol) {
+    unsigned int SfstAlphabet::add_symbol(const char * symbol) {
       if (sm.find(symbol) != sm.end())
     return sm[symbol];
       
@@ -100,7 +100,7 @@ namespace hfst {
       throw "Error: too many symbols in transducer definition";
     }
     
-    void HfstAlphabet::add_symbol( const char *symbol, unsigned int c )
+    void SfstAlphabet::add_symbol( const char *symbol, unsigned int c )
 
     {
       // check whether the symbol was previously defined
@@ -134,7 +134,7 @@ namespace hfst {
       }
     }
 
-    void HfstAlphabet::complement( std::vector<unsigned int> &sym ) {
+    void SfstAlphabet::complement( std::vector<unsigned int> &sym ) {
       std::vector<unsigned int> result;
       for( CharMap::const_iterator it=cm.begin(); it!=cm.end(); it++ ) {
     unsigned int c = it->first;
@@ -161,7 +161,7 @@ namespace hfst {
     /*                                                                 */
     /*******************************************************************/
     
-    int HfstAlphabet::next_mcsym( char* &string, bool insert )
+    int SfstAlphabet::next_mcsym( char* &string, bool insert )
       
     {
       char *start=string;
@@ -203,7 +203,7 @@ namespace hfst {
       return EOF;
     }
 
-    int HfstAlphabet::next_code( char* &string, bool extended, bool insert )
+    int SfstAlphabet::next_code( char* &string, bool extended, bool insert )
       
     {
       if (*string == 0)
@@ -231,7 +231,7 @@ namespace hfst {
     }*/
     }
 
-    std::pair<unsigned int, unsigned int> HfstAlphabet::next_label(char * &string, bool extended)
+    std::pair<unsigned int, unsigned int> SfstAlphabet::next_label(char * &string, bool extended)
     {
       // read first character
       int c = next_code( string, extended );
@@ -271,12 +271,12 @@ main(int argc, char** argv)
   std::cout << "Unit tests for " __FILE__ ":";
   std::cout << std::endl << "constructors: ";
   std::cout << " default()...";
-  HfstAlphabet defaultAlpha;
+  SfstAlphabet defaultAlpha;
   std::cout << " (copy)...";
-  HfstAlphabet copyAlpha(defaultAlpha);
+  SfstAlphabet copyAlpha(defaultAlpha);
   std::cout << std::endl << "destructor: ";
-    delete new HfstAlphabet();
-    delete new HfstAlphabet(defaultAlpha);
+    delete new SfstAlphabet();
+    delete new SfstAlphabet(defaultAlpha);
     std::cout << std::endl << "rest skipped...";
     std::cout << "ok" << std::endl;
     return EXIT_SUCCESS;
