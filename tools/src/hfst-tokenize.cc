@@ -578,7 +578,7 @@ void print_location_vector_giellacg(hfst_ol::PmatchContainer & container,
             string form = it->substr(first, last-first);
             LocationVector loc = locate_fullmatch(container, form);
             if(loc.size() == 0) {
-                std::cerr << "Warning: Backtrack-subform '" << form << "' had no covering analyses."<<std::endl;
+                std::cerr << "Warning: The analysis of \"<" << locations.at(0).input << ">\" has backtracking around the substring \"<" << form << ">\", but that substring has no analyses." << std::endl;
                 // but push it anyway, since we want exactly one subvector per splitpoint
             }
             if(form.length() != it->length()) { // Ensure the spaces we ignored when looking up are output in the form:
