@@ -184,7 +184,6 @@ endif
 
 noinst_HEADERS= \
 	calculate_functions.h hfst-commandline.h hfst-program-options.h \
-	SfstCompiler.h SfstBasic.h SfstAlphabet.h SfstUtf8.h \
 	inc/check-params-binary.h inc/check-params-common.h \
 	inc/check-params-unary.h  inc/getopt-cases-binary.h \
 	inc/getopt-cases-common.h inc/getopt-cases-error.h  \
@@ -192,7 +191,7 @@ noinst_HEADERS= \
 	inc/globals-common.h      inc/globals-unary.h \
 	hfst-file-to-mem.h \
 	hfst-tool-metadata.h hfst-optimized-lookup.h \
-	guessify_fst.h generate_model_forms.h sfst-compiler.$(HEADER)
+	guessify_fst.h generate_model_forms.h
 # parsers/XreCompiler.h parsers/xre_utils.h
 
 # sort alphabetically
@@ -232,7 +231,7 @@ HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc \
 				hfst-tool-metadata.cc
 # sort alphabetically
 hfst_affix_guessify_SOURCES=hfst-affix-guessify.cc $(HFST_COMMON_SRC)
-hfst_calculate_SOURCES=sfst-main.cc sfst-compiler.yy sfst-scanner.ll SfstCompiler.cc SfstBasic.cc SfstAlphabet.cc SfstUtf8.cc $(HFST_COMMON_SRC)
+hfst_calculate_SOURCES=sfst-main.cc $(HFST_COMMON_SRC)
 hfst_compare_SOURCES=hfst-compare.cc $(HFST_COMMON_SRC)
 hfst_compose_intersect_SOURCES=hfst-compose-intersect.cc $(HFST_COMMON_SRC)
 hfst_compose_SOURCES=hfst-compose.cc $(HFST_COMMON_SRC)
@@ -326,7 +325,7 @@ uninstall-local:
 
 BUILT_SOURCES=$(hfst_lexc_BUILT)
 
-CLEANFILES=$(hfst_compiler_header_file) sfst-compiler.cc $(hfst_lexc_BUILT)
+CLEANFILES=$(hfst_lexc_BUILT)
 
 
 hfst_calculate_CXXFLAGS= -Wall -Wno-error -Wno-sign-compare -Wno-deprecated
@@ -335,7 +334,3 @@ hfst_calculate_CXXFLAGS= -Wall -Wno-error -Wno-sign-compare -Wno-deprecated
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 
-sfst-scanner.ll: sfst-compiler.$(HEADER)
-
-CLEANFILES+=sfst-compiler.$(HEADER)
-EXTRA_DIST=sfst-scanner.cc sfst-compiler.cc sfst-compiler.$(HEADER)

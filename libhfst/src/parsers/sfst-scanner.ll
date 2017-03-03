@@ -23,12 +23,12 @@
   #include "sfst-compiler.hh"
 #endif
 
-#include "HfstBasic.h"
-#include "HfstUtf8.h"
+#include "SfstBasic.h"
+#include "SfstUtf8.h"
 #include "HfstTransducer.h"
 
 using namespace hfst;
-using namespace basic;
+using namespace sfst_basic;
 
 namespace hfst
 {
@@ -183,7 +183,7 @@ FN	[A-Za-z0-9._/\-*+]
 \r?\n             { print_lineno(); return NEWLINE; }
 
 \\[0-9]+          { long l=atol(sfsttext+1);
-		    if (l <= 1114112) { sfstlval.value=fst_strdup(hfst_utf8::int2utf8((unsigned)l)); return UTF8CHAR; }
+		    if (l <= 1114112) { sfstlval.value=fst_strdup(sfst_utf8::int2utf8((unsigned)l)); return UTF8CHAR; }
 		    sfsterror(strdup("invalid expression"));
                   }
 

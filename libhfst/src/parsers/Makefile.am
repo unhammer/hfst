@@ -23,12 +23,16 @@ LEXC_SRCS=lexc-lexer.ll lexc-parser.yy lexc-utils.cc LexcCompiler.cc
 LEXC_HDRS=LexcCompiler.h lexc-utils.h
 LEXC_BUILT=lexc-parser.cc lexc-lexer.cc
 
+SFST_SRCS=sfst-scanner.ll sfst-compiler.yy SfstCompiler.cc SfstUtf8.cc SfstBasic.cc SfstAlphabet.cc
+SFST_HDRS=SfstCompiler.h SfstUtf8.h SfstBasic.h SfstAlphabet.h
+SFST_BUILT=sfst-compiler.cc sfst-scanner.cc
+
 # TODO: hfst-string-conversions.cc
 XFST_SRCS=xfst-lexer.ll xfst-parser.yy xfst-utils.cc XfstCompiler.cc xfst_help_message.cc
 XFST_HDRS=XfstCompiler.h xfst-utils.h xfst_help_message.h
 XFST_BUILT=xfst-parser.cc xfst-lexer.cc
 
-BUILT_SOURCES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT) $(XFST_BUILT)
+BUILT_SOURCES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT) $(XFST_BUILT) $(SFST_BUILT)
 
 if YACC_USE_PARSER_H_EXTENSION
   HEADER=h
@@ -36,8 +40,8 @@ else
   HEADER=hh
 endif
 
-CLEANFILES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT) $(XFST_BUILT) \
-	xre_parse.$(HEADER) pmatch_parse.$(HEADER) lexc-parser.$(HEADER) xfst-parser.$(HEADER)
+CLEANFILES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT) $(XFST_BUILT) $(SFST_BUILT) \
+	xre_parse.$(HEADER) pmatch_parse.$(HEADER) lexc-parser.$(HEADER) xfst-parser.$(HEADER) sfst-compiler.$(HEADER)
 
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
@@ -46,8 +50,9 @@ xre_lex.ll: xre_parse.$(HEADER)
 pmatch_lex.ll: pmatch_parse.$(HEADER)
 lexc-lexer.ll: lexc-parser.$(HEADER)
 xfst-lexer.ll: xfst-parser.$(HEADER)
+sfst-scanner.ll: sfst-compiler.$(HEADER)
 
-libhfstparsers_la_SOURCES=$(SFST_SRCS) $(XRE_SRCS) $(PMATCH_SRCS) $(LEXC_SRCS) $(XFST_SRCS)
+libhfstparsers_la_SOURCES=$(XRE_SRCS) $(PMATCH_SRCS) $(LEXC_SRCS) $(XFST_SRCS) $(SFST_SRCS)
 
 AM_CPPFLAGS=-I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/libhfst/src \
 		-Wno-deprecated
@@ -60,7 +65,7 @@ endif
 hfstincludedir = $(includedir)/hfst
 extincludedir = $(hfstincludedir)/parsers
 
-extinclude_HEADERS = $(XRE_HDRS) $(PMATCH_HDRS) $(LEXC_HDRS) $(XFST_HDRS)
+extinclude_HEADERS = $(XRE_HDRS) $(PMATCH_HDRS) $(LEXC_HDRS) $(XFST_HDRS) $(SFST_HDRS)
 
 LIBHFST_PARSER_TSTS=XreCompiler LexcCompiler # PmatchCompiler
 
@@ -78,5 +83,5 @@ LexcCompiler_LDADD=../libhfst.la
 
 TESTS=$(LIBHFST_PARSER_TSTS)
 
-EXTRA_DIST=xre_parse.$(HEADER) pmatch_parse.$(HEADER) lexc-parser.$(HEADER) xfst-parser.$(HEADER) $(BUILT_SOURCES)
+EXTRA_DIST=xre_parse.$(HEADER) pmatch_parse.$(HEADER) lexc-parser.$(HEADER) xfst-parser.$(HEADER) sfst-compiler.$(HEADER) $(BUILT_SOURCES)
 
