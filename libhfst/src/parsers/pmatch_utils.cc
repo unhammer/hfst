@@ -317,11 +317,22 @@ struct CosineSimilarityWithWordVectorComparison {
             left_accumulator += compare_with_this.vector[i]*left.vector[i];
             right_accumulator += compare_with_this.vector[i]*right.vector[i];
         }
-        left_accumulator /= norm(left.vector);
-        right_accumulator /= norm(right.vector);
+        left_accumulator /= left.norm;
+        right_accumulator /= right.norm;
         return left_accumulator > right_accumulator;
     }
 };
+
+std::vector<WordVecFloat> get_projected_vector(std::vector<WordVecFloat> vec,
+                                               std::vector<WordVecFloat> plane_vec,
+                                               WordVecFloat translation_term)
+{
+    return pointwise_plus(vec,
+                          pointwise_multiplication(
+                              (((translation_term - dot_product(vec, plane_vec)) / square_sum(plane_vec))
+                               * vector_similarity_projection_factor),
+                              plane_vec));
+}
 
 struct CosineSimilarityProjectedToPlaneComparison {
     std::vector<WordVecFloat> plane_vec;
@@ -413,6 +424,27 @@ template<typename T> T norm(std::vector<T> v)
     return sqrt(square_sum(v));
 }
 
+WordVecFloat cosine_distance(WordVector left, WordVector right)
+{
+    // Sometimes very nearby vectors combined with rounding error will produce
+    // a slightly negative distance, so make sure to return at least 0.0
+    WordVecFloat retval = 1.0 - dot_product(left.vector, right.vector) /
+        (left.norm * right.norm);
+    if (retval < 0.0) {
+        return 0.0;       
+    }
+    return retval;
+}
+
+WordVecFloat cosine_distance(std::vector<WordVecFloat> left, std::vector<WordVecFloat> right)
+{
+    WordVecFloat retval = 1.0 - dot_product(left, right) / (norm(left) * norm(right));
+    if (retval < 0.0) {
+        return 0.0;       
+    }
+    return retval;
+}
+
 PmatchObject * compile_like_arc(std::string word1, std::string word2,
                                 unsigned int nwords)
 {
@@ -435,47 +467,67 @@ PmatchObject * compile_like_arc(std::string word1, std::string word2,
         word1_o->multichar = true; word2_o->multichar = true;
         return new PmatchBinaryOperation(Disjunct, word1_o, word2_o);
     }
+
     if (this_word1.word == "" || this_word2.word == "") {
         // just one match
         WordVector this_word = (this_word1.word == "" ? this_word2 : this_word1);
         CosineSimilarityWithWordVectorComparison comparison_object(this_word);
         std::sort(word_vectors.begin(), word_vectors.end(), comparison_object);
-    } else {
-        if(variables["vector-similarity-projection-factor"] != "1.0") {
-            vector_similarity_projection_factor =
-                strtod(variables["vector-similarity-projection-factor"].c_str(), NULL);
+        HfstTokenizer tok;
+        HfstTransducer * retval = new HfstTransducer(format);
+        for (size_t i = 0; i < word_vectors.size() && i <= nwords; ++i) {
+            HfstTransducer tmp(word_vectors[i].word, tok, format);
+            tmp.set_final_weights(cosine_distance(word_vectors[i], this_word));
+            retval->disjunct(tmp);
         }
-        /*
-         * When there are two vectors A and B, we compute the vector A - B that
-         * goes from one to the other, and define a hyperplane orthogonal to that
-         * vector that intersects the vector at the midpoint between the
-         * two. We then add to all vectors a multiple of A - B to move them closer
-         * to the plane, reducing the distance that is due to the difference
-         * between A and B. (This is like projecting the space to the hyperplane
-         * if we go all the way to the plane)
-         *
-         * The hyperplane is defined by the equation |B - A| = d, where d is a
-         * translation term. |B - A| = 0 would be the set of vectors orthogonal to
-         * |B - A|. We set d so that the distance from the hyperplane to A is
-         * half of the norm of |B - A|.
-         */
-        
-        std::vector<WordVecFloat> B_minus_A = pointwise_minus(
-            this_word1.vector, this_word2.vector);
-        std::vector<WordVecFloat> halfway_point = pointwise_plus(
-            this_word2.vector, pointwise_multiplication(
-                static_cast<WordVecFloat>(0.5), B_minus_A));
-        WordVecFloat hyperplane_translation_term = dot_product(B_minus_A, this_word1.vector)
-            - square_sum(B_minus_A) * 0.5;
-        CosineSimilarityProjectedToPlaneComparison comparison_object(
-            B_minus_A, halfway_point, hyperplane_translation_term);
-        std::sort(word_vectors.begin(), word_vectors.end(), comparison_object);
+        return new PmatchTransducerContainer(retval);
     }
+
+    // the general case
+    if(variables["vector-similarity-projection-factor"] != "1.0") {
+        vector_similarity_projection_factor =
+            strtod(variables["vector-similarity-projection-factor"].c_str(), NULL);
+    }
+    /*
+     * When there are two vectors A and B, we compute the vector A - B that
+     * goes from one to the other, and define a hyperplane orthogonal to that
+     * vector that intersects the vector at the midpoint between the
+     * two. We then add to all vectors a multiple of A - B to move them closer
+     * to the plane, reducing the distance that is due to the difference
+     * between A and B. (This is like projecting the space to the hyperplane
+     * if we go all the way to the plane)
+     *
+     * The hyperplane is defined by the equation |B - A| = d, where d is a
+     * translation term. |B - A| = 0 would be the set of vectors orthogonal to
+     * |B - A|. We set d so that the distance from the hyperplane to A is
+     * half of the norm of |B - A|.
+     */
+        
+    std::vector<WordVecFloat> B_minus_A = pointwise_minus(
+        this_word1.vector, this_word2.vector);
+    std::vector<WordVecFloat> halfway_point = pointwise_plus(
+        this_word2.vector, pointwise_multiplication(
+            static_cast<WordVecFloat>(0.5), B_minus_A));
+    WordVecFloat hyperplane_translation_term = dot_product(B_minus_A, this_word1.vector)
+        - square_sum(B_minus_A) * 0.5;
+    CosineSimilarityProjectedToPlaneComparison comparison_object(
+        B_minus_A, halfway_point, hyperplane_translation_term);
+    std::sort(word_vectors.begin(), word_vectors.end(), comparison_object);
+
     HfstTokenizer tok;
     HfstTransducer * retval = new HfstTransducer(format);
     for (size_t i = 0; i < word_vectors.size() && i <= nwords; ++i) {
         HfstTransducer tmp(word_vectors[i].word, tok, format);
+        std::vector<WordVecFloat> projected_i = get_projected_vector(
+            word_vectors[i].vector, B_minus_A, hyperplane_translation_term);
+        tmp.set_final_weights(cosine_distance(projected_i, halfway_point));
         retval->disjunct(tmp);
+        for (size_t j = i + 1; j < word_vectors.size() && j <= nwords; ++j) {
+            HfstTransducer tmp2(word_vectors[i].word + "_cos_" + word_vectors[j].word, tok, format);
+            tmp2.set_final_weights(cosine_distance(projected_i,
+                                                   get_projected_vector(word_vectors[j].vector, B_minus_A, hyperplane_translation_term)));
+            retval->disjunct(tmp2);
+        }
     }
     return new PmatchTransducerContainer(retval);
 }
@@ -1167,6 +1219,7 @@ void read_vec(std::string filename)
             WordVector wv;
             wv.word = word;
             wv.vector = components;
+            wv.norm = norm(components);
             word_vectors.push_back(wv);
         }
     }

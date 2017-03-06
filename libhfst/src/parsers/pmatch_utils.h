@@ -136,6 +136,7 @@ template<typename T> T dot_product(std::vector<T> l,
                                    std::vector<T> r);
 template<typename T> T square_sum(std::vector<T> v);
 template<typename T> T norm(std::vector<T> v);
+WordVecFloat cosine_distance(WordVector left, WordVector right);
 PmatchObject * compile_like_arc(std::string word1, std::string word2 = "",
     unsigned int nwords = 10);
 PmatchTransducerContainer * make_counter(std::string name);
@@ -209,6 +210,7 @@ struct WordVector
 {
     std::string word;
     std::vector<WordVecFloat> vector;
+    WordVecFloat norm;
 };
 
 /**
