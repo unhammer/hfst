@@ -114,6 +114,10 @@ for type in types:
     tr.insert_freely(('A','B'))
     tr.minimize()
 
+    # Read sfst
+    tr = hfst.compile_sfst_file('test.sfstpl')
+    assert(not (tr == None))
+
     # Substitute
     tr = hfst.regex('a a:b b;')
     tr.substitute('a', 'A', input=True, output=False)
