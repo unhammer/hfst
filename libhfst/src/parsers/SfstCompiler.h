@@ -14,13 +14,13 @@
 #define _HFST_COMPILER_H_
 
 #include "HfstDataTypes.h"
-#include "HfstAlphabet.h"
+#include "SfstAlphabet.h"
 #include <iostream>
 #include <fstream>
 
 namespace hfst
 {
-  using implementations::HfstAlphabet;
+  using implementations::SfstAlphabet;
 
   typedef unsigned int Character;
 
@@ -47,7 +47,7 @@ namespace hfst
        and the HFST library and contains some extra functions needed by the parser.
        Most of these functions either directly use the SFST interface or are generalized
        versions of corresponding SFST functions that work on all types of HfstTransducers. */
-    class HfstCompiler {
+    class SfstCompiler {
       
       struct ltstr {
     bool operator()(const char* s1, const char* s2) const
@@ -68,19 +68,28 @@ namespace hfst
       SVarMap SVM;
       RVarSet RS;
       RVarSet RSS;
+      HfstTransducer * result_;
       
     public:
       bool Verbose;
       bool Alphabet_Defined;
-      HfstAlphabet TheAlphabet;
+      SfstAlphabet TheAlphabet;
       ImplementationType compiler_type;
-
+      std::string filename;
+      std::string foldername;
+      int switch_;
       
-    HfstCompiler( ImplementationType type, bool verbose=false ) :
-      Verbose(verbose), Alphabet_Defined(false), compiler_type(type)
-      {}
+      SfstCompiler( ImplementationType type, bool verbose=false );
       
     public:
+      void set_result(HfstTransducer * tr);
+      HfstTransducer * get_result();
+      void set_input(FILE * input);
+      void set_filename(const std::string & name);
+      void set_foldername(const std::string & name);
+      void set_switch(int value);
+      void parse();
+
       HfstTransducer * make_transducer(Range *r1, Range *r2, ImplementationType type);
       static void warn(const char *msg);
       HfstTransducer *new_transducer( Range*, Range*, ImplementationType );

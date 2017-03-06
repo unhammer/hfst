@@ -151,7 +151,13 @@ libhfst_source_files = ["libhfst/src/parsers/XfstCompiler" + cpp,
                         "libhfst/src/parsers/pmatch_utils" + cpp,
                         "libhfst/src/parsers/xre_utils" + cpp,
                         "libhfst/src/parsers/xfst-utils" + cpp,
-                        "libhfst/src/parsers/xfst_help_message" + cpp ]
+                        "libhfst/src/parsers/xfst_help_message" + cpp,
+                        "libhfst/src/parsers/sfst-scanner" + cpp,
+                        "libhfst/src/parsers/sfst-compiler" + cpp,
+                        "libhfst/src/parsers/SfstCompiler" + cpp,
+                        "libhfst/src/parsers/SfstAlphabet" + cpp,
+                        "libhfst/src/parsers/SfstBasic" + cpp,
+                        "libhfst/src/parsers/SfstUtf8" + cpp ]
 
 foma_source_files = [ "back-ends/foma/int_stack.c",
                       "back-ends/foma/define.c",

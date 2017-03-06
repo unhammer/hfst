@@ -70,7 +70,7 @@ namespace hfst
   namespace implementations {
     class HfstBasicTransducer;
   }
-  class HfstCompiler;
+  class SfstCompiler;
   class HfstTransducer;
   namespace xfst {
     class XfstCompiler;
@@ -1410,7 +1410,7 @@ ccc : ddd
 
 
 
-    /* For HfstCompiler: Optimized disjunction function. */
+    /* For SfstCompiler: Optimized disjunction function. */
     HFSTDLL HfstTransducer &disjunct(const StringPairVector &spv);
 
     /** \brief Intersect this transducer with \a another. */
@@ -1698,7 +1698,7 @@ transducer.transform_weights(&func);
     friend class HfstInputStream;
     friend class HfstOutputStream;
     friend class hfst::implementations::HfstTransitionGraph<class C>;
-    friend class HfstCompiler;
+    friend class SfstCompiler;
     friend class hfst::implementations::ConversionFunctions;
     friend class HfstGrammar;
     friend class xfst::XfstCompiler;

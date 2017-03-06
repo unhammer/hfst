@@ -211,8 +211,114 @@ def epsilon_fst(weight=0):
 
 ## Get a transducer as defined by regular expression \a regexp.
 # @param regexp The regular expression defined with <a href="http://www.fsmbook.com/">Xerox transducer notation</a>.
-# @param kwargs Argumnets recognized are: error.
+# @param kwargs Arguments recognized are: error.
 # @param error Where warnings and errors are printed. Possible values are sys.stdout, sys.stderr (the default), a StringIO or None, indicating a quiet mode.
+#
+# Regular expression operators:
+#
+# \verbatim
+#
+# ~   complement
+# \   term complement
+# &   intersection
+# -   minus
+#
+# $.  contains once
+# $?  contains optionally
+# $   contains once or more
+# ( ) optionality
+#
+# +   Kleene plus
+# *   Kleene star
+#
+# ./. ignore internally (not yet implemented)
+# /   ignoring
+#
+# |   union
+#
+# <>  shuffle
+# <   before
+# >   after
+#
+# .o.   composition
+# .O.   lenient composition
+# .m>.  merge right
+# .<m.  merge left
+# .x.   cross product
+# .P.   input priority union
+# .p.   output priority union
+# .-u.  input minus
+# .-l.  output minus
+# `[ ]  substitute
+#
+# ^n,k  catenate from n to k times, inclusive
+# ^>n   catenate more than n times
+# ^>n   catenate less than n times
+# ^n    catenate n times
+#
+# .r   reverse
+# .i   invert
+# .u   input side
+# .l   output side
+#
+# \\\  left quotient
+#
+# Two-level rules:
+#
+#  \<=   left restriction
+#  <=>   left and right arrow
+#  <=    left arrow
+#  =>    right arrow
+#
+# Replace rules:
+#
+#  ->    replace right
+#  (->)  optionally replace right
+#  <-    replace left
+#  (<-)  optionally replace left
+#  <->   replace left and right
+#  (<->) optionally replace left and right
+#  @->   left-to-right longest match
+#  @>    left-to-right shortest match
+#  ->@   right-to-left longest match
+#  >@    right-to-left shortest match
+#
+# Rule contexts, markers and separators:
+#
+#  ||   match contexts on input sides
+#  //   match left context on output side and right context on input side
+#  \\   match left context on input side and right context on output side
+#  \/   match contexts on output sides
+#  _    center marker
+#  ...  markup marker
+#  ,,   rule separator in parallel rules
+#  ,    context separator
+#  [. .]  match epsilons only once
+#
+# Read from file:
+#
+#  @bin" "  read binary transducer
+#  @txt" "  read transducer in att text format
+#  @stxt" " read spaced text
+#  @pl" "   read transducer in prolog text format
+#  @re" "   read regular expression
+#
+# Symbols:
+#
+#  .#.  word boundary symbol in replacements, restrictions
+#  0    the epsilon
+#  ?    any token
+#  %    escape character
+#  { }  concatenate symbols
+#  " "  quote symbol
+#
+# :    pair separator
+# ::   weight
+#
+# ;   end of expression
+# !   starts a comment until end of line
+# #   starts a comment until end of line
+# \endverbatim
 def regex(regexp, **kwargs):
     pass
 
@@ -2607,4 +2713,3 @@ class ImplementationType:
 #    gunzip transducer.foma.gz
 #    hfst-sometool transducer.foma
 # \endverbatim
-

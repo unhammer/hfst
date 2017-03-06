@@ -1,7 +1,7 @@
 AM_YFLAGS= -d -o y.tab.c
 AM_CXXFLAGS= -Wcast-qual -Wno-deprecated -Wfatal-errors
 bin_PROGRAMS=htwolcpre1 htwolcpre2 htwolcpre3 hfst-twolc-system
-bin_SCRIPTS=hfst-twolc$(EXEEXT) hfst-twolc-loc$(EXEEXT)
+bin_SCRIPTS=hfst-twolc hfst-twolc-loc
 EXTRA_DIST=hfst-twolc.sh hfst-twolc.bat common_globals.h
 IO_SRC=$(srcdir)/io_src
 STRING_SRC=$(srcdir)/string_src
@@ -16,7 +16,7 @@ LDADD = $(top_builddir)/libhfst/src/libhfst.la
 # the preprocessor scripts do not support options per se, so we whitelist
 # them here
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=htwolcpre1 htwolcpre2 htwolcpre3 \
-				hfst-twolc$(EXEEXT) hfst-twolc-loc$(EXEEXT) hfst-twolc-system$(EXEEXT)
+				hfst-twolc hfst-twolc-loc hfst-twolc-system$(EXEEXT)
 
 htwolcpre1_SOURCES=htwolcpre1.yy scanner1.ll HfstTwolcDefs.h \
 		   $(CL_SRC)/CommandLine.h $(CL_SRC)/CommandLine.cc \
@@ -91,16 +91,16 @@ endif
 CLEANFILES=htwolcpre1.$(HEADER) htwolcpre2.$(HEADER) htwolcpre3.$(HEADER) \
 	   htwolcpre1.cc htwolcpre2.cc htwolcpre3.cc
 
-hfst-twolc$(EXEEXT): hfst-twolc.sh
+hfst-twolc: hfst-twolc.sh
 	cat $< | sed -e 's|BINDIR|$(bindir)|' > $@
-	chmod ogu+rx hfst-twolc$(EXEEXT)
+	chmod ogu+rx hfst-twolc
 
-hfst-twolc-loc$(EXEEXT): hfst-twolc.sh
+hfst-twolc-loc: hfst-twolc.sh
 	cat $< | sed -e 's|BINDIR|$(abs_builddir)|' > $@
-	chmod ogu+rx hfst-twolc-loc$(EXEEXT)
+	chmod ogu+rx hfst-twolc-loc
 
 clean-local:
-	-rm -f hfst-twolc$(EXEEXT) hfst-twolc-loc$(EXEEXT) hfst-twolc-system$(EXEEXT)
+	-rm -f hfst-twolc hfst-twolc-loc hfst-twolc-system$(EXEEXT)
 
 CLEANFILES+=htwolcpre1.$(HEADER) htwolcpre2.$(HEADER) htwolcpre3.$(HEADER)
 

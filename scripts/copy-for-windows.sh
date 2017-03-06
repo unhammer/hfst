@@ -195,7 +195,7 @@ done
 # libhfst/src/parsers
 for file in \
 LexcCompiler PmatchCompiler XreCompiler XfstCompiler xfst_help_message \
-lexc-utils pmatch_utils xre_utils xfst-utils;
+lexc-utils pmatch_utils xre_utils xfst-utils SfstCompiler SfstAlphabet SfstBasic SfstUtf8;
 do
     cp libhfst/src/parsers/$file.cc \
         $1/libhfst/src/parsers/$file.cpp
@@ -203,13 +203,13 @@ do
         $1/libhfst/src/parsers/$file.h
 done
 for file in \
-lexc-lexer pmatch_lex xre_lex xfst-lexer;
+lexc-lexer pmatch_lex xre_lex xfst-lexer sfst-scanner;
 do
     cp libhfst/src/parsers/$file.cc \
         $1/libhfst/src/parsers/$file.cpp
 done
 for file in \
-lexc-parser pmatch_parse xre_parse xfst-parser;
+lexc-parser pmatch_parse xre_parse xfst-parser sfst-compiler;
 do
     cp libhfst/src/parsers/$file.cc \
         $1/libhfst/src/parsers/$file.cpp

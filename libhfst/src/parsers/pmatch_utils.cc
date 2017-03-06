@@ -48,7 +48,7 @@ pmatcherror(const char *msg)
         fprintf(stderr, "***    parsing %s [line %d, near %s]...\n",
                 buf, pmatchlineno, pmatchtext);
     }
-    exit(0);
+    throw 1;
 }
 
 void pmatchwarning(const char *msg)

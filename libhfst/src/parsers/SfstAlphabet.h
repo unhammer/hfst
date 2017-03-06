@@ -1,5 +1,5 @@
-#ifndef _HFST_ALPHABET_H_
-#define _HFST_ALPHABET_H_
+#ifndef _SFST_ALPHABET_H_
+#define _SFST_ALPHABET_H_
 
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -21,14 +21,14 @@
 #include <string.h>
 #include <stdio.h>
 
-/* @file HfstAlphabet.h
-   \brief Declaration of class HfstAlphabet. */
+/* @file SfstAlphabet.h
+   \brief Declaration of class SfstAlphabet. */
 
 namespace hfst {
   namespace implementations {
 
     /* copied from SFST's alphabet.h|C */
-    class HfstAlphabet {
+    class SfstAlphabet {
       
     public:
       typedef std::pair<unsigned int,unsigned int> NumberPair;
@@ -64,9 +64,9 @@ namespace hfst {
       NumberPairSet pairs;
       
     public:
-      HfstAlphabet();
-      HfstAlphabet(const HfstAlphabet &alpha);
-      ~HfstAlphabet();
+      SfstAlphabet();
+      SfstAlphabet(const SfstAlphabet &alpha);
+      ~SfstAlphabet();
 
       typedef NumberPairSet::const_iterator const_iterator;
       const_iterator begin() const;

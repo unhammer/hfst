@@ -233,7 +233,14 @@ process_stream(HfstOutputStream& outstream)
         file_contents.push_back(c);
     }
     if (file_contents.size() > 1) {
-            definitions = comp.compile(file_contents);
+      try
+        {
+          definitions = comp.compile(file_contents);
+        }
+      catch(...)
+        {
+          return EXIT_FAILURE;
+        }
     }
 
     if (verbose) {
