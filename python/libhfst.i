@@ -42,6 +42,7 @@
 #include "parsers/XreCompiler.h"
 #include "parsers/LexcCompiler.h"
 #include "parsers/XfstCompiler.h"
+#include "parsers/SfstCompiler.h"
 #include "implementations/HfstBasicTransition.h"
 #include "implementations/HfstBasicTransducer.h"
 #include "implementations/optimized-lookup/pmatch.h"
@@ -53,6 +54,7 @@ namespace hfst { typedef std::vector<hfst::xeroxRules::Rule> HfstRuleVector; }
 #include "hfst_lexc_extensions.cc"
 #include "hfst_xfst_extensions.cc"
 #include "hfst_pmatch_extensions.cc"
+#include "hfst_sfst_extensions.cc"
 #include "hfst_lookup_extensions.cc"
 #include "hfst_rules_extensions.cc"
 #include "hfst_prolog_extensions.cc"
@@ -1535,6 +1537,9 @@ int hfst::hfst_compile_xfst(hfst::xfst::XfstCompiler & comp, std::string input, 
 
 std::string hfst::get_hfst_lexc_output();
 hfst::HfstTransducer * hfst::hfst_compile_lexc(hfst::lexc::LexcCompiler & comp, const std::string & filename, const std::string & error_stream);
+
+std::string hfst::get_hfst_sfst_output();
+hfst::HfstTransducer * hfst::hfst_compile_sfst(const std::string & filename, const std::string & error_stream, bool verbose, bool output_to_console);
 
 std::string hfst::one_level_paths_to_string(const HfstOneLevelPaths &);
 std::string hfst::two_level_paths_to_string(const HfstTwoLevelPaths &);

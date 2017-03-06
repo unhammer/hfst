@@ -322,6 +322,15 @@ def epsilon_fst(weight=0):
 def regex(regexp, **kwargs):
     pass
 
+## Compile sfst file \a filename into a transducer.
+# @param filename The name of the sfst file.
+# @param kwargs Arguments recognized are: verbose, output.
+# @param verbose Whether sfst file is processed in verbose mode, defaults to False.
+# @param output TODO: Where output is printed. Possible values are sys.stdout, sys.stderr, a StringI0, sys.stderr being the default.
+# @return On success the resulting transducer, else None.
+def compile_sfst_file(filename, **kwargs):
+    pass
+
 ## Compile lexc file \a filename into a transducer.
 # @param filename The name of the lexc file.
 # @param kwargs Arguments recognized are: verbosity, with_flags, output.

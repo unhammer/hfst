@@ -783,6 +783,55 @@ def compile_pmatch_file(filename):
     defs = compile_pmatch_expression(data)
     return defs
 
+def compile_sfst_file(filename, **kvargs):
+    """
+    Compile sfst file *filename* into a transducer.
+
+    Parameters
+    ----------
+    * `filename` :
+        The name of the sfst file.
+    * `kvargs` :
+        Arguments recognized are: verbose, output.
+    * `verbose` :
+        Whether sfst file is processed in verbose mode, defaults to False.
+    * `output` :
+        Where output is printed. Possible values are sys.stdout, sys.stderr, a
+        StringI0, sys.stderr being the default. TODO
+
+    Returns
+    -------
+    On success the resulting transducer, else None.
+    """
+    verbosity=False
+    type = get_default_fst_type()
+    output=None
+    to_console=get_output_to_console()
+
+    for k,v in kvargs.items():
+      if k == 'verbose':
+        verbosity=v
+      elif k == 'output':
+          output=v
+      elif k == 'output_to_console':
+          to_console=v
+      else:
+        print('Warning: ignoring unknown argument %s.' % (k))
+
+    retval=None
+    import sys
+    if output == None:
+       retval = libhfst.hfst_compile_sfst(filename, "", verbosity, to_console)
+    elif output == sys.stdout:
+       retval = libhfst.hfst_compile_sfst(filename, "cout", verbosity, to_console)
+    elif output == sys.stderr:
+       retval = libhfst.hfst_compile_sfst(filename, "cerr", verbosity, to_console)
+    else:
+       retval = libhfst.hfst_compile_sfst(filename, "", verbosity, to_console)
+       output.write(unicode(libhfst.get_hfst_sfst_output(), 'utf-8'))
+
+    return retval
+
 def compile_lexc_file(filename, **kvargs):
     """
     Compile lexc file *filename* into a transducer.
@@ -800,7 +849,7 @@ def compile_lexc_file(filename, **kvargs):
         Whether lexc flags are used when compiling, defaults to False.
     * `output` :
         Where output is printed. Possible values are sys.stdout, sys.stderr, a
-        StringIO, sys.stderr being the default
+        StringIO, sys.stderr being the default.
 
     Returns
     -------
