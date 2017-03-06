@@ -58,6 +58,7 @@ using std::pair;
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
+#include "HfstExceptionDefs.h"
 #include "implementations/ConvertTransducerFormat.h"
 #include "parsers/PmatchCompiler.h"
 #include "hfst-commandline.h"
@@ -237,8 +238,9 @@ process_stream(HfstOutputStream& outstream)
         {
           definitions = comp.compile(file_contents);
         }
-      catch(...)
+      catch(HfstException & e)
         {
+          std::cerr << e.name << std::endl;
           return EXIT_FAILURE;
         }
     }

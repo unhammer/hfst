@@ -18,8 +18,10 @@
 #include <cstring>
 #include <sstream>
 
-#include "pmatch_utils.h"
 #include "HfstTransducer.h"
+#include "HfstExceptionDefs.h"
+
+#include "pmatch_utils.h"
 //#include "tools/src/HfstUtf8.h"
 #include "implementations/optimized-lookup/pmatch.h"
 
@@ -34,21 +36,31 @@ extern int pmatchnerrs;
 int
 pmatcherror(const char *msg)
 {
-    fprintf(stderr, "*** pmatch parsing failed: %s\n", msg);
+    std::string parsedata;
     if (strlen(hfst::pmatch::data) < 60)
     {
-        fprintf(stderr, "*** parsing %s [line %d, near %s]\n",
-                hfst::pmatch::data, pmatchlineno, pmatchtext);
+        parsedata = hfst::pmatch::data;
     }
     else
     {
-        char buf[200];
-        memcpy(buf, hfst::pmatch::data, 200 - 1);
-        buf[200 - 1] = '\0';
-        fprintf(stderr, "***    parsing %s [line %d, near %s]...\n",
-                buf, pmatchlineno, pmatchtext);
+        parsedata = std::string(hfst::pmatch::data, 59) + "... [truncated]";
     }
-    throw 1;
+    std::string errmsg = "pmatch parsing failed: ";
+    errmsg.append(msg);
+    errmsg.append("\n*** parsing ");
+    errmsg.append(parsedata);
+    errmsg.append(" at line ");
+    std::ostringstream ss;
+    ss << pmatchlineno;
+    errmsg.append(ss.str());
+    errmsg.append(" near ");
+    errmsg.append(pmatchtext);
+    errmsg.append("\n");
+
+    // TODO: clean the potentially large amounts of data we're leaking in case
+    // the caller isn't the command line utility that exits after this
+    
+    HFST_THROW_MESSAGE(HfstException, errmsg);
 }
 
 void pmatchwarning(const char *msg)
@@ -957,6 +969,7 @@ void init_globals(void)
     variables["max-recursion"] =  "5000";
     variables["need-separators"] = "on";
     variables["vector-similarity-projection-factor"] = "1.0";
+    call_stack.clear();
     def_insed_expressions.clear();
     inserted_names.clear();
     unsatisfied_insertions.clear();
