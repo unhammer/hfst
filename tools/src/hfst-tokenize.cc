@@ -74,6 +74,7 @@ std::string tokenizer_filename;
 static hfst::ImplementationType default_format = hfst::TROPICAL_OPENFST_TYPE;
 enum OutputFormat {
     tokenize,
+    space_separated,
     xerox,
     cg,
     finnpos,
@@ -106,6 +107,7 @@ print_usage()
             "                           (where analyses with equal weight constitute a class\n"
             "  -u, --unique             Remove duplicate analyses\n"
             "  -z, --segment            Segmenting / tokenization mode (default)\n"
+	    "  -i, --space-separated    Tokenization with one sentence per line, space-separated tokens\n"
             "  -x, --xerox              Xerox output\n"
             "  -c, --cg                 Constraint Grammar output\n"
             "  -g, --giella-cg          CG format used in Giella infrastructe (implies -l2,\n"
@@ -126,7 +128,7 @@ print_usage()
 
 void print_no_output(std::string const & input, std::ostream & outstream)
 {
-    if (output_format == tokenize) {
+    if (output_format == tokenize || output_format == space_separated) {
         outstream << input;
     } else if (output_format == xerox) {
         outstream << input << "\t" << input << "+?";
@@ -150,7 +152,7 @@ void print_escaping_newlines(std::string const & str, std::ostream & outstream)
 
 void print_nonmatching_sequence(std::string const & str, std::ostream & outstream)
 {
-    if (output_format == tokenize) {
+    if (output_format == tokenize || output_format == space_separated) {
         outstream << str;
     } else if (output_format == xerox) {
         outstream << str << "\t" << str << "+?";
@@ -720,6 +722,15 @@ void print_location_vector(hfst_ol::PmatchContainer & container,
         if (locations.at(0).tag == "<Boundary=Sentence>") {
             outstream << std::endl;
         }
+    } else if (output_format == space_separated && locations.size() != 0) {
+	outstream << locations.at(0).input;
+        if (print_weights) {
+            outstream << "\t" << locations.at(0).weight;
+        }
+        outstream << " ";
+        if (locations.at(0).tag == "<Boundary=Sentence>") {
+            outstream << std::endl;
+        }
     } else if (output_format == cg && locations.size() != 0) {
         // Print the cg cohort header
         outstream << "\"<" << locations.at(0).input << ">\"" << std::endl;
@@ -1002,6 +1013,7 @@ int parse_options(int argc, char** argv)
                 {"weight-classes", required_argument, 0, 'l'},
                 {"unique", required_argument, 0, 'u'},
                 {"segment", no_argument, 0, 'z'},
+		{"space-separated", no_argument, 0, 'd'},
                 {"xerox", no_argument, 0, 'x'},
                 {"cg", no_argument, 0, 'c'},
                 {"giella-cg", no_argument, 0, 'g'},
@@ -1011,7 +1023,7 @@ int parse_options(int argc, char** argv)
                 {0,0,0,0}
             };
         int option_index = 0;
-        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nkawmut:l:zxcgCf",
+        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nkawmut:l:zixcgCf",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -1059,6 +1071,9 @@ int parse_options(int argc, char** argv)
             break;
         case 'z':
             output_format = tokenize;
+            break;
+        case 'i':
+            output_format = space_separated;
             break;
         case 'x':
             output_format = xerox;
