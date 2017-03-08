@@ -66,7 +66,7 @@ XREUNRESTRICTED [\x21-\x7e\n]{-}[- <>%!:;@0~""\\&?$+*/_{}\]\[-]
 
 /* RegExp. stuff */
 XREALPHA {XREUNRESTRICTED}|{U8H}|{EC}
-XREOPERATOR [~\\&\-/\t |+*$_\]\[{}()0?:""]|"@\""|"$."|"$?"|"./."|"<>"|".#."|"."[riul]
+XREOPERATOR [~\\&\-/\t |+*$_\]\[{}()0?:""]|"@\""|"$."|"$?"|"./."|"<>"|"^>"|"^<"|".#."|"."[riul]
 XREQUOTSTRING "\""([^""\n;]|"%;"|"\\\"")*"\""
 XRECHAR {XREOPERATOR}|{XREALPHA}|{XREQUOTSTRING}
 XRETOKEN {XRECHAR}+

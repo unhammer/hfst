@@ -15,6 +15,8 @@ LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc
           basic.almost-reserved-words.lexc
           basic.regexps.lexc
           hfst.weights.lexc
+          xre.more-than-twice.lexc
+          xre.less-than-twice.lexc
           xre.automatic-multichar-symbols.lexc xre.basic.lexc 
           xre.definitions.lexc xre.months.lexc xre.nested-definitions.lexc 
           xre.numeric-star.lexc xre.sharp.lexc xre.quotations.lexc

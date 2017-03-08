@@ -311,6 +311,7 @@ LEXC_TXTS=basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc \
 		  cat.lexc hfst.weights.lexc stress.random-lexicons-100.lexc \
 		  xfail.bogus.lexc xfail.ISO-8859-1.lexc xfail.lexicon-semicolon.lexc \
 		  xfail.sublexicon-defined-more-than-once.lexc \
+		  xre.more-than-twice.lexc xre.less-than-twice.lexc \
 		  xre.any-variations.lexc xre.at-file.lexc \
 		  xre.automatic-multichar-symbols.lexc xre.basic.lexc \
 		  xre.definitions.lexc xre.months.lexc xre.nested-definitions.lexc \
@@ -417,6 +418,10 @@ basic.zeros-epsilons.lexc.flag.result.prolog \
 basic.zeros-epsilons.lexc.result.prolog \
 hfst.weights.lexc.flag.result.prolog \
 hfst.weights.lexc.result.prolog \
+xre.more-than-twice.lexc.flag.result.prolog \
+xre.more-than-twice.lexc.result.prolog \
+xre.less-than-twice.lexc.flag.result.prolog \
+xre.less-than-twice.lexc.result.prolog \
 xre.any-variations.lexc.flag.result.prolog \
 xre.any-variations.lexc.result.prolog \
 xre.automatic-multichar-symbols.lexc.flag.result.prolog \
