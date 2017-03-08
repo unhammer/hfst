@@ -30,7 +30,21 @@
 
   // input_defs.h declares the inputHandler, which is
   // an object that overrides flex' default input reading.
-  #include "io_src/input_defs.h"
+  //#include "io_src/input_defs.h"
+
+#include "io_src/InputReader.h"
+extern InputReader pre1_input_reader;
+#undef YY_INPUT
+#define YY_INPUT( buf, result, max_size ) { \
+char c = pre1_input_reader.input(); \
+if (c == 0) { \
+result = YY_NULL; \
+} \
+ else { \
+buf[0] = c; \
+result = 1; \
+} \
+}
 
   // symbol_queue is used to pass strings from Flex to Bison.
   #include "HfstTwolcDefs.h"

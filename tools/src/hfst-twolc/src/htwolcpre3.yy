@@ -29,7 +29,6 @@
 #include "rule_src/OtherSymbolTransducer.h"
 #include "alphabet_src/Alphabet.h"
 #include "string_src/string_manipulation.h"
-#include "commandline_src/CommandLine.h"
 #include <cstdio>
 #include "common_globals.h"
 
@@ -49,14 +48,14 @@
   int htwolcpre3lex();
   int htwolcpre3parse();
   
-  bool silent = false;
-  bool verbose = false;
+  extern bool silent; // = false;
+  extern bool verbose; // = false;
 
 #define YYERROR_VERBOSE 1
 
   // For reading input one byte at a time.
   size_t line_number = 1;
-  InputReader input_reader(line_number);
+  InputReader pre3_input_reader(line_number);
 
 #ifdef HAVE_XFSM
   #define Alphabet TwolCAlphabet
@@ -497,7 +496,7 @@ void warn(const char * warning)
 void htwolcpre3error(const char * text)
 {
   (void)text;
-  input_reader.error(text);
+  pre3_input_reader.error(text);
   exit(1);
 }
 
@@ -542,67 +541,4 @@ std::string get_name(const std::string &s)
     { ss.replace(pos,std::string("__HFST_TWOLC_SPACE").size()," "); }
   return ss;
 }
-
-int main(int argc, char * argv[])
-{
-#ifdef WINDOWS
-  _setmode(0, _O_BINARY);
-  _setmode(1, _O_BINARY);
-#endif
-
-#ifdef DEBUG_TWOLC_3_GRAMMAR
-  htwolcpre3debug = 1;
-#endif
-
-  try
-    {
-      CommandLine command_line(argc,argv);
-      if (command_line.help || command_line.usage || command_line.version)
-    { exit(0); }
-      if (command_line.has_debug_file)
-    { input_reader.set_input(command_line.set_input_file()); }
-      else
-    { input_reader.set_input(std::cin); }
-      
-      OtherSymbolTransducer::set_transducer_type(command_line.format);
-      silent = command_line.be_quiet;
-      verbose = command_line.be_verbose;
-      
-      TwolCGrammar twolc_grammar(command_line.be_quiet,
-				 command_line.be_verbose,
-				 command_line.resolve_left_conflicts,
-				 command_line.resolve_right_conflicts);
-      grammar = &twolc_grammar;
-      int exit_code = htwolcpre3parse();
-      if (exit_code != 0)
-    { exit(exit_code); }
-      
-      message("Compiling and storing rules.");
-      if (! command_line.has_output_file)
-    {
-      HfstOutputStream stdout_(command_line.format);
-      grammar->compile_and_store(stdout_);
-    }
-      else
-    {
-      HfstOutputStream out
-        (command_line.output_file_name,command_line.format);
-      grammar->compile_and_store(out);
-    }
-      exit(0);
-    }
-  catch (const HfstException e)
-    {
-      std::cerr << "This is an hfst interface bug:" << std::endl
-        << e() << std::endl;
-      exit(1);
-    }
-  catch (const char * s)
-    {
-      std::cerr << "This is an a bug probably from sfst:" << std::endl
-        << s << std::endl;
-      exit(1);
-    }
-}
-
 

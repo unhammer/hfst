@@ -28,7 +28,21 @@
 
   // input_defs.h declares the inputHandler, which is
   // an object that overrides flex' default input reading.
-  #include "io_src/input_defs.h"
+  //#include "io_src/input_defs.h"
+#include "io_src/InputReader.h"
+extern InputReader pre2_input_reader;
+#undef YY_INPUT
+#define YY_INPUT( buf, result, max_size ) { \
+char c = pre2_input_reader.input(); \
+if (c == 0) { \
+result = YY_NULL; \
+} \
+ else { \
+buf[0] = c; \
+result = 1; \
+} \
+}
+
 
   // non_alphabet_symbol_queue is used to store the grammar symbols which are
   // not located in the Alphabet section of the grammar.

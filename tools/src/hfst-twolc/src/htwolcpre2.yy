@@ -24,10 +24,7 @@
 #include <fstream>
 #include <cstdlib>
 #include "io_src/InputReader.h"
-#include "commandline_src/CommandLine.h"
 #include "grammar_defs.h"
-#include "HfstTwolcDefs.h"
-#include "common_globals.h"
 
   extern int htwolcpre2lineno;
   extern char * htwolcpre2text;
@@ -46,20 +43,8 @@
   size_t line_number = 1;
 
   // For reading input one byte at a time.
-  InputReader input_reader(line_number);
+  InputReader pre2_input_reader(line_number);
 
-  // non_alphabet_symbol_queue is used to store the grammar symbols which are
-  // not located in the Alphabet section of the grammar.
-  HandyDeque<std::string> non_alphabet_symbol_queue;
-
-  // alphabet_symbol_queue is used to store the symbols in the Alphabet section
-  // of the grammar.
-  HandyDeque<std::string> alphabet_symbol_queue;
-
-  // alphabet_symbol_queue is used to store the symbols in the Alphabet section
-  // of the grammar after it has been completed with all symbol pairs in the
-  // grammar.
-  HandyDeque<std::string> total_alphabet_symbol_queue;
 %}
 
 %name-prefix "htwolcpre2"
@@ -229,61 +214,9 @@ SEMI_COLON_LIST: SEMI_COLON
 
 %%
 
-void insert_alphabet_pairs(const HandyDeque<std::string> &symbol_queue,
-			   HandySet<SymbolPair> &symbol_pair_set)
-{
-  for (HandyDeque<std::string>::const_iterator it = symbol_queue.begin();
-       it != symbol_queue.end();
-       ++it)
-    {
-      //If we found a symbol pair, we insert it into symbol_pair_set.
-      if ((*it == "__HFST_TWOLC_0" ||
-	   *it == "__HFST_TWOLC_.#." ||
-	   *it == "__HFST_TWOLC_#" ||
-	   *it == "__HFST_TWOLC_SPACE" ||
-	   *it == "__HFST_TWOLC_TAB" ||
-           it->find("__HFST_TWOLC_") == std::string::npos)
-	  &&
-	  *(it+1) == "__HFST_TWOLC_:"
-	  &&
-	  (*(it+2) == "__HFST_TWOLC_0" ||
-	   *(it+2) == "__HFST_TWOLC_.#." ||
-	   *(it+2) == "__HFST_TWOLC_#" ||
-	   *(it+2) == "__HFST_TWOLC_SPACE" ||
-	   *(it+2) == "__HFST_TWOLC_TAB" ||
-           (it+2)->find("__HFST_TWOLC_") == std::string::npos))
-	{
-	  std::string input_symbol = *it == "__HFST_TWOLC_#" ? "#" : *it;
-	  ++(++it);
-	  std::string output_symbol = *it == "__HFST_TWOLC_#" ? "#" : *it;
-	  symbol_pair_set.insert(SymbolPair(input_symbol,output_symbol));
-	}
-    }
-  symbol_pair_set.insert(SymbolPair("__HFST_TWOLC_.#.","__HFST_TWOLC_.#."));
-}
-
-// Add all pairs in the grammar, which are missing from the Alphabet section,
-// into the Alphabet section.
-void complete_alphabet(void)
-{
-  HandySet<SymbolPair> symbol_pair_set;
-  insert_alphabet_pairs(alphabet_symbol_queue,symbol_pair_set);
-  insert_alphabet_pairs(non_alphabet_symbol_queue,symbol_pair_set);
-
-  total_alphabet_symbol_queue.push_back("__HFST_TWOLC_Alphabet");
-  for(HandySet<SymbolPair>::const_iterator it = symbol_pair_set.begin();
-      it != symbol_pair_set.end();
-      ++it)
-    {
-      total_alphabet_symbol_queue.push_back(it->first);
-      total_alphabet_symbol_queue.push_back("__HFST_TWOLC_:");
-      total_alphabet_symbol_queue.push_back(it->second);
-    }
-}
-
 // Print warning.
 void warn(const char * warning)
-{ input_reader.warn(warning); }
+{ pre2_input_reader.warn(warning); }
 
 // Print error messge and exit 1.
 void htwolcpre2error(const char * text)
@@ -294,25 +227,5 @@ void htwolcpre2error(const char * text)
 }
 
 void semantic_error(const char * text)
-{ input_reader.error(text); }
-
-int main(int argc, char * argv[])
-{
-#ifdef WINDOWS
-  _setmode(0, _O_BINARY);
-  _setmode(1, _O_BINARY);
-#endif
-
-  CommandLine command_line(argc,argv);
-  if (command_line.help || command_line.usage || command_line.version)
-    { exit(0); }
-  //yydebug = 1;
-  input_reader.set_input(std::cin);
-  int exit_code = htwolcpre2parse();
-  complete_alphabet();
-  std::cout << total_alphabet_symbol_queue << " ";
-  std::cout << non_alphabet_symbol_queue;
-  return exit_code;
-}
-
+{ pre2_input_reader.error(text); }
 

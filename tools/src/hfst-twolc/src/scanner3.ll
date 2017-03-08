@@ -20,7 +20,22 @@
 
   // input_defs.h declares the inputHandler, which is
   // an object that overrides flex' default input reading.
-#include "io_src/input_defs.h"
+//#include "io_src/input_defs.h"
+
+#include "io_src/InputReader.h"
+extern InputReader pre3_input_reader;
+#undef YY_INPUT
+#define YY_INPUT( buf, result, max_size ) { \
+char c = pre3_input_reader.input(); \
+if (c == 0) { \
+result = YY_NULL; \
+} \
+ else { \
+buf[0] = c; \
+result = 1; \
+} \
+}
+
 
 #include "string_src/string_manipulation.h"
 

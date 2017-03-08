@@ -19,7 +19,7 @@ LDADD = $(top_builddir)/libhfst/src/libhfst.la
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=htwolcpre1 htwolcpre2 htwolcpre3 \
 				hfst-twolc hfst-twolc-loc hfst-twolc-system$(EXEEXT)
 
-htwolcpre1_SOURCES=htwolcpre1.yy scanner1.ll HfstTwolcDefs.h \
+htwolcpre1_SOURCES=htwolcpre1.yy scanner1.ll htwolcpre1-main.cc HfstTwolcDefs.h \
 		   $(CL_SRC)/CommandLine.h $(CL_SRC)/CommandLine.cc \
 	           $(IO_SRC)/input_defs.h grammar_defs.h \
                    $(IO_SRC)/InputReader.h $(IO_SRC)/InputReader.cc \
@@ -43,12 +43,12 @@ htwolcpre1_SOURCES=htwolcpre1.yy scanner1.ll HfstTwolcDefs.h \
 		   $(VARIABLE_SRC)/MixedConstContainerIterator.h \
 		   $(VARIABLE_SRC)/ConstContainerIterator.h
 
-htwolcpre2_SOURCES=htwolcpre2.yy scanner2.ll HfstTwolcDefs.h \
+htwolcpre2_SOURCES=htwolcpre2.yy scanner2.ll htwolcpre2-main.cc HfstTwolcDefs.h \
 		   $(CL_SRC)/CommandLine.h $(CL_SRC)/CommandLine.cc \
 	           $(IO_SRC)/input_defs.h grammar_defs.h \
                    $(IO_SRC)/InputReader.h $(IO_SRC)/InputReader.cc
 
-htwolcpre3_SOURCES=htwolcpre3.yy scanner3.ll HfstTwolcDefs.h \
+htwolcpre3_SOURCES=htwolcpre3.yy scanner3.ll htwolcpre3-main.cc HfstTwolcDefs.h \
 		   $(CL_SRC)/CommandLine.h $(CL_SRC)/CommandLine.cc \
 	           $(IO_SRC)/input_defs.h grammar_defs.h \
                    $(IO_SRC)/InputReader.cc $(IO_SRC)/InputReader.h \
@@ -103,6 +103,10 @@ hfst-twolc-loc: hfst-twolc.sh
 
 clean-local:
 	-rm -f hfst-twolc hfst-twolc-loc hfst-twolc-system$(EXEEXT)
+
+htwolcpre1.$(HEADER): htwolcpre1.yy
+htwolcpre2.$(HEADER): htwolcpre2.yy
+htwolcpre3.$(HEADER): htwolcpre3.yy
 
 scanner1.ll: htwolcpre1.$(HEADER)
 scanner2.ll: htwolcpre2.$(HEADER)

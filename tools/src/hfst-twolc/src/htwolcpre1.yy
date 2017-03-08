@@ -27,7 +27,6 @@
 #include "grammar_defs.h"
 #include "variable_src/RuleSymbolVector.h"
 #include "variable_src/RuleVariables.h"
-#include "commandline_src/CommandLine.h"
 #include "common_globals.h"
 
   extern int htwolcpre1lineno;
@@ -53,7 +52,7 @@
   size_t line_number = 1;
  
   // For reading input one byte at a time.
-  InputReader input_reader(line_number);
+  InputReader pre1_input_reader(line_number);
 
   // For keeping track of values of variables.
   VariableValueMap variable_value_map;
@@ -483,12 +482,12 @@ SEMI_COLON_LIST: SEMI_COLON
 
 // Print warning.
 void warn(const char * warning)
-{ input_reader.warn(warning); }
+{ pre1_input_reader.warn(warning); }
 
 // Print error messge and exit 1.
 void htwolcpre1error(const char * text)
 {
-  input_reader.error(text);
+  pre1_input_reader.error(text);
   std::cout << "__HFST_TWOLC_DIE";
   exit(1);
 }
@@ -621,52 +620,4 @@ void reduce_queue(bool variable_symbol)
       pop_symbol_queue();
     }
 }
-
-int main(int argc, char * argv[])
-{
-#ifdef WINDOWS
-  _setmode(1, _O_BINARY);
-#endif
-
-  CommandLine command_line(argc,argv);
-
-  if (command_line.help || command_line.version)
-    {
-      if (command_line.version)
-	{ command_line.print_version(); }
-      if (command_line.help)
-	{ command_line.print_help(); }
-      exit(0);
-    }
-  if (command_line.usage)
-    {
-      command_line.print_usage();
-      exit(0);
-    }
-  if (! command_line.be_quiet)
-    {
-      if (! command_line.has_input_file)
-	{ std::cerr << "Reading input from STDIN." << std::endl; }
-      else
-	{ std::cerr << "Reading input from " << command_line.input_file_name
-		    << "." << std::endl; }
-      if (! command_line.has_output_file)
-	{ std::cerr << "Writing output to STDOUT." << std::endl; }
-      else
-	{ std::cerr << "Writing output to " << command_line.output_file_name
-		    << "." << std::endl; }
-    }
-  if (command_line.be_verbose)
-    { std::cerr << "Verbose mode." << std::endl; }
-
-  input_reader.set_input(command_line.set_input_file());
-
-  // Test that the output file is okay.
-  (void)command_line.set_output_file();
-
-  //yydebug = 1;
-
-  return htwolcpre1parse();
-}
-
 
