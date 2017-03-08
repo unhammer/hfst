@@ -1,4 +1,4 @@
-%option 8Bit batch yylineno noyywrap nounput
+%option 8Bit batch yylineno noyywrap nounput prefix="htwolcpre2"
 
 %{
   //   This program is free software: you can redistribute it and/or modify
@@ -86,7 +86,7 @@ __HFST_TWOLC_KILL_SYMBOL {
 [ ] { /* space: ignore */ }
 __HFST_TWOLC_RULE_NAME=\"[^\"]+\" {
   // Rule name.
-  non_alphabet_symbol_queue.push_back(yytext);
+  non_alphabet_symbol_queue.push_back(htwolcpre2text);
   return RULE_NAME;
 }
 __HFST_TWOLC_[*] {
@@ -131,9 +131,9 @@ __HFST_TWOLC_[?] {
 }
 __HFST_TWOLC_[0] {
   if (alphabet_ended)
-    { non_alphabet_symbol_queue.push_back(yytext); }
+    { non_alphabet_symbol_queue.push_back(htwolcpre2text); }
   else
-    { alphabet_symbol_queue.push_back(yytext); }
+    { alphabet_symbol_queue.push_back(htwolcpre2text); }
   return SYMBOL;
 }
 __HFST_TWOLC_[|] {
@@ -158,12 +158,12 @@ __HFST_TWOLC_[\-] {
 }
 __HFST_TWOLC_NUMBER=[0-9]+,[0-9]+ {
   // Number.
-  non_alphabet_symbol_queue.push_back(yytext);
+  non_alphabet_symbol_queue.push_back(htwolcpre2text);
   return NUMBER;
 }
 __HFST_TWOLC_NUMBER=[0-9]+ {
   // Number.
-  non_alphabet_symbol_queue.push_back(yytext);
+  non_alphabet_symbol_queue.push_back(htwolcpre2text);
   return NUMBER;
 }
 __HFST_TWOLC_[.][#][.] {
@@ -276,18 +276,18 @@ __HFST_TWOLC_DIE {
   exit(1);
 }
 __HFST_TWOLC_SET_NAME=[^ ]+ {
-  non_alphabet_symbol_queue.push_back(yytext);
+  non_alphabet_symbol_queue.push_back(htwolcpre2text);
   return SET_NAME;
 }
 __HFST_TWOLC_DEFINITION_NAME=[^ ]+ {
-  non_alphabet_symbol_queue.push_back(yytext);
+  non_alphabet_symbol_queue.push_back(htwolcpre2text);
   return DEFINITION_NAME;
 }
 [^ ]+ {
   if (alphabet_ended)
-    { non_alphabet_symbol_queue.push_back(yytext); }
+    { non_alphabet_symbol_queue.push_back(htwolcpre2text); }
   else
-    { alphabet_symbol_queue.push_back(yytext); }
+    { alphabet_symbol_queue.push_back(htwolcpre2text); }
   return SYMBOL;
 }
 

@@ -37,17 +37,17 @@
 #define YYDEBUG 1
 #endif
 
-  extern int yylineno;
-  extern char * yytext;
-  extern int yylineno;
-  extern char * yytext;
+  extern int htwolcpre3lineno;
+  extern char * htwolcpre3text;
+  extern int htwolcpre3lineno;
+  extern char * htwolcpre3text;
   extern bool rules_start;
-  void yyerror(const char * text );
+  void htwolcpre3error(const char * text );
   void semantic_error(const char * text);
   void warn(const char * warning );
   void message(const std::string &m);
-  int yylex();
-  int yyparse();
+  int htwolcpre3lex();
+  int htwolcpre3parse();
   
   bool silent = false;
   bool verbose = false;
@@ -79,7 +79,7 @@
 
 %}
 
-
+%name-prefix "htwolcpre3"
 
 %union
 {
@@ -494,7 +494,7 @@ void warn(const char * warning)
 }
 
 // Print error messge and exit 1.
-void yyerror(const char * text)
+void htwolcpre3error(const char * text)
 {
   (void)text;
   input_reader.error(text);
@@ -551,7 +551,7 @@ int main(int argc, char * argv[])
 #endif
 
 #ifdef DEBUG_TWOLC_3_GRAMMAR
-  yydebug = 1;
+  htwolcpre3debug = 1;
 #endif
 
   try
@@ -573,7 +573,7 @@ int main(int argc, char * argv[])
 				 command_line.resolve_left_conflicts,
 				 command_line.resolve_right_conflicts);
       grammar = &twolc_grammar;
-      int exit_code = yyparse();
+      int exit_code = htwolcpre3parse();
       if (exit_code != 0)
     { exit(exit_code); }
       

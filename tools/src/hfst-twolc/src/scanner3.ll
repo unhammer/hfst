@@ -1,4 +1,4 @@
-%option 8Bit batch yylineno noyywrap nounput
+%option 8Bit batch yylineno noyywrap nounput prefix="htwolcpre3"
 
 %{
   //   This program is free software: you can redistribute it and/or modify
@@ -57,7 +57,7 @@ __HFST_TWOLC_DIE {
 [ \t\n] { /* space: ignore */ }
 
 __HFST_TWOLC_RULE_NAME=\"[^\"]+\" {
-  yylval.value = string_copy(yytext);
+  htwolcpre3lval.value = string_copy(htwolcpre3text);
   return RULE_NAME;
 }
 __HFST_TWOLC_except { return EXCEPT; }
@@ -70,7 +70,7 @@ __HFST_TWOLC_[$][.] { return CONTAINMENT_ONCE; }
 __HFST_TWOLC_[$] { return CONTAINMENT; }
 __HFST_TWOLC_[?] { return QUESTION_MARK; }
 __HFST_TWOLC_[0] {
-  yylval.value = string_copy(yytext);
+  htwolcpre3lval.value = string_copy(htwolcpre3text);
   return SYMBOL;
 }
 __HFST_TWOLC_[|] { return UNION; }
@@ -78,11 +78,11 @@ __HFST_TWOLC_[&] { return INTERSECTION; }
 __HFST_TWOLC_[\^] { return POWER; }
 __HFST_TWOLC_[\-] { return DIFFERENCE; }
 __HFST_TWOLC_NUMBER=[0-9]+ {
-  yylval.value = string_copy(yytext);
+  htwolcpre3lval.value = string_copy(htwolcpre3text);
   return NUMBER;
 }
 __HFST_TWOLC_NUMBER=[0-9]+,[0-9]+ {
-  yylval.value = string_copy(yytext);
+  htwolcpre3lval.value = string_copy(htwolcpre3text);
   return NUMBER_RANGE;
 }
 __HFST_TWOLC_\[ { return LEFT_SQUARE_BRACKET; }
@@ -105,15 +105,15 @@ __HFST_TWOLC_[=] { return EQUALS; }
 __HFST_TWOLC__ { return CENTER_MARKER; }
 
 __HFST_TWOLC_SET_NAME=[^ ]+ {
-  yylval.value = string_copy(yytext);
+  htwolcpre3lval.value = string_copy(htwolcpre3text);
   return SYMBOL;
 }
 __HFST_TWOLC_DEFINITION_NAME=[^ ]+ {
-  yylval.value = string_copy(yytext);
+  htwolcpre3lval.value = string_copy(htwolcpre3text);
   return DEFINITION_NAME;
 }
 [^ ]+ {
-  yylval.value = string_copy(yytext);
+  htwolcpre3lval.value = string_copy(htwolcpre3text);
   return SYMBOL;
 }
 

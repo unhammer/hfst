@@ -29,16 +29,16 @@
 #include "HfstTwolcDefs.h"
 #include "common_globals.h"
 
-  extern int yylineno;
-  extern char * yytext;
-  extern int yylineno;
-  extern char * yytext;
+  extern int htwolcpre2lineno;
+  extern char * htwolcpre2text;
+  extern int htwolcpre2lineno;
+  extern char * htwolcpre2text;
   extern bool rules_start;
-  void yyerror(const char * text );
+  void htwolcpre2error(const char * text );
   void semantic_error(const char * text);
   void warn(const char * warning );
-  int yylex();
-  int yyparse();
+  int htwolcpre2lex();
+  int htwolcpre2parse();
   void complete_alphabet(void);
 
 #define YYERROR_VERBOSE 1
@@ -62,7 +62,7 @@
   HandyDeque<std::string> total_alphabet_symbol_queue;
 %}
 
-
+%name-prefix "htwolcpre2"
 
 %union
 { int symbol_number; };
@@ -286,7 +286,7 @@ void warn(const char * warning)
 { input_reader.warn(warning); }
 
 // Print error messge and exit 1.
-void yyerror(const char * text)
+void htwolcpre2error(const char * text)
 {
   std::cerr << text << std::endl;
   (void)text;
@@ -308,7 +308,7 @@ int main(int argc, char * argv[])
     { exit(0); }
   //yydebug = 1;
   input_reader.set_input(std::cin);
-  int exit_code = yyparse();
+  int exit_code = htwolcpre2parse();
   complete_alphabet();
   std::cout << total_alphabet_symbol_queue << " ";
   std::cout << non_alphabet_symbol_queue;

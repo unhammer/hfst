@@ -1,4 +1,5 @@
-AM_YFLAGS= -d -o y.tab.c
+AM_YFLAGS=-d
+AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 AM_CXXFLAGS= -Wcast-qual -Wno-deprecated -Wfatal-errors
 bin_PROGRAMS=htwolcpre1 htwolcpre2 htwolcpre3 hfst-twolc-system
 bin_SCRIPTS=hfst-twolc hfst-twolc-loc
@@ -89,7 +90,8 @@ else
 endif
 
 CLEANFILES=htwolcpre1.$(HEADER) htwolcpre2.$(HEADER) htwolcpre3.$(HEADER) \
-	   htwolcpre1.cc htwolcpre2.cc htwolcpre3.cc
+	   htwolcpre1.cc htwolcpre2.cc htwolcpre3.cc \
+	   scanner1.cc scanner2.cc scanner3.cc
 
 hfst-twolc: hfst-twolc.sh
 	cat $< | sed -e 's|BINDIR|$(bindir)|' > $@
@@ -101,8 +103,6 @@ hfst-twolc-loc: hfst-twolc.sh
 
 clean-local:
 	-rm -f hfst-twolc hfst-twolc-loc hfst-twolc-system$(EXEEXT)
-
-CLEANFILES+=htwolcpre1.$(HEADER) htwolcpre2.$(HEADER) htwolcpre3.$(HEADER)
 
 scanner1.ll: htwolcpre1.$(HEADER)
 scanner2.ll: htwolcpre2.$(HEADER)

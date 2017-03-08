@@ -30,16 +30,16 @@
 #include "commandline_src/CommandLine.h"
 #include "common_globals.h"
 
-  extern int yylineno;
-  extern char * yytext;
-  extern int yylineno;
-  extern char * yytext;
+  extern int htwolcpre1lineno;
+  extern char * htwolcpre1text;
+  extern int htwolcpre1lineno;
+  extern char * htwolcpre1text;
   extern bool regexp_start;
   extern bool rules_start;
-  void yyerror(const char * text );
+  void htwolcpre1error(const char * text );
   void warn(const char * warning );
-  int yylex();
-  int yyparse();
+  int htwolcpre1lex();
+  int htwolcpre1parse();
   void reduce_queue(bool variable_symbol=false);
   void set_variable_values(void);
   void reduce_symbol_pair(bool no_definitions = false);
@@ -94,6 +94,7 @@
 %}
 
 
+%name-prefix "htwolcpre1"
 
 %union
 { int symbol_number; };
@@ -195,7 +196,7 @@ NEGATIVE_RULE_CONTEXTS RULE_VARIABLES
       std::string error
 	("Variable rules with keyword matched have to have equal length "
 	 "variable value lists.");
-      yyerror(error.c_str());
+      htwolcpre1error(error.c_str());
       exit(1);
     }
   // Clear all containers, so that we'll be ready to handle the next rule.
@@ -485,7 +486,7 @@ void warn(const char * warning)
 { input_reader.warn(warning); }
 
 // Print error messge and exit 1.
-void yyerror(const char * text)
+void htwolcpre1error(const char * text)
 {
   input_reader.error(text);
   std::cout << "__HFST_TWOLC_DIE";
@@ -522,7 +523,7 @@ void reduce_symbol_pair(bool no_definitions)
 	    "Definition name " + def + " can't be used in pair expressions " +
 	    def + ":, :" + def + " and " + def + ":" + def + ".";
 	  
-	  yyerror(error.c_str());
+	  htwolcpre1error(error.c_str());
 	}
     }
 
@@ -538,7 +539,7 @@ void reduce_symbol_pair(bool no_definitions)
 	    "Definition name " + def + " can't be used in pair expressions " +
 	    def + ":, :" + def + " and " + def + ":" + def + ".";
 	  
-	  yyerror(error.c_str());
+	  htwolcpre1error(error.c_str());
 	}
     }
 
@@ -665,7 +666,7 @@ int main(int argc, char * argv[])
 
   //yydebug = 1;
 
-  return yyparse();
+  return htwolcpre1parse();
 }
 
 

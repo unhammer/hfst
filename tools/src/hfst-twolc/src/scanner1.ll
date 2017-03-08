@@ -1,4 +1,4 @@
-%option 8Bit batch yylineno noyywrap nounput
+%option 8Bit batch yylineno noyywrap nounput prefix="htwolcpre1"
 
 %{
   //   This program is free software: you can redistribute it and/or modify
@@ -128,7 +128,7 @@ in/{RESERVED_SYMBOL} { return IN; }
   // Rule name.
   symbol_queue.push_back
     (std::string("__HFST_TWOLC_RULE_NAME=")+
-     replace_substr(yytext," ","__HFST_TWOLC_SPACE"));
+     replace_substr(htwolcpre1text," ","__HFST_TWOLC_SPACE"));
   // reduce_queue();
   return RULE_NAME;
 }
@@ -229,17 +229,17 @@ in/{RESERVED_SYMBOL} { return IN; }
 }
 [0-9],[0-9]+/{RESERVED_EXC_COL} {
   // Number.
-  symbol_queue.push_back(+yytext);
+  symbol_queue.push_back(+htwolcpre1text);
   return NUMBER_SPACE;
 }
 [0-9]+/{RESERVED_EXC_COL} {
   // Number.
-  symbol_queue.push_back(yytext);
+  symbol_queue.push_back(htwolcpre1text);
   return NUMBER_SPACE;
 }
 [0-9]+/[:] {
   // Number.
-  symbol_queue.push_back(yytext);
+  symbol_queue.push_back(htwolcpre1text);
   return NUMBER;
 }
 [.][#][.]/{RESERVED_SYMBOL} {
@@ -391,7 +391,7 @@ in/{RESERVED_SYMBOL} { return IN; }
 (([%]({RESERVED_SYMBOL}|{FREE_SYMBOL}))|{FREE_SYMBOL})+/[:] {
   // A symbol which is the left side of a pair e.g. "a" in "a:b".
   std::string symbol =
-    remove_white_space(replace_substr(yytext,"\n","__HFST_TWOLC_\\n"));
+    remove_white_space(replace_substr(htwolcpre1text,"\n","__HFST_TWOLC_\\n"));
   if (symbol == "#")
     { symbol_queue.push_back("__HFST_TWOLC_#"); }
   else
@@ -402,7 +402,7 @@ in/{RESERVED_SYMBOL} { return IN; }
 (([%]({RESERVED_SYMBOL}|{FREE_SYMBOL}))|{FREE_SYMBOL})+/{RESERVED_EXC_COL} {
   // A symbol which is not the left side of a pair e.g. "b" in "a:b" or "[b]".
   std::string symbol =
-    remove_white_space(replace_substr(yytext,"\n","__HFST_TWOLC_\\n"));
+    remove_white_space(replace_substr(htwolcpre1text,"\n","__HFST_TWOLC_\\n"));
   if (symbol == "#")
     { symbol = "__HFST_TWOLC_#"; }
   symbol_queue.push_back(symbol);
