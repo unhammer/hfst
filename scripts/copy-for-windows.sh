@@ -37,7 +37,7 @@ fi
 for file in docstrings.i libhfst.i \
 hfst_extensions.cc hfst_file_extensions.cc hfst_lexc_extensions.cc hfst_lookup_extensions.cc \
 hfst_pmatch_extensions.cc hfst_prolog_extensions.cc hfst_regex_extensions.cc \
-hfst_rules_extensions.cc hfst_xfst_extensions.cc ;
+hfst_rules_extensions.cc hfst_xfst_extensions.cc hfst_sfst_extensions.cc ;
 do
     cp python/$file $1/
 done
