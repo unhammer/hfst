@@ -14,6 +14,7 @@
 
 int htwolcpre1parse();
 void htwolcpre1_set_input(std::istream & istr);
+void htwolcpre1_set_output(std::ostream & ostr);
 
 int main(int argc, char * argv[])
 {
@@ -56,6 +57,6 @@ int main(int argc, char * argv[])
 
   // Test that the output file is okay.
   (void)command_line.set_output_file();
-
+  htwolcpre1_set_output(std::cout);
   return htwolcpre1parse();
 }

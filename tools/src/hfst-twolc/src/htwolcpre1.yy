@@ -44,6 +44,12 @@
   void increase_line_counter(void);
   std::string &get_symbol_queue_front(void);
   void pop_symbol_queue(void);
+  std::ostream * output = NULL;
+
+  void htwolcpre1_set_output(std::ostream & ostr)
+  {
+    output = &ostr;
+  }
 
 #define YYERROR_VERBOSE 1
 
@@ -182,7 +188,7 @@ NEGATIVE_RULE_CONTEXTS RULE_VARIABLES
   try
     {
       if (rule_variables.empty())
-	{ std::cout << rule_symbol_vector.replace_variables(); }
+	{ *output << rule_symbol_vector.replace_variables(); }
       else
 	{
 	  for (RuleVariables::const_iterator it = rule_variables.begin();
@@ -190,7 +196,7 @@ NEGATIVE_RULE_CONTEXTS RULE_VARIABLES
 	       ++it)
 	    {
 	      it.set_values(variable_value_map);
-	      std::cout << rule_symbol_vector.replace_variables();
+	      *output << rule_symbol_vector.replace_variables();
 	    }
 	}
     }
@@ -210,7 +216,7 @@ NEGATIVE_RULE_CONTEXTS RULE_VARIABLES
 | RULE_NAME_DECL RE_RULE_CENTER RE_RULE_OPERATOR RULE_CONTEXTS
 NEGATIVE_RULE_CONTEXTS
 {
-  std::cout << rule_symbol_vector.replace_variables();
+  *output << rule_symbol_vector.replace_variables();
 
   // Clear all containers, so that we'll be ready to handle the next rule.
   rule_symbol_vector.clear();
@@ -354,7 +360,7 @@ SET_SYMBOL: GRAMMAR_SYMBOL_SPACE
 	     ["__HFST_TWOLC_SET_NAME=" + get_symbol_queue_front()].end();
 	   ++it)
 	{
-	  std::cout << *it << " ";
+	  *output << *it << " ";
 	  latest_set.push_back(*it);
 	}
       pop_symbol_queue();
@@ -492,7 +498,7 @@ void warn(const char * warning)
 void htwolcpre1error(const char * text)
 {
   htwolcpre1_input_reader.error(text);
-  std::cout << "__HFST_TWOLC_DIE";
+  *output << "__HFST_TWOLC_DIE";
   exit(1);
 }
 
@@ -608,7 +614,7 @@ void reduce_queue(bool variable_symbol)
     {
       if (! htwolcpre1_rules_start)
 	{
-	  std::cout << get_symbol_queue_front() << " ";
+	  *output << get_symbol_queue_front() << " ";
 	  pop_symbol_queue();
 	}
       else
