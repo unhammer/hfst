@@ -40,7 +40,6 @@
   extern char * htwolcpre3text;
   extern int htwolcpre3lineno;
   extern char * htwolcpre3text;
-  extern bool rules_start;
   void htwolcpre3error(const char * text );
   void semantic_error(const char * text);
   void warn(const char * warning );
@@ -48,14 +47,28 @@
   int htwolcpre3lex();
   int htwolcpre3parse();
   
-  extern bool silent; // = false;
-  extern bool verbose; // = false;
+  bool silent_ = false;
+  void htwolcpre3_set_silent(bool val)
+  {
+    silent_ = val;
+  }
+
+  bool verbose_ = false;
+  void htwolcpre3_set_verbose(bool val)
+  {
+    verbose_ = val;
+  }
 
 #define YYERROR_VERBOSE 1
 
   // For reading input one byte at a time.
   size_t line_number = 1;
-  InputReader pre3_input_reader(line_number);
+  InputReader htwolcpre3_input_reader(line_number);
+
+  void htwolcpre3_set_input(std::istream & istr)
+  {
+    htwolcpre3_input_reader.set_input(istr);
+  }
 
 #ifdef HAVE_XFSM
   #define Alphabet TwolCAlphabet
@@ -71,6 +84,16 @@
   // rule transducers.
   // TwolCGrammar grammar(true,true);
   TwolCGrammar * grammar;
+
+  void htwolcpre3_set_grammar(TwolCGrammar * grammar_)
+  {
+    grammar = grammar_;
+  }
+
+  TwolCGrammar * htwolcpre3_get_grammar()
+  {
+    return grammar;
+  }
 
   unsigned int get_number(const std::string &);
   unsigned int get_second_number(const std::string &s);
@@ -169,7 +192,7 @@ RULE: RULE_NAME RULE_CENTER RULE_OPERATOR RULE_CONTEXTS NEGATIVE_RULE_CONTEXTS
   // Subtract negative contexts from positive contexts.
   $4->apply(&HfstTransducer::subtract,*$5);
 
-  if (verbose)
+  if (verbose_)
     { message(std::string("Processing: ")+ get_name($1)); }
 
   if ($2->size() == 1)
@@ -496,7 +519,7 @@ void warn(const char * warning)
 void htwolcpre3error(const char * text)
 {
   (void)text;
-  pre3_input_reader.error(text);
+  htwolcpre3_input_reader.error(text);
   exit(1);
 }
 
@@ -527,7 +550,7 @@ unsigned int get_second_number(const std::string &s)
 
 void message(const std::string &m)
 {
-  if (! silent)
+  if (! silent_)
     { std::cerr << m << std::endl; }
 }
 

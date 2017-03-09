@@ -10,11 +10,10 @@
 //   You should have received a copy of the GNU General Public License
 //   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "io_src/InputReader.h"
 #include "commandline_src/CommandLine.h"
 
-extern int htwolcpre1parse();
-extern InputReader pre1_input_reader;
+int htwolcpre1parse();
+void htwolcpre1_set_input(std::istream & istr);
 
 int main(int argc, char * argv[])
 {
@@ -53,12 +52,10 @@ int main(int argc, char * argv[])
   if (command_line.be_verbose)
     { std::cerr << "Verbose mode." << std::endl; }
 
-  pre1_input_reader.set_input(command_line.set_input_file());
+  htwolcpre1_set_input(command_line.set_input_file());
 
   // Test that the output file is okay.
   (void)command_line.set_output_file();
-
-  //yydebug = 1;
 
   return htwolcpre1parse();
 }

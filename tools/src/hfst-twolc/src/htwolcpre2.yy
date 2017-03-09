@@ -24,26 +24,28 @@
 #include <fstream>
 #include <cstdlib>
 #include "io_src/InputReader.h"
+#include "HfstTwolcDefs.h"
 #include "grammar_defs.h"
 
   extern int htwolcpre2lineno;
   extern char * htwolcpre2text;
   extern int htwolcpre2lineno;
   extern char * htwolcpre2text;
-  extern bool rules_start;
   void htwolcpre2error(const char * text );
-  void semantic_error(const char * text);
-  void warn(const char * warning );
   int htwolcpre2lex();
   int htwolcpre2parse();
-  void complete_alphabet(void);
 
 #define YYERROR_VERBOSE 1
 
   size_t line_number = 1;
 
   // For reading input one byte at a time.
-  InputReader pre2_input_reader(line_number);
+  InputReader htwolcpre2_input_reader(line_number);
+
+  void htwolcpre2_set_input(std::istream & istr)
+  {
+    htwolcpre2_input_reader.set_input(istr);
+  }
 
 %}
 
@@ -216,7 +218,7 @@ SEMI_COLON_LIST: SEMI_COLON
 
 // Print warning.
 void warn(const char * warning)
-{ pre2_input_reader.warn(warning); }
+{ htwolcpre2_input_reader.warn(warning); }
 
 // Print error messge and exit 1.
 void htwolcpre2error(const char * text)
@@ -227,5 +229,79 @@ void htwolcpre2error(const char * text)
 }
 
 void semantic_error(const char * text)
-{ pre2_input_reader.error(text); }
+{ htwolcpre2_input_reader.error(text); }
 
+// non_alphabet_symbol_queue is used to store the grammar symbols which are
+// not located in the Alphabet section of the grammar.
+HandyDeque<std::string> htwolcpre2_non_alphabet_symbol_queue;
+
+// alphabet_symbol_queue is used to store the symbols in the Alphabet section
+// of the grammar.
+HandyDeque<std::string> htwolcpre2_alphabet_symbol_queue;
+
+// alphabet_symbol_queue is used to store the symbols in the Alphabet section
+// of the grammar after it has been completed with all symbol pairs in the
+// grammar.
+HandyDeque<std::string> total_alphabet_symbol_queue;
+
+const HandyDeque<std::string> & htwolcpre2_get_total_alphabet_symbol_queue()
+{
+  return total_alphabet_symbol_queue;
+}
+
+const HandyDeque<std::string> & htwolcpre2_get_non_alphabet_symbol_queue()
+{
+  return htwolcpre2_non_alphabet_symbol_queue;
+}
+
+void insert_alphabet_pairs(const HandyDeque<std::string> &symbol_queue,
+			   HandySet<SymbolPair> &symbol_pair_set)
+{
+  for (HandyDeque<std::string>::const_iterator it = symbol_queue.begin();
+       it != symbol_queue.end();
+       ++it)
+    {
+      //If we found a symbol pair, we insert it into symbol_pair_set.
+      if ((*it == "__HFST_TWOLC_0" ||
+	   *it == "__HFST_TWOLC_.#." ||
+	   *it == "__HFST_TWOLC_#" ||
+	   *it == "__HFST_TWOLC_SPACE" ||
+	   *it == "__HFST_TWOLC_TAB" ||
+           it->find("__HFST_TWOLC_") == std::string::npos)
+	  &&
+	  *(it+1) == "__HFST_TWOLC_:"
+	  &&
+	  (*(it+2) == "__HFST_TWOLC_0" ||
+	   *(it+2) == "__HFST_TWOLC_.#." ||
+	   *(it+2) == "__HFST_TWOLC_#" ||
+	   *(it+2) == "__HFST_TWOLC_SPACE" ||
+	   *(it+2) == "__HFST_TWOLC_TAB" ||
+           (it+2)->find("__HFST_TWOLC_") == std::string::npos))
+	{
+	  std::string input_symbol = *it == "__HFST_TWOLC_#" ? "#" : *it;
+	  ++(++it);
+	  std::string output_symbol = *it == "__HFST_TWOLC_#" ? "#" : *it;
+	  symbol_pair_set.insert(SymbolPair(input_symbol,output_symbol));
+	}
+    }
+  symbol_pair_set.insert(SymbolPair("__HFST_TWOLC_.#.","__HFST_TWOLC_.#."));
+}
+
+// Add all pairs in the grammar, which are missing from the Alphabet section,
+// into the Alphabet section.
+void htwolcpre2_complete_alphabet(void)
+{
+  HandySet<SymbolPair> symbol_pair_set;
+  insert_alphabet_pairs(htwolcpre2_alphabet_symbol_queue,symbol_pair_set);
+  insert_alphabet_pairs(htwolcpre2_non_alphabet_symbol_queue,symbol_pair_set);
+
+  total_alphabet_symbol_queue.push_back("__HFST_TWOLC_Alphabet");
+  for(HandySet<SymbolPair>::const_iterator it = symbol_pair_set.begin();
+      it != symbol_pair_set.end();
+      ++it)
+    {
+      total_alphabet_symbol_queue.push_back(it->first);
+      total_alphabet_symbol_queue.push_back("__HFST_TWOLC_:");
+      total_alphabet_symbol_queue.push_back(it->second);
+    }
+}

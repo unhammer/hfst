@@ -33,8 +33,7 @@
   extern char * htwolcpre1text;
   extern int htwolcpre1lineno;
   extern char * htwolcpre1text;
-  extern bool regexp_start;
-  extern bool rules_start;
+  extern bool htwolcpre1_rules_start;
   void htwolcpre1error(const char * text );
   void warn(const char * warning );
   int htwolcpre1lex();
@@ -52,7 +51,12 @@
   size_t line_number = 1;
  
   // For reading input one byte at a time.
-  InputReader pre1_input_reader(line_number);
+  InputReader htwolcpre1_input_reader(line_number);
+
+  void htwolcpre1_set_input(std::istream & istr)
+  {
+    htwolcpre1_input_reader.set_input(istr);
+  }
 
   // For keeping track of values of variables.
   VariableValueMap variable_value_map;
@@ -65,7 +69,7 @@
   RuleSymbolVector rule_symbol_vector(variable_value_map);
 
   // The latest symbol that was read is always the last element of this queue.
-  HandyDeque<std::string> symbol_queue;
+  HandyDeque<std::string> htwolcpre1_symbol_queue;
 
   // Stores symbol set names.
   HandySet<std::string> sets;
@@ -83,7 +87,7 @@
   std::vector<std::string> latest_set;
 
   // Tells whether we are inside a ( .. ). For variable rules.
-  bool inside_parenthesis = false;
+  bool htwolcpre1_inside_parenthesis = false;
 
   // For temporarily storing a rule variable and its values
   StringVector variable_vector;
@@ -314,8 +318,8 @@ RE_LIST: /* empty */
 RE: PAIR
 | RE POWER NUMBER_SPACE
 {
-  symbol_queue.front() =
-    std::string("__HFST_TWOLC_NUMBER=") + symbol_queue.front();
+  htwolcpre1_symbol_queue.front() =
+    std::string("__HFST_TWOLC_NUMBER=") + htwolcpre1_symbol_queue.front();
   reduce_queue();
 }
 | RE STAR
@@ -410,7 +414,7 @@ PAIR: GRAMMAR_SYMBOL COLON_SPACE
   // Push a "__HFST_TWOLC_?" onto symbol_queue.
   // Reduce the three first symbols "__HFST_TWOLC_?", "__HFST_TWOLC_:" and "X"
   // from symbol_queue.
-  symbol_queue.push_front("__HFST_TWOLC_?");
+  htwolcpre1_symbol_queue.push_front("__HFST_TWOLC_?");
   reduce_symbol_pair(true);
 }
 | GRAMMAR_SYMBOL COLON GRAMMAR_SYMBOL_SPACE
@@ -426,7 +430,7 @@ PAIR: GRAMMAR_SYMBOL COLON_SPACE
   // Push a "__HFST_TWOLC_?" onto symbol_queue.
   // Reduce the three first symbols "__HFST_TWOLC_?", "__HFST_TWOLC_:" and
   // "__HFST_TWOLC_?" from symbol_queue.
-  symbol_queue.push_front("__HFST_TWOLC_?");
+  htwolcpre1_symbol_queue.push_front("__HFST_TWOLC_?");
   reduce_symbol_pair();
 }
 | GRAMMAR_SYMBOL_SPACE
@@ -438,8 +442,8 @@ PAIR: GRAMMAR_SYMBOL COLON_SPACE
   std::string symbol = get_symbol_queue_front();
 
   // Add the colon and output symbol.
-  symbol_queue.push_front("__HFST_TWOLC_:");
-  symbol_queue.push_front(symbol);
+  htwolcpre1_symbol_queue.push_front("__HFST_TWOLC_:");
+  htwolcpre1_symbol_queue.push_front(symbol);
   reduce_symbol_pair();
 }
 
@@ -458,8 +462,8 @@ ALPHABET_PAIR: GRAMMAR_SYMBOL COLON GRAMMAR_SYMBOL_SPACE
   // Reduce the first three symbols "X", "__HFST_TWOLC_:" and "X" from
   // symbol_queue.
   std::string symbol = get_symbol_queue_front();
-  symbol_queue.push_back("__HFST_TWOLC_:");
-  symbol_queue.push_back(symbol);
+  htwolcpre1_symbol_queue.push_back("__HFST_TWOLC_:");
+  htwolcpre1_symbol_queue.push_back(symbol);
   reduce_symbol_pair();
 }
 
@@ -482,12 +486,12 @@ SEMI_COLON_LIST: SEMI_COLON
 
 // Print warning.
 void warn(const char * warning)
-{ pre1_input_reader.warn(warning); }
+{ htwolcpre1_input_reader.warn(warning); }
 
 // Print error messge and exit 1.
 void htwolcpre1error(const char * text)
 {
-  pre1_input_reader.error(text);
+  htwolcpre1_input_reader.error(text);
   std::cout << "__HFST_TWOLC_DIE";
   exit(1);
 }
@@ -549,11 +553,11 @@ void reduce_symbol_pair(bool no_definitions)
 // encountered.
 void increase_line_counter(void)
 {
-  while (! symbol_queue.empty() &&
-	 symbol_queue.front() == "__HFST_TWOLC_\\n")
+  while (! htwolcpre1_symbol_queue.empty() &&
+	 htwolcpre1_symbol_queue.front() == "__HFST_TWOLC_\\n")
     {
       ++line_number;
-      symbol_queue.pop_front();
+      htwolcpre1_symbol_queue.pop_front();
     }
 }
 
@@ -563,7 +567,7 @@ void increase_line_counter(void)
 void pop_symbol_queue(void)
 {
   increase_line_counter();
-  symbol_queue.pop_front();
+  htwolcpre1_symbol_queue.pop_front();
 }
 
 // First pop all "__HFST_TWOLC_\\n" in symbol_queue, while incrementing
@@ -572,7 +576,7 @@ void pop_symbol_queue(void)
 std::string &get_symbol_queue_front(void)
 {
   increase_line_counter();
-  return symbol_queue.front();
+  return htwolcpre1_symbol_queue.front();
 }
 
 // Decide what to do with the next symbol in symbol_queue.
@@ -602,7 +606,7 @@ void reduce_queue(bool variable_symbol)
   //    rule-variable names and values.
   if (! variable_symbol)
     {
-      if (! rules_start)
+      if (! htwolcpre1_rules_start)
 	{
 	  std::cout << get_symbol_queue_front() << " ";
 	  pop_symbol_queue();

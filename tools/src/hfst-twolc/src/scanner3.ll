@@ -23,10 +23,10 @@
 //#include "io_src/input_defs.h"
 
 #include "io_src/InputReader.h"
-extern InputReader pre3_input_reader;
+extern InputReader htwolcpre3_input_reader;
 #undef YY_INPUT
 #define YY_INPUT( buf, result, max_size ) { \
-char c = pre3_input_reader.input(); \
+char c = htwolcpre3_input_reader.input(); \
 if (c == 0) { \
 result = YY_NULL; \
 } \
