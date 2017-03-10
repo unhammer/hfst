@@ -15,11 +15,15 @@
 #include "commandline_src/CommandLine.h"
 #include "grammar_defs.h"
 
-int htwolcpre2parse();
-void htwolcpre2_set_input(std::istream & istr);
-void htwolcpre2_complete_alphabet(void);
-const HandyDeque<std::string> & htwolcpre2_get_total_alphabet_symbol_queue();
-const HandyDeque<std::string> & htwolcpre2_get_non_alphabet_symbol_queue();
+namespace hfst {
+  namespace twolcpre2 {
+    int parse();
+    void set_input(std::istream & istr);
+    void complete_alphabet(void);
+    const HandyDeque<std::string> & get_total_alphabet_symbol_queue();
+    const HandyDeque<std::string> & get_non_alphabet_symbol_queue();
+  }
+}
 
 int main(int argc, char * argv[])
 {
@@ -31,10 +35,10 @@ int main(int argc, char * argv[])
   CommandLine command_line(argc,argv);
   if (command_line.help || command_line.usage || command_line.version)
     { exit(0); }
-  htwolcpre2_set_input(std::cin);
-  int exit_code = htwolcpre2parse();
-  htwolcpre2_complete_alphabet();
-  std::cout << htwolcpre2_get_total_alphabet_symbol_queue() << " ";
-  std::cout << htwolcpre2_get_non_alphabet_symbol_queue();
+  hfst::twolcpre2::set_input(std::cin);
+  int exit_code = hfst::twolcpre2::parse();
+  hfst::twolcpre2::complete_alphabet();
+  std::cout << hfst::twolcpre2::get_total_alphabet_symbol_queue() << " ";
+  std::cout << hfst::twolcpre2::get_non_alphabet_symbol_queue();
   return exit_code;
 }

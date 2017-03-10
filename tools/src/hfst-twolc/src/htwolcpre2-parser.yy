@@ -42,10 +42,16 @@
   // For reading input one byte at a time.
   InputReader htwolcpre2_input_reader(htwolcpre2_line_number);
 
-  void htwolcpre2_set_input(std::istream & istr)
+namespace hfst { namespace twolcpre2 {
+  void set_input(std::istream & istr)
   {
     htwolcpre2_input_reader.set_input(istr);
   }
+  int parse()
+  {
+    return htwolcpre2parse();
+  }        
+}}
 
 %}
 
@@ -244,15 +250,17 @@ HandyDeque<std::string> htwolcpre2_alphabet_symbol_queue;
 // grammar.
 HandyDeque<std::string> total_alphabet_symbol_queue;
 
-const HandyDeque<std::string> & htwolcpre2_get_total_alphabet_symbol_queue()
+namespace hfst { namespace twolcpre2 {
+const HandyDeque<std::string> & get_total_alphabet_symbol_queue()
 {
   return total_alphabet_symbol_queue;
 }
 
-const HandyDeque<std::string> & htwolcpre2_get_non_alphabet_symbol_queue()
+const HandyDeque<std::string> & get_non_alphabet_symbol_queue()
 {
   return htwolcpre2_non_alphabet_symbol_queue;
 }
+}}
 
 void insert_alphabet_pairs(const HandyDeque<std::string> &symbol_queue,
 			   HandySet<SymbolPair> &symbol_pair_set)
@@ -289,7 +297,8 @@ void insert_alphabet_pairs(const HandyDeque<std::string> &symbol_queue,
 
 // Add all pairs in the grammar, which are missing from the Alphabet section,
 // into the Alphabet section.
-void htwolcpre2_complete_alphabet(void)
+namespace hfst { namespace twolcpre2 {
+void complete_alphabet(void)
 {
   HandySet<SymbolPair> symbol_pair_set;
   insert_alphabet_pairs(htwolcpre2_alphabet_symbol_queue,symbol_pair_set);
@@ -305,3 +314,4 @@ void htwolcpre2_complete_alphabet(void)
       total_alphabet_symbol_queue.push_back(it->second);
     }
 }
+}}

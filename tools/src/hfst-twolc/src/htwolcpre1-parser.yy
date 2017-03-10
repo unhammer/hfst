@@ -46,11 +46,6 @@
   void pop_symbol_queue(void);
   std::ostream * output = NULL;
 
-  void htwolcpre1_set_output(std::ostream & ostr)
-  {
-    output = &ostr;
-  }
-
 #define YYERROR_VERBOSE 1
 
   // For displaying the line number in error messages and warnings.
@@ -59,10 +54,23 @@
   // For reading input one byte at a time.
   InputReader htwolcpre1_input_reader(htwolcpre1_line_number);
 
-  void htwolcpre1_set_input(std::istream & istr)
-  {
-    htwolcpre1_input_reader.set_input(istr);
+namespace hfst {
+  namespace twolcpre1 {
+
+    void set_input(std::istream & istr)
+    {
+      htwolcpre1_input_reader.set_input(istr);
+    }
+    int parse()
+    {
+      return htwolcpre1parse();
+    }
+    void set_output(std::ostream & ostr)
+    {
+      output = &ostr;
+    }
   }
+}
 
   // For keeping track of values of variables.
   VariableValueMap variable_value_map;

@@ -42,9 +42,9 @@ result = 1; \
 #include "rule_src/TwolCGrammar.h"
 
 #ifdef YACC_USE_PARSER_H_EXTENSION
-  #include "htwolcpre3.h"
+  #include "htwolcpre3-parser.h"
 #else
-  #include "htwolcpre3.hh"
+  #include "htwolcpre3-parser.hh"
 #endif
 
   /*

@@ -12,9 +12,13 @@
 
 #include "commandline_src/CommandLine.h"
 
-int htwolcpre1parse();
-void htwolcpre1_set_input(std::istream & istr);
-void htwolcpre1_set_output(std::ostream & ostr);
+namespace hfst {
+  namespace twolcpre1 {
+    int parse();
+    void set_input(std::istream & istr);
+    void set_output(std::ostream & ostr);
+  }
+}
 
 int main(int argc, char * argv[])
 {
@@ -53,10 +57,10 @@ int main(int argc, char * argv[])
   if (command_line.be_verbose)
     { std::cerr << "Verbose mode." << std::endl; }
 
-  htwolcpre1_set_input(command_line.set_input_file());
+  hfst::twolcpre1::set_input(command_line.set_input_file());
 
   // Test that the output file is okay.
   (void)command_line.set_output_file();
-  htwolcpre1_set_output(std::cout);
-  return htwolcpre1parse();
+  hfst::twolcpre1::set_output(std::cout);
+  return hfst::twolcpre1::parse();
 }

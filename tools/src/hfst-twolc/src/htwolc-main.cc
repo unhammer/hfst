@@ -17,22 +17,34 @@
 #include "rule_src/TwolCGrammar.h"
 #include "rule_src/OtherSymbolTransducer.h"
 
-int htwolcpre1parse();
-void htwolcpre1_set_input(std::istream & istr);
-void htwolcpre1_set_output(std::ostream & ostr);
+namespace hfst {
+  namespace twolcpre1 {
+    int parse();
+    void set_input(std::istream & istr);
+    void set_output(std::ostream & ostr);
+  }
+}
 
-int htwolcpre2parse();
-void htwolcpre2_set_input(std::istream & istr);
-void htwolcpre2_complete_alphabet(void);
-const HandyDeque<std::string> & htwolcpre2_get_total_alphabet_symbol_queue();
-const HandyDeque<std::string> & htwolcpre2_get_non_alphabet_symbol_queue();
+namespace hfst {
+  namespace twolcpre2 {
+    int parse();
+    void set_input(std::istream & istr);
+    void complete_alphabet(void);
+    const HandyDeque<std::string> & get_total_alphabet_symbol_queue();
+    const HandyDeque<std::string> & get_non_alphabet_symbol_queue();
+  }
+}
 
-int htwolcpre3parse();
-void htwolcpre3_set_input(std::istream & istr);
-void htwolcpre3_set_grammar(TwolCGrammar * grammar);
-TwolCGrammar * htwolcpre3_get_grammar();
-void htwolcpre3_set_silent(bool val);
-void htwolcpre3_set_verbose(bool val);
+namespace hfst {
+  namespace twolcpre3 {
+    int parse();
+    void set_input(std::istream & istr);
+    void set_grammar(TwolCGrammar * grammar);
+    TwolCGrammar * get_grammar();
+    void set_silent(bool val);
+    void set_verbose(bool val);
+  }
+}
 
 bool silent=false;
 bool verbose=false;
@@ -77,50 +89,50 @@ int main(int argc, char * argv[])
   if (command_line.be_verbose)
     { std::cerr << "Verbose mode." << std::endl; }
 
-  htwolcpre1_set_input(command_line.set_input_file());
+  hfst::twolcpre1::set_input(command_line.set_input_file());
 
   // Test that the output file is okay.
   (void)command_line.set_output_file();
   std::ostringstream oss1;
-  htwolcpre1_set_output(oss1);
-  if (htwolcpre1parse() != 0)
+  hfst::twolcpre1::set_output(oss1);
+  if (hfst::twolcpre1::parse() != 0)
     {
       exit(1);
     }
 
   std::istringstream iss1(oss1.str());
-  htwolcpre2_set_input(iss1);
-  if (htwolcpre2parse() != 0)
+  hfst::twolcpre2::set_input(iss1);
+  if (hfst::twolcpre2::parse() != 0)
     {
       exit(1);
     }
-  htwolcpre2_complete_alphabet();
+  hfst::twolcpre2::complete_alphabet();
   
   std::ostringstream oss2;
-  oss2 << htwolcpre2_get_total_alphabet_symbol_queue() << " ";
-  oss2 << htwolcpre2_get_non_alphabet_symbol_queue();
+  oss2 << hfst::twolcpre2::get_total_alphabet_symbol_queue() << " ";
+  oss2 << hfst::twolcpre2::get_non_alphabet_symbol_queue();
 
 #ifdef DEBUG_TWOLC_3_GRAMMAR
-  htwolcpre3debug = 1;
+  hfst::twolcpre3debug = 1;
 #endif
 
   try
     {
       std::istringstream iss2(oss2.str());
-      htwolcpre3_set_input(iss2);
+      hfst::twolcpre3::set_input(iss2);
       
       OtherSymbolTransducer::set_transducer_type(command_line.format);
       silent = command_line.be_quiet;
-      htwolcpre3_set_silent(silent);
+      hfst::twolcpre3::set_silent(silent);
       verbose = command_line.be_verbose;
-      htwolcpre3_set_verbose(verbose);
+      hfst::twolcpre3::set_verbose(verbose);
       
       TwolCGrammar twolc_grammar(command_line.be_quiet,
 				 command_line.be_verbose,
 				 command_line.resolve_left_conflicts,
 				 command_line.resolve_right_conflicts);
-      htwolcpre3_set_grammar(&twolc_grammar);
-      int exit_code = htwolcpre3parse();
+      hfst::twolcpre3::set_grammar(&twolc_grammar);
+      int exit_code = hfst::twolcpre3::parse();
       if (exit_code != 0)
     { exit(exit_code); }
       
@@ -128,13 +140,13 @@ int main(int argc, char * argv[])
       if (! command_line.has_output_file)
     {
       HfstOutputStream stdout_(command_line.format);
-      htwolcpre3_get_grammar()->compile_and_store(stdout_);
+      hfst::twolcpre3::get_grammar()->compile_and_store(stdout_);
     }
       else
     {
       HfstOutputStream out
         (command_line.output_file_name,command_line.format);
-      htwolcpre3_get_grammar()->compile_and_store(out);
+      hfst::twolcpre3::get_grammar()->compile_and_store(out);
     }
       exit(0);
     }

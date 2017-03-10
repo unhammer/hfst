@@ -26,9 +26,9 @@ $(CL_SRC)/CommandLine.cc \
 $(CL_SRC)/CommandLine.h \
 grammar_defs.h \
 HfstTwolcDefs.h \
-htwolcpre1.yy \
-htwolcpre2.yy \
-htwolcpre3.yy \
+htwolcpre1-parser.yy \
+htwolcpre2-parser.yy \
+htwolcpre3-parser.yy \
 $(IO_SRC)/input_defs.h \
 $(IO_SRC)/InputReader.cc \
 $(IO_SRC)/InputReader.h \
@@ -54,9 +54,9 @@ $(RULE_SRC)/RuleContainer.h \
 $(RULE_SRC)/Rule.h \
 $(RULE_SRC)/TwolCGrammar.cc \
 $(RULE_SRC)/TwolCGrammar.h \
-scanner1.ll \
-scanner2.ll \
-scanner3.ll \
+htwolcpre1-lexer.ll \
+htwolcpre2-lexer.ll \
+htwolcpre3-lexer.ll \
 $(STRING_SRC)/string_manipulation.cc \
 $(STRING_SRC)/string_manipulation.h \
 $(VARIABLE_SRC)/ConstContainerIterator.h \
@@ -77,7 +77,7 @@ $(VARIABLE_SRC)/VariableValueIterator.h \
 $(VARIABLE_SRC)/VariableValues.cc \
 $(VARIABLE_SRC)/VariableValues.h
 
-htwolcpre1_SOURCES=htwolcpre1.yy scanner1.ll htwolcpre1-main.cc HfstTwolcDefs.h \
+htwolcpre1_SOURCES=htwolcpre1-parser.yy htwolcpre1-lexer.ll htwolcpre1-main.cc HfstTwolcDefs.h \
 		   $(CL_SRC)/CommandLine.h $(CL_SRC)/CommandLine.cc \
 	           $(IO_SRC)/input_defs.h grammar_defs.h \
                    $(IO_SRC)/InputReader.h $(IO_SRC)/InputReader.cc \
@@ -101,12 +101,12 @@ htwolcpre1_SOURCES=htwolcpre1.yy scanner1.ll htwolcpre1-main.cc HfstTwolcDefs.h 
 		   $(VARIABLE_SRC)/MixedConstContainerIterator.h \
 		   $(VARIABLE_SRC)/ConstContainerIterator.h
 
-htwolcpre2_SOURCES=htwolcpre2.yy scanner2.ll htwolcpre2-main.cc HfstTwolcDefs.h \
+htwolcpre2_SOURCES=htwolcpre2-parser.yy htwolcpre2-lexer.ll htwolcpre2-main.cc HfstTwolcDefs.h \
 		   $(CL_SRC)/CommandLine.h $(CL_SRC)/CommandLine.cc \
 	           $(IO_SRC)/input_defs.h grammar_defs.h \
                    $(IO_SRC)/InputReader.h $(IO_SRC)/InputReader.cc
 
-htwolcpre3_SOURCES=htwolcpre3.yy scanner3.ll htwolcpre3-main.cc HfstTwolcDefs.h \
+htwolcpre3_SOURCES=htwolcpre3-parser.yy htwolcpre3-lexer.ll htwolcpre3-main.cc HfstTwolcDefs.h \
 		   $(CL_SRC)/CommandLine.h $(CL_SRC)/CommandLine.cc \
 	           $(IO_SRC)/input_defs.h grammar_defs.h \
                    $(IO_SRC)/InputReader.cc $(IO_SRC)/InputReader.h \
@@ -139,7 +139,7 @@ htwolcpre3_SOURCES=htwolcpre3.yy scanner3.ll htwolcpre3-main.cc HfstTwolcDefs.h 
 hfst_twolc_system_SOURCES=hfst-twolc-system.cc
 
 # some systems might require all these
-BUILT_SOURCES=htwolcpre1.cc htwolcpre2.cc htwolcpre3.cc
+BUILT_SOURCES=htwolcpre1-parser.cc htwolcpre2-parser.cc htwolcpre3-parser.cc
 
 if YACC_USE_PARSER_H_EXTENSION
   HEADER=h
@@ -147,9 +147,9 @@ else
   HEADER=hh
 endif
 
-CLEANFILES=htwolcpre1.$(HEADER) htwolcpre2.$(HEADER) htwolcpre3.$(HEADER) \
-	   htwolcpre1.cc htwolcpre2.cc htwolcpre3.cc \
-	   scanner1.cc scanner2.cc scanner3.cc
+CLEANFILES=htwolcpre1-parser.$(HEADER) htwolcpre2-parser.$(HEADER) htwolcpre3-parser.$(HEADER) \
+	   htwolcpre1-parser.cc htwolcpre2-parser.cc htwolcpre3-parser.cc \
+	   htwolcpre1-lexer.cc htwolcpre2-lexer.cc htwolcpre3-lexer.cc
 
 hfst-twolc: hfst-twolc.sh
 	cat $< | sed -e 's|BINDIR|$(bindir)|' > $@
@@ -162,13 +162,13 @@ hfst-twolc-loc: hfst-twolc.sh
 clean-local:
 	-rm -f hfst-twolc hfst-twolc-loc hfst-twolc-system$(EXEEXT)
 
-htwolcpre1.$(HEADER): htwolcpre1.yy
-htwolcpre2.$(HEADER): htwolcpre2.yy
-htwolcpre3.$(HEADER): htwolcpre3.yy
+htwolcpre1-parser.$(HEADER): htwolcpre1-parser.yy
+htwolcpre2-parser.$(HEADER): htwolcpre2-parser.yy
+htwolcpre3-parser.$(HEADER): htwolcpre3-parser.yy
 
-scanner1.ll: htwolcpre1.$(HEADER)
-scanner2.ll: htwolcpre2.$(HEADER)
-scanner3.ll: htwolcpre3.$(HEADER)
+htwolcpre1-lexer.ll: htwolcpre1-parser.$(HEADER)
+htwolcpre2-lexer.ll: htwolcpre2-parser.$(HEADER)
+htwolcpre3-lexer.ll: htwolcpre3-parser.$(HEADER)
 
 HFST_TWOLC_TESTS=string_manipulation InputReader Alphabet \
                  OtherSymbolTransducer Rule LeftArrowRule RightArrowRule \
@@ -270,6 +270,6 @@ TwolCGrammar_CXXFLAGS=-DTEST_TWOL_C_GRAMMAR -Wno-deprecated
 
 TESTS=$(HFST_TWOLC_TESTS)
 
-EXTRA_DIST += htwolcpre1.$(HEADER) htwolcpre2.$(HEADER) htwolcpre3.$(HEADER) \
-	   htwolcpre1.cc htwolcpre2.cc htwolcpre3.cc \
-	   scanner1.cc scanner2.cc scanner3.cc
+EXTRA_DIST += htwolcpre1-parser.$(HEADER) htwolcpre2-parser.$(HEADER) htwolcpre3-parser.$(HEADER) \
+	   htwolcpre1-parser.cc htwolcpre2-parser.cc htwolcpre3-parser.cc \
+	   htwolcpre1-lexer.cc htwolcpre2-lexer.cc htwolcpre3-lexer.cc

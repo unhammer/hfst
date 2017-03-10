@@ -48,16 +48,23 @@
   int htwolcpre3parse();
   
   bool silent_ = false;
-  void htwolcpre3_set_silent(bool val)
+  bool verbose_ = false;
+
+namespace hfst {
+  namespace twolcpre3 {
+  void set_silent(bool val)
   {
     silent_ = val;
   }
-
-  bool verbose_ = false;
-  void htwolcpre3_set_verbose(bool val)
+  void set_verbose(bool val)
   {
     verbose_ = val;
   }
+  int parse()
+  {
+    return htwolcpre3parse();
+  }
+}}
 
 #define YYERROR_VERBOSE 1
 
@@ -65,10 +72,12 @@
   size_t htwolcpre3_line_number = 1;
   InputReader htwolcpre3_input_reader(htwolcpre3_line_number);
 
-  void htwolcpre3_set_input(std::istream & istr)
+namespace hfst { namespace twolcpre3 {
+  void set_input(std::istream & istr)
   {
     htwolcpre3_input_reader.set_input(istr);
   }
+}}
 
 #ifdef HAVE_XFSM
   #define Alphabet TwolCAlphabet
@@ -85,15 +94,17 @@
   // TwolCGrammar grammar(true,true);
   TwolCGrammar * grammar;
 
-  void htwolcpre3_set_grammar(TwolCGrammar * grammar_)
+namespace hfst {
+  namespace twolcpre3 {
+  void set_grammar(TwolCGrammar * grammar_)
   {
     grammar = grammar_;
   }
-
-  TwolCGrammar * htwolcpre3_get_grammar()
+  TwolCGrammar * get_grammar()
   {
     return grammar;
   }
+}}
 
   unsigned int get_number(const std::string &);
   unsigned int get_second_number(const std::string &s);

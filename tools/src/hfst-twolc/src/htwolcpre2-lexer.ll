@@ -21,9 +21,9 @@
 
   // The parser. Supplies flex with its symbol tables.
 #ifdef YACC_USE_PARSER_H_EXTENSION
-  #include "htwolcpre2.h"
+  #include "htwolcpre2-parser.h"
 #else
-  #include "htwolcpre2.hh"
+  #include "htwolcpre2-parser.hh"
 #endif
 
   // input_defs.h declares the inputHandler, which is
