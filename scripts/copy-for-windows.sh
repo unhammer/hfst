@@ -353,18 +353,18 @@ TWOLC_DIR=tools/src/hfst-twolc/src
 
 for file in \
 HfstTwolcDefs.h common_globals.h grammar_defs.h hfst-twolc.bat \
-htwolcpre1.hh htwolcpre2.hh htwolcpre3.hh;
+htwolcpre1-parser.hh htwolcpre2-parser.hh htwolcpre3-parser.hh;
 do
     cp $TWOLC_DIR/$file $1/$TWOLC_DIR/
 done
 
 for file in \
-hfst-twolc-system htwolcpre1 htwolcpre2 htwolcpre3 scanner1 scanner2 scanner3;
+hfst-twolc-system htwolcpre1-parser htwolcpre2-parser htwolcpre3-parser htwolcpre1-lexer htwolcpre2-lexer htwolcpre3-lexer;
 do
     cp $TWOLC_DIR/$file.cc $1/$TWOLC_DIR/$file.cpp
 done
 
-for file in scanner1.cpp scanner2.cpp scanner3.cpp;
+for file in htwolcpre1-lexer.cpp htwolcpre2-lexer.cpp htwolcpre3-lexer.cpp;
 do
     sed -i 's/#include <unistd.h>/#include <io.h>/' $1/$TWOLC_DIR/$file
     sed -i 's/yywrap( )/yywrap(void)/' $1/$TWOLC_DIR/$file
