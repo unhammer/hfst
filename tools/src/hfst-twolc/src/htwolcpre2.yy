@@ -37,10 +37,10 @@
 
 #define YYERROR_VERBOSE 1
 
-  size_t line_number = 1;
+  size_t htwolcpre2_line_number = 1;
 
   // For reading input one byte at a time.
-  InputReader htwolcpre2_input_reader(line_number);
+  InputReader htwolcpre2_input_reader(htwolcpre2_line_number);
 
   void htwolcpre2_set_input(std::istream & istr)
   {
@@ -217,7 +217,7 @@ SEMI_COLON_LIST: SEMI_COLON
 %%
 
 // Print warning.
-void warn(const char * warning)
+void htwolcpre2warn(const char * warning)
 { htwolcpre2_input_reader.warn(warning); }
 
 // Print error messge and exit 1.
@@ -228,7 +228,7 @@ void htwolcpre2error(const char * text)
   exit(1);
 }
 
-void semantic_error(const char * text)
+void htwolcpre2_semantic_error(const char * text)
 { htwolcpre2_input_reader.error(text); }
 
 // non_alphabet_symbol_queue is used to store the grammar symbols which are

@@ -41,8 +41,8 @@
   extern int htwolcpre3lineno;
   extern char * htwolcpre3text;
   void htwolcpre3error(const char * text );
-  void semantic_error(const char * text);
-  void warn(const char * warning );
+  void htwolcpre3_semantic_error(const char * text);
+  void htwolcpre3warn(const char * warning );
   void message(const std::string &m);
   int htwolcpre3lex();
   int htwolcpre3parse();
@@ -62,8 +62,8 @@
 #define YYERROR_VERBOSE 1
 
   // For reading input one byte at a time.
-  size_t line_number = 1;
-  InputReader htwolcpre3_input_reader(line_number);
+  size_t htwolcpre3_line_number = 1;
+  InputReader htwolcpre3_input_reader(htwolcpre3_line_number);
 
   void htwolcpre3_set_input(std::istream & istr)
   {
@@ -474,7 +474,7 @@ PAIR: PAIR_SYMBOL COLON PAIR_SYMBOL
         "Compilation is terminated because a rule context, definition\n" +
         "or rule center becomes empty.\n\n";
 
-      semantic_error(error.c_str());
+      htwolcpre3_semantic_error(error.c_str());
     }
     }
 
@@ -506,7 +506,7 @@ SEMI_COLON_LIST: SEMI_COLON
 %%
 
 // Print warning.
-void warn(const char * warning)
+void htwolcpre3warn(const char * warning)
 {
 #ifdef DEBUG_TWOLC_3_GRAMMAR
   std::cerr << warning << std::endl;
@@ -524,7 +524,7 @@ void htwolcpre3error(const char * text)
 }
 
 // Print error messge and exit 1.
-void semantic_error(const char * text)
+void htwolcpre3_semantic_error(const char * text)
 {
   std::cerr << std::endl << "Error: " << text << std::endl;
   exit(1);

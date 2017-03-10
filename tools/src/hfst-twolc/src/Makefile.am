@@ -1,7 +1,7 @@
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 AM_CXXFLAGS= -Wcast-qual -Wno-deprecated -Wfatal-errors
-bin_PROGRAMS=htwolcpre1 htwolcpre2 htwolcpre3 hfst-twolc-system
+bin_PROGRAMS=htwolcpre1 htwolcpre2 htwolcpre3 htwolc hfst-twolc-system
 bin_SCRIPTS=hfst-twolc hfst-twolc-loc
 EXTRA_DIST=hfst-twolc.sh hfst-twolc.bat common_globals.h
 IO_SRC=$(srcdir)/io_src
@@ -16,8 +16,66 @@ LDADD = $(top_builddir)/libhfst/src/libhfst.la
 
 # the preprocessor scripts do not support options per se, so we whitelist
 # them here
-AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=htwolcpre1 htwolcpre2 htwolcpre3 \
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=htwolcpre1 htwolcpre2 htwolcpre3 htwolc \
 				hfst-twolc hfst-twolc-loc hfst-twolc-system$(EXEEXT)
+
+htwolc_SOURCES=htwolc-main.cc \
+$(ALPHABET_SRC)/Alphabet.cc \
+$(ALPHABET_SRC)/Alphabet.h \
+$(CL_SRC)/CommandLine.cc \
+$(CL_SRC)/CommandLine.h \
+grammar_defs.h \
+HfstTwolcDefs.h \
+htwolcpre1.yy \
+htwolcpre2.yy \
+htwolcpre3.yy \
+$(IO_SRC)/input_defs.h \
+$(IO_SRC)/InputReader.cc \
+$(IO_SRC)/InputReader.h \
+$(RULE_SRC)/ConflictResolvingLeftArrowRule.cc \
+$(RULE_SRC)/ConflictResolvingLeftArrowRule.h \
+$(RULE_SRC)/ConflictResolvingRightArrowRule.cc \
+$(RULE_SRC)/ConflictResolvingRightArrowRule.h \
+$(RULE_SRC)/LeftArrowRule.cc \
+$(RULE_SRC)/LeftArrowRuleContainer.cc \
+$(RULE_SRC)/LeftArrowRuleContainer.h \
+$(RULE_SRC)/LeftArrowRule.h \
+$(RULE_SRC)/LeftRestrictionArrowRule.cc \
+$(RULE_SRC)/LeftRestrictionArrowRule.h \
+$(RULE_SRC)/OtherSymbolTransducer.cc \
+$(RULE_SRC)/OtherSymbolTransducer.h \
+$(RULE_SRC)/RightArrowRule.cc \
+$(RULE_SRC)/RightArrowRuleContainer.cc \
+$(RULE_SRC)/RightArrowRuleContainer.h \
+$(RULE_SRC)/RightArrowRule.h \
+$(RULE_SRC)/Rule.cc \
+$(RULE_SRC)/RuleContainer.cc \
+$(RULE_SRC)/RuleContainer.h \
+$(RULE_SRC)/Rule.h \
+$(RULE_SRC)/TwolCGrammar.cc \
+$(RULE_SRC)/TwolCGrammar.h \
+scanner1.ll \
+scanner2.ll \
+scanner3.ll \
+$(STRING_SRC)/string_manipulation.cc \
+$(STRING_SRC)/string_manipulation.h \
+$(VARIABLE_SRC)/ConstContainerIterator.h \
+$(VARIABLE_SRC)/MatchedConstContainerIterator.h \
+$(VARIABLE_SRC)/MixedConstContainerIterator.h \
+$(VARIABLE_SRC)/RuleSymbolVector.cc \
+$(VARIABLE_SRC)/RuleSymbolVector.h \
+$(VARIABLE_SRC)/RuleVariables.cc \
+$(VARIABLE_SRC)/RuleVariablesConstIterator.cc \
+$(VARIABLE_SRC)/RuleVariablesConstIterator.h \
+$(VARIABLE_SRC)/RuleVariables.h \
+$(VARIABLE_SRC)/VariableBlockContainer.h \
+$(VARIABLE_SRC)/VariableBlock.h \
+$(VARIABLE_SRC)/VariableContainerBase.h \
+$(VARIABLE_SRC)/VariableContainer.h \
+$(VARIABLE_SRC)/VariableDefs.h \
+$(VARIABLE_SRC)/VariableValueIterator.h \
+$(VARIABLE_SRC)/VariableValues.cc \
+$(VARIABLE_SRC)/VariableValues.h
 
 htwolcpre1_SOURCES=htwolcpre1.yy scanner1.ll htwolcpre1-main.cc HfstTwolcDefs.h \
 		   $(CL_SRC)/CommandLine.h $(CL_SRC)/CommandLine.cc \

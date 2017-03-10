@@ -35,7 +35,7 @@
   extern char * htwolcpre1text;
   extern bool htwolcpre1_rules_start;
   void htwolcpre1error(const char * text );
-  void warn(const char * warning );
+  void htwolcpre1warn(const char * warning );
   int htwolcpre1lex();
   int htwolcpre1parse();
   void reduce_queue(bool variable_symbol=false);
@@ -54,10 +54,10 @@
 #define YYERROR_VERBOSE 1
 
   // For displaying the line number in error messages and warnings.
-  size_t line_number = 1;
+  size_t htwolcpre1_line_number = 1;
  
   // For reading input one byte at a time.
-  InputReader htwolcpre1_input_reader(line_number);
+  InputReader htwolcpre1_input_reader(htwolcpre1_line_number);
 
   void htwolcpre1_set_input(std::istream & istr)
   {
@@ -491,7 +491,7 @@ SEMI_COLON_LIST: SEMI_COLON
 %%
 
 // Print warning.
-void warn(const char * warning)
+void htwolcpre1warn(const char * warning)
 { htwolcpre1_input_reader.warn(warning); }
 
 // Print error messge and exit 1.
@@ -562,7 +562,7 @@ void increase_line_counter(void)
   while (! htwolcpre1_symbol_queue.empty() &&
 	 htwolcpre1_symbol_queue.front() == "__HFST_TWOLC_\\n")
     {
-      ++line_number;
+      ++htwolcpre1_line_number;
       htwolcpre1_symbol_queue.pop_front();
     }
 }
