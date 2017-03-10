@@ -1,7 +1,7 @@
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 AM_CXXFLAGS= -Wcast-qual -Wno-deprecated -Wfatal-errors
-bin_PROGRAMS=htwolcpre1 htwolcpre2 htwolcpre3 htwolc hfst-twolc-system
+bin_PROGRAMS=htwolcpre1 htwolcpre2 htwolcpre3 hfst-twolc-system
 bin_SCRIPTS=hfst-twolc hfst-twolc-loc
 EXTRA_DIST=hfst-twolc.sh hfst-twolc.bat common_globals.h
 IO_SRC=$(srcdir)/io_src
