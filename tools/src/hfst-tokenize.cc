@@ -110,9 +110,10 @@ print_usage()
 	    "  -i, --space-separated    Tokenization with one sentence per line, space-separated tokens\n"
             "  -x, --xerox              Xerox output\n"
             "  -c, --cg                 Constraint Grammar output\n"
+            "  -S, --superblanks        Ignore contents of unescaped [] (cf. apertium-destxt); flush on NUL\n"
             "  -g, --giella-cg          CG format used in Giella infrastructe (implies -l2,\n"
             "                           treats @PMATCH_INPUT_MARK@ as subreading separator,\n"
-            "                           and expects tags to start or end with +)\n"
+            "                           expects tags to start or end with +, flush on NUL)\n"
             "  -C  --conllu             CoNLL-U format\n"
             "  -f, --finnpos            FinnPos output\n");
     fprintf(message_out,
@@ -872,9 +873,9 @@ void match_and_print(hfst_ol::PmatchContainer & container,
 }
 
 // TODO: lambda this when C++11 available everywhere
-inline void process_input_superblanks_print(hfst_ol::PmatchContainer & container,
-                                            std::ostream & outstream,
-                                            std::ostringstream& cur)
+inline void process_input_0delim_print(hfst_ol::PmatchContainer & container,
+                                       std::ostream & outstream,
+                                       std::ostringstream& cur)
 {
     string input_text(cur.str());
     if(!input_text.empty()) {
@@ -884,8 +885,9 @@ inline void process_input_superblanks_print(hfst_ol::PmatchContainer & container
     cur.str(string());
 }
 
-int process_input_superblanks(hfst_ol::PmatchContainer & container,
-                              std::ostream & outstream)
+template<bool do_superblank>
+int process_input_0delim(hfst_ol::PmatchContainer & container,
+                         std::ostream & outstream)
 {
     char * line = NULL;
     size_t bufsize = 0;
@@ -900,12 +902,12 @@ int process_input_superblanks(hfst_ol::PmatchContainer & container,
                 escaped = false;
                 continue;
             }
-            else if(!in_blank && line[i] == '[') {
-                process_input_superblanks_print(container, outstream, cur);
+            else if(do_superblank && !in_blank && line[i] == '[') {
+                process_input_0delim_print(container, outstream, cur);
                 cur << line[i];
                 in_blank = true;
             }
-            else if(in_blank && line[i] == ']') {
+            else if(do_superblank && in_blank && line[i] == ']') {
                 cur << line[i];
                 if(i+1 < len && line[i+1] == '[') {
                     // Join consecutive superblanks
@@ -920,7 +922,7 @@ int process_input_superblanks(hfst_ol::PmatchContainer & container,
                 }
             }
             else if(line[i] == '\0') {
-                process_input_superblanks_print(container, outstream, cur);
+                process_input_0delim_print(container, outstream, cur);
                 outstream << "<STREAMCMD:FLUSH>" << std::endl; // CG format uses this instead of \0
                 outstream.flush();
                 if(outstream.bad()) {
@@ -942,7 +944,7 @@ int process_input_superblanks(hfst_ol::PmatchContainer & container,
         print_nonmatching_sequence(cur.str(), outstream);
     }
     else {
-        process_input_superblanks_print(container, outstream, cur);
+        process_input_0delim_print(container, outstream, cur);
     }
     return EXIT_SUCCESS;
 }
@@ -958,8 +960,13 @@ inline void maybe_erase_newline(string& input_text)
 int process_input(hfst_ol::PmatchContainer & container,
                   std::ostream & outstream)
 {
-    if(superblanks) {
-        return process_input_superblanks(container, outstream);
+    if(output_format == giellacg || superblanks) {
+        if(superblanks) {
+            return process_input_0delim<true>(container, outstream);
+        }
+        else {
+            return process_input_0delim<false>(container, outstream);
+        }
     }
     string input_text;
     char * line = NULL;
@@ -1016,6 +1023,7 @@ int parse_options(int argc, char** argv)
 		{"space-separated", no_argument, 0, 'd'},
                 {"xerox", no_argument, 0, 'x'},
                 {"cg", no_argument, 0, 'c'},
+                {"superblanks", no_argument, 0, 'S'},
                 {"giella-cg", no_argument, 0, 'g'},
                 {"gtd", no_argument, 0, 'g'},
                 {"conllu", no_argument, 0, 'C'},
@@ -1023,7 +1031,7 @@ int parse_options(int argc, char** argv)
                 {0,0,0,0}
             };
         int option_index = 0;
-        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nkawmut:l:zixcgCf",
+        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nkawmut:l:zixcSgCf",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -1084,13 +1092,14 @@ int parse_options(int argc, char** argv)
         case 'C':
             output_format = conllu;
             break;
+        case 'S':
+            superblanks = true;
+            break;
         case 'g':
             output_format = giellacg;
             print_weights = true;
             print_all = true;
             dedupe = true;
-            superblanks = true;
-
             if(max_weight_classes == std::numeric_limits<int>::max()) {
                 max_weight_classes = 2;
             }
