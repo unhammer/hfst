@@ -921,6 +921,10 @@ int process_input_0delim(hfst_ol::PmatchContainer & container,
                     cur.str(string());
                 }
             }
+            else if(!in_blank && line[i] == '\n') {
+                cur << line[i];
+                process_input_0delim_print(container, outstream, cur);
+            }
             else if(line[i] == '\0') {
                 process_input_0delim_print(container, outstream, cur);
                 outstream << "<STREAMCMD:FLUSH>" << std::endl; // CG format uses this instead of \0

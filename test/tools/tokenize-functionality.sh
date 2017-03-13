@@ -66,8 +66,8 @@ fi
 
 
 # --giella-cg superblanks
-if ! printf 'dog[\\\n<\\\\>]cat !and \ndogs[][\n]' | $TOOLDIR/hfst-tokenize --giella-cg $srcdir/tokenize-dog.pmhfst > test.strings ; then
-    echo tokenize --giella-cg superblank fail:
+if ! printf 'dog[\\\n<\\\\>]cat !and \ndogs[][\n]' | $TOOLDIR/hfst-tokenize --giella-cg --superblanks $srcdir/tokenize-dog.pmhfst > test.strings ; then
+    echo tokenize --giella-cg --superblanks superblank fail:
     cat test.strings
     exit 1
 fi

@@ -31,7 +31,7 @@ from="${tmpd}/from"
 mkfifo "${to}" "${from}"
 
 # Server:
-$TOOLDIR/hfst-tokenize --giella-cg $srcdir/tokenize-dog.pmhfst <"${to}" >"${from}" &
+$TOOLDIR/hfst-tokenize --giella-cg --superblanks $srcdir/tokenize-dog.pmhfst <"${to}" >"${from}" &
 pid=$!
 trap 'kill $pid; wait $pid 2>/dev/null; rm -rf "${tmpd}"' EXIT
 
