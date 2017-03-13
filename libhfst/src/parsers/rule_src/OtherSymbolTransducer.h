@@ -24,7 +24,7 @@
 #  include <config.h>
 #endif
 
-#include "../../../../../libhfst/src/HfstTransducer.h"
+#include "../../../../libhfst/src/HfstTransducer.h"
 #include "HfstTwolcDefs.h"
 #include "grammar_defs.h"
 #include "../string_src/string_manipulation.h"

@@ -17,6 +17,8 @@
 
 #include "OtherSymbolTransducer.h"
 
+#ifndef TEST_OTHER_SYMBOL_TRANSDUCER
+
 HandySet<std::string> OtherSymbolTransducer::input_symbols;
 HandySet<std::string> OtherSymbolTransducer::output_symbols;
 HandySet<std::string> OtherSymbolTransducer::diacritics;
@@ -732,6 +734,8 @@ bool OtherSymbolTransducer::is_empty(void) const
 
 std::ostream &operator<<(std::ostream &out,const OtherSymbolTransducer &o)
 { return out << "FST:" << std::endl << o.transducer; }
+
+#endif // #ifndef TEST_OTHER_SYMBOL_TRANSDUCER
 
 #ifdef TEST_OTHER_SYMBOL_TRANSDUCER
 #include <cassert>
