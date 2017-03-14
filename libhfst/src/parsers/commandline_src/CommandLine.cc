@@ -2,6 +2,12 @@
 
 #include "CommandLine.h"
 
+#ifndef _MSC_VER
+#  include <getopt.h>
+#else
+#  include "../../../hfst-getopt.h"
+#endif
+
 void CommandLine::print_version(void)
 {
   // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dversion

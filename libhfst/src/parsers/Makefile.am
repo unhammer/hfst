@@ -37,10 +37,11 @@ STRING_SRC=$(srcdir)/string_src
 VARIABLE_SRC=$(srcdir)/variable_src
 RULE_SRC=$(srcdir)/rule_src
 ALPHABET_SRC=$(srcdir)/alphabet_src
-#CL_SRC=$(srcdir)/commandline_src
+CL_SRC=$(srcdir)/commandline_src
 
-#$(CL_SRC)/CommandLine.cc
 TWOLC_SRCS=htwolcpre1-parser.yy htwolcpre1-lexer.ll htwolcpre2-parser.yy htwolcpre2-lexer.ll htwolcpre3-parser.yy htwolcpre3-lexer.ll \
+TwolcCompiler.cc \
+$(CL_SRC)/CommandLine.cc \
 $(ALPHABET_SRC)/Alphabet.cc \
 $(IO_SRC)/InputReader.cc \
 $(RULE_SRC)/ConflictResolvingLeftArrowRule.cc \
@@ -61,8 +62,9 @@ $(VARIABLE_SRC)/RuleVariablesConstIterator.cc \
 $(VARIABLE_SRC)/VariableValues.cc
 
 # remove: $(IO_SRC)/input_defs.h
-#$(CL_SRC)/CommandLine.h
-TWOLC_HDRS=$(ALPHABET_SRC)/Alphabet.h \
+TWOLC_HDRS=TwolcCompiler.h \
+$(ALPHABET_SRC)/Alphabet.h \
+$(CL_SRC)/CommandLine.h \
 grammar_defs.h \
 HfstTwolcDefs.h \
 $(IO_SRC)/InputReader.h \

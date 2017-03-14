@@ -10,12 +10,12 @@ LDADD = $(top_builddir)/libhfst/src/libhfst.la
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=htwolcpre1 htwolcpre2 htwolcpre3 htwolc \
 				hfst-twolc hfst-twolc-loc hfst-twolc-system$(EXEEXT)
 
-CL_SRC=$(srcdir)/commandline_src
+#CL_SRC=$(srcdir)/commandline_src
 
-htwolc_SOURCES=htwolc-main.cc $(CL_SRC)/CommandLine.cc $(CL_SRC)/CommandLine.h
-htwolcpre1_SOURCES=htwolcpre1-main.cc $(CL_SRC)/CommandLine.cc $(CL_SRC)/CommandLine.h
-htwolcpre2_SOURCES=htwolcpre2-main.cc $(CL_SRC)/CommandLine.cc $(CL_SRC)/CommandLine.h
-htwolcpre3_SOURCES=htwolcpre3-main.cc $(CL_SRC)/CommandLine.cc $(CL_SRC)/CommandLine.h
+htwolc_SOURCES=htwolc-main.cc # $(CL_SRC)/CommandLine.cc $(CL_SRC)/CommandLine.h
+htwolcpre1_SOURCES=htwolcpre1-main.cc # $(CL_SRC)/CommandLine.cc $(CL_SRC)/CommandLine.h
+htwolcpre2_SOURCES=htwolcpre2-main.cc # $(CL_SRC)/CommandLine.cc $(CL_SRC)/CommandLine.h
+htwolcpre3_SOURCES=htwolcpre3-main.cc # $(CL_SRC)/CommandLine.cc $(CL_SRC)/CommandLine.h
 hfst_twolc_system_SOURCES=hfst-twolc-system.cc
 
 hfst-twolc: hfst-twolc.sh

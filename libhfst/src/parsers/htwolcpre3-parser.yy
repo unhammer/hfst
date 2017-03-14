@@ -43,7 +43,7 @@
   void htwolcpre3error(const char * text );
   void htwolcpre3_semantic_error(const char * text);
   void htwolcpre3warn(const char * warning );
-  void message(const std::string &m);
+  void htwolcpre3message(const std::string &m);
   int htwolcpre3lex();
   int htwolcpre3parse();
   
@@ -63,6 +63,10 @@ namespace hfst {
   int parse()
   {
     return htwolcpre3parse();
+  }
+  void message(const std::string &m)
+  {
+    return htwolcpre3message(m);
   }
 }}
 
@@ -193,7 +197,7 @@ GRAMMAR4: RULES
 RULES:RULES_HEADER RULE_LIST
 
 RULES_HEADER:RULES_DECLARATION
-{ message("Reading rules and compiling their contexts and centers."); }
+{ htwolcpre3message("Reading rules and compiling their contexts and centers."); }
 
 RULE_LIST: /* empty */
 | RULE_LIST RULE
@@ -204,7 +208,7 @@ RULE: RULE_NAME RULE_CENTER RULE_OPERATOR RULE_CONTEXTS NEGATIVE_RULE_CONTEXTS
   $4->apply(&HfstTransducer::subtract,*$5);
 
   if (verbose_)
-    { message(std::string("Processing: ")+ get_name($1)); }
+    { htwolcpre3message(std::string("Processing: ")+ get_name($1)); }
 
   if ($2->size() == 1)
     { grammar->add_rule($1,(*$2)[0],$3,OtherSymbolTransducerVector(1,*$4)); }
@@ -305,7 +309,7 @@ ALPHABET: ALPHABET_HEADER ALPHABET_PAIR_LIST SEMI_COLON_LIST
 { alphabet.alphabet_done(); }
 
 ALPHABET_HEADER:ALPHABET_DECLARATION
-{ message("Reading alphabet."); }
+{ htwolcpre3message("Reading alphabet."); }
 
 DIACRITICS: DIACRITICS_HEADER SYMBOL_LIST SEMI_COLON_LIST
 {
@@ -315,17 +319,17 @@ DIACRITICS: DIACRITICS_HEADER SYMBOL_LIST SEMI_COLON_LIST
 }
 
 DIACRITICS_HEADER:DIACRITICS_DECLARATION
-{ message("Reading diacritics."); }
+{ htwolcpre3message("Reading diacritics."); }
 
 SETS: SETS_HEADER SET_LIST
 
 SETS_HEADER:SETS_DECLARATION
-{ message("Reading sets."); }
+{ htwolcpre3message("Reading sets."); }
 
 DEFINITIONS: DEFINITION_HEADER DEFINITION_LIST
 
 DEFINITION_HEADER:DEFINITION_DECLARATION
-{ message("Reading and compiling definitions."); }
+{ htwolcpre3message("Reading and compiling definitions."); }
 
 DEFINITION_LIST: /* empty */
 | DEFINITION_LIST DEFINITION
@@ -559,7 +563,7 @@ unsigned int get_second_number(const std::string &s)
   return number;
 }
 
-void message(const std::string &m)
+void htwolcpre3message(const std::string &m)
 {
   if (! silent_)
     { std::cerr << m << std::endl; }

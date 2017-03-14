@@ -23,12 +23,6 @@
 
 #include <iostream>
 
-#ifndef _MSC_VER
-#  include <getopt.h>
-#else
-#  include "../../../hfst-getopt.h"
-#endif
-
 #include "HfstTransducer.h"
 using hfst::ImplementationType;
 

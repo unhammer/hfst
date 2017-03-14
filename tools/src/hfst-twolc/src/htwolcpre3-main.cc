@@ -23,13 +23,12 @@ namespace hfst {
     TwolCGrammar * get_grammar();
     void set_silent(bool val);
     void set_verbose(bool val);
+    void message(const std::string &);
   }
 }
 
 bool silent=false;
 bool verbose=false;
-
-void message(const std::string &m);
 
 int main(int argc, char * argv[])
 {
@@ -67,7 +66,7 @@ int main(int argc, char * argv[])
       if (exit_code != 0)
     { exit(exit_code); }
       
-      message("Compiling and storing rules.");
+      hfst::twolcpre3::message("Compiling and storing rules.");
       if (! command_line.has_output_file)
     {
       HfstOutputStream stdout_(command_line.format);
