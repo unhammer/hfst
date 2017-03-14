@@ -32,6 +32,11 @@
   // an object that overrides flex' default input reading.
   //#include "io_src/input_defs.h"
 
+extern int htwolcpre1error(const char*);
+
+#undef YY_FATAL_ERROR
+#define YY_FATAL_ERROR(msg) htwolcpre1error(msg);
+
 #include "io_src/InputReader.h"
 extern InputReader htwolcpre1_input_reader;
 #undef YY_INPUT

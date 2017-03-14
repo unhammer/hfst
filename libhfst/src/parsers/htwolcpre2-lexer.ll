@@ -25,6 +25,12 @@
 #else
   #include "htwolcpre2-parser.hh"
 #endif
+#include "../HfstExceptionDefs.h"
+
+extern int htwolcpre2error(const char*);
+
+#undef YY_FATAL_ERROR
+#define YY_FATAL_ERROR(msg) htwolcpre2error(msg);
 
   // input_defs.h declares the inputHandler, which is
   // an object that overrides flex' default input reading.
@@ -42,7 +48,6 @@ buf[0] = c; \
 result = 1; \
 } \
 }
-
 
   // non_alphabet_symbol_queue is used to store the grammar symbols which are
   // not located in the Alphabet section of the grammar.
@@ -95,7 +100,7 @@ __HFST_TWOLC_KILL_SYMBOL {
   // Signifies a syntax error in the first compilation phase.
   // Just die quietly, since syntax error msgs have been issued by
   // the first compilation phase.
-  exit(1);
+  throw HfstException();
 }
 [ ] { /* space: ignore */ }
 __HFST_TWOLC_RULE_NAME=\"[^\"]+\" {
@@ -286,8 +291,8 @@ __HFST_TWOLC__ {
 }
 __HFST_TWOLC_DIE {
   // If this symbol is seen, pass it on and exit quietly.
-  std::cout << "__HFST_TWOLC_DIE";
-  exit(1);
+  //std::cout << "__HFST_TWOLC_DIE";
+  throw HfstException();
 }
 __HFST_TWOLC_SET_NAME=[^ ]+ {
   htwolcpre2_non_alphabet_symbol_queue.push_back(htwolcpre2text);

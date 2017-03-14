@@ -26,6 +26,7 @@
 #include "io_src/InputReader.h"
 #include "HfstTwolcDefs.h"
 #include "grammar_defs.h"
+#include "../HfstExceptionDefs.h"
 
   extern int htwolcpre2lineno;
   extern char * htwolcpre2text;
@@ -235,12 +236,13 @@ SEMI_COLON_LIST: SEMI_COLON
 void htwolcpre2warn(const char * warning)
 { htwolcpre2_input_reader.warn(warning); }
 
-// Print error messge and exit 1.
+// Print error messge and throw an exception.
 void htwolcpre2error(const char * text)
 {
-  std::cerr << text << std::endl;
+  //std::cerr << text << std::endl;
+  htwolcpre2_input_reader.error(text);
   (void)text;
-  exit(1);
+  throw HfstException();
 }
 
 void htwolcpre2_semantic_error(const char * text)

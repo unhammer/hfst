@@ -537,21 +537,23 @@ void htwolcpre3warn(const char * warning)
 #else
   (void)warning;
 #endif
+  htwolcpre3_input_reader.warn(warning);
 }
 
-// Print error messge and exit 1.
+// Print error messge and throw an exception
 void htwolcpre3error(const char * text)
 {
   (void)text;
   htwolcpre3_input_reader.error(text);
-  exit(1);
+  throw HfstException();
 }
 
 // Print error messge and exit 1.
 void htwolcpre3_semantic_error(const char * text)
 {
-  std::cerr << std::endl << "Error: " << text << std::endl;
-  exit(1);
+  htwolcpre3_input_reader.error(text);
+  //std::cerr << std::endl << "Error: " << text << std::endl;
+  throw HfstException();
 }
 
 unsigned int get_number(const std::string &s)

@@ -437,7 +437,6 @@ MAPPINGPAIR_VECTOR: MAPPINGPAIR_VECTOR COMMA MAPPINGPAIR
          if ($1->first != $3->first)
          {
             hfst::xre::warn("Replace arrows should be the same. Calculated as if all replacements had the first arrow.");
-            //exit(1);
          }
  
          $1->second.push_back($3->second);

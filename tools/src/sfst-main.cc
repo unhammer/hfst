@@ -237,6 +237,11 @@ int main( int argc, char *argv[] )
       if (strarg != NULL) { free(strarg); }
       exit(1);
   }
+  catch (HfstException e) {
+    cerr << "\n" << e.what() << "\n\n";
+    if (strarg != NULL) { free(strarg); }
+    exit(1);
+  }
 
   if (strarg != NULL) { free(strarg); }
   exit(0);

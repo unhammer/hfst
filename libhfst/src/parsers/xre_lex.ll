@@ -27,6 +27,11 @@
 #undef YY_INPUT
 #define YY_INPUT(buf, retval, maxlen)   (retval = hfst::xre::getinput(buf, maxlen))
 
+extern int xreerror(const char*);
+
+#undef YY_FATAL_ERROR
+#define YY_FATAL_ERROR(msg) xreerror(msg);
+
 // These variablese are used when scanning a regex for a given SYMBOL
 // when performing variable substitution in function definition.
 namespace hfst {

@@ -26,8 +26,10 @@
 #undef YY_INPUT
 #define YY_INPUT(buf, retval, maxlen)   (retval = hfst::pmatch::getinput(buf, maxlen))
 
-extern
-int pmatcherror(char *text);
+extern int pmatcherror(const char *text);
+
+#undef YY_FATAL_ERROR
+#define YY_FATAL_ERROR(msg) pmatcherror(msg);
 
 %}
 

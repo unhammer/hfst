@@ -80,10 +80,10 @@ using hfst::implementations::HfstBasicTransition;
 #define GET_TOP(x) HfstTransducer * x = this->top(); if ((x) == NULL) { xfst_lesser_fail(); return *this; }
 #define PROMPT_AND_RETURN_THIS prompt(); return *this;
 #define PRINT_INFO_PROMPT_AND_RETURN_THIS print_transducer_info(); prompt(); return *this;
-#define IF_NULL_PROMPT_AND_RETURN_THIS(x) if (x == NULL) { if(variables_["quit-on-fail"] == "ON") { /*exit(EXIT_FAILURE);*/ this->fail_flag_ = true; } prompt(); return *this; }
+#define IF_NULL_PROMPT_AND_RETURN_THIS(x) if (x == NULL) { if(variables_["quit-on-fail"] == "ON") { this->fail_flag_ = true; } prompt(); return *this; }
 #define MAYBE_MINIMIZE(x) x->optimize();
-#define MAYBE_ASSERT(assertion, value) if (!value && ((variables_["assert"] == "ON" || assertion) && (variables_["quit-on-fail"] == "ON"))) { /*exit(EXIT_FAILURE);*/ this->fail_flag_ = true; }
-#define MAYBE_QUIT if(variables_["quit-on-fail"] == "ON") { /*exit(EXIT_FAILURE);*/ this->fail_flag_ = true; }
+#define MAYBE_ASSERT(assertion, value) if (!value && ((variables_["assert"] == "ON" || assertion) && (variables_["quit-on-fail"] == "ON"))) { this->fail_flag_ = true; }
+#define MAYBE_QUIT if(variables_["quit-on-fail"] == "ON") { this->fail_flag_ = true; }
 
 #define EMPTY_STACK error() << "Empty stack." << std::endl; flush(&error());
 
@@ -352,7 +352,6 @@ namespace xfst {
     if (variables_["quit-on-fail"] == "ON")
       {
         this->fail_flag_ = true;
-        //exit(EXIT_FAILURE);
       }
   }
 
@@ -361,7 +360,6 @@ namespace xfst {
     if (variables_["quit-on-fail"] == "ON" && !read_interactive_text_from_stdin_)
       {
         this->fail_flag_ = true;
-        //exit(EXIT_FAILURE);
       }
   }
 
@@ -2755,7 +2753,6 @@ namespace xfst {
           flush(&error());
           //hfst_fprintf(errorstream_, "fatal error in substitution\n");
           this->fail_flag_ = true;
-          //exit(EXIT_FAILURE);
         }
       PROMPT_AND_RETURN_THIS;
     }

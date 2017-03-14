@@ -30,7 +30,6 @@ namespace hfst {
   #include "xfst-parser.hh"
 #endif
 
-
 #include "xfst-utils.h"
 #include "XfstCompiler.h"
 
@@ -39,6 +38,9 @@ namespace hfst {
 #include "HfstDataTypes.h"
 
 extern void hxfsterror(const char *text);
+
+#undef YY_FATAL_ERROR
+#define YY_FATAL_ERROR(msg) hxfsterror(msg)
 
 int source_stack_size = 0;
 

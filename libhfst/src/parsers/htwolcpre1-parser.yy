@@ -28,6 +28,7 @@
 #include "variable_src/RuleSymbolVector.h"
 #include "variable_src/RuleVariables.h"
 #include "common_globals.h"
+#include "../HfstExceptionDefs.h"
 
   extern int htwolcpre1lineno;
   extern char * htwolcpre1text;
@@ -222,7 +223,7 @@ NEGATIVE_RULE_CONTEXTS RULE_VARIABLES
 	("Variable rules with keyword matched have to have equal length "
 	 "variable value lists.");
       htwolcpre1error(error.c_str());
-      exit(1);
+      throw HfstException();
     }
   // Clear all containers, so that we'll be ready to handle the next rule.
   rule_symbol_vector.clear();
@@ -510,12 +511,12 @@ SEMI_COLON_LIST: SEMI_COLON
 void htwolcpre1warn(const char * warning)
 { htwolcpre1_input_reader.warn(warning); }
 
-// Print error messge and exit 1.
+// Print error message and throw exception.
 void htwolcpre1error(const char * text)
 {
   htwolcpre1_input_reader.error(text);
   *output << "__HFST_TWOLC_DIE";
-  exit(1);
+  throw HfstException();
 }
 
 // Set the variable of this variable initialization and set its values.

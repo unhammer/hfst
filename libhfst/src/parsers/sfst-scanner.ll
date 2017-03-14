@@ -27,6 +27,11 @@
 #include "SfstUtf8.h"
 #include "HfstTransducer.h"
 
+extern void sfsterror(char*);
+
+#undef YY_FATAL_ERROR
+#define YY_FATAL_ERROR(msg) sfsterror(msg);
+
 using namespace hfst;
 using namespace sfst_basic;
 
@@ -98,7 +103,7 @@ FN	[A-Za-z0-9._/\-*+]
 		     name[strlen(name)-1] = 0;
                      if ( Include_Stack_Ptr >= MAX_INCLUDE_DEPTH ) {
 		       fprintf( stderr, "Includes nested too deeply" );
-		       exit( 1 );
+                       throw HfstException();
 		     }
 		     if (sfst_compiler->Verbose) fputc('\n', stderr);
 		     file = fopen( name, "rt" );

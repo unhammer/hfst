@@ -22,6 +22,11 @@
   // an object that overrides flex' default input reading.
 //#include "io_src/input_defs.h"
 
+extern int htwolcpre3error(const char*);
+
+#undef YY_FATAL_ERROR
+#define YY_FATAL_ERROR(msg) htwolcpre3error(msg);
+
 #include "io_src/InputReader.h"
 extern InputReader htwolcpre3_input_reader;
 #undef YY_INPUT
@@ -35,7 +40,6 @@ buf[0] = c; \
 result = 1; \
 } \
 }
-
 
 #include "string_src/string_manipulation.h"
 
@@ -67,7 +71,7 @@ __HFST_TWOLC_Sets { return SETS_DECLARATION; }
 __HFST_TWOLC_Rules { return RULES_DECLARATION; }
 __HFST_TWOLC_DIE {
   // If this symbol is seen, exit quietly.
-  exit(1);
+  throw HfstException();
 }
 [ \t\n] { /* space: ignore */ }
 

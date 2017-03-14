@@ -33,6 +33,10 @@
 
 
 extern void hlexcerror(const char *text);
+
+#undef YY_FATAL_ERROR
+#define YY_FATAL_ERROR(msg) hlexcerror(msg);
+
 %}
 
 /* c.f. Unicode Standard 5.1 D92 Table 3-7 */
