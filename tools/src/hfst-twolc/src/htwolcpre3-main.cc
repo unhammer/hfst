@@ -24,6 +24,8 @@ namespace hfst {
     void set_silent(bool val);
     void set_verbose(bool val);
     void message(const std::string &);
+    void set_warning_stream(std::ostream & ostr);
+    void set_error_stream(std::ostream & ostr);
   }
 }
 
@@ -50,6 +52,9 @@ int main(int argc, char * argv[])
     { hfst::twolcpre3::set_input(command_line.set_input_file()); }
       else
     { hfst::twolcpre3::set_input(std::cin); }
+
+      hfst::twolcpre3::set_warning_stream(std::cerr);
+      hfst::twolcpre3::set_error_stream(std::cerr);
       
       OtherSymbolTransducer::set_transducer_type(command_line.format);
       silent = command_line.be_quiet;

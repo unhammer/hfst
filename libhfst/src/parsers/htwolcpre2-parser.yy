@@ -50,7 +50,16 @@ namespace hfst { namespace twolcpre2 {
   int parse()
   {
     return htwolcpre2parse();
-  }        
+  }
+  void set_warning_stream(std::ostream & ostr)
+  {
+    htwolcpre2_input_reader.set_warning_stream(ostr);
+  }
+  void set_error_stream(std::ostream & ostr)
+  {
+    htwolcpre2_input_reader.set_error_stream(ostr);
+  }
+
 }}
 
 %}

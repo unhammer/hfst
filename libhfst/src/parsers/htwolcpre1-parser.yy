@@ -69,6 +69,14 @@ namespace hfst {
     {
       output = &ostr;
     }
+    void set_warning_stream(std::ostream & ostr)
+    {
+      htwolcpre1_input_reader.set_warning_stream(ostr);
+    }
+    void set_error_stream(std::ostream & ostr)
+    {
+      htwolcpre1_input_reader.set_error_stream(ostr);
+    }
   }
 }
 

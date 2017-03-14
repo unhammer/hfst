@@ -17,6 +17,8 @@ namespace hfst {
     int parse();
     void set_input(std::istream & istr);
     void set_output(std::ostream & ostr);
+    void set_warning_stream(std::ostream & ostr);
+    void set_error_stream(std::ostream & ostr);
   }
 }
 
@@ -62,5 +64,7 @@ int main(int argc, char * argv[])
   // Test that the output file is okay.
   (void)command_line.set_output_file();
   hfst::twolcpre1::set_output(std::cout);
+  hfst::twolcpre1::set_warning_stream(std::cerr);
+  hfst::twolcpre1::set_error_stream(std::cerr);
   return hfst::twolcpre1::parse();
 }

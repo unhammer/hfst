@@ -81,6 +81,15 @@ namespace hfst { namespace twolcpre3 {
   {
     htwolcpre3_input_reader.set_input(istr);
   }
+  void set_warning_stream(std::ostream & ostr)
+  {
+    htwolcpre3_input_reader.set_warning_stream(ostr);
+  }
+  void set_error_stream(std::ostream & ostr)
+  {
+    htwolcpre3_input_reader.set_error_stream(ostr);
+  }
+
 }}
 
 #ifdef HAVE_XFSM

@@ -51,6 +51,8 @@ private:
   char buffer[500000];
   size_t buffer_size;
   size_t buffer_index;
+  std::ostream * warning_stream;
+  std::ostream * error_stream;
 
 public:
   //! @brief Initialize a reader with line counter @a counter.
@@ -61,6 +63,12 @@ public:
 
   //! @brief Set the input stream from which the twolc-grmmar is read.
   void set_input(std::istream &file);
+
+  //! @brief Set the output stream where \a warn prints its input.
+  void set_warning_stream(std::ostream & os);
+
+  //! @brief Set the output stream where \a error prints its input.
+  void set_error_stream(std::ostream & os);
 
   //! @brief Display the warning message @a warning.
   void warn(const std::string &warning);

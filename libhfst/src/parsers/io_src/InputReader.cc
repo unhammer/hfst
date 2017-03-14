@@ -20,7 +20,9 @@ InputReader::InputReader(size_t &counter):
   input_stream(NULL),
   counter(counter),
   buffer_size(500000),
-  buffer_index(0)
+  buffer_index(0),
+  warning_stream(NULL),
+  error_stream(NULL)
 {}
 
 void InputReader::set_input(std::istream &file)
@@ -29,21 +31,37 @@ void InputReader::set_input(std::istream &file)
   input_stream->getline(buffer,buffer_size);
 }
 
+void InputReader::set_warning_stream(std::ostream & ostr)
+{
+  warning_stream = &ostr;
+}
+
+void InputReader::set_error_stream(std::ostream & ostr)
+{
+  error_stream = &ostr;
+}
+
 void InputReader::warn(const std::string &warning)
 {
-  std::cerr << std::endl;
-  std::cerr << warning << std::endl;
-  std::cerr << "on line " << counter << ":" << std::endl;
-  std::cerr << buffer << std::endl;
+  if (warning_stream != NULL)
+    {
+      *warning_stream << std::endl;
+      *warning_stream << warning << std::endl;
+      *warning_stream << "on line " << counter << ":" << std::endl;
+      *warning_stream << buffer << std::endl;
+    }
 }
 
 void InputReader::error(const std::string &err)
 {
-  std::cerr << std::endl;
-  std::cerr << err << std::endl;
-  std::cerr << "on line " << counter << ":" << std::endl;
-  std::cerr << buffer << std::endl;
-  std::cerr << "Aborted." << std::endl << std::endl;
+  if (error_stream != NULL)
+    {
+      *error_stream << std::endl;
+      *error_stream << err << std::endl;
+      *error_stream << "on line " << counter << ":" << std::endl;
+      *error_stream << buffer << std::endl;
+      *error_stream << "Aborted." << std::endl << std::endl;
+    }
 }
 
 char InputReader::input(void)

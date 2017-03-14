@@ -23,6 +23,8 @@ namespace hfst {
     int parse();
     void set_input(std::istream & istr);
     void set_output(std::ostream & ostr);
+    void set_warning_stream(std::ostream & ostr);
+    void set_error_stream(std::ostream & ostr);
   }
 }
 
@@ -33,6 +35,8 @@ namespace hfst {
     void complete_alphabet(void);
     const HandyDeque<std::string> & get_total_alphabet_symbol_queue();
     const HandyDeque<std::string> & get_non_alphabet_symbol_queue();
+    void set_warning_stream(std::ostream & ostr);
+    void set_error_stream(std::ostream & ostr);
   }
 }
 
@@ -45,6 +49,8 @@ namespace hfst {
     void set_silent(bool val);
     void set_verbose(bool val);
     void message(const std::string &m);
+    void set_warning_stream(std::ostream & ostr);
+    void set_error_stream(std::ostream & ostr);
   }
 }
 
@@ -58,6 +64,8 @@ namespace hfst {
     hfst::twolcpre1::set_input(command_line.set_input_file());
     std::ostringstream oss1;
     hfst::twolcpre1::set_output(oss1);
+    hfst::twolcpre1::set_warning_stream(std::cerr);
+    hfst::twolcpre1::set_error_stream(std::cerr);
     if (hfst::twolcpre1::parse() != 0)
       {
         throw HfstException();
@@ -65,6 +73,8 @@ namespace hfst {
 
     std::istringstream iss1(oss1.str());
     hfst::twolcpre2::set_input(iss1);
+    hfst::twolcpre2::set_warning_stream(std::cerr);
+    hfst::twolcpre2::set_error_stream(std::cerr);
 
     if (hfst::twolcpre2::parse() != 0)
       {
@@ -77,6 +87,8 @@ namespace hfst {
 
     std::istringstream iss2(oss2.str());
     hfst::twolcpre3::set_input(iss2);
+    hfst::twolcpre3::set_warning_stream(std::cerr);
+    hfst::twolcpre3::set_error_stream(std::cerr);
       
     OtherSymbolTransducer::set_transducer_type(command_line.format);
     hfst::twolcpre3::set_silent(command_line.be_quiet);

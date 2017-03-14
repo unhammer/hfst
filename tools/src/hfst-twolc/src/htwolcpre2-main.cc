@@ -22,6 +22,8 @@ namespace hfst {
     void complete_alphabet(void);
     const HandyDeque<std::string> & get_total_alphabet_symbol_queue();
     const HandyDeque<std::string> & get_non_alphabet_symbol_queue();
+    void set_warning_stream(std::ostream & ostr);
+    void set_error_stream(std::ostream & ostr);
   }
 }
 
@@ -36,6 +38,9 @@ int main(int argc, char * argv[])
   if (command_line.help || command_line.usage || command_line.version)
     { exit(0); }
   hfst::twolcpre2::set_input(std::cin);
+  hfst::twolcpre2::set_warning_stream(std::cerr);
+  hfst::twolcpre2::set_error_stream(std::cerr);
+
   int exit_code = hfst::twolcpre2::parse();
   hfst::twolcpre2::complete_alphabet();
   std::cout << hfst::twolcpre2::get_total_alphabet_symbol_queue() << " ";
