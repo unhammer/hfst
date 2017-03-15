@@ -58,7 +58,7 @@ int main(int argc, char * argv[])
 
   try 
     {
-      hfst::TwolcCompiler comp(command_line);
+      hfst::TwolcCompiler comp(command_line, std::cerr, std::cerr);
       comp.compile();
       std::cerr << "Compiling and storing rules.";
       if (! command_line.has_output_file)

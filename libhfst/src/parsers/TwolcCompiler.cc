@@ -56,16 +56,16 @@ namespace hfst {
 
 namespace hfst {
 
-  TwolcCompiler::TwolcCompiler(const CommandLine & cl):
-    command_line(cl) {};
+  TwolcCompiler::TwolcCompiler(const CommandLine & cl, std::ostream & warn, std::ostream & error):
+    command_line(cl), warning_stream(warn), error_stream(error) {};
 
   void TwolcCompiler::compile()
   {
     hfst::twolcpre1::set_input(command_line.set_input_file());
     std::ostringstream oss1;
     hfst::twolcpre1::set_output(oss1);
-    hfst::twolcpre1::set_warning_stream(std::cerr);
-    hfst::twolcpre1::set_error_stream(std::cerr);
+    hfst::twolcpre1::set_warning_stream(this->warning_stream);
+    hfst::twolcpre1::set_error_stream(this->error_stream);
     if (hfst::twolcpre1::parse() != 0)
       {
         throw HfstException();
@@ -73,8 +73,8 @@ namespace hfst {
 
     std::istringstream iss1(oss1.str());
     hfst::twolcpre2::set_input(iss1);
-    hfst::twolcpre2::set_warning_stream(std::cerr);
-    hfst::twolcpre2::set_error_stream(std::cerr);
+    hfst::twolcpre2::set_warning_stream(this->warning_stream);
+    hfst::twolcpre2::set_error_stream(this->error_stream);
 
     if (hfst::twolcpre2::parse() != 0)
       {
@@ -87,8 +87,8 @@ namespace hfst {
 
     std::istringstream iss2(oss2.str());
     hfst::twolcpre3::set_input(iss2);
-    hfst::twolcpre3::set_warning_stream(std::cerr);
-    hfst::twolcpre3::set_error_stream(std::cerr);
+    hfst::twolcpre3::set_warning_stream(this->warning_stream);
+    hfst::twolcpre3::set_error_stream(this->error_stream);
       
     OtherSymbolTransducer::set_transducer_type(command_line.format);
     hfst::twolcpre3::set_silent(command_line.be_quiet);

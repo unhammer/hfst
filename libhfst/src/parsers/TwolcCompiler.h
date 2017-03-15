@@ -23,8 +23,10 @@ namespace hfst {
   {
   private:
     CommandLine command_line;
+    std::ostream & warning_stream;
+    std::ostream & error_stream;
   public:
-    TwolcCompiler(const CommandLine & cl);
+    TwolcCompiler(const CommandLine & cl, std::ostream & warn, std::ostream & error);
     void compile();
     void store(hfst::HfstOutputStream & ostr);
   };
