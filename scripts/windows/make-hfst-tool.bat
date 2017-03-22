@@ -45,9 +45,10 @@ HfstPrintDot.cpp ^
 HfstPrintPCKimmo.cpp ^
 hfst-string-conversions.cpp ^
 string-utils.cpp ^
-implementations\HfstTransitionGraph.cpp ^
-implementations\ConvertTransducerFormat.cpp ^
+implementations\HfstBasicTransducer.cpp ^
+implementations\HfstBasicTransition.cpp ^
 implementations\HfstTropicalTransducerTransitionData.cpp ^
+implementations\ConvertTransducerFormat.cpp ^
 implementations\ConvertTropicalWeightTransducer.cpp ^
 implementations\ConvertLogWeightTransducer.cpp ^
 implementations\ConvertFomaTransducer.cpp ^
@@ -83,6 +84,37 @@ parsers\pmatch_utils.cpp ^
 parsers\xre_utils.cpp ^
 parsers\xfst-utils.cpp ^
 parsers\xfst_help_message.cpp ^
+parsers\sfst-scanner.cpp ^
+parsers\xfst-compiler.cpp ^
+parsers\XfstCompiler.cpp ^
+parsers\SfstAlphabet.cpp ^
+parsers\SfstBasic.cpp ^
+parsers\SfstUtf8.cpp ^
+parsers\htwolcpre1-parser.cpp ^
+parsers\htwolcpre2-parser.cpp ^
+parsers\htwolcpre3-parser.cpp ^
+parsers\htwolcpre1-lexer.cpp ^
+parsers\htwolcpre2-lexer.cpp ^
+parsers\htwolcpre3-lexer.cpp ^
+parsers\alphabet_src\Alphabet.cpp ^
+parsers\commandline_src\CommandLine.cpp ^
+parsers\io_src\InputReader.cpp ^
+parsers\rule_src\ConflictResolvingLeftArrowRule.cpp ^
+parsers\rule_src\ConflictResolvingRightArrowRule.cpp ^
+parsers\rule_src\LeftArrowRule.cpp ^
+parsers\rule_src\LeftArrowRuleContainer.cpp ^
+parsers\rule_src\LeftRestrictionArrowRule.cpp ^
+parsers\rule_src\OtherSymbolTransducer.cpp ^
+parsers\rule_src\RightArrowRule.cpp ^
+parsers\rule_src\RightArrowRuleContainer.cpp ^
+parsers\rule_src\Rule.cpp ^
+parsers\rule_src\RuleContainer.cpp ^
+parsers\rule_src\TwolCGrammar.cpp ^
+parsers\string_src\string_manipulation.cpp ^
+parsers\variable_src\RuleSymbolVector.cpp ^
+parsers\variable_src\RuleVariables.cpp ^
+parsers\variable_src\RuleVariablesConstIterator.cpp ^
+parsers\variable_src\VariableValues.cpp ^
 ..\..\back-ends\openfstwin\src\lib\compat.cpp ^
 ..\..\back-ends\openfstwin\src\lib\flags.cpp ^
 ..\..\back-ends\openfstwin\src\lib\fst.cpp ^
@@ -91,5 +123,3 @@ parsers\xfst_help_message.cpp ^
 ..\..\back-ends\openfstwin\src\lib\symbol-table-ops.cpp ^
 ..\..\back-ends\openfstwin\src\lib\util.cpp ^
 ..\..\back-ends\foma\*.c user32.lib
-
-

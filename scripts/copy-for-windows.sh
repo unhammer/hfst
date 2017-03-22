@@ -119,6 +119,13 @@ mkdir $1/libhfst/src/implementations
 mkdir $1/libhfst/src/implementations/compose_intersect
 mkdir $1/libhfst/src/implementations/optimized-lookup
 mkdir $1/libhfst/src/parsers
+mkdir $1/libhfst/src/parsers/alphabet_src
+mkdir $1/libhfst/src/parsers/commandline_src
+mkdir $1/libhfst/src/parsers/io_src
+mkdir $1/libhfst/src/parsers/rule_src
+mkdir $1/libhfst/src/parsers/string_src
+mkdir $1/libhfst/src/parsers/variable_src
+
 
 # libhfst/src without subdirectories
 for file in \
@@ -195,6 +202,7 @@ done
 # libhfst/src/parsers
 for file in \
 LexcCompiler PmatchCompiler XreCompiler XfstCompiler xfst_help_message \
+TwolcCompiler \
 lexc-utils pmatch_utils xre_utils xfst-utils SfstCompiler SfstAlphabet SfstBasic SfstUtf8;
 do
     cp libhfst/src/parsers/$file.cc \
@@ -203,21 +211,63 @@ do
         $1/libhfst/src/parsers/$file.h
 done
 for file in \
-lexc-lexer pmatch_lex xre_lex xfst-lexer sfst-scanner;
+lexc-lexer pmatch_lex xre_lex xfst-lexer sfst-scanner htwolcpre1-lexer htwolcpre2-lexer htwolcpre3-lexer;
 do
     cp libhfst/src/parsers/$file.cc \
         $1/libhfst/src/parsers/$file.cpp
 done
 for file in \
-lexc-parser pmatch_parse xre_parse xfst-parser sfst-compiler;
+lexc-parser pmatch_parse xre_parse xfst-parser sfst-compiler htwolcpre1-parser htwolcpre2-parser htwolcpre3-parser;
 do
     cp libhfst/src/parsers/$file.cc \
         $1/libhfst/src/parsers/$file.cpp
     cp libhfst/src/parsers/$file.hh \
         $1/libhfst/src/parsers/$file.hh
 done
-sed -i 's/#include <unistd.h>/#include <io.h>/' $1/libhfst/src/parsers/xfst-lexer.cpp
-sed -i 's/hxfstwrap( )/hxfstwrap(void)/' $1/libhfst/src/parsers/xfst-lexer.cpp
+
+for file in xfst-lexer htwolcpre1-lexer htwolcpre2-lexer htwolcpre3-lexer;
+do
+    sed -i 's/#include <unistd.h>/#include <io.h>/' $1/libhfst/src/parsers/$file.cpp
+    sed -i 's/hxfstwrap( )/hxfstwrap(void)/' $1/libhfst/src/parsers/$file.cpp
+done
+
+for file in HfstTwolcDefs.h common_globals.h grammar_defs.h;
+do
+    cp libhfst/src/parsers/$file $1/libhfst/src/parsers/$file
+done
+
+PARSERDIR=libhfst/src/parsers
+
+cp $PARSERDIR/alphabet_src/Alphabet.cc $1/$PARSERDIR/alphabet_src/Alphabet.cpp
+cp $PARSERDIR/alphabet_src/Alphabet.h $1/$PARSERDIR/alphabet_src/Alphabet.h
+cp $PARSERDIR/commandline_src/CommandLine.cc $1/$PARSERDIR/commandline_src/CommandLine.cpp
+cp $PARSERDIR/commandline_src/CommandLine.h $1/$PARSERDIR/commandline_src/CommandLine.h
+cp $PARSERDIR/io_src/InputReader.cc $1/$PARSERDIR/io_src/InputReader.cpp
+cp $PARSERDIR/io_src/InputReader.h $1/$PARSERDIR/io_src/InputReader.h
+cp $PARSERDIR/io_src/input_defs.h $1/$PARSERDIR/io_src/input_defs.h
+
+for file in ConflictResolvingLeftArrowRule ConflictResolvingRightArrowRule \
+					   LeftArrowRule LeftArrowRuleContainer LeftRestrictionArrowRule OtherSymbolTransducer \
+					   RightArrowRule RightArrowRuleContainer Rule RuleContainer TwolCGrammar;
+do
+    cp $PARSERDIR/rule_src/$file.h $1/$PARSERDIR/rule_src/$file.h
+    cp $PARSERDIR/rule_src/$file.cc $1/$PARSERDIR/rule_src/$file.cpp
+done
+
+cp $PARSERDIR/string_src/string_manipulation.cc $1/$PARSERDIR/string_src/string_manipulation.cpp
+cp $PARSERDIR/string_src/string_manipulation.h $1/$PARSERDIR/string_src/string_manipulation.h
+
+for file in ConstContainerIterator.h MatchedConstContainerIterator.h MixedConstContainerIterator.h \
+				     RuleSymbolVector.h RuleVariables.h RuleVariablesConstIterator.h VariableBlock.h VariableBlockContainer.h \
+				     VariableContainer.h VariableContainerBase.h VariableDefs.h VariableValueIterator.h VariableValues.h;
+do
+    cp $PARSERDIR/variable_src/$file $1/$PARSERDIR/variable_src/
+done
+
+for file in RuleSymbolVector RuleVariables RuleVariablesConstIterator VariableValues;
+do
+    cp $PARSERDIR/variable_src/$file.cc $1/$PARSERDIR/variable_src/$file.cpp
+done
 
 
 cp scripts/windows/make-python-bindings.bat $1/libhfst/src/
@@ -290,12 +340,6 @@ mkdir $1/tools/src/hfst-proc
 mkdir $1/tools/src/inc
 mkdir $1/tools/src/hfst-twolc
 mkdir $1/tools/src/hfst-twolc/src
-mkdir $1/tools/src/hfst-twolc/src/alphabet_src
-mkdir $1/tools/src/hfst-twolc/src/commandline_src
-mkdir $1/tools/src/hfst-twolc/src/io_src
-mkdir $1/tools/src/hfst-twolc/src/rule_src
-mkdir $1/tools/src/hfst-twolc/src/string_src
-mkdir $1/tools/src/hfst-twolc/src/variable_src
 
 # tools/src/parsers
 for file in hfst-xfst init_help;
@@ -306,6 +350,9 @@ for file in cmd.h abbrcmd.h;
 do
     cp tools/src/parsers/$file $1/tools/src/parsers/
 done
+
+# twolc
+cp tools/src/hfst-twolc/src/htwolc-main.cc $1/tools/src/hfst-twolc/src/hfst-twolc.cpp 
 
 # compare, strings2fst and txt2fst are needed for testing hfst-xfst
 for file in \
@@ -345,61 +392,3 @@ globals-common.h globals-unary.h;
 do
     cp tools/src/inc/$file $1/tools/src/inc/
 done
-
-
-# Copy twolc
-
-TWOLC_DIR=tools/src/hfst-twolc/src
-
-for file in \
-HfstTwolcDefs.h common_globals.h grammar_defs.h hfst-twolc.bat \
-htwolcpre1-parser.hh htwolcpre2-parser.hh htwolcpre3-parser.hh;
-do
-    cp $TWOLC_DIR/$file $1/$TWOLC_DIR/
-done
-
-for file in \
-hfst-twolc-system htwolcpre1-parser htwolcpre2-parser htwolcpre3-parser htwolcpre1-lexer htwolcpre2-lexer htwolcpre3-lexer;
-do
-    cp $TWOLC_DIR/$file.cc $1/$TWOLC_DIR/$file.cpp
-done
-
-for file in htwolcpre1-lexer.cpp htwolcpre2-lexer.cpp htwolcpre3-lexer.cpp;
-do
-    sed -i 's/#include <unistd.h>/#include <io.h>/' $1/$TWOLC_DIR/$file
-    sed -i 's/yywrap( )/yywrap(void)/' $1/$TWOLC_DIR/$file
-done
-
-cp $TWOLC_DIR/alphabet_src/Alphabet.cc $1/$TWOLC_DIR/alphabet_src/Alphabet.cpp
-cp $TWOLC_DIR/alphabet_src/Alphabet.h $1/$TWOLC_DIR/alphabet_src/Alphabet.h
-cp $TWOLC_DIR/commandline_src/CommandLine.cc $1/$TWOLC_DIR/commandline_src/CommandLine.cpp
-cp $TWOLC_DIR/commandline_src/CommandLine.h $1/$TWOLC_DIR/commandline_src/CommandLine.h
-cp $TWOLC_DIR/io_src/InputReader.cc $1/$TWOLC_DIR/io_src/InputReader.cpp
-cp $TWOLC_DIR/io_src/InputReader.h $1/$TWOLC_DIR/io_src/InputReader.h
-cp $TWOLC_DIR/io_src/input_defs.h $1/$TWOLC_DIR/io_src/input_defs.h
-
-for file in ConflictResolvingLeftArrowRule ConflictResolvingRightArrowRule \
-LeftArrowRule LeftArrowRuleContainer LeftRestrictionArrowRule OtherSymbolTransducer \
-RightArrowRule RightArrowRuleContainer Rule RuleContainer TwolCGrammar;
-do
-    cp $TWOLC_DIR/rule_src/$file.h $1/$TWOLC_DIR/rule_src/$file.h
-    cp $TWOLC_DIR/rule_src/$file.cc $1/$TWOLC_DIR/rule_src/$file.cpp
-done
-
-cp $TWOLC_DIR/string_src/string_manipulation.cc $1/$TWOLC_DIR/string_src/string_manipulation.cpp
-cp $TWOLC_DIR/string_src/string_manipulation.h $1/$TWOLC_DIR/string_src/string_manipulation.h
-
-for file in ConstContainerIterator.h MatchedConstContainerIterator.h MixedConstContainerIterator.h \
-RuleSymbolVector.h RuleVariables.h RuleVariablesConstIterator.h VariableBlock.h VariableBlockContainer.h \
-VariableContainer.h VariableContainerBase.h VariableDefs.h VariableValueIterator.h VariableValues.h;
-do
-    cp $TWOLC_DIR/variable_src/$file $1/$TWOLC_DIR/variable_src/
-done
-
-for file in RuleSymbolVector RuleVariables RuleVariablesConstIterator VariableValues;
-do
-    cp $TWOLC_DIR/variable_src/$file.cc $1/$TWOLC_DIR/variable_src/$file.cpp
-done
-
-# For convenience
-cp $TWOLC_DIR/hfst-twolc.bat $1/libhfst/src/
