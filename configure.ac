@@ -314,6 +314,12 @@ AC_ARG_ENABLE([twolc],
               [enable_twolc=$enableval],
               [if test x$enable_no_tools != xno; then enable_twolc=no; else enable_twolc=yes; fi])
 AM_CONDITIONAL([WANT_TWOLC], [test "x$enable_twolc" != xno])
+AC_ARG_ENABLE([twolc-script],
+              [AS_HELP_STRING([--enable-twolc-script],
+                              [build script implementation of twolc @<:@default=no@:>@])],
+              [enable_twolc_script=$enableval],
+              [enable_twolc_script=$enable_all_tools])
+AM_CONDITIONAL([WANT_TWOLC_SCRIPT], [test "x$enable_twolc_script" != xno])
 AC_ARG_ENABLE([tagger],
               [AS_HELP_STRING([--enable-tagger],
                               [build tagger utilities @<:@default=no@:>@])],
@@ -817,6 +823,7 @@ cat <<EOF
     *                 tail: $enable_tail
     *                 test: $enable_test
     *                 twolc: $enable_twolc
+    *                 twolc-script: $enable_twolc_script
     *                 tagger: $enable_tagger
     *                 txt2fst: $enable_txt2fst
     *                 xfst: $enable_xfst
