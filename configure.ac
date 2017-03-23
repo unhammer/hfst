@@ -158,7 +158,7 @@ AS_IF([test "x$enable_load_so_entries" != xno], [AC_DEFINE([ENABLE_LOAD_SO_ENTRI
 
 AC_ARG_ENABLE([all_tools],
 			  [AS_HELP_STRING([--enable-all-tools],
-							  [build all tools @<:@default=no@:>@])],
+			  [build all tools (except hfst-twolc-script and hfst-train-tagger which must be explicitly enabled with --enable-twolc-script and --enable-train-tagger) @<:@default=no@:>@])],
 			  [enable_all_tools=$enableval],
 			  [enable_all_tools=no])
 
@@ -318,7 +318,7 @@ AC_ARG_ENABLE([twolc-script],
               [AS_HELP_STRING([--enable-twolc-script],
                               [build script implementation of twolc @<:@default=no@:>@])],
               [enable_twolc_script=$enableval],
-              [enable_twolc_script=$enable_all_tools])
+              [enable_twolc_script=no])
 AM_CONDITIONAL([WANT_TWOLC_SCRIPT], [test "x$enable_twolc_script" != xno])
 AC_ARG_ENABLE([tagger],
               [AS_HELP_STRING([--enable-tagger],
@@ -326,6 +326,12 @@ AC_ARG_ENABLE([tagger],
               [enable_tagger=$enableval],
               [enable_tagger=$enable_all_tools])
 AM_CONDITIONAL([WANT_TAGGER], [test "x$enable_tagger" != xno])
+AC_ARG_ENABLE([train-tagger],
+              [AS_HELP_STRING([--enable-train-tagger],
+                              [build tagger training utilities @<:@default=no@:>@])],
+              [enable_train_tagger=$enableval],
+              [enable_train_tagger=no])
+AM_CONDITIONAL([WANT_TRAIN_TAGGER], [test "x$enable_train_tagger" != xno])
 AC_ARG_ENABLE([lexc],
               [AS_HELP_STRING([--enable-lexc],
                               [build lexc cli @<:@default=yes@:>@])],
@@ -825,6 +831,7 @@ cat <<EOF
     *                 twolc: $enable_twolc
     *                 twolc-script: $enable_twolc_script
     *                 tagger: $enable_tagger
+    *                 train-tagger: $enable_train_tagger
     *                 txt2fst: $enable_txt2fst
     *                 xfst: $enable_xfst
     * unicode parsed in corpus tools with: $with_unicode_handler
@@ -848,7 +855,7 @@ AS_IF([test "x$enable_twolc" == "xno"],
       [AC_MSG_WARN([hfst-twolc is not enabled; you will not be able to compile xerox twolc grammars; enable using --enable-twolc])])
 
 AS_IF([test "x$enable_tagger" == "xno"],
-      [AC_MSG_WARN([hfst-train-tagger and hfst-tag are not enabled; you will not be able to train and use taggers; enable using --enable-tagger])])
+      [AC_MSG_WARN([hfst-tag is not enabled; you will not be able to use taggers; enable using --enable-tagger])])
 AS_IF([test "x$enable_calculate" == "xno"],
       [AC_MSG_WARN([hfst-calculate is not enabled; you will not be able to compile SFST-PL scripts; enable using --enable-calculate])])
 AS_IF([test "x$enable_xfst" == "xno"],
