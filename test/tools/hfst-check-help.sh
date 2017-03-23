@@ -25,9 +25,8 @@ EXT=
 if (uname | egrep "MINGW|mingw" 2>1 > /dev/null); then
     # Executables have an exe extension
     EXT=".exe";
-    # We use system call version of the shell script
-    TWOLC_TOOLS=hfst-twolc/src/hfst-twolc-system
-    # Tagger tool shell script not implemented for windows (MinGW)
+    # TODO: implement these tools for windows
+    TWOLC_TOOLS=
     TAGGER_TOOLS=
 fi
 
