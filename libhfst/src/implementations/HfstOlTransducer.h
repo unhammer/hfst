@@ -10,7 +10,7 @@
 #ifndef _HFST_OL_TRANSDUCER_H_
 #define _HFST_OL_TRANSDUCER_H_
 
-#include <iostream>
+#include <iosfwd>
 #include <fstream>
 #include "../HfstExceptionDefs.h"
 #include "../HfstFlagDiacritics.h"

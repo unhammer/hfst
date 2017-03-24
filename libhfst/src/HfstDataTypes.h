@@ -15,7 +15,7 @@
 #endif
 
 #include <string>
-#include <iostream>
+#include <iosfwd>
 #include <vector>
 #include <map>
 #include <set>
@@ -92,6 +92,9 @@ namespace hfst
   //!
   //! Used by functions in namespace \link hfst::rules rules\endlink
   typedef std::vector <HfstTransducerPair> HfstTransducerPairVector;
+
+  typedef std::pair<std::string, std::string> StringPair;
+  typedef std::set<std::pair<std::string, std::string> > StringPairSet;
 
   //! @brief A vector of strings
   //!

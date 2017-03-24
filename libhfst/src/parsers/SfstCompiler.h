@@ -15,7 +15,7 @@
 
 #include "HfstDataTypes.h"
 #include "SfstAlphabet.h"
-#include <iostream>
+#include <iosfwd>
 #include <fstream>
 
 namespace hfst

@@ -15,7 +15,7 @@
 #endif // HAVE_CONFIG_H
 
 #include <map>
-#include <iostream>
+#include <iosfwd>
 #include <vector>
 
 #if HAVE_OPENFST

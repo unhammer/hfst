@@ -26,7 +26,7 @@
 #include <map>
 #include <set>
 #include <deque>
-#include <iostream>
+#include <iosfwd>
 
 //! @brief Convenient subclass of std::map.
 template <class K,class V> class HandyMap : public std::map<K,V>

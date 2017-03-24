@@ -17,7 +17,7 @@
 #include <set>
 #include <cassert>
 #include <cstdio>
-#include <iostream>
+#include <iosfwd>
 #include <vector>
 #include "../HfstExceptionDefs.h"
 

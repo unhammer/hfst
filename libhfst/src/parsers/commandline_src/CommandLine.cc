@@ -1,6 +1,8 @@
 //! @file CommandLine.cc
 
 #include "CommandLine.h"
+#include <cstring>
+#include <fstream>
 
 #ifndef _MSC_VER
 #  include <getopt.h>

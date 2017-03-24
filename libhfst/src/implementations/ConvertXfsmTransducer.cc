@@ -13,7 +13,7 @@
 
 #include "ConvertTransducerFormat.h"
 #include "HfstBasicTransducer.h"
-#include "HfstTransducer.h"
+//#include "HfstTransducer.h"
 
 #ifndef MAIN_TEST
 namespace hfst { namespace implementations

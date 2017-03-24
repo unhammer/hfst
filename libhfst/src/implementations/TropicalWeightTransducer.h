@@ -28,7 +28,7 @@
 #include <cstdio>
 #include <string>
 #include <sstream>
-#include <iostream>
+#include <iosfwd>
 #include <fstream>
 
 //#include "HfstAlphabet.h"

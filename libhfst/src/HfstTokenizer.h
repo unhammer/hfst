@@ -11,7 +11,7 @@
 #define _HFST_TOKENIZER_H_
 #include "HfstSymbolDefs.h"
 #include "HfstExceptionDefs.h"
-#include <iostream>
+#include <iosfwd>
 #include <climits>
 #include <string>
 

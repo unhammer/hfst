@@ -16,7 +16,7 @@
 #include "ConvertTransducerFormat.h"
 #include "optimized-lookup/convert.h"
 #include "HfstBasicTransducer.h"
-#include "HfstTransducer.h"
+//#include "HfstTransducer.h"
 
 #ifndef MAIN_TEST
 namespace hfst { namespace implementations

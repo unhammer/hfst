@@ -14,9 +14,9 @@
 #include <string>
 #include <cassert>
 #include <vector>
-#include <iostream>
+#include <iosfwd>
 #ifdef DEBUG
-#include <iostream>
+#include <iosfwd>
 #endif
 
 enum DiacriticOperator

@@ -15,6 +15,7 @@
 
 #include <string>
 #include <map>
+#include <cassert>
 
 using std::string;
 using std::map;

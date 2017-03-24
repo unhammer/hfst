@@ -12,7 +12,7 @@
 #include "HfstSymbolDefs.h"
 #include <string>
 #include <vector>
-#include <iostream>
+#include <iosfwd>
 #include <sstream>
 #include <set>
 

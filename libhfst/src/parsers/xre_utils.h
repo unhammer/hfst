@@ -18,7 +18,7 @@
 #define GUARD_xre_utils_h
 
 #include <map>
-#include "HfstTransducer.h"
+#include "HfstDataTypes.h"
 
 namespace hfst { namespace xre {
 

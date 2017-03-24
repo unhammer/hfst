@@ -22,7 +22,7 @@ namespace SFST { class Transducer; typedef short unsigned int Character; class A
 #include <cstdio>
 #include <string>
 #include <sstream>
-#include <iostream>
+#include <iosfwd>
 
 /** @file SfstTransducer.h
     \brief Declarations of functions and datatypes that form a bridge between

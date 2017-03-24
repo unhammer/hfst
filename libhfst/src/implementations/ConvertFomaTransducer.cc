@@ -20,7 +20,7 @@
 
 #include "ConvertTransducerFormat.h"
 #include "HfstBasicTransducer.h"
-#include "HfstTransducer.h"
+#include "FomaTransducer.h"
 
 #ifndef MAIN_TEST
 namespace hfst { namespace implementations

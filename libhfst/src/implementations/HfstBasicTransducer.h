@@ -17,7 +17,7 @@
  #include <string>
  #include <set>
  #include <cassert>
- #include <iostream>
+ #include <iosfwd>
  #include <algorithm>
  #include <stack>
 

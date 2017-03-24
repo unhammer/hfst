@@ -7,8 +7,8 @@
 // See the file COPYING included with this distribution for more
 // information.
 
-#include "HfstTransducer.h"
-#include <iostream>
+#include "HfstDataTypes.h"
+#include <iosfwd>
 
 namespace hfst
 {

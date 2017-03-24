@@ -18,7 +18,7 @@
 
 #include "ConvertTransducerFormat.h"
 #include "HfstBasicTransducer.h"
-#include "HfstTransducer.h"
+#include "SfstTransducer.h"
 
 #include <stdexcept>
 

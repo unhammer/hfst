@@ -26,7 +26,7 @@ struct fsm;
 #include <cstdio>
 #include <string>
 #include <sstream>
-#include <iostream>
+#include <iosfwd>
 
 #include "../FormatSpecifiers.h"
 

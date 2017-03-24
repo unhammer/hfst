@@ -21,9 +21,8 @@
 
 #include <set>
 #include <string>
-#include <iostream>  // --- in the cc-file instead?
-#include <algorithm> // --- "" ---
-#include <cassert>   // --- "" ---
+#include <iosfwd>
+#include <algorithm>
 
 #include "HfstDataTypes.h"
 #include "HfstSymbolDefs.h"

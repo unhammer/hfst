@@ -13,7 +13,7 @@
 
 #include "ConvertTransducerFormat.h"
 #include "HfstBasicTransducer.h"
-#include "HfstTransducer.h"
+#include "LogWeightTransducer.h"
 
 #ifdef _MSC_VER
 #include "back-ends/openfstwin/src/include/fst/fstlib.h"

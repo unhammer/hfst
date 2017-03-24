@@ -10,7 +10,7 @@
 #ifndef _FLAG_DIACRITICS_H_
 #define _FLAG_DIACRITICS_H_
 
-#include <iostream>
+#include <iosfwd>
 #include <string>
 #include <map>
 #include <vector>

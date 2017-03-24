@@ -51,8 +51,7 @@
 #include "HfstOutputStream.h"
 
 #include <string>
-#include <cassert>
-#include <iostream>
+#include <iosfwd>
 #include <vector>
 #include <map>
 #include <set>
