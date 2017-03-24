@@ -977,6 +977,7 @@ void init_globals(void)
     function_names.clear();
     zero_minimization_guard();
     need_delimiters = false;
+    pmatchnerrs = 0;
 }
 
 std::map<std::string, HfstTransducer*>
@@ -1545,6 +1546,7 @@ PmatchObject::PmatchObject(void)
     weight = 0.0;
     line_defined = pmatchlineno;
     cache = (HfstTransducer*) (NULL);
+    parent_is_context = false;
 }
 
 HfstTransducer * PmatchObject::evaluate(std::vector<PmatchObject *> args)
@@ -1896,7 +1898,56 @@ HfstTransducer * PmatchUnaryOperation::evaluate(PmatchEvalType eval_type)
             delete retval;
             retval = tmp;
         }
+    } else if (op == LC) {
+        if (!parent_is_context) {
+            retval->reverse();
+            HfstTransducer * tmp = new HfstTransducer(hfst::internal_epsilon, LC_ENTRY_SYMBOL, format);
+            tmp->concatenate(*retval);
+            HfstTransducer lc_exit(hfst::internal_epsilon, LC_EXIT_SYMBOL, format);
+            tmp->concatenate(lc_exit);
+            delete retval;
+            retval = tmp;
+            }
+    } else if (op == NLC) {
+        if (!parent_is_context) {
+            retval->reverse();
+            PmatchTransducerContainer * tmp = make_minimization_guard();
+            HfstTransducer * head = tmp->evaluate(); delete tmp;
+            HfstTransducer passthrough(hfst::internal_epsilon, PASSTHROUGH_SYMBOL, format);
+            HfstTransducer nlc_entry(hfst::internal_epsilon, NLC_ENTRY_SYMBOL, format);
+            HfstTransducer nlc_exit(hfst::internal_epsilon, NLC_EXIT_SYMBOL, format);
+            nlc_entry.concatenate(*retval);
+            nlc_entry.concatenate(nlc_exit);
+            nlc_entry.disjunct(passthrough);
+            head->concatenate(nlc_entry);
+            delete retval;
+            retval = head;
+            }
+    } else if (op == RC) {
+        if (!parent_is_context) {
+            HfstTransducer * tmp = new HfstTransducer(hfst::internal_epsilon, RC_ENTRY_SYMBOL, format);
+            tmp->concatenate(*retval);
+            HfstTransducer rc_exit(hfst::internal_epsilon, RC_EXIT_SYMBOL, format);
+            tmp->concatenate(rc_exit);
+            delete retval;
+            retval = tmp;
+        }
+    } else if (op == NRC) {
+        if (!parent_is_context) {
+            PmatchTransducerContainer * tmp = make_minimization_guard();
+            HfstTransducer * head = tmp->evaluate(); delete tmp;
+            HfstTransducer passthrough(hfst::internal_epsilon, PASSTHROUGH_SYMBOL, format);
+            HfstTransducer nlc_entry(hfst::internal_epsilon, NLC_ENTRY_SYMBOL, format);
+            HfstTransducer nlc_exit(hfst::internal_epsilon, NLC_EXIT_SYMBOL, format);
+            nlc_entry.concatenate(*retval);
+            nlc_entry.concatenate(nlc_exit);
+            nlc_entry.disjunct(passthrough);
+            head->concatenate(nlc_entry);
+            delete retval;
+            retval = head;
+            }
     }
+
     retval->set_final_weights(hfst::double_to_float(weight), true);
     if (cache == NULL && should_use_cache() == true) {
         cache = retval;

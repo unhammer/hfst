@@ -372,7 +372,7 @@ TERM_COMPLEMENT EXPRESSION12 { $$ = new PmatchUnaryOperation(TermComplement, $2)
 
 EXPRESSION12: EXPRESSION13 { } |
 LEFT_BRACKET EXPRESSION2 RIGHT_BRACKET { $$ = $2; } |
-EXPRESSION12 PAIR_SEPARATOR EXPRESSION13 { $$ = new PmatchBinaryOperation(CrossProduct, $1, $3); } |
+EXPRESSION12 PAIR_SEPARATOR EXPRESSION12 { $$ = new PmatchBinaryOperation(CrossProduct, $1, $3); } |
 LEFT_PARENTHESIS EXPRESSION2 RIGHT_PARENTHESIS { $$ = new PmatchUnaryOperation(Optionalize, $2); } |
 EXPRESSION12 WEIGHT { $$ = $1; $$->weight += $2; } |
 LEFT_BRACKET EXPRESSION2 RIGHT_BRACKET TAG_LEFT SYMBOL RIGHT_PARENTHESIS {
@@ -741,38 +741,23 @@ PMATCH_CONTEXT COMMA PMATCH_CONTEXTS {
 };
 
 PMATCH_RIGHT_CONTEXT: RC_LEFT EXPRESSION2 RIGHT_PARENTHESIS {
-    $$ = new PmatchBinaryOperation(Concatenate, make_rc_entry(),
-                                   new PmatchBinaryOperation(
-                                       Concatenate, $2, make_rc_exit()));
+    $2->mark_context_children();
+    $$ = new PmatchUnaryOperation(RC, $2);
 };
 
 PMATCH_NEGATIVE_RIGHT_CONTEXT: NRC_LEFT EXPRESSION2 RIGHT_PARENTHESIS {
-    $$ = new PmatchBinaryOperation(
-        Concatenate, make_minimization_guard(),
-        new PmatchBinaryOperation(
-            Disjunct, make_passthrough(),
-            new PmatchBinaryOperation(
-                Concatenate, make_nrc_entry(),
-                new PmatchBinaryOperation(Concatenate, $2, make_nrc_exit()))));
+    $2->mark_context_children();
+    $$ = new PmatchUnaryOperation(NRC, $2);
 };
 
 PMATCH_LEFT_CONTEXT: LC_LEFT EXPRESSION2 RIGHT_PARENTHESIS {
-    $$ = new PmatchBinaryOperation(
-        Concatenate, make_lc_entry(),
-        new PmatchBinaryOperation(
-            Concatenate, new PmatchUnaryOperation(
-                Reverse, $2), make_lc_exit()));
+    $2->mark_context_children();
+    $$ = new PmatchUnaryOperation(LC, $2);
 };
 
 PMATCH_NEGATIVE_LEFT_CONTEXT: NLC_LEFT EXPRESSION2 RIGHT_PARENTHESIS {
-    $$ = new PmatchBinaryOperation(
-        Concatenate, make_minimization_guard(),
-        new PmatchBinaryOperation(
-            Disjunct, make_passthrough(),
-            new PmatchBinaryOperation(
-                Concatenate, make_nlc_entry(),
-                new PmatchBinaryOperation(Concatenate, new PmatchUnaryOperation(
-                                              Reverse, $2), make_nlc_exit()))));
+    $2->mark_context_children();
+    $$ = new PmatchUnaryOperation(NLC, $2);
 };
 
 
