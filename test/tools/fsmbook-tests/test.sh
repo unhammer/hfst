@@ -111,6 +111,7 @@ do
             echo "ERROR: in converting result from xfst/foma to hfst format"
             exit 1;
         fi
+	rm -f Result.prolog
 
         # Also compile with hfst-xfst using all back-end formats..
         if [ "$COMPILE_XFST_SCRIPT" == "true" ]; then
@@ -149,6 +150,7 @@ do
                     exit 1;
                 fi
             fi
+	    rm -f Result_from_hfst_xfst
         done
         fi
 
@@ -267,6 +269,9 @@ for format in $backend_formats;
 do 
     rm -f Result_from_hfst_script_$format
 done
+
+rm -f tmpdir/NumbersToNumerals
+rmdir tmpdir
 
 echo ""
 echo "**********"

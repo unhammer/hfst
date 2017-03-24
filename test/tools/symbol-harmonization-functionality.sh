@@ -298,4 +298,4 @@ for ext in .sfst .ofst .foma; do
 
 done
 
-exit 0;
+rm -f tmp1 tmp2 tmp3 result

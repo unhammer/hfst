@@ -17,7 +17,7 @@ if ! echo "cat" | $TOOLDIR/hfst-pmatch pmatch_endtag.pmatch > test.pmatch;
         exit 1
     fi
     
-rm test.pmatch
+rm test.pmatch test.lookups
 
 # Jyrki's suite
 if ! $srcdir/pmatch-tests.sh --log none; then

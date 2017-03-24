@@ -28,7 +28,7 @@ XFST_TOOLS="parsers/hfst-xfst"
 # Extension for executables
 EXT=
 # Check if we are in MinGW environment
-if (uname | egrep "MINGW|mingw" 2>1 > /dev/null); then
+if (uname | egrep "MINGW|mingw" 2> /dev/null > /dev/null); then
     # Executables have an exe extension
     EXT=".exe";
     # TODO: implement these for windows
@@ -104,4 +104,4 @@ for prog in $TWOLC_TOOLS $TAGGER_TOOLS; do
     fi    
 done
 
-rm -f version1.out1 version2.out
+rm -f version1.out version2.out
