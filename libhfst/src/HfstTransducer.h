@@ -125,23 +125,28 @@ namespace hfst
   HFSTDLL void set_minimization_algorithm(MinimizationAlgorithm);
   HFSTDLL MinimizationAlgorithm get_minimization_algorithm();
 
+  /* Whether weights are encoded as part of transition in weighted minimization. Defaults to false. */
   HFSTDLL void set_encode_weights(bool);
   HFSTDLL bool get_encode_weights();
 
+  /* Whether minimization is carried out even it the transducer is known to be minimal. Defaults to false. */
   HFSTDLL void set_minimize_even_if_already_minimal(bool);
   HFSTDLL bool get_minimize_even_if_already_minimal();
 
+  /* Allow full minimization of intermediary results instead of only removing epsilons and determinizing. Defaults to true. */
   HFSTDLL void set_minimization(bool);
   HFSTDLL bool get_minimization();
 
+  /* Whether flag diacritics are matched with unknowns and identities in composition. Defaults to false. */
   HFSTDLL void set_xerox_composition(bool);
   HFSTDLL bool get_xerox_composition();
 
+  /* Whether flag diacritics are treated as epsilons in composition. Defaults to false. */
   HFSTDLL void set_flag_is_epsilon_in_composition(bool);
   HFSTDLL bool get_flag_is_epsilon_in_composition();
 
   /* Whether in harmonization the smaller transducer is always harmonized
-     according to the bigger transducer. */
+     according to the bigger transducer. Defaults to true. */
   HFSTDLL void set_harmonize_smaller(bool);
   HFSTDLL bool get_harmonize_smaller();
 
@@ -152,6 +157,7 @@ namespace hfst
   HFSTDLL void set_unknown_symbols_in_use(bool);
   HFSTDLL bool get_unknown_symbols_in_use();
 
+  /* Where warnings from TropicalWeightTransducer are printed. */
   void set_warning_stream(std::ostream * os);
   std::ostream * get_warning_stream();
 
@@ -286,9 +292,6 @@ An example:
 
       hfst_ol::Transducer * hfst_ol;
 
-#if HAVE_OPENFST // is this needed?
-      hfst::implementations::StdVectorFst * internal;
-#endif
     };
 
     /* The backend implementation */
@@ -381,7 +384,7 @@ An example:
   protected:
 
     /* Get the number used to represent the symbol \a symbol. */
-    unsigned int get_symbol_number(const std::string &symbol);
+    //unsigned int get_symbol_number(const std::string &symbol);
     
     /* For internal use, implemented only for SFST_TYPE. */
     std::vector<HfstTransducer*> extract_path_transducers();

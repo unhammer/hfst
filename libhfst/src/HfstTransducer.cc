@@ -32,39 +32,39 @@ using hfst::implementations::ConversionFunctions;
 namespace hfst
 {
 
-// -----------------------------------------------------------------------
-//
-//     Interfaces through which the backend implementations are called
-//
-// -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  //
+  //     Interfaces through which the backend implementations are called
+  //
+  // -----------------------------------------------------------------------
 
 #if HAVE_SFST
-hfst::implementations::SfstTransducer HfstTransducer::sfst_interface;
+  hfst::implementations::SfstTransducer HfstTransducer::sfst_interface;
 #endif
 #if HAVE_OPENFST
-hfst::implementations::TropicalWeightTransducer
+  hfst::implementations::TropicalWeightTransducer
   HfstTransducer::tropical_ofst_interface;
 #if HAVE_OPENFST_LOG
-hfst::implementations::LogWeightTransducer
+  hfst::implementations::LogWeightTransducer
   HfstTransducer::log_ofst_interface;
 #endif
 #endif
 #if HAVE_FOMA
-hfst::implementations::FomaTransducer HfstTransducer::foma_interface;
+  hfst::implementations::FomaTransducer HfstTransducer::foma_interface;
 #endif
   hfst::implementations::HfstOlTransducer HfstTransducer::hfst_ol_interface;
-/* Add here the interface between HFST and your transducer library. */
-//#if HAVE_MY_TRANSDUCER_LIBRARY
-//hfst::implementations::MyTransducerLibraryTransducer
-// HfstTransducer::my_transducer_library_interface;
-//#endif
+  /* Add here the interface between HFST and your transducer library. */
+  //#if HAVE_MY_TRANSDUCER_LIBRARY
+  //hfst::implementations::MyTransducerLibraryTransducer
+  // HfstTransducer::my_transducer_library_interface;
+  //#endif
 
 
-// -----------------------------------------------------------------------
-//
-//                   Testing and optimization functions
-//
-// -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  //
+  //                   Testing and optimization functions
+  //
+  // -----------------------------------------------------------------------
 
 #if HAVE_XFSM
   void initialize_xfsm()
@@ -80,25 +80,25 @@ hfst::implementations::FomaTransducer HfstTransducer::foma_interface;
   InitializeXfsm dummy;
 #endif
 
-/* The default minimization algorithm if Hopcroft. */
-MinimizationAlgorithm minimization_algorithm=HOPCROFT;
- /* By default, we do not minimize transducers that are already minimal.
-    This variable is for debugging and profiling. */
-bool minimize_even_if_already_minimal=false;
-/* By default, weights are not encoded in minimization. */
-bool encode_weights=false;
-/* Allow minimization of intermediary results, used in some more complex functions. 
-   A false value indicates that only epsilon removal and determinization is allowed. */
-bool can_minimize=true;
-/* By default, harmonization is optimized. */
-bool harmonize_smaller=true;
-/* By default, unknown symbols are used. */
-bool unknown_symbols_in_use=true;
+  /* The default minimization algorithm if Hopcroft. */
+  MinimizationAlgorithm minimization_algorithm=HOPCROFT;
+  /* By default, we do not minimize transducers that are already minimal.
+     This variable is for debugging and profiling. */
+  bool minimize_even_if_already_minimal=false;
+  /* By default, weights are not encoded in minimization. */
+  bool encode_weights=false;
+  /* Allow minimization of intermediary results, used in some more complex functions.
+     A false value indicates that only epsilon removal and determinization is allowed. */
+  bool can_minimize=true;
+  /* By default, harmonization is optimized. */
+  bool harmonize_smaller=true;
+  /* By default, unknown symbols are used. */
+  bool unknown_symbols_in_use=true;
 
-/* Xerox-style composition where flag diacritics match unknowns and identities. */
-bool xerox_composition=false;
-/* Xerox option where flag diacritic are treated as epsilons in composition. */
-bool flag_is_epsilon_in_composition=false;
+  /* Xerox-style composition where flag diacritics match unknowns and identities. */
+  bool xerox_composition=false;
+  /* Xerox option where flag diacritic are treated as epsilons in composition. */
+  bool flag_is_epsilon_in_composition=false;
 
   void set_xerox_composition(bool value) {
     xerox_composition=value;
@@ -153,12 +153,20 @@ void set_encode_weights(bool value) {
 
   void set_warning_stream(std::ostream * os)
   {
+#if HAVE_OPENFST
     hfst::implementations::TropicalWeightTransducer::set_warning_stream(os);
+#else
+    (void)os;
+#endif
   }
 
   std::ostream * get_warning_stream()
   {
+#if HAVE_OPENFST
     return hfst::implementations::TropicalWeightTransducer::get_warning_stream();
+#else
+    HFST_THROW_MESSAGE(FunctionNotImplementedException, "get_warning_stream");
+#endif
   }
 
 void set_minimization_algorithm(MinimizationAlgorithm a) {
@@ -390,43 +398,6 @@ StringSet HfstTransducer::get_alphabet() const
         return hfst_ol_interface.get_alphabet(implementation.hfst_ol);
     default:
         HFST_THROW_MESSAGE(FunctionNotImplementedException, "get_alphabet");
-    }
-}
-
-unsigned int HfstTransducer::get_symbol_number(const std::string &symbol)
-{
-  switch(type)
-    {
-#if HAVE_SFST
-    case SFST_TYPE:
-      return sfst_interface.get_symbol_number(implementation.sfst, symbol);
-#endif
-#if HAVE_OPENFST
-    case TROPICAL_OPENFST_TYPE:
-      return tropical_ofst_interface.get_symbol_number
-    (implementation.tropical_ofst, symbol);
-#if HAVE_OPENFST_LOG
-    case LOG_OPENFST_TYPE:
-      return log_ofst_interface.get_symbol_number(implementation.log_ofst,
-                          symbol);
-#endif
-#endif
-#if HAVE_FOMA
-    case FOMA_TYPE:
-      return foma_interface.get_symbol_number(implementation.foma,
-                          symbol);
-#endif
-#if HAVE_XFSM
-    case XFSM_TYPE:
-      HFST_THROW_MESSAGE(FunctionNotImplementedException, "get_symbol_number");
-#endif
-    case ERROR_TYPE:
-      HFST_THROW(TransducerHasWrongTypeException);
-    case HFST_OL_TYPE:
-    case HFST_OLW_TYPE:
-    default:
-      HFST_THROW_MESSAGE(FunctionNotImplementedException,
-               "get_symbol_number");
     }
 }
 
@@ -689,18 +660,6 @@ HfstOneLevelPaths * HfstTransducer::lookup_fd(const StringVector& s,
       HFST_THROW(TransducerHasWrongTypeException);
     default:
       HFST_THROW(FunctionNotImplementedException);
-
-      /*
-      hfst::implementations::HfstBasicTransducer net(*this);
-      HfstTransducer * tmp;
-      if (this->type == TROPICAL_OPENFST_TYPE) {
-        tmp = new HfstTransducer(net, HFST_OLW_TYPE); }
-      else {
-        tmp = new HfstTransducer(net, HFST_OL_TYPE); }
-      HfstOneLevelPaths * retval = tmp->lookup_fd(s, limit);
-      delete tmp;
-      return retval;
-      */
     }
 }
 
@@ -718,17 +677,6 @@ HfstOneLevelPaths * HfstTransducer::lookup_fd(const std::string & s,
     default:
       HFST_THROW(FunctionNotImplementedException);
 
-      /*
-      hfst::implementations::HfstBasicTransducer net(*this);
-      HfstTransducer * tmp;
-      if (this->type == TROPICAL_OPENFST_TYPE) {
-        tmp = new HfstTransducer(net, HFST_OLW_TYPE); }
-      else {
-        tmp = new HfstTransducer(net, HFST_OL_TYPE); }
-      HfstOneLevelPaths * retval = tmp->lookup_fd(s, limit);
-      delete tmp;
-      return retval;
-      */
     }
 }
 
@@ -2642,35 +2590,7 @@ bool HfstTransducer::extract_longest_paths
       // if paths were found
       if (results.size() > 0)
         {
-          //if (show_flags)
           return true;
-          /*
-          // it is possible that there are longer paths after flags have been removed
-          else
-            {
-              results = remove_flags(results);
-              results = get_longest_paths(results);
-              int max_length = longest_path_length(results);
-              if (max_length < 0 || max_length > *length) // this should not happen
-                {
-                  HFST_THROW(HfstFatalException);
-                }
-              if (max_length == *length)
-                {
-                  return true;
-                }
-              // see if there could be longer paths
-              length++;
-              if (*length == path_lengths.end())
-                {
-                  return true;
-                }
-              if (*length < max_length)
-                {
-                  return true;
-                }
-              else this gets a bit complicated...
-                }*/
         }
 
     } // lengths of accepted paths gone through
@@ -5214,6 +5134,7 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
 #endif
     case ERROR_TYPE:
     default:
+      (void)internal;
       HFST_THROW(TransducerHasWrongTypeException);
       break;
     }
