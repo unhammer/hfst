@@ -178,7 +178,7 @@ AC_ARG_ENABLE([affix_guessify],
 AM_CONDITIONAL([WANT_AFFIX_GUESSIFY], [test x$enable_affix_guessify != xno])
 AC_ARG_ENABLE([calculate],
 			  [AS_HELP_STRING([--enable-calculate],
-							  [build calculate tool @<:@default=no@:>@])],
+							  [build calculate tool @<:@default=yes@:>@])],
 			  [enable_calculate=$enableval],
 			  [enable_calculate=$enable_all_tools])
 AM_CONDITIONAL([WANT_CALCULATE], [test x$enable_calculate != xno])
@@ -416,12 +416,6 @@ AC_ARG_ENABLE([regexp2fst],
 			  [enable_regexp2fst=$enableval],
 			  [if test x$enable_no_tools != xno; then enable_regexp2fst=no; else enable_regexp2fst=yes; fi])
 AM_CONDITIONAL([WANT_REGEXP2FST], [test x$enable_regexp2fst != xno])
-AC_ARG_ENABLE([xfst],
-			  [AS_HELP_STRING([--enable-xfst],
-							  [build xfst tool @<:@default=no@:>@])],
-			  [enable_xfst=$enableval],
-			  [enable_xfst=$enable_all_tools])
-AM_CONDITIONAL([WANT_XFST], [test x$enable_xfst != xno])
 AC_ARG_ENABLE([pmatch2fst],
 			  [AS_HELP_STRING([--enable-pmatch2fst],
 							  [build pmatch2fst tool @<:@default=yes@:>@])],
@@ -526,7 +520,7 @@ AC_ARG_ENABLE([foma_wrapper],
 AM_CONDITIONAL([WANT_FOMA_WRAPPER], [test x$enable_foma_wrapper != xno])
 AC_ARG_ENABLE([xfst],
 			  [AS_HELP_STRING([--enable-xfst],
-							  [build xfst tool @<:@default=no@:>@])],
+							  [build xfst tool @<:@default=yes@:>@])],
 			  [enable_xfst=$enableval],
 			  [enable_xfst=$enable_all_tools])
 AM_CONDITIONAL([WANT_XFST], [test x$enable_xfst != xno])
