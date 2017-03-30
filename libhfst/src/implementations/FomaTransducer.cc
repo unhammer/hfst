@@ -14,8 +14,30 @@
 
 #include "FomaTransducer.h"
 
+#ifdef PROFILE_FOMA
+#include <ctime>
+#endif
+
 #ifndef MAIN_TEST
 namespace hfst { namespace implementations {
+
+    // add this to the beginning of code block to be profiled
+    //#ifdef PROFILE_FOMA
+    //clock_t startclock = clock();
+    //#endif
+
+    // and this to the end of the block
+    //#ifdef PROFILE_FOMA
+    //clock_t endclock = clock();
+    //foma_seconds = foma_seconds +
+    //      ( (float)(endclock - startclock) / CLOCKS_PER_SEC);
+    //#endif
+
+    float foma_seconds=0;
+    float FomaTransducer::get_profile_seconds() {
+      return foma_seconds;
+    }
+
 
 
   // ---------- FomaInputStream functions ----------
@@ -334,13 +356,13 @@ namespace hfst { namespace implementations {
     // returns the argument, so a copy is taken here
     return fsm_determinize(fsm_copy(t));
   }
-  
+
   fsm * FomaTransducer::minimize(fsm * t)
   {
     // returns the argument, so a copy is taken here
     return fsm_minimize(fsm_copy(t));
   }
-  
+
   fsm * FomaTransducer::remove_epsilons(fsm * t)
   {
     // returns the argument, so a copy is taken here

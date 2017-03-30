@@ -157,6 +157,8 @@ namespace hfst {
       static fsm * read_lexc(const std::string &filename, bool verbose);
 #endif
 
+      static float get_profile_seconds();
+
       static unsigned int number_of_states(fsm * net);
       static unsigned int number_of_arcs(fsm * net);
 
