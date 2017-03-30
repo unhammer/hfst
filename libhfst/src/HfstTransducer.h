@@ -436,7 +436,6 @@ An example:
     /* For debugging */
   public:
     HFSTDLL void print_alphabet();
-  protected:
     static float get_profile_seconds(ImplementationType type);
 
 #include "hfst_apply_schemas.h"
@@ -1648,6 +1647,10 @@ transducer.transform_weights(&func);
     */
     HFSTDLL HfstTransducer &push_weights(PushType type);
 
+    /**\brief  Whether the transducer has non-zero weights in transitions or end states.
+
+	If the transducer is of unweighted type, false is always returned. */
+    HFSTDLL bool has_weights() const;
 
     /** \brief Compile a lexc file in file \a filename into an HfstTransducer
     of type \a type and return the transducer. */

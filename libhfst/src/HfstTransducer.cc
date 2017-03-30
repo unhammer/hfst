@@ -3782,7 +3782,22 @@ HfstTransducer &HfstTransducer::transform_weights(float (*func)(float))
     return *this;
 }
 
-
+bool HfstTransducer::has_weights()
+{
+#if HAVE_OPENFST
+  if (this->type == TROPICAL_OPENFST_TYPE)
+    {
+      return this->tropical_ofst_interface.has_weights(implementation.tropical_ofst);
+    }
+#if HAVE_OPENFST_LOG
+    if (this->type == LOG_OPENFST_TYPE)
+      {
+	HFST_THROW(FunctionNotImplementedException, "has_weights");
+      }
+#endif
+#endif
+    return false;
+}
 
 
 // -----------------------------------------------------------------------
