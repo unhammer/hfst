@@ -88,7 +88,7 @@ namespace implementations
 
   class SfstTransducer
     {
-#ifndef OMIT_SFST_TRANSDUCER
+#if HAVE_SFST
     public:
       static SFST::Transducer * create_empty_transducer(void);
       static SFST::Transducer * create_epsilon_transducer(void);

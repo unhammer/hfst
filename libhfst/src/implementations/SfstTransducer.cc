@@ -225,7 +225,7 @@ namespace hfst { namespace implementations {
     }
   }
 
-#ifndef OMIT_SFST_TRANSDUCER
+#if HAVE_SFST
     
     class HfstNode2Int {
 
@@ -1269,7 +1269,7 @@ namespace hfst { namespace implementations {
     expand2(t, t->root_node(), new_symbols, visited_nodes);
   }
 
-#endif // OMIT_SFST_TRANSDUCER
+#endif // !HAVE_SFST
 
     // These functions are needed in transducer type conversions
 
@@ -1363,7 +1363,7 @@ bool does_sfst_alphabet_contain(SFST::Transducer *t, const char *str)
 
 int main(int argc, char * argv[])
 {
-#ifndef OMIT_SFST_TRANSDUCER
+#if HAVE_SFST
     std::cout << "Unit tests for " __FILE__ ":";
 
     // Test alphabet pruning
@@ -1395,7 +1395,7 @@ int main(int argc, char * argv[])
 #else
     std::cout << "Skipping unit tests for " << __FILE__ << ", SfstTransducer has not been enabled"
     return 77;
-#endif // OMIT_SFST_TRANSDUCER
+#endif // HAVE_SFST
 }
 #endif // MAIN_TEST
 
