@@ -19,6 +19,9 @@
 #include "back-ends/openfst/src/include/fst/fstlib.h"
 #endif // _MSC_VER
 
+#ifdef PROFILE_OPENFST
+#include <ctime>
+#endif
 
 #ifndef MAIN_TEST
 
@@ -28,6 +31,23 @@ namespace hfst {
   bool get_encode_weights();
 
   namespace implementations {
+
+    // add this to the beginning of code block to be profiled
+    //#ifdef PROFILE_OPENFST
+    //clock_t startclock = clock();
+    //#endif
+
+    // and this to the end of the block
+    //#ifdef PROFILE_OPENFST
+    //clock_t endclock = clock();
+    //tropical_seconds = tropical_seconds +
+    //      ( (float)(endclock - startclock) / CLOCKS_PER_SEC);
+    //#endif
+
+  float tropical_seconds=0;
+  float TropicalWeightTransducer::get_profile_seconds() {
+    return tropical_seconds;
+  }
 
     std::ostream * TropicalWeightTransducer::warning_stream = NULL;
 
@@ -113,6 +133,32 @@ namespace hfst {
       return retval;
     }
 
+    bool TropicalWeightTransducer::has_weights(const StdVectorFst * t)
+    {
+      for (fst::StateIterator<StdVectorFst> siter(*t);
+           ! siter.Done(); siter.Next())
+        {
+          StateId s = siter.Value();
+          for (fst::ArcIterator<StdVectorFst> aiter(*t,s);
+               !aiter.Done(); aiter.Next())
+            {
+              const StdArc &arc = aiter.Value();
+              if (arc.weight.Value() != 0)
+		{
+		  return true;
+		}
+            }
+          if (t->Final(s) != TropicalWeight::Zero())
+            {
+              if (t->Final(s).Value() != 0)
+		{
+		  return true;
+		}
+            }
+        }
+      return false;
+    }
+
     // This function can be moved to its own file if TropicalWeightTransducer.o
     // yields a 'File too big' error.
     StdVectorFst * TropicalWeightTransducer::minimize(StdVectorFst * t)
@@ -146,11 +192,6 @@ namespace hfst {
     }
 
     void print_att_number(StdVectorFst *t, FILE * ofile);
-
-  float tropical_seconds_in_harmonize=0;
-  float TropicalWeightTransducer::get_profile_seconds() {
-    return tropical_seconds_in_harmonize;
-  }
 
   bool openfst_tropical_use_hopcroft=false;
   void openfst_tropical_set_hopcroft(bool value) {
@@ -1047,10 +1088,6 @@ namespace hfst {
   {
     bool DEBUG=false;
 
-#ifdef PROFILE_MINIMIZATION
-    clock_t startclock = clock();
-#endif
-
     // 1. Calculate the set of unknown symbols for transducers t1 and t2.
 
     StringSet unknown_t1;    // symbols known to another but not this
@@ -1119,12 +1156,6 @@ namespace hfst {
       harmonized_t2 = expand_arcs(t2, unknown_t2, unknown_symbols_in_use);
       harmonized_t2->SetInputSymbols(t2->InputSymbols());
     }
-
-#ifdef PROFILE_MINIMIZATION
-    clock_t endclock = clock();
-    tropical_seconds_in_harmonize = tropical_seconds_in_harmonize +
-      ( (float)(endclock - startclock) / CLOCKS_PER_SEC);
-#endif
 
     return std::pair<StdVectorFst*, StdVectorFst*>
       (harmonized_t1, harmonized_t2);

@@ -258,6 +258,7 @@ namespace implementations
         (StdVectorFst * t,float (*func)(float f));
       static StdVectorFst * push_weights
         (StdVectorFst * t, bool to_initial_state);
+      static bool has_weights(const StdVectorFst * t);
 
       static std::pair<StdVectorFst*, StdVectorFst*> harmonize
         (StdVectorFst *t1, StdVectorFst *t2, bool unknown_symbols_in_use=true);
@@ -337,7 +338,7 @@ namespace implementations
                                               Grammar * grammar);
 #endif
 
-      float get_profile_seconds();
+      static float get_profile_seconds();
 
       static unsigned int number_of_states(const StdVectorFst * t);
       static unsigned int number_of_arcs(const StdVectorFst * t);
