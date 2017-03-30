@@ -11,9 +11,9 @@
 #  include <config.h>
 #endif
 
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
 #include "back-ends/sfst/fst.h"
-#endif // HAVE_SFST
+#endif // HAVE_SFST || HAVE_LEAN_SFST
 
 #if HAVE_FOMA
 #ifndef _FOMALIB_H_
@@ -80,13 +80,13 @@ namespace hfst { namespace implementations
   HfstBasicTransducer * ConversionFunctions::
   hfst_transducer_to_hfst_basic_transducer
   (const hfst::HfstTransducer &t) {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
     if (t.type == SFST_TYPE) {
       HfstBasicTransducer * retval = sfst_to_hfst_basic_transducer(t.implementation.sfst);
       retval->name = t.get_name();
       return retval;
     }
-#endif // HAVE_SFST
+#endif // HAVE_SFST || HAVE_LEAN_SFST
 
 #if HAVE_OPENFST
     if (t.type == TROPICAL_OPENFST_TYPE) {

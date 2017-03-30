@@ -34,6 +34,10 @@ libhfst_la_LIBADD = implementations/libhfstimplementations.la \
 
 if WANT_SFST
   libhfst_la_LIBADD += $(top_builddir)/back-ends/sfst/libsfst.la
+else
+if WANT_LEAN_SFST
+  libhfst_la_LIBADD += $(top_builddir)/back-ends/sfst/libsfst.la
+endif
 endif
 
 if WANT_FOMA

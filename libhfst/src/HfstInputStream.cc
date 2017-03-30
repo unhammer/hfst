@@ -37,7 +37,7 @@ namespace hfst
   {
     switch (type)
       {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         this->implementation.sfst->ignore(n);
         break;
@@ -79,7 +79,7 @@ namespace hfst
       return c = input_stream->get();
     switch (type)
       {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         return c = this->implementation.sfst->stream_get();
         break;
@@ -125,7 +125,7 @@ namespace hfst
       }
     switch (type)
       {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         return i = this->implementation.sfst->stream_get_short();
         break;
@@ -177,7 +177,7 @@ namespace hfst
       return (char) input_stream->get();
     switch (type)
       {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         return this->implementation.sfst->stream_get();
         break;
@@ -222,7 +222,7 @@ namespace hfst
     }
     switch (type)
       {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         this->implementation.sfst->stream_unget(c);
         break;
@@ -289,7 +289,7 @@ namespace hfst
   bool HfstInputStream::set_implementation_specific_header_data
   (StringPairVector& /* data */, unsigned int /* index*/)
   {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
     switch (type)
       {
       case SFST_TYPE:
@@ -330,7 +330,7 @@ namespace hfst
 
     switch (type)
       {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         {
         t.implementation.sfst =
@@ -948,13 +948,13 @@ namespace hfst
       HFST_THROW(EndOfStreamException);
     type = stream_fst_type();
 
-    if ( ! HfstTransducer::is_implementation_type_available(type)) {
+    if ( ! HfstTransducer::is_lean_implementation_type_available(type)) {
       throw ImplementationTypeNotAvailableException("ImplementationTypeNotAvailableException", __FILE__, __LINE__, type);
     }
 
     switch (type)
     {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
     case SFST_TYPE:
       implementation.sfst = new hfst::implementations::SfstInputStream;
       break;
@@ -1026,13 +1026,13 @@ namespace hfst
       type = stream_fst_type();
     }
     
-    if ( ! HfstTransducer::is_implementation_type_available(type)) {
+    if ( ! HfstTransducer::is_lean_implementation_type_available(type)) {
       throw ImplementationTypeNotAvailableException("ImplementationTypeNotAvailableException", __FILE__, __LINE__, type);
     }
     
     switch (type)
       {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         implementation.sfst
           = new hfst::implementations::SfstInputStream(filename);
@@ -1094,7 +1094,7 @@ namespace hfst
   {
     switch (type)
       {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         delete implementation.sfst;
         break;
@@ -1139,7 +1139,7 @@ namespace hfst
   {
     switch (type)
       {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         implementation.sfst->close();
         break;
@@ -1182,7 +1182,7 @@ namespace hfst
   {
     switch (type)
       {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         return implementation.sfst->is_eof();
         break;
@@ -1225,7 +1225,7 @@ namespace hfst
   {
     switch (type)
       {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         return implementation.sfst->is_bad();
         break;
@@ -1269,7 +1269,7 @@ namespace hfst
   {
     switch (type)
       {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         return implementation.sfst->is_good();
         break;

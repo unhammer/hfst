@@ -21,13 +21,13 @@ namespace hfst
   HfstOutputStream::HfstOutputStream(ImplementationType type, bool hfst_format):
     type(type), hfst_format(hfst_format), is_open(false)
   {
-    if (! HfstTransducer::is_implementation_type_available(type)) {
+    if (! HfstTransducer::is_lean_implementation_type_available(type)) {
       throw ImplementationTypeNotAvailableException("ImplementationTypeNotAvailableException", __FILE__, __LINE__, type);
     }
 
     switch(type)
       {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         implementation.sfst =
           new hfst::implementations::SfstOutputStream();
@@ -84,13 +84,13 @@ namespace hfst
   (const std::string &filename,ImplementationType type, bool hfst_format_):
     type(type), hfst_format(hfst_format_), is_open(false)
   {
-    if (! HfstTransducer::is_implementation_type_available(type)) {
+    if (! HfstTransducer::is_lean_implementation_type_available(type)) {
       throw ImplementationTypeNotAvailableException("ImplementationTypeNotAvailableException", __FILE__, __LINE__, type);
     }
 
     switch(type)
       {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         implementation.sfst =
           new hfst::implementations::SfstOutputStream(filename);
@@ -154,7 +154,7 @@ namespace hfst
   {
     switch (type)
       {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         delete implementation.sfst;
         break;
@@ -216,7 +216,7 @@ namespace hfst
   {
     switch(type)
       {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         implementation.sfst->write(c);
         break;
@@ -267,7 +267,7 @@ namespace hfst
 
     switch(type)
       {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         type_value=std::string("SFST");
         break;
@@ -310,7 +310,7 @@ namespace hfst
     append(header, type_value);
   }
 
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
 void
 HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&
                                                              header,
@@ -322,7 +322,7 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
                                                              HfstTransducer&)
 #endif
   {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
     switch(type)
       {
       case SFST_TYPE:
@@ -447,7 +447,7 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
 
     switch (type)
       {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         implementation.sfst->write_transducer
           (transducer.implementation.sfst);
@@ -497,7 +497,7 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
   void HfstOutputStream::close(void) {
     switch (type)
       {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
       case SFST_TYPE:
         implementation.sfst->close();
         break;

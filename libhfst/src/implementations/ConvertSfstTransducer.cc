@@ -11,7 +11,7 @@
 #  include <config.h>
 #endif
 
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
   #include "back-ends/sfst/interface.h"
   #include "back-ends/sfst/fst.h"
 #endif
@@ -33,7 +33,7 @@ namespace hfst { namespace implementations
 
      ----------------------------------------------------------- */
 
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
 
   SFST::VType VMARK = 10000;
 
@@ -224,7 +224,7 @@ namespace hfst { namespace implementations
     return t;
   }
   
-#endif // HAVE_SFST
+#endif // HAVE_SFST || HAVE_LEAN_SFST
 
   }}
 #else // MAIN_TEST was defined

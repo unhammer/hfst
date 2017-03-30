@@ -20,7 +20,7 @@
 #include "HfstSymbolDefs.h"
 #include "parsers/LexcCompiler.h"
 
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
 #include "implementations/SfstTransducer.h"
 #endif
 
@@ -269,7 +269,7 @@ An example:
     /* The union of possible backend implementations. */
     union TransducerImplementation
     {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
       hfst::implementations::Transducer * sfst;
 #endif
 #if HAVE_OPENFST
@@ -298,7 +298,7 @@ An example:
     TransducerImplementation implementation;
 
     /* Interfaces through which the backend implementations can be accessed */
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
     static hfst::implementations::SfstTransducer sfst_interface;
 #endif
 #if HAVE_OPENFST
@@ -367,6 +367,10 @@ An example:
        needed by implementation type \a type. */
     HFSTDLL static bool is_implementation_type_available(ImplementationType type);
 
+    /* whether HFST offers at least reading, writing, and conversion functions
+       for implementation type \a type. */
+    HFSTDLL static bool is_lean_implementation_type_available(ImplementationType type);
+    
     HFSTDLL unsigned int number_of_states() const;
     HFSTDLL unsigned int number_of_arcs() const;
 

@@ -14,8 +14,6 @@
 #include "HfstFlagDiacritics.h"
 #include "HfstSymbolDefs.h"
 #include "HfstExtractStrings.h"
-//#include "back-ends/sfst/interface.h"
-//#include "back-ends/sfst/fst.h"
 
 namespace SFST { class Transducer; typedef short unsigned int Character; class Alphabet; class Label; }
 
@@ -36,8 +34,6 @@ namespace implementations
   ;
   using std::ostream;
   using std::ostringstream;
-
-  void sfst_set_hopcroft(bool);
 
   class SfstInputStream
   {
@@ -77,7 +73,6 @@ namespace implementations
   private:
     std::string filename;
     FILE *ofile;
-    //void write_3_0_library_header(FILE *file, bool is_minimal);
   public:
     SfstOutputStream(void);
     SfstOutputStream(const std::string &filename);
@@ -86,38 +81,14 @@ namespace implementations
     void append_implementation_specific_header_data
       (std::vector<char> &header, SFST::Transducer *t);
     void write_transducer(SFST::Transducer * transducer);
-  };
+  };  
 
-  /*
-  class HfstNode2Int {
-    
-    struct hashf {
-      size_t operator()(const SFST::Node *node) const {
-    return (size_t)node;
-      }
-    };
-    struct equalf {
-      int operator()(const SFST::Node *n1, const SFST::Node *n2) const {
-    return (n1 == n2);
-      }
-    };
-    typedef SFST::hash_map<SFST::Node*, int, hashf, equalf> NL;
-    
-  private:
-    NL number;
-    
-  public:
-    int &operator[]( SFST::Node *node ) {
-      NL::iterator it=number.find(node);
-      if (it == number.end())
-    return number.insert(NL::value_type(node, 0)).first->second;
-      return it->second;
-    };
-    };*/
-  
-  
+  void sfst_set_hopcroft(bool);
+
+
   class SfstTransducer
     {
+#ifndef OMIT_SFST_TRANSDUCER
     public:
       static SFST::Transducer * create_empty_transducer(void);
       static SFST::Transducer * create_epsilon_transducer(void);
@@ -125,8 +96,6 @@ namespace implementations
       static SFST::Transducer * define_transducer(unsigned int number);
       static SFST::Transducer * define_transducer
         (unsigned int inumber, unsigned int onumber);
-
-      static void delete_transducer(SFST::Transducer * t);
 
       static SFST::Transducer * define_transducer(const std::string &symbol);
       static SFST::Transducer * define_transducer
@@ -188,12 +157,6 @@ namespace implementations
       static void print_test(SFST::Transducer *t);
       static void print_alphabet(SFST::Transducer *t);
 
-      static unsigned int get_biggest_symbol_number(SFST::Transducer * t);
-
-      static StringVector get_symbol_vector(SFST::Transducer * t);
-
-      static std::map<std::string, unsigned int> get_symbol_map(SFST::Transducer * t);
-
       static SFST::Transducer * disjunct(SFST::Transducer * t, const StringPairVector &spv);
 
       static StringPairSet get_symbol_pairs(SFST::Transducer *t);
@@ -202,12 +165,10 @@ namespace implementations
       static unsigned int number_of_states(SFST::Transducer *t);
       static unsigned int number_of_arcs(SFST::Transducer *t);
 
-      static StringSet get_alphabet(SFST::Transducer *t);
+
       static void insert_to_alphabet(SFST::Transducer *t, const std::string &symbol);
       static void remove_from_alphabet
     (SFST::Transducer *t, const std::string &symbol);
-      static unsigned int get_symbol_number(SFST::Transducer *t,
-                        const std::string &symbol);
 
     protected:
       static void initialize_alphabet(SFST::Transducer *t);
@@ -220,6 +181,17 @@ namespace implementations
           hfst::StringSet &new_symbols, std::set<SFST::Node*> &visited_nodes );
       static void expand(SFST::Transducer *t, hfst::StringSet &new_symbols);
 
+#endif
+      // needed in transducer format conversions
+    public:
+      static void delete_transducer(SFST::Transducer * t);
+      static unsigned int get_symbol_number(SFST::Transducer *t,
+					    const std::string &symbol);
+      static StringSet get_alphabet(SFST::Transducer *t);
+      static unsigned int get_biggest_symbol_number(SFST::Transducer * t);
+      static StringVector get_symbol_vector(SFST::Transducer * t);
+      static std::map<std::string, unsigned int> get_symbol_map(SFST::Transducer * t);      
     };
+
 } }
 #endif

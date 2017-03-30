@@ -1149,7 +1149,7 @@ HfstTransducer::HfstTransducer(const std::string& upper_utf8_str,
 HfstTransducer::HfstTransducer(HfstInputStream &in):
     type(in.type), anonymous(false),is_trie(false), name("")
 {
-    if (! is_implementation_type_available(type)) {
+  if (! is_lean_implementation_type_available(type)) {
       throw ImplementationTypeNotAvailableException("ImplementationTypeNotAvailableException", __FILE__, __LINE__, type);
     }
 
@@ -1223,12 +1223,12 @@ HfstTransducer::HfstTransducer
   ImplementationType type):
     type(type),anonymous(false),is_trie(false), name("")
 {
-    if (! is_implementation_type_available(type))
+    if (! is_lean_implementation_type_available(type))
       throw ImplementationTypeNotAvailableException("ImplementationTypeNotAvailableException", __FILE__, __LINE__, type);
 
     switch (type)
     {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
     case SFST_TYPE:
         implementation.sfst =
         ConversionFunctions::hfst_basic_transducer_to_sfst(&net);
@@ -1277,12 +1277,12 @@ HfstTransducer::HfstTransducer
 
 HfstTransducer::~HfstTransducer(void)
 {
-    if (! is_implementation_type_available(type))
+    if (! is_lean_implementation_type_available(type))
       throw ImplementationTypeNotAvailableException("ImplementationTypeNotAvailableException", __FILE__, __LINE__, type);
 
     switch (type)
     {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
     case SFST_TYPE:
         sfst_interface.delete_transducer(implementation.sfst);
         break;
@@ -4874,7 +4874,7 @@ HfstTransducer &HfstTransducer::subtract
 implementations::HfstBasicTransducer * HfstTransducer::
 get_basic_transducer() const
 {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
     if (this->type == SFST_TYPE)
       {
         hfst::implementations::HfstBasicTransducer * net =
@@ -4920,7 +4920,7 @@ get_basic_transducer() const
 implementations::HfstBasicTransducer * HfstTransducer::
 convert_to_basic_transducer()
 {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
     if (this->type == SFST_TYPE)
       {
         hfst::implementations::HfstBasicTransducer * net =
@@ -4970,7 +4970,7 @@ convert_to_basic_transducer()
 HfstTransducer &HfstTransducer::
 convert_to_hfst_transducer(implementations::HfstBasicTransducer *t)
 {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
     if (this->type == SFST_TYPE)
       {
         implementation.sfst =
@@ -5026,7 +5026,7 @@ HfstTransducer &HfstTransducer::convert(const HfstTransducer &t,
     }
     if (type == t.type)
     { return *(new HfstTransducer(t)); }
-    if (! is_implementation_type_available(type)) {
+    if (! is_lean_implementation_type_available(type)) {
       throw ImplementationTypeNotAvailableException("HfstTransducer::convert", __FILE__, __LINE__, type);
     }
 
@@ -5067,10 +5067,34 @@ bool HfstTransducer::is_implementation_type_available
     return true;
 }
 
+bool HfstTransducer::is_lean_implementation_type_available
+(ImplementationType type) {
+#if !HAVE_FOMA
+    if (type == FOMA_TYPE)
+    return false;
+#endif
+#if !HAVE_SFST
+#if !HAVE_LEAN_SFST
+    if (type == SFST_TYPE)
+    return false;
+#endif
+#endif
+#if !HAVE_OPENFST
+    if (type == TROPICAL_OPENFST_TYPE || type == LOG_OPENFST_TYPE)
+    return false;
+#endif
+#if !HAVE_XFSM
+    if (type == XFSM_TYPE)
+      return false;
+#endif
+    (void)type;
+    return true;
+}  
+  
 HfstTransducer &HfstTransducer::convert(ImplementationType type,
                     std::string options)
 {
-  if (! is_implementation_type_available(this->type)) {
+  if (! is_lean_implementation_type_available(this->type)) {
     HFST_THROW_MESSAGE(HfstFatalException,
                        "HfstTransducer::convert: the original type "
                        "of the transducer is not available!");
@@ -5082,7 +5106,7 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
                            "HfstTransducer::convert"); }
     if (type == this->type)
     { return *this; }
-    if (! is_implementation_type_available(type)) {
+    if (! is_lean_implementation_type_available(type)) {
       throw ImplementationTypeNotAvailableException("HfstTransducer::convert", __FILE__, __LINE__, type);
     }
 
@@ -5115,7 +5139,7 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
             //delete(implementation.my_transducer_library);
             //break;
             //#endif
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
     case SFST_TYPE:
       internal =
         ConversionFunctions::sfst_to_hfst_basic_transducer
@@ -5156,7 +5180,7 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
     this->type = type;
     switch (this->type)
     {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
     case SFST_TYPE:
       implementation.sfst =
         ConversionFunctions::hfst_basic_transducer_to_sfst(internal);
@@ -5321,7 +5345,7 @@ HfstTransducer::HfstTransducer(FILE * ifile,
 #endif
   unsigned int linecount=0;
 
-    if (! is_implementation_type_available(type))
+    if (! is_lean_implementation_type_available(type))
       throw ImplementationTypeNotAvailableException("ImplementationTypeNotAvailableException", __FILE__, __LINE__, type);
 
     HfstTokenizer::check_utf8_correctness(epsilon_symbol);
@@ -5335,7 +5359,7 @@ HfstTransducer::HfstTransducer(FILE * ifile,
     // Conversion is done here.
     switch (type)
     {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
     case SFST_TYPE:
         implementation.sfst =
         ConversionFunctions::hfst_basic_transducer_to_sfst(&net);
@@ -5397,7 +5421,7 @@ HfstTransducer::HfstTransducer(FILE * ifile,
     HFST_THROW(FunctionNotImplementedException);
 #endif
 
-    if (! is_implementation_type_available(type))
+    if (! is_lean_implementation_type_available(type))
       throw ImplementationTypeNotAvailableException("ImplementationTypeNotAvailableException", __FILE__, __LINE__, type);
 
     HfstTokenizer::check_utf8_correctness(epsilon_symbol);
@@ -5411,7 +5435,7 @@ HfstTransducer::HfstTransducer(FILE * ifile,
     // Conversion is done here.
     switch (type)
     {
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
     case SFST_TYPE:
         implementation.sfst =
         ConversionFunctions::hfst_basic_transducer_to_sfst(&net);

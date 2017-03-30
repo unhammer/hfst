@@ -31,7 +31,7 @@ namespace hfst
 #endif
     class TropicalWeightOutputStream;
 #endif
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
     class SfstOutputStream;
 #endif
 #if HAVE_FOMA
@@ -78,7 +78,7 @@ For more information on HFST transducer structure, see
 #endif
       hfst::implementations::TropicalWeightOutputStream * tropical_ofst;
 #endif
-#if HAVE_SFST
+#if HAVE_SFST || HAVE_LEAN_SFST
       hfst::implementations::SfstOutputStream * sfst;
 #endif
 #if HAVE_FOMA

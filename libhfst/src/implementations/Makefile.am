@@ -44,6 +44,10 @@ endif
 # the bridges
 if WANT_SFST
 MAYBE_SFST=SfstTransducer.cc
+else
+if WANT_LEAN_SFST
+MAYBE_SFST=SfstTransducer.cc
+endif
 endif
 if WANT_OPENFST
 MAYBE_OPENFST=TropicalWeightTransducer.cc

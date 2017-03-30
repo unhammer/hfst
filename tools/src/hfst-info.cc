@@ -215,28 +215,32 @@ int main (int argc, char * argv[])
       if ((*f == "sfst") || (*f == "SFST") || (*f == "HAVE_SFST"))
         {
           verbose_printf("Requiring SFST support from library");
-#ifndef HAVE_SFST
+#if !HAVE_SFST
+#if !HAVE_LEAN_SFST
           error(EXIT_FAILURE, 0, "Required SFST support not present");
+#else
+          error(EXIT_FAILURE, 0, "Required SFST support present only in limited form");
+#endif
 #endif
         }
       else if ((*f == "foma") || (*f == "FOMA") || (*f == "HAVE_FOMA"))
         {
           verbose_printf("Requiring foma support from library");
-#ifndef HAVE_FOMA
+#if HAVE_FOMA
           error(EXIT_FAILURE, 0, "Required foma support not present");
 #endif
         }
       else if ((*f == "xfsm") || (*f == "XFSM") || (*f == "HAVE_XFSM"))
         {
           verbose_printf("Requiring xfsm support from library");
-#ifndef HAVE_XFSM
+#if HAVE_XFSM
           error(EXIT_FAILURE, 0, "Required xfsm support not present");
 #endif
         }
       else if ((*f == "openfst") || (*f == "OPENFST") || (*f == "HAVE_OPENFST"))
         {
           verbose_printf("Requiring OpenFst support from library");
-#ifndef HAVE_OPENFST
+#if HAVE_OPENFST
           error(EXIT_FAILURE, 0, "Required OpenFst support not present");
 #endif
         }
@@ -245,7 +249,7 @@ int main (int argc, char * argv[])
           verbose_printf("Requiring Unicode parsed by Glib");
 #ifndef USE_GLIB_UNICODE
           error(EXIT_FAILURE, 0,
-                "Required GLIB-based Unicode handling not presesnt");
+                "Required GLIB-based Unicode handling not present");
 #endif
         }
       else
@@ -269,6 +273,10 @@ int main (int argc, char * argv[])
 #endif
 #if HAVE_SFST
   verbose_printf("SFST supported\n");
+#else
+#if HAVE_LEAN_SFST
+  verbose_printf("SFST limitedly supported\n");
+#endif
 #endif
 #if HAVE_FOMA
   verbose_printf("foma supported\n");

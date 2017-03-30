@@ -71,7 +71,12 @@ AC_ARG_WITH([sfst],
             [with_sfst=yes])
 AS_IF([test "x$with_sfst" != xno], [AC_DEFINE([HAVE_SFST], [1],
                                               [Define to compile SFST support in HFST])])
-AM_CONDITIONAL([WANT_SFST], [test x$with_sfst != xno])
+AS_IF([test "x$with_sfst" == xlean], [AC_DEFINE([HAVE_SFST], [0], [Define to compile SFST support in HFST])
+				      AC_DEFINE([HAVE_LEAN_SFST], [1], [Define to compile lean SFST support in HFST])])
+
+AM_CONDITIONAL([WANT_SFST], [test x$with_sfst != xno -a x$with_sfst != xlean])
+AM_CONDITIONAL([WANT_LEAN_SFST], [test x$with_sfst == xlean])
+
 AC_ARG_WITH([openfst],
             [AS_HELP_STRING([--with-openfst],
                             [process weighted fsts with OpenFst @<:@default=yes@:>@])],
