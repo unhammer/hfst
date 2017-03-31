@@ -191,7 +191,7 @@ AC_ARG_ENABLE([calculate],
 			  [AS_HELP_STRING([--enable-calculate],
 							  [build calculate tool @<:@default=yes@:>@])],
 			  [enable_calculate=$enableval],
-			  [enable_calculate=$enable_all_tools])
+			  [if test x$enable_no_tools != xno; then enable_calculate=no; else enable_calculate=yes; fi])
 AM_CONDITIONAL([WANT_CALCULATE], [test x$enable_calculate != xno])
 AC_ARG_ENABLE([compare],
 			  [AS_HELP_STRING([--enable-compare],
@@ -533,7 +533,7 @@ AC_ARG_ENABLE([xfst],
 			  [AS_HELP_STRING([--enable-xfst],
 							  [build xfst tool @<:@default=yes@:>@])],
 			  [enable_xfst=$enableval],
-			  [enable_xfst=$enable_all_tools])
+			  [if test x$enable_no_tools != xno; then enable_xfst=no; else enable_xfst=yes; fi])
 AM_CONDITIONAL([WANT_XFST], [test x$enable_xfst != xno])
 
 # Check if zlib is available
