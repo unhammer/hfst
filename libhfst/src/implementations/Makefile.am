@@ -53,6 +53,10 @@ if WANT_OPENFST
 MAYBE_OPENFST=TropicalWeightTransducer.cc
 if WANT_OPENFST_LOG
 MAYBE_OPENFST += LogWeightTransducer.cc
+else
+if WANT_LEAN_OPENFST_LOG
+MAYBE_OPENFST += LogWeightTransducer.cc
+endif
 endif
 endif
 if WANT_FOMA

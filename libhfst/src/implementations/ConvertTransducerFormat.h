@@ -202,7 +202,7 @@ namespace implementations {
   static fst::StdVectorFst * hfst_constant_transducer_to_tropical_ofst
   (const HfstConstantTransducer * t); */
 
-#if HAVE_OPENFST_LOG
+#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
   static HfstBasicTransducer * log_ofst_to_hfst_basic_transducer
     (fst::LogFst * t, bool had_hfst_header=true);
   
@@ -229,7 +229,7 @@ namespace implementations {
 
 #endif
 
-#endif // HAVE_OPENFST
+#endif // HAVE_OPENFST || HAVE_LEAN_OPENFST_LOG
   
   
   static HfstBasicTransducer * hfst_ol_to_hfst_basic_transducer

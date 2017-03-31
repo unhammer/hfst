@@ -20,19 +20,6 @@
 #ifndef MAIN_TEST
 namespace hfst { namespace implementations
 {
-  float log_seconds_in_harmonize=0;
-
-    float LogWeightTransducer::get_profile_seconds() {
-      return log_seconds_in_harmonize;
-    }
-
-  bool openfst_log_use_hopcroft=false;
-
-  void openfst_log_set_hopcroft(bool value) {
-    openfst_log_use_hopcroft=value;
-  }
-
-  void initialize_symbol_tables(LogFst *t);
 
   LogWeightInputStream::LogWeightInputStream(void):
     i_stream(),input_stream(cin)
@@ -53,6 +40,173 @@ namespace hfst { namespace implementations
 
   void LogWeightInputStream::stream_unget(char c) {
     input_stream.putback(c); }
+
+
+  /* Skip the identifier string "LOG_OFST_TYPE" */
+  void LogWeightInputStream::skip_identifier_version_3_0(void)
+  { input_stream.ignore(14); }
+
+  void LogWeightInputStream::skip_hfst_header(void)
+  {
+    input_stream.ignore(6);
+    //char c;
+    //i_stream.get(c);
+    //switch (c)
+    //{
+    //case 0:
+    skip_identifier_version_3_0();
+    //break;
+    //default:
+    //assert(false);
+    //}
+  }
+
+  void LogWeightInputStream::close(void)
+  {
+    if (filename != string())
+      { i_stream.close(); }
+  }
+  bool LogWeightInputStream::is_eof(void) const
+  {
+    return input_stream.peek() == EOF;
+  }
+  bool LogWeightInputStream::is_bad(void) const
+  {
+    if (filename == string())
+      { return std::cin.bad(); }
+    else
+      { return input_stream.bad(); }
+  }
+  bool LogWeightInputStream::is_good(void) const
+  {
+    if(is_eof())
+      return false;
+    if (filename == string())
+      { return std::cin.good(); }
+    else
+      { return input_stream.good(); }
+  }
+
+  bool LogWeightInputStream::is_fst(void) const
+  {
+    return is_fst(input_stream);
+  }
+
+  bool LogWeightInputStream::is_fst(FILE * f)
+  {
+    if (f == NULL)
+      { return false; }
+    int c = getc(f);
+    ungetc(c, f);
+    return c == 0xd6;
+  }
+
+  bool LogWeightInputStream::is_fst(istream &s)
+  {
+    return s.good() && (s.peek() == 0xd6);
+  }
+
+  bool LogWeightInputStream::operator() (void) const
+  { return is_good(); }
+
+  void LogWeightInputStream::ignore(unsigned int n)
+  { input_stream.ignore(n); }
+
+  LogFst * LogWeightInputStream::read_transducer()
+  {
+    if (is_eof())
+      { //throw StreamIsClosedException();
+        HFST_THROW(StreamIsClosedException); }
+    LogFst * t;
+    FstHeader header;
+    try
+      {
+        if (filename == string())
+          {
+            header.Read(input_stream,"STDIN");
+            t = static_cast<LogFst*>
+              (LogFst::Read(input_stream,
+                                  FstReadOptions("STDIN",
+                                                 &header)));
+          }
+        else
+          {
+            header.Read(input_stream,filename);
+            t = static_cast<LogFst*>
+              (LogFst::Read(input_stream,
+                                  FstReadOptions(filename,
+                                                 &header)));
+          }
+        if (t == NULL)
+          { //throw TransducerHasWrongTypeException();
+            HFST_THROW(TransducerHasWrongTypeException); }
+      }
+    //catch (TransducerHasWrongTypeException e)
+    catch (const HfstException e)
+      { throw e; }
+
+    try
+      {
+        return t;
+      }
+    //catch (HfstInterfaceException e)
+    catch (const HfstException e)
+      { throw e; }
+  }
+
+    LogWeightOutputStream::LogWeightOutputStream(void):
+    filename(std::string()), output_stream(std::cout)
+  {
+    if (!output_stream)
+      fprintf(stderr, "LogWeightOutputStream: ERROR: failbit set (3).\n");
+  }
+
+  LogWeightOutputStream::LogWeightOutputStream(const std::string &str):
+    filename(std::string(str)),o_stream(str.c_str(),std::ios::out),
+    output_stream(o_stream)
+  {}
+
+  void LogWeightOutputStream::write(const char &c)
+  {
+    output_stream.put(char(c));
+  }
+
+  void LogWeightOutputStream::write_transducer(LogFst * transducer)
+  {
+    if (!output_stream)
+      fprintf(stderr, "LogWeightOutputStream: ERROR: failbit set (1).\n");
+    /* When writing a transducer, both input and output symbol tables are
+       included. */
+    fst::SymbolTable output_st(*(transducer->InputSymbols()));
+    transducer->SetOutputSymbols(&output_st);
+    transducer->Write(output_stream,FstWriteOptions()); }
+
+  void LogWeightOutputStream::close(void)
+  {
+    if (filename != string())
+      { o_stream.close(); }
+  }
+
+  void LogWeightTransducer::delete_transducer(LogFst * t)
+  {
+    delete t;
+  }
+
+#if HAVE_OPENFST_LOG
+
+  float log_seconds_in_harmonize=0;
+
+    float LogWeightTransducer::get_profile_seconds() {
+      return log_seconds_in_harmonize;
+    }
+
+  bool openfst_log_use_hopcroft=false;
+
+  void openfst_log_set_hopcroft(bool value) {
+    openfst_log_use_hopcroft=value;
+  }
+
+  void initialize_symbol_tables(LogFst *t);
 
   void LogWeightTransducer::remove_symbol_table(LogFst *t)
   {
@@ -819,199 +973,6 @@ namespace hfst { namespace implementations
 
   }
 
-
-
-  /* Skip the identifier string "LOG_OFST_TYPE" */
-  void LogWeightInputStream::skip_identifier_version_3_0(void)
-  { input_stream.ignore(14); }
-
-  void LogWeightInputStream::skip_hfst_header(void)
-  {
-    input_stream.ignore(6);
-    //char c;
-    //i_stream.get(c);
-    //switch (c)
-    //{
-    //case 0:
-    skip_identifier_version_3_0();
-    //break;
-    //default:
-    //assert(false);
-    //}
-  }
-  
-  void LogWeightInputStream::close(void)
-  {
-    if (filename != string())
-      { i_stream.close(); }
-  }
-  bool LogWeightInputStream::is_eof(void) const
-  {
-    return input_stream.peek() == EOF;
-  }
-  bool LogWeightInputStream::is_bad(void) const
-  {
-    if (filename == string())
-      { return std::cin.bad(); }
-    else
-      { return input_stream.bad(); }
-  }
-  bool LogWeightInputStream::is_good(void) const
-  {
-    if(is_eof())
-      return false;
-    if (filename == string())
-      { return std::cin.good(); }
-    else
-      { return input_stream.good(); }
-  }
-  
-  bool LogWeightInputStream::is_fst(void) const
-  {
-    return is_fst(input_stream);
-  }
-  
-  bool LogWeightInputStream::is_fst(FILE * f)
-  {
-    if (f == NULL)
-      { return false; }
-    int c = getc(f);
-    ungetc(c, f);
-    return c == 0xd6;
-  }
-  
-  bool LogWeightInputStream::is_fst(istream &s)
-  {
-    return s.good() && (s.peek() == 0xd6);
-  }
-
-  bool LogWeightInputStream::operator() (void) const
-  { return is_good(); }
-
-  void LogWeightInputStream::ignore(unsigned int n)
-  { input_stream.ignore(n); }
-
-  LogFst * LogWeightInputStream::read_transducer()
-  {
-    if (is_eof())
-      { //throw StreamIsClosedException();
-        HFST_THROW(StreamIsClosedException); }
-    LogFst * t;
-    FstHeader header;
-    try
-      {
-        if (filename == string())
-          {
-            header.Read(input_stream,"STDIN");
-            t = static_cast<LogFst*>
-              (LogFst::Read(input_stream,
-                                  FstReadOptions("STDIN",
-                                                 &header)));
-          }
-        else
-          {
-            header.Read(input_stream,filename);
-            t = static_cast<LogFst*>
-              (LogFst::Read(input_stream,
-                                  FstReadOptions(filename,
-                                                 &header)));
-          }
-        if (t == NULL)
-          { //throw TransducerHasWrongTypeException();
-            HFST_THROW(TransducerHasWrongTypeException); }
-      }
-    //catch (TransducerHasWrongTypeException e)
-    catch (const HfstException e)
-      { throw e; }
-
-    try
-      {
-        return t;
-      }
-    //catch (HfstInterfaceException e)
-    catch (const HfstException e)
-      { throw e; }
-  }
-
-  /*
-  LogWeightStateIterator::LogWeightStateIterator(LogFst * t):
-    iterator(new StateIterator<LogFst>(*t))
-  {}
-
-  LogWeightStateIterator::~LogWeightStateIterator(void)
-  { delete iterator; }
-
-  void LogWeightStateIterator::next(void)
-  {
-    iterator->Next();
-  }
-
-  bool LogWeightStateIterator::done(void)
-  {
-    return iterator->Done();
-  }
-
-  LogWeightState LogWeightStateIterator::value(void)
-  {
-    return iterator->Value();
-  }
-
-
-
-  LogWeightTransition::LogWeightTransition(const LogArc &arc, LogFst *t):
-    arc(arc), t(t)
-  {}
-
-  LogWeightTransition::~LogWeightTransition(void)
-  {}
-
-  std::string LogWeightTransition::get_input_symbol(void) const
-  {
-    return t->InputSymbols()->Find(arc.ilabel);
-  }
-
-  std::string LogWeightTransition::get_output_symbol(void) const
-  {
-    return t->InputSymbols()->Find(arc.olabel);
-  }
-
-  LogWeightState LogWeightTransition::get_target_state(void) const
-  {
-    return arc.nextstate;
-  }
-
-  LogWeight LogWeightTransition::get_weight(void) const
-  {
-    return arc.weight;
-  }
-
-
-
-  LogWeightTransitionIterator::LogWeightTransitionIterator
-  (LogFst *t, StateId state):
-    arc_iterator(new ArcIterator<LogFst>(*t, state)),
-    t(t)
-  {}
-
-  LogWeightTransitionIterator::~LogWeightTransitionIterator(void)
-  {}
-
-  void LogWeightTransitionIterator::next()
-  {
-    arc_iterator->Next();
-  }
-
-  bool LogWeightTransitionIterator::done()
-  {
-    return arc_iterator->Done();
-  }
-
-  LogWeightTransition LogWeightTransitionIterator::value()
-  {
-    return LogWeightTransition(arc_iterator->Value(), this->t);
-    }*/
-
-
   fst::SymbolTable LogWeightTransducer::create_symbol_table(std::string name) {
     fst::SymbolTable st(name);
     st.AddSymbol(internal_epsilon, 0);
@@ -1042,11 +1003,6 @@ namespace hfst { namespace implementations
     t->SetStart(s);
     t->SetFinal(s,0);
     return t;
-  }
-
-  void LogWeightTransducer::delete_transducer(LogFst * t)
-  {
-    delete t;
   }
 
   LogFst * LogWeightTransducer::define_transducer(unsigned int number)
@@ -1547,51 +1503,6 @@ namespace hfst { namespace implementations
     delete st;
     return t;
     }
-
-  /*static LogFst * insert_freely(LogFst * t, const NumberPair &number_pair)
-  {
-    for (fst::StateIterator<LogFst> siter(*t); !siter.Done(); siter.Next()) {
-      StateId state_id = siter.Value();
-      t->AddArc(state_id, fst::LogArc(number_pair.first, number_pair.second,
-                                      0, state_id));
-    }
-    return t;
-    }*/
-
-  /*
-  LogFst * LogWeightTransducer::substitute
-  (LogFst *t, void (*func)(std::string &isymbol, std::string &osymbol) )
-  {
-    LogFst * tc = t->Copy();
-    SymbolTable * st = tc->InputSymbols()->Copy();
-    assert(st != NULL);
-
-    for (fst::StateIterator<LogFst> siter(*tc);
-         not siter.Done(); siter.Next())
-      {
-        StateId s = siter.Value();
-        for (fst::MutableArcIterator<LogFst> aiter(tc,s);
-        !aiter.Done(); aiter.Next())
-          {
-            const LogArc &arc = aiter.Value(); // current values
-            LogArc new_arc;                    // new values
-            
-            std::string istring = st->Find(arc.ilabel);
-            std::string ostring = st->Find(arc.olabel);
-            func(istring,ostring);
-            new_arc.ilabel = st->AddSymbol(istring);
-            new_arc.olabel = st->AddSymbol(ostring);
-            // copy weight and next state as such
-            new_arc.weight = arc.weight.Value();
-            new_arc.nextstate = arc.nextstate;
-            aiter.SetValue(new_arc);
-          }
-      }
-    tc->SetInputSymbols(st);
-    delete st;
-    return tc;
-  }
-  */
 
   LogFst * LogWeightTransducer::substitute
   (LogFst * t,unsigned int old_key,unsigned int new_key)
@@ -2247,32 +2158,6 @@ namespace hfst { namespace implementations
           }
         }
       }
-
-      /*
-      int lp=lpos;
-      int up=upos;
-      
-      if (arc.ilabel != 0 &&
-          (!filter_fd || fd_state_stack->back().get_table().
-           get_operation(arc.ilabel)==NULL))
-      {
-        std::string str = t->InputSymbols()->Find(arc.ilabel);
-        if(lpos+str.length() >= lbuffer.size())
-          lbuffer.resize(lbuffer.size()*2, 0);
-        strcpy(&lbuffer[lpos], str.c_str());
-        lp += str.length();
-      }
-      if (arc.olabel != 0 &&
-          (!filter_fd || fd_state_stack->back().get_table().
-           get_operation(arc.olabel)==NULL))
-      {
-        std::string str = t->InputSymbols()->Find(arc.olabel);
-        if(upos+str.length() > ubuffer.size())
-          ubuffer.resize(ubuffer.size()*2, 0);
-        strcpy(&ubuffer[upos], str.c_str());
-        up += str.length();
-      }
-      */
       
       /* Handle spv here. Special symbols (flags, epsilons) are
          always inserted. */
@@ -2361,40 +2246,7 @@ namespace hfst { namespace implementations
     return;
   }
 
-
-
-  LogWeightOutputStream::LogWeightOutputStream(void):
-    filename(std::string()), output_stream(std::cout)
-  {
-    if (!output_stream)
-      fprintf(stderr, "LogWeightOutputStream: ERROR: failbit set (3).\n");
-  }
-
-  LogWeightOutputStream::LogWeightOutputStream(const std::string &str):
-    filename(std::string(str)),o_stream(str.c_str(),std::ios::out),
-    output_stream(o_stream)
-  {}
-
-  void LogWeightOutputStream::write(const char &c)
-  {
-    output_stream.put(char(c));
-  }
-
-  void LogWeightOutputStream::write_transducer(LogFst * transducer)
-  {
-    if (!output_stream)
-      fprintf(stderr, "LogWeightOutputStream: ERROR: failbit set (1).\n");
-    /* When writing a transducer, both input and output symbol tables are
-       included. */
-    fst::SymbolTable output_st(*(transducer->InputSymbols()));
-    transducer->SetOutputSymbols(&output_st);
-    transducer->Write(output_stream,FstWriteOptions()); }
-
-  void LogWeightOutputStream::close(void)
-  {
-    if (filename != string())
-      { o_stream.close(); }
-  }
+#endif // HAVE_OPENFST_LOG
   }
 }
 
@@ -2407,6 +2259,7 @@ using namespace hfst::implementations;
 
 int main(int argc, char * argv[])
 {
+#if HAVE_OPENFST_LOG
     std::cout << "Unit tests for " __FILE__ ":";
     LogWeightTransducer ofst;
     LogFst * t = ofst.create_empty_transducer();
@@ -2415,5 +2268,9 @@ int main(int argc, char * argv[])
     delete t;
     std::cout << std::endl << "ok" << std::endl;
     return EXIT_SUCCESS;
+#else // HAVE_OPENFST_LOG
+    std::cout << "Skipping unit tests for " << __FILE__ << ", LogWeightTransducer has not been enabled" << std::endl;
+    return 77;
+#endif // HAVE_OPENFST_LOG
 }
 #endif // MAIN_TEST

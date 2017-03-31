@@ -1392,8 +1392,8 @@ int main(int argc, char * argv[])
 
     std::cout << std::endl << "ok" << std::endl;
     return EXIT_SUCCESS;
-#else
-    std::cout << "Skipping unit tests for " << __FILE__ << ", SfstTransducer has not been enabled"
+#else // HAVE_SFST
+    std::cout << "Skipping unit tests for " << __FILE__ << ", SfstTransducer has not been enabled" << std::endl;
     return 77;
 #endif // HAVE_SFST
 }

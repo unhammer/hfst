@@ -71,8 +71,8 @@ AC_ARG_WITH([sfst],
             [with_sfst=yes])
 AS_IF([test "x$with_sfst" != xno], [AC_DEFINE([HAVE_SFST], [1],
                                               [Define to compile SFST support in HFST])])
-AS_IF([test "x$with_sfst" == xlean], [AC_DEFINE([HAVE_SFST], [0], [Define to compile SFST support in HFST])
-				      AC_DEFINE([HAVE_LEAN_SFST], [1], [Define to compile lean SFST support in HFST])])
+AS_IF([test "x$with_sfst" == xlean], [AC_DEFINE([HAVE_SFST], [0], [Define not to compile full SFST support in HFST])
+			     	      AC_DEFINE([HAVE_LEAN_SFST], [1], [Define to compile lean SFST support in HFST])])
 
 AM_CONDITIONAL([WANT_SFST], [test x$with_sfst != xno -a x$with_sfst != xlean])
 AM_CONDITIONAL([WANT_LEAN_SFST], [test x$with_sfst == xlean])
@@ -85,6 +85,7 @@ AC_ARG_WITH([openfst],
 AS_IF([test "x$with_openfst" != xno], [AC_DEFINE([HAVE_OPENFST], [1],
                                               [Define to compile OpenFst support in HFST])])
 AM_CONDITIONAL([WANT_OPENFST], [test x$with_openfst != xno])
+
 AC_ARG_WITH([openfst-log],
             [AS_HELP_STRING([--with-openfst-log],
                             [enable logarithmic weights @<:@default=yes@:>@])],
@@ -92,7 +93,12 @@ AC_ARG_WITH([openfst-log],
             [with_openfst_log=yes])
 AS_IF([test "x$with_openfst_log" != xno], [AC_DEFINE([HAVE_OPENFST_LOG], [1],
                                               [Define to compile OpenFst with log weight support in HFST])])
-AM_CONDITIONAL([WANT_OPENFST_LOG], [test x$with_openfst_log != xno])
+AS_IF([test "x$with_openfst_log" == xlean], [AC_DEFINE([HAVE_OPENFST_LOG], [0], [Define not to compile OpenFst with full log weight support in HFST])
+				      	     AC_DEFINE([HAVE_LEAN_OPENFST_LOG], [1], [Define to compile OpenFst with lean log weight support in HFST])])
+
+AM_CONDITIONAL([WANT_OPENFST_LOG], [test x$with_openfst_log != xno -a x$with_openfst_log != xlean])
+AM_CONDITIONAL([WANT_LEAN_OPENFST_LOG], [test x$with_openfst_log == xlean])
+
 AC_ARG_WITH([foma],
             [AS_HELP_STRING([--with-foma],
                             [process unweighted fsts with foma @<:@default=yes@:>@])],

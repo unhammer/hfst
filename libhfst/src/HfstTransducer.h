@@ -26,6 +26,9 @@
 
 #if HAVE_OPENFST
 #include "implementations/TropicalWeightTransducer.h"
+#endif
+
+#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
 #include "implementations/LogWeightTransducer.h"
 #endif
 
@@ -274,7 +277,7 @@ An example:
 #endif
 #if HAVE_OPENFST
       hfst::implementations::StdVectorFst * tropical_ofst;
-#if HAVE_OPENFST_LOG
+#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
       hfst::implementations::LogFst * log_ofst;
 #endif
 #endif
@@ -304,7 +307,7 @@ An example:
 #if HAVE_OPENFST
     static hfst::implementations::TropicalWeightTransducer
       tropical_ofst_interface;
-#if HAVE_OPENFST_LOG
+#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
     static hfst::implementations::LogWeightTransducer log_ofst_interface;
 #endif
 #endif

@@ -22,6 +22,7 @@
 #endif // _MSC_VER
 
 #ifndef _MSC_VER
+#if HAVE_OPENFST_LOG // if HAVE_LEAN_OPENFST_LOG is requested, these are not defined elsewhere (?)
 namespace fst
 {
   extern template class LogWeightTpl<float>;
@@ -30,6 +31,7 @@ namespace fst
   extern template class ArcIterator<LogFst>;
   extern template class StateIterator<LogFst>;
 }
+#endif
 #endif // _MSC_VER
 
 #ifndef MAIN_TEST
@@ -37,7 +39,7 @@ namespace hfst { namespace implementations
 {
 
 #if HAVE_OPENFST
-#if HAVE_OPENFST_LOG
+#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
 
   /* --- Conversion between log OpenFst and HfstBasicTransducer --- */
   

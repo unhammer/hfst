@@ -95,7 +95,7 @@ namespace hfst { namespace implementations
       retval->name = t.get_name();
       return retval;
     }
-#if HAVE_OPENFST_LOG
+#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
     if (t.type == LOG_OPENFST_TYPE) {
       HfstBasicTransducer * retval = log_ofst_to_hfst_basic_transducer(t.implementation.log_ofst);
       retval->name = t.get_name();

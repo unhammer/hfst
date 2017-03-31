@@ -18,19 +18,12 @@
   #include "../../../config.h"
 #endif
 
-//#ifdef _MSC_VER
-// #include "back-ends/openfstwin/src/include/fst/fstlib.h"
-//#else
-// #include "back-ends/openfst/src/include/fst/fstlib.h"
-//#endif // _MSC_VER
-
 #include "HfstExtractStrings.h"
 #include <cstdio>
 #include <string>
 #include <sstream>
 #include <iosfwd>
 #include <fstream>
-//#include "HfstAlphabet.h"
 
 #ifdef OPENFST_VERSION_1_5_4
   #include "back-ends/openfst/src/include/fst/fst-decl.h"
@@ -127,58 +120,12 @@ namespace implementations
     void write_transducer(LogFst * transducer);
   };
 
-  /*  class LogWeightTransitionIterator;
-
-  typedef StateId LogWeightState;
-
-  class LogWeightStateIterator
-    {
-    protected:
-      StateIterator<LogFst> * iterator;
-    public:
-      LogWeightStateIterator(LogFst * t);
-      ~LogWeightStateIterator(void);
-      void next(void);
-      bool done(void);
-      LogWeightState value(void);
-    };
- 
-
-  class LogWeightTransition
-    {
-    protected:
-      LogArc arc;
-      LogFst * t;
-    public:
-      LogWeightTransition(const LogArc &arc, LogFst *t);
-      ~LogWeightTransition(void);
-      std::string get_input_symbol(void) const;
-      std::string get_output_symbol(void) const;
-      LogWeightState get_target_state(void) const;
-      LogWeight get_weight(void) const;
-    };
-
-
-  class LogWeightTransitionIterator
-    {
-    protected:
-      ArcIterator<LogFst> * arc_iterator;
-      LogFst * t;
-    public:
-      LogWeightTransitionIterator(LogFst * t, StateId state);
-      ~LogWeightTransitionIterator(void);
-      void next(void);
-      bool done(void);
-      LogWeightTransition value(void);
-    };
-  */
-
   class LogWeightTransducer
     {
+#if HAVE_OPENFST_LOG
     public:
       static LogFst * create_empty_transducer(void);
       static LogFst * create_epsilon_transducer(void);
-      void delete_transducer(LogFst * t);
 
       // string versions
       static LogFst * define_transducer(const std::string &symbol);
@@ -335,6 +282,11 @@ namespace implementations
       static float is_final(LogFst *t, StateId s);
       static StateId get_initial_state(LogFst *t);
       static void represent_empty_transducer_as_having_one_state(LogFst *t);
+
+#endif // HAVE_OPENFST_LOG
+      // needed in lean implementation
+    public:
+      void delete_transducer(LogFst * t);
 
     };
 
