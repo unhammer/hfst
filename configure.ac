@@ -169,7 +169,7 @@ AS_IF([test "x$enable_load_so_entries" != xno], [AC_DEFINE([ENABLE_LOAD_SO_ENTRI
 
 AC_ARG_ENABLE([all_tools],
 			  [AS_HELP_STRING([--enable-all-tools],
-			  [build all tools (except hfst-twolc-script and hfst-train-tagger which must be explicitly enabled with --enable-twolc-script and --enable-train-tagger) @<:@default=no@:>@])],
+			  [build all tools (excluding legacy programs which must be explicitly enabled with --enable-lexc-wrapper --enable-foma-wrapper --enable-twolc-script and --enable-train-tagger) @<:@default=no@:>@])],
 			  [enable_all_tools=$enableval],
 			  [enable_all_tools=no])
 
@@ -242,7 +242,7 @@ AC_ARG_ENABLE([disjunct],
 			  [if test x$enable_no_tools != xno; then enable_disjunct=no; else enable_disjunct=yes; fi])
 AM_CONDITIONAL([WANT_DISJUNCT], [test x$enable_disjunct != xno])
 AC_ARG_ENABLE([expand_equivalences],
-			  [AS_HELP_STRING([--enable-edit-metadata],
+			  [AS_HELP_STRING([--enable-expand-equivalences],
 							  [build acx tool @<:@default=no@:>@])],
 			  [enable_expand_equivalences=$enableval],
 			  [enable_expand_equivalences=$enable_all_tools])
@@ -315,9 +315,9 @@ AC_ARG_ENABLE([invert],
 AM_CONDITIONAL([WANT_INVERT], [test x$enable_invert != xno])
 AC_ARG_ENABLE([lexc-wrapper],
               [AS_HELP_STRING([--enable-lexc-wrapper],
-                              [build lexc-wrapper cli and readline @<:@default=no@:>@])],
+                              [build legacy lexc tool @<:@default=no@:>@])],
               [enable_lexc_wrapper=$enableval],
-              [enable_lexc_wrapper=$enable_all_tools])
+              [enable_lexc_wrapper=no])
 AM_CONDITIONAL([WANT_LEXC_WRAPPER], [test "x$enable_lexc_wrapper" != xno])
 AC_ARG_ENABLE([twolc],
               [AS_HELP_STRING([--enable-twolc],
@@ -345,7 +345,7 @@ AC_ARG_ENABLE([train-tagger],
 AM_CONDITIONAL([WANT_TRAIN_TAGGER], [test "x$enable_train_tagger" != xno])
 AC_ARG_ENABLE([lexc],
               [AS_HELP_STRING([--enable-lexc],
-                              [build lexc cli @<:@default=yes@:>@])],
+                              [build lexc tool @<:@default=yes@:>@])],
               [enable_lexc=$enableval],
               [if test x$enable_no_tools != xno; then enable_lexc=no; else enable_lexc=yes; fi])
 AM_CONDITIONAL([WANT_LEXC], [test "x$enable_lexc" != xno])
@@ -475,12 +475,6 @@ AC_ARG_ENABLE([strings2fst],
 			  [enable_strings2fst=$enableval],
 			  [if test x$enable_no_tools != xno; then enable_strings2fst=no; else enable_strings2fst=yes; fi])
 AM_CONDITIONAL([WANT_STRINGS2FST], [test x$enable_strings2fst != xno])
-#AC_ARG_ENABLE([strip_header],
-#			  [AS_HELP_STRING([--enable-strip-header],
-#							  [build strip-header tool @<:@default=yes@:>@])],
-#			  [enable_strip_header=$enableval],
-#			  [enable_strip_header=yes])
-#AM_CONDITIONAL([WANT_STRIP_HEADER], [test x$enable_strip_header != xno])
 AC_ARG_ENABLE([substitute],
 			  [AS_HELP_STRING([--enable-substitute],
 							  [build substitution tool @<:@default=yes@:>@])],
@@ -525,9 +519,9 @@ AC_ARG_ENABLE([txt2fst],
 AM_CONDITIONAL([WANT_TXT2FST], [test x$enable_txt2fst != xno])
 AC_ARG_ENABLE([foma_wrapper],
 			  [AS_HELP_STRING([--enable-foma-wrapper],
-							  [build foma wrapper tool @<:@default=no@:>@])],
+							  [build legacy foma wrapper tool @<:@default=no@:>@])],
 			  [enable_foma_wrapper=$enableval],
-			  [enable_foma_wrapper=$enable_all_tools])
+			  [enable_foma_wrapper=no])
 AM_CONDITIONAL([WANT_FOMA_WRAPPER], [test x$enable_foma_wrapper != xno])
 AC_ARG_ENABLE([xfst],
 			  [AS_HELP_STRING([--enable-xfst],
