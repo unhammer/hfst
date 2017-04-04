@@ -93,17 +93,34 @@ int main(int argc, char * argv[])
   (void)command_line.set_output_file();
   std::ostringstream oss1;
   hfst::twolcpre1::set_output(oss1);
-  if (hfst::twolcpre1::parse() != 0)
+  try
     {
+      if (hfst::twolcpre1::parse() != 0)
+	{
+	  exit(1);
+	}
+    }
+  catch(const HfstException & e)
+    {
+      std::cerr << e.what() << std::endl;
       exit(1);
     }
 
   std::istringstream iss1(oss1.str());
   hfst::twolcpre2::set_input(iss1);
-  if (hfst::twolcpre2::parse() != 0)
+  try
     {
+      if (hfst::twolcpre2::parse() != 0)
+	{
+	  exit(1);
+	}
+    }
+  catch(const HfstException & e)
+    {
+      std::cerr << e.what() << std::endl;
       exit(1);
     }
+
   hfst::twolcpre2::complete_alphabet();
   
   std::ostringstream oss2;
