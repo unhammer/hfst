@@ -17,6 +17,7 @@
 #include "SfstAlphabet.h"
 #include <iosfwd>
 #include <fstream>
+#include <unordered_map>
 
 namespace hfst
 {
@@ -60,8 +61,10 @@ namespace hfst
       };
       
       typedef std::set<char*, ltstr> RVarSet;
-      typedef __gnu_cxx::hash_map<char*, HfstTransducer*, __gnu_cxx::hash<const char*>, eqstr> VarMap;
-      typedef __gnu_cxx::hash_map<char*, Range*, __gnu_cxx::hash<const char*>, eqstr> SVarMap;
+      //typedef __gnu_cxx::hash_map<char*, HfstTransducer*, __gnu_cxx::hash<const char*>, eqstr> VarMap;
+      //typedef __gnu_cxx::hash_map<char*, Range*, __gnu_cxx::hash<const char*>, eqstr> SVarMap;
+      typedef std::unordered_map<char*,HfstTransducer*> VarMap;
+      typedef std::unordered_map<char*,Range*> SVarMap;
       
     private:
       VarMap VM;
