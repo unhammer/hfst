@@ -33,13 +33,7 @@ using std::set_difference;
 #include "HfstTransducer.h"
 #include "XreCompiler.h"
 #include "lexc-utils.h"
-
-#ifdef YACC_USE_PARSER_H_EXTENSION
-  #include "lexc-parser.h"
-#else
-  #include "lexc-parser.hh"
-#endif
-
+#include "lexc-parser.hh"
 #include "xre_utils.h"
 #include "HfstSymbolDefs.h"
 
