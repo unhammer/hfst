@@ -215,7 +215,7 @@ TwolCGrammar_LDADD=../libhfst.la
 TESTS=$(LIBHFST_PARSER_TSTS) $(HFST_TWOLC_TESTS)
 
 EXTRA_DIST=xre_parse.$(HEADER) pmatch_parse.$(HEADER) lexc-parser.$(HEADER) xfst-parser.$(HEADER) sfst-compiler.$(HEADER) \
-	   htwolcpre1-parser.$(HEADER) htwolcpre2-parser.$(HEADER) htwolcpre3-parser.$(HEADER) $(BUILT_SOURCES)
+	   htwolcpre1-parser.$(HEADER) htwolcpre2-parser.$(HEADER) htwolcpre3-parser.$(HEADER) $(BUILT_SOURCES) common_globals.h
 
 
 # some systems might require all these
