@@ -213,7 +213,7 @@ bin_PROGRAMS= \
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc hfst-tool-metadata.cc
 
 # sort alphabetically
-hfst_affix_guessify_SOURCES=hfst-affix-guessify.cc $HFST_COMMON_SRC)
+hfst_affix_guessify_SOURCES=hfst-affix-guessify.cc $(HFST_COMMON_SRC)
 hfst_calculate_SOURCES=sfst-main.cc $(HFST_COMMON_SRC)
 hfst_compare_SOURCES=hfst-compare.cc $(HFST_COMMON_SRC)
 hfst_compose_intersect_SOURCES=hfst-compose-intersect.cc $(HFST_COMMON_SRC)
