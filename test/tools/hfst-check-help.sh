@@ -14,14 +14,8 @@ hfst-shuffle hfst-split hfst-strings2fst hfst-substitute \
 hfst-subtract hfst-summarize hfst-tail hfst-traverse \
 hfst-txt2fst"
 
-TWOLC_TOOLS=
-if [ -e "$TOOLDIR/hfst-twolc/src/hfst-twolc-loc" ] ; then
-    TWOLC_TOOLS="hfst-twolc/src/hfst-twolc-loc"
-else
-    TWOLC_TOOLS="$TOOLDIR/hfst-twolc/src/hfst-twolc"
-fi
-
-TAGGER_TOOLS="hfst-tagger/src/hfst-tag /hfst-tagger/src/hfst-train-tagger-loc"
+TWOLC_TOOLS="$TOOLDIR/hfst-twolc/src/hfst-twolc"
+TAGGER_TOOLS="hfst-tagger/src/hfst-tag"
 PROC_TOOLS="hfst-proc/hfst-apertium-proc"
 XFST_TOOLS="parsers/hfst-xfst"
 
