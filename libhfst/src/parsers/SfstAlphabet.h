@@ -5,17 +5,7 @@
 #  include <config.h>
 #endif
 
-#if HAVE_BACKWARD_HASH_MAP
-#  include <backward/hash_map>
-#elif HAVE_EXT_HASH_MAP
-#  include <ext/hash_map>
-#elif HAVE_HASH_MAP
-#  include <hash_map>
-#else
-#  warning "unknown hash_map"
-#  include <hash_map>
-#endif
-
+#include <unordered_map>
 #include <set>
 #include <vector>
 #include <string.h>
@@ -32,27 +22,19 @@ namespace hfst {
       
     public:
       typedef std::pair<unsigned int,unsigned int> NumberPair;
-      // hash table used to map the codes back to the symbols
-#ifdef __GNUC__
-      typedef __gnu_cxx::hash_map<unsigned int, char*> CharMap;
-#else
-      typedef std::hash_map<unsigned int, char*> CharMap;
-#endif
+      // used to map the codes back to the symbols
+      typedef std::unordered_map<unsigned int, char*> CharMap;
 
     private:
-      // string comparison operators needed to stored strings in a hash table
+      // string comparison operators needed ???
       struct eqstr {
     bool operator()(const char* s1, const char* s2) const {
       return strcmp(s1, s2) == 0;
     }
       };
       
-      // hash table used to map the symbols to their codes
-#ifdef __GNUC__
-      typedef __gnu_cxx::hash_map<const char*, unsigned int, __gnu_cxx::hash<const char*>,eqstr> SymbolMap;
-#else
-      typedef std::hash_map<const char*, unsigned int, std::hash<const char*>,eqstr> SymbolMap;
-#endif
+      // used to map the symbols to their codes
+      typedef std::unordered_map<const char*, unsigned int> SymbolMap;
       // set of symbol pairs
       typedef std::set<NumberPair> NumberPairSet;
       
