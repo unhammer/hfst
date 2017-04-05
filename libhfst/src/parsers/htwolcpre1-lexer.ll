@@ -19,7 +19,11 @@
 #endif
 
   // The parser. Supplies flex with its symbol tables.
-#include "htwolcpre1-parser.hh"
+#ifdef YACC_USE_PARSER_H_EXTENSION
+  #include "htwolcpre1-parser.h"
+#else
+  #include "htwolcpre1-parser.hh"
+#endif
 
   // Functions for manipulating strings.
   #include "string_src/string_manipulation.h"

@@ -581,9 +581,23 @@ AC_PROG_AWK
 AC_PROG_CPP
 AC_PROG_YACC
 
+#Do not use *.h extension for parser header files, use newer *.hh
+yacc_use_parser_h_extension=false
+
 #Verify automake version 1.11 headers for yy files are .h, >= 1.12 uses .hh
 automake_version=`automake --version | head -n 1 | cut '-d ' -f 4`
 AC_DEFINE_UNQUOTED([AUTOMAKE_VERSION], [$automake_version], [Defines automake version])
+
+if test "$automake_version" \< "1.12" ; then
+      #Use *.h extension for parser header file
+      yacc_use_parser_h_extension=true
+      # issue a warning at the end of configure
+      AC_DEFINE([YACC_USE_PARSER_H_EXTENSION], [1], [Use *.h extension for parser header file])
+else
+      echo "automake version >= 1.12, using .hh extension for yacc/bison generated header files"
+fi
+
+AM_CONDITIONAL([YACC_USE_PARSER_H_EXTENSION], [test x$yacc_use_parser_h_extension = xtrue])
 
 AC_PROG_LEX
 
@@ -846,5 +860,5 @@ AS_IF([test "x$enable_calculate" == "xno"],
 AS_IF([test "x$enable_xfst" == "xno"],
       [AC_MSG_WARN([hfst-xfst is not enabled; you will not be able to compile XFST scripts; enable using --enable-xfst])])
 AC_MSG_WARN([Python bindings for HFST are not under autotools; see python/README for instructions about how to build and install them])
-AS_IF([test "$automake_version" \< "1.12"],
-   [AC_MSG_WARN([automake version < 1.12; unless you are building with pre-flex-generated sources, building will fail])])
+AS_IF([test "x$yacc_use_parser_h_extension" == "xtrue"],
+      [AC_MSG_WARN([automake version < 1.12; using .h extension for yacc/bison generated header files; if you are building with pre-generated files, modifying them will make building fail, because they use .hh extension])])

@@ -16,7 +16,11 @@
 #include "HfstInputStream.h"
 #include "HfstXeroxRules.h"
 #include "pmatch_utils.h"
-#include "pmatch_parse.hh"
+#ifdef YACC_USE_PARSER_H_EXTENSION
+  #include "pmatch_parse.h"
+#else
+  #include "pmatch_parse.hh"
+#endif
 
 #undef YY_INPUT
 #define YY_INPUT(buf, retval, maxlen)   (retval = hfst::pmatch::getinput(buf, maxlen))

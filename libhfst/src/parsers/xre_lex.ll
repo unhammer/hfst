@@ -16,7 +16,11 @@
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstXeroxRules.h"
-#include "xre_parse.hh"
+#ifdef YACC_USE_PARSER_H_EXTENSION
+  #include "xre_parse.h"
+#else
+  #include "xre_parse.hh"
+#endif
 #include "xre_utils.h"
 
 #undef YY_INPUT

@@ -98,11 +98,11 @@ TWOLC_BUILT=htwolcpre1-parser.cc htwolcpre1-lexer.cc htwolcpre2-parser.cc htwolc
 
 BUILT_SOURCES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT) $(XFST_BUILT) $(SFST_BUILT) $(TWOLC_BUILT)
 
-#if YACC_USE_PARSER_H_EXTENSION
-#  HEADER=h
-#else
+if YACC_USE_PARSER_H_EXTENSION
+  HEADER=h
+else
 HEADER=hh
-#endif
+endif
 
 CLEANFILES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT) $(XFST_BUILT) $(SFST_BUILT) $(TWOLC_BUILT) \
 	xre_parse.$(HEADER) pmatch_parse.$(HEADER) lexc-parser.$(HEADER) xfst-parser.$(HEADER) sfst-compiler.$(HEADER) \

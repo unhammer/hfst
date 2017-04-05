@@ -16,7 +16,11 @@
 #include <string.h>
 
 #include "SfstCompiler.h"
-#include "sfst-compiler.hh"
+#ifdef YACC_USE_PARSER_H_EXTENSION
+  #include "sfst-compiler.h"
+#else
+  #include "sfst-compiler.hh"
+#endif
 #include "SfstBasic.h"
 #include "SfstUtf8.h"
 #include "HfstTransducer.h"
