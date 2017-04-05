@@ -19,12 +19,9 @@
 #endif
 
 
-  // The parser. Supplies flex with its symbol tables.
-#ifdef YACC_USE_PARSER_H_EXTENSION
-  #include "htwolcpre2-parser.h"
-#else
-  #include "htwolcpre2-parser.hh"
-#endif
+// The parser. Supplies flex with its symbol tables.
+#include "htwolcpre2-parser.hh"
+
 #include "../HfstExceptionDefs.h"
 
 extern int htwolcpre2error(const char*);

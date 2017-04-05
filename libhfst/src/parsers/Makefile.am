@@ -98,11 +98,9 @@ TWOLC_BUILT=htwolcpre1-parser.cc htwolcpre1-lexer.cc htwolcpre2-parser.cc htwolc
 
 BUILT_SOURCES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT) $(XFST_BUILT) $(SFST_BUILT) $(TWOLC_BUILT)
 
-if YACC_USE_PARSER_H_EXTENSION
-  HEADER=h
-else
+# If automake is < 1.12, *.h extension is used instead and build will fail,
+# unless pre-yacc-generated *.cc files are used and *.yy source files are not modified.
 HEADER=hh
-endif
 
 CLEANFILES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT) $(XFST_BUILT) $(SFST_BUILT) $(TWOLC_BUILT) \
 	xre_parse.$(HEADER) pmatch_parse.$(HEADER) lexc-parser.$(HEADER) xfst-parser.$(HEADER) sfst-compiler.$(HEADER) \

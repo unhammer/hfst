@@ -20,12 +20,7 @@
 #  include <config.h>
 #endif
 
-#ifdef YACC_USE_PARSER_H_EXTENSION
-  #include "lexc-parser.h"
-#else
-  #include "lexc-parser.hh"
-#endif
-
+#include "lexc-parser.hh"
 #include "lexc-utils.h"
 #include "HfstDataTypes.h"
 

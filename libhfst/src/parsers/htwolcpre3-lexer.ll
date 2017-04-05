@@ -45,11 +45,7 @@ result = 1; \
 
 #include "rule_src/TwolCGrammar.h"
 
-#ifdef YACC_USE_PARSER_H_EXTENSION
-  #include "htwolcpre3-parser.h"
-#else
-  #include "htwolcpre3-parser.hh"
-#endif
+#include "htwolcpre3-parser.hh"
 
   /*
 #include "io_src/InputReader.h"
