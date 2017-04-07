@@ -11,16 +11,16 @@
 #  include <config.h>
 #endif
 
-#if HAVE_SFST || HAVE_LEAN_SFST
-#include "back-ends/sfst/fst.h"
-#endif // HAVE_SFST || HAVE_LEAN_SFST
+//#if HAVE_SFST || HAVE_LEAN_SFST
+//#include "back-ends/sfst/fst.h"
+//#endif // HAVE_SFST || HAVE_LEAN_SFST
 
-#if HAVE_FOMA
-#ifndef _FOMALIB_H_
-#define _FOMALIB_H_
-#include "back-ends/foma/fomalib.h"
-#endif // _FOMALIB_H_
-#endif // HAVE_FOMA
+//#if HAVE_FOMA
+//#ifndef _FOMALIB_H_
+//#define _FOMALIB_H_
+//#include "back-ends/foma/fomalib.h"
+//#endif // _FOMALIB_H_
+//#endif // HAVE_FOMA
 
 #include "ConvertTransducerFormat.h"
 #include "optimized-lookup/convert.h"

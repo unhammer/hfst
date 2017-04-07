@@ -7,6 +7,14 @@
 // See the file COPYING included with this distribution for more
 // information.
 
+#ifndef MAIN_TEST
+
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
+#if HAVE_FOMA
+
 #ifndef _FOMALIB_H_
 #define _FOMALIB_H_
 #include "back-ends/foma/fomalib.h"
@@ -18,7 +26,6 @@
 #include <ctime>
 #endif
 
-#ifndef MAIN_TEST
 namespace hfst { namespace implementations {
 
     // add this to the beginning of code block to be profiled
@@ -1156,17 +1163,19 @@ static inline int explode_line (char *buf, int *values) {
     }
 
   } }
+#endif // HAVE_FOMA
 
 #else // MAIN_TEST was defined
 #include <cstdlib>
 #include <cassert>
 #include <iostream>
-using namespace hfst::implementations;
 
 int main(int argc, char * argv[])
 {
+#if HAVE_FOMA
     std::cout << "Unit tests for " __FILE__ ":";
 
+    using namespace hfst::implementations;
     fsm * epsilon
       = FomaTransducer::define_transducer("@_EPSILON_SYMBOL_@");
     fsm * epsilon_i = FomaTransducer::extract_input_language(epsilon);
@@ -1179,5 +1188,9 @@ int main(int argc, char * argv[])
     
     std::cout << std::endl << "ok" << std::endl;
     return EXIT_SUCCESS;
+#else // HAVE_FOMA
+    std::cout << "Skipping unit tests for " << __FILE__ << ", FomaTransducer has not been enabled" << std::endl;
+    return 77;
+#endif // HAVE_FOMA
 }
 #endif // MAIN_TEST

@@ -7,6 +7,14 @@
 // See the file COPYING included with this distribution for more
 // information.
 
+#ifndef MAIN_TEST
+
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
+#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+
 #include "LogWeightTransducer.h"
 #include "HfstSymbolDefs.h"
 
@@ -16,8 +24,6 @@
 #include "back-ends/openfst/src/include/fst/fstlib.h"
 #endif // _MSC_VER
 
-
-#ifndef MAIN_TEST
 namespace hfst { namespace implementations
 {
 
@@ -2246,21 +2252,21 @@ namespace hfst { namespace implementations
     return;
   }
 
-#endif // HAVE_OPENFST_LOG
+#endif // #if HAVE_OPENFST_LOG
   }
 }
+#endif // HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
 
 #else // MAIN_TEST was defined
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
 
-using namespace hfst::implementations;
-
 int main(int argc, char * argv[])
 {
 #if HAVE_OPENFST_LOG
     std::cout << "Unit tests for " __FILE__ ":";
+    using namespace hfst::implementations;
     LogWeightTransducer ofst;
     LogFst * t = ofst.create_empty_transducer();
     delete t;

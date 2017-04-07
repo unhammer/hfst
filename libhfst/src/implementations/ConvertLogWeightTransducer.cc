@@ -7,9 +7,13 @@
 // See the file COPYING included with this distribution for more
 // information.
 
+#ifndef MAIN_TEST
+
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif
+
+#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
 
 #include "ConvertTransducerFormat.h"
 #include "HfstBasicTransducer.h"
@@ -32,14 +36,10 @@ namespace fst
   extern template class StateIterator<LogFst>;
 }
 #endif
-#endif // _MSC_VER
+#endif // #ifndef _MSC_VER
 
-#ifndef MAIN_TEST
 namespace hfst { namespace implementations
 {
-
-#if HAVE_OPENFST
-#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
 
   /* --- Conversion between log OpenFst and HfstBasicTransducer --- */
   
@@ -296,11 +296,10 @@ namespace hfst { namespace implementations
     return t;
   }
 
-#endif
-#endif // HAVE_OPENFST
-
-
   }}
+
+#endif // HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+
 #else // MAIN_TEST was defined
 #include <iostream>
 

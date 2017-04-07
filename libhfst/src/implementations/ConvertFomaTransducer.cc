@@ -7,22 +7,23 @@
 // See the file COPYING included with this distribution for more
 // information.
 
+#ifndef MAIN_TEST
+
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
 #if HAVE_FOMA
-  #ifndef _FOMALIB_H_
-    #define _FOMALIB_H_
-    #include "back-ends/foma/fomalib.h"
-  #endif
+
+#ifndef _FOMALIB_H_
+  #define _FOMALIB_H_
+  #include "back-ends/foma/fomalib.h"
 #endif
 
 #include "ConvertTransducerFormat.h"
 #include "HfstBasicTransducer.h"
 #include "FomaTransducer.h"
 
-#ifndef MAIN_TEST
 namespace hfst { namespace implementations
 {
 
@@ -31,9 +32,6 @@ namespace hfst { namespace implementations
       Conversion functions between HfstBasicTransducer and foma transducer.
 
       ---------------------------------------------------------- */
-
-
-#if HAVE_FOMA
 
 
   /* -----------------------------------------------------------------
@@ -331,12 +329,9 @@ namespace hfst { namespace implementations
     return net;
   }
 
+  }}
 #endif // HAVE_FOMA
 
-
-
-
-  }}
 #else // MAIN_TEST was defined
 
 #include <iostream>

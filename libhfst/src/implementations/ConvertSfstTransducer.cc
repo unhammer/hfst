@@ -7,14 +7,16 @@
 // See the file COPYING included with this distribution for more
 // information.
 
+#ifndef MAIN_TEST
+
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
 #if HAVE_SFST || HAVE_LEAN_SFST
-  #include "back-ends/sfst/interface.h"
-  #include "back-ends/sfst/fst.h"
-#endif
+
+#include "back-ends/sfst/interface.h"
+#include "back-ends/sfst/fst.h"
 
 #include "ConvertTransducerFormat.h"
 #include "HfstBasicTransducer.h"
@@ -22,7 +24,7 @@
 
 #include <stdexcept>
 
-#ifndef MAIN_TEST
+
 namespace hfst { namespace implementations
 {
 
@@ -32,8 +34,6 @@ namespace hfst { namespace implementations
       Conversion functions between HfstBasicTransducer and SFST transducer.
 
      ----------------------------------------------------------- */
-
-#if HAVE_SFST || HAVE_LEAN_SFST
 
   SFST::VType VMARK = 10000;
 
@@ -223,10 +223,10 @@ namespace hfst { namespace implementations
     
     return t;
   }
-  
-#endif // HAVE_SFST || HAVE_LEAN_SFST
 
   }}
+#endif // #if HAVE_SFST || HAVE_LEAN_SFST
+  
 #else // MAIN_TEST was defined
 
 #include <iostream>

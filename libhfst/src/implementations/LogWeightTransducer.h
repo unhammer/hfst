@@ -10,13 +10,15 @@
 #ifndef _LOG_WEIGHT_TRANSDUCER_H_
 #define _LOG_WEIGHT_TRANSDUCER_H_
 
-#include "HfstSymbolDefs.h"
-#include "HfstExceptionDefs.h"
-#include "HfstFlagDiacritics.h"
-
 #if HAVE_CONFIG_H
   #include "../../../config.h"
 #endif
+
+#if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+
+#include "HfstSymbolDefs.h"
+#include "HfstExceptionDefs.h"
+#include "HfstFlagDiacritics.h"
 
 #include "HfstExtractStrings.h"
 #include <cstdio>
@@ -289,4 +291,7 @@ namespace implementations
     };
 
 } }
+
+#endif // #if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
+
 #endif

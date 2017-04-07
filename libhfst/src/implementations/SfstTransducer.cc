@@ -7,6 +7,14 @@
 // See the file COPYING included with this distribution for more
 // information.
 
+#ifndef MAIN_TEST
+
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
+#if HAVE_SFST || HAVE_LEAN_SFST
+
 #include "back-ends/sfst/interface.h"
 #include "back-ends/sfst/fst.h"
 #include "SfstTransducer.h"
@@ -15,7 +23,6 @@
 
 using namespace SFST;
 
-#ifndef MAIN_TEST
 namespace hfst { namespace implementations {
 
     /** Create an SfstInputStream that reads from stdin. */
@@ -1269,7 +1276,7 @@ namespace hfst { namespace implementations {
     expand2(t, t->root_node(), new_symbols, visited_nodes);
   }
 
-#endif // !HAVE_SFST
+#endif // HAVE_SFST
 
     // These functions are needed in transducer type conversions
 
@@ -1346,10 +1353,13 @@ namespace hfst { namespace implementations {
 
 } }
 
+#endif // HAVE_SFST || HAVE_LEAN_SFST
+
 #else // MAIN_TEST was defined
-using namespace hfst::implementations;
+
 #include <iostream>
 
+#if HAVE_SFST
 bool does_sfst_alphabet_contain(SFST::Transducer *t, const char *str)
 {
   SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
@@ -1360,12 +1370,14 @@ bool does_sfst_alphabet_contain(SFST::Transducer *t, const char *str)
   }
   return false;
 }
+#endif
 
 int main(int argc, char * argv[])
 {
 #if HAVE_SFST
     std::cout << "Unit tests for " __FILE__ ":";
 
+    using namespace hfst::implementations;
     // Test alphabet pruning
     SFST::Transducer * t = SfstTransducer::define_transducer("a", "b");
 
