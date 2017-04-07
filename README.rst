@@ -46,26 +46,6 @@ and Cygwin. Python bindings for Windows are currently available only for 64-bit
 Python versions 3.3 and 3.4 on our `download page
 <https://hfst.github.io/downloads/index.html>`_.
 
-Installation for MacPorts
--------------------------
-
-The port tree for HFST and related software can be downloaded from `HFST
-download directory <https://sourceforge.net/projects/hfst/files/hfst/>`_.
-To add this port tree to your macports installation, unpack it to wherever
-and insert that directory to your ``sources.conf``, e.g. in the default
-installation to ``/opt/local/etc/macports/sources.conf``::
-
-    [...]
-    # If an rsync URL points to a .tar file, a signed .rmd160 must exist next to
-    # it on the server and will be used to verify its integrity.
-    
-    file:///Users/flammie/Sources/hfst-macport/
-    rsync://rsync.macports.org/release/tarballs/ports.tar [default]
-
-Now you can install hfst and related software using port commands::
-
-  sudo port install hfst
-
 Installation for Gentoo Linux
 -----------------------------
 
