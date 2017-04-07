@@ -7,6 +7,7 @@ include hfst_prolog_extensions.cc
 include hfst_regex_extensions.cc
 include hfst_rules_extensions.cc
 include hfst_xfst_extensions.cc
+include hfst_sfst_extensions.cc
 include docstrings.i
 include libhfst/src/*.h
 include libhfst/src/implementations/*.h
