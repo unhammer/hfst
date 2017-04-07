@@ -42,17 +42,6 @@ namespace fst
 #endif // OPENFST_VERSION_1_5_4
 #endif // HAVE_OPENFST
 
-/*#if HAVE_SFST
-#include "back-ends/sfst/fst.h"
-#endif // HAVE_SFST
-
-#if HAVE_FOMA
-#ifndef _FOMALIB_H_
-#define _FOMALIB_H_
-#include "back-ends/foma/fomalib.h"
-#endif // _FOMALIB_H_
-#endif // HAVE_FOMA*/
-
 #if HAVE_XFSM
 #include "xfsm/xfsm_api.h"
 #endif
@@ -67,7 +56,6 @@ namespace fst
 
 #include "../HfstExceptionDefs.h"
 #include "optimized-lookup/transducer.h"
-//#include "HfstConstantTransducer.h"
 
 namespace SFST { class Node; class Transducer; }
 struct fsm;
@@ -130,20 +118,6 @@ namespace implementations {
   static SFST::Transducer * hfst_basic_transducer_to_sfst
     (const HfstBasicTransducer * t);
 
-  /*  static void sfst_to_hfst_fast_transducer
-    ( SFST::Node *node,
-      HfstFastTransducer *net, NumberVector &harmonization_vector);
-
-  static HfstFastTransducer * sfst_to_hfst_fast_transducer
-    (SFST::Transducer * t);
-
-  static SFST::Transducer * hfst_fast_transducer_to_sfst
-    (const HfstFastTransducer * t);
-
-  static void sfst_to_hfst_constant_transducer
-    ( SFST::Node *node,
-      HfstConstantTransducer *net);
-
   static HfstConstantTransducer * sfst_to_hfst_constant_transducer
     (SFST::Transducer * t);
 
@@ -156,19 +130,6 @@ namespace implementations {
 
   static fsm * hfst_basic_transducer_to_foma
     (const HfstBasicTransducer * t);
-
-
-  /*  static HfstFastTransducer * foma_to_hfst_fast_transducer(struct fsm * t);
-
-  static struct fsm * hfst_fast_transducer_to_foma
-    (const HfstFastTransducer * t);
-
-
-  static HfstConstantTransducer * foma_to_hfst_constant_transducer
-    (struct fsm * t);
-
-  static struct fsm * hfst_constant_transducer_to_foma
-  (const HfstConstantTransducer * t); */
 #endif // HAVE_FOMA
 
 #if HAVE_XFSM
@@ -187,21 +148,6 @@ namespace implementations {
   static fst::StdVectorFst * hfst_basic_transducer_to_tropical_ofst
     (const HfstBasicTransducer * t);
 
-
-  /*  static HfstFastTransducer * tropical_ofst_to_hfst_fast_transducer
-    (fst::StdVectorFst * t, bool has_hfst_header=true);
-
-  static fst::StdVectorFst * hfst_fast_transducer_to_tropical_ofst
-    (const HfstFastTransducer * t);
-
-
-
-  static HfstConstantTransducer * tropical_ofst_to_hfst_constant_transducer
-    (fst::StdVectorFst * t, bool has_hfst_header=true);
-
-  static fst::StdVectorFst * hfst_constant_transducer_to_tropical_ofst
-  (const HfstConstantTransducer * t); */
-
 #if HAVE_OPENFST_LOG || HAVE_LEAN_OPENFST_LOG
   static HfstBasicTransducer * log_ofst_to_hfst_basic_transducer
     (fst::LogFst * t, bool had_hfst_header=true);
@@ -212,21 +158,6 @@ namespace implementations {
 
   static fst::LogFst * hfst_basic_transducer_to_log_ofst
     (const HfstBasicTransducer * t);
-
-
-  /*  static HfstFastTransducer * log_ofst_to_hfst_fast_transducer
-    (LogFst * t, bool has_hfst_header=true);
-
-  static LogFst * hfst_fast_transducer_to_log_ofst
-    (const HfstFastTransducer * t);
-
-
-  static HfstConstantTransducer * log_ofst_to_hfst_constant_transducer
-    (LogFst * t, bool had_hfst_header=true);
-
-  static LogFst * hfst_constant_transducer_to_log_ofst
-  (const HfstConstantTransducer * t); */
-
 #endif
 
 #endif // HAVE_OPENFST || HAVE_LEAN_OPENFST_LOG
