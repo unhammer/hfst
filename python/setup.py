@@ -29,6 +29,7 @@ libhfst_module = Extension('_libhfst',
                            include_dirs = [absolute_libhfst_src_path],
                            library_dirs = [absolute_libhfst_src_path + "/.libs"],
                            libraries = ["hfst"],
+                           extra_compile_args = ["-std=c++0x"],
                            extra_link_args = extra_link_arguments
                            )
 # When making the windows package, replace data_files with
