@@ -18,20 +18,12 @@
   #include "../../../config.h"
 #endif
 
-//#ifdef _MSC_VER
-//#include "back-ends/openfstwin/src/include/fst/fstlib.h"
-//#else
-//#include "back-ends/openfst/src/include/fst/fstlib.h"
-//#endif // _MSC_VER
-
 #include "HfstExtractStrings.h"
 #include <cstdio>
 #include <string>
 #include <sstream>
 #include <iosfwd>
 #include <fstream>
-
-//#include "HfstAlphabet.h"
 
 #ifdef OPENFST_VERSION_1_5_4
   #include "back-ends/openfst/src/include/fst/fst-decl.h"
@@ -75,7 +67,6 @@ namespace implementations
   using namespace fst;
   ;
   typedef unsigned int StateId;
-  //typedef StdArc::StateId StateId;
 
   typedef std::vector<StdArc> StdArcVector;
   struct StdArcLessThan {
@@ -122,7 +113,6 @@ namespace implementations
     std::ofstream o_stream;
     std::ostream &output_stream;
     bool hfst_format;
-    //void write_3_0_library_header(std::ostream &out);
   public:
     TropicalWeightOutputStream(bool hfst_format=true);
     TropicalWeightOutputStream
@@ -131,52 +121,6 @@ namespace implementations
     void write(const char &c);
     void write_transducer(StdVectorFst * transducer);
   };
-
-  /*class TropicalWeightTransitionIterator;
-
-  typedef StateId TropicalWeightState;
-
-  class TropicalWeightStateIterator
-    {
-    protected:
-      fst::StateIterator<fst::StdVectorFst> * iterator;
-    public:
-      TropicalWeightStateIterator(StdVectorFst * t);
-      ~TropicalWeightStateIterator(void);
-      void next(void);
-      bool done(void);
-      TropicalWeightState value(void);
-      };*/
- 
-
-  /*  class TropicalWeightTransition
-    {
-    protected:
-      StdArc arc;
-      StdVectorFst * t;
-    public:
-      TropicalWeightTransition(const StdArc &arc, StdVectorFst *t);
-      ~TropicalWeightTransition(void);
-      std::string get_input_symbol(void) const;
-      std::string get_output_symbol(void) const;
-      TropicalWeightState get_target_state(void) const;
-      TropicalWeight get_weight(void) const;
-    };
-
-
-  class TropicalWeightTransitionIterator
-    {
-    protected:
-      fst::ArcIterator<fst::StdVectorFst> * arc_iterator;
-      fst::StdVectorFst * t;
-    public:
-      TropicalWeightTransitionIterator(StdVectorFst * t, StateId state);
-      ~TropicalWeightTransitionIterator(void);
-      void next(void);
-      bool done(void);
-      TropicalWeightTransition value(void);
-      };*/
-  
 
   class TropicalWeightTransducer
     {

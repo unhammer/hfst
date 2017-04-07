@@ -63,7 +63,6 @@ namespace implementations
 {
   using namespace fst;
   ;
-  //typedef LogArc::StateId StateId;
   typedef unsigned int StateId;
   typedef VectorFst<LogArc> LogFst;
 
@@ -111,7 +110,6 @@ namespace implementations
     std::string filename;
     std::ofstream o_stream;
     std::ostream &output_stream;
-    //void write_3_0_library_header(std::ostream &out);
   public:
     LogWeightOutputStream(void);
     LogWeightOutputStream(const std::string &filename);

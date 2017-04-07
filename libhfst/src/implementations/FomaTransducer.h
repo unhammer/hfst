@@ -16,11 +16,6 @@
 #include "HfstFlagDiacritics.h"
 #include <stdlib.h>
 
-//#ifndef _FOMALIB_H_
-//#define _FOMALIB_H_
-//#include "back-ends/foma/fomalib.h"
-//#endif
-
 struct fsm;
 
 #include <cstdio>
@@ -72,7 +67,6 @@ namespace hfst {
   private:
     std::string filename;
     FILE *ofile;
-    //void write_3_0_library_header(FILE *file);
   public:
     FomaOutputStream(void);
     FomaOutputStream(const std::string &filename);

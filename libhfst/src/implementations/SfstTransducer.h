@@ -29,9 +29,7 @@ namespace SFST { class Transducer; typedef short unsigned int Character; class A
 namespace hfst {
 namespace implementations
 {
-  //using namespace SFST;
   typedef SFST::Transducer Transducer;
-  ;
   using std::ostream;
   using std::ostringstream;
 
