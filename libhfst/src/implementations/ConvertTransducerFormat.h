@@ -117,12 +117,6 @@ namespace implementations {
 
   static SFST::Transducer * hfst_basic_transducer_to_sfst
     (const HfstBasicTransducer * t);
-
-  static HfstConstantTransducer * sfst_to_hfst_constant_transducer
-    (SFST::Transducer * t);
-
-  static SFST::Transducer * hfst_constant_transducer_to_sfst
-  (const HfstConstantTransducer * t); */
 #endif // HAVE_SFST || HAVE_LEAN_SFST
   
 #if HAVE_FOMA
