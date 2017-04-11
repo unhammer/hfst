@@ -3,7 +3,7 @@ This directory contains documentation for hfst package in Doxygen format.
 Run 'doxygen Doxyfile' to generate the documentation (it will be written in
 directory html which is created when doxygen is run) and copy everything under
 directory 'html' to HFST github repository (hfst.github.io/python/VERSION/, 
-where VERSION is the version number of HFST, e.g. '3.12.0', or 'next_release'
+where VERSION is the version number of HFST, e.g. '3.12.2', or 'next_release'
 for upcoming releases). The documentation will be visible on page
 <https://hfst.github.io/python/VERSION/index.html>. Also remember to update
 the redirection link in hfst.github.io/python/index.html to point to the
