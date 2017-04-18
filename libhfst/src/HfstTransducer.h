@@ -1315,6 +1315,12 @@ ccc : ddd
         to <i>osymbol:osymbol</i>. */
     HFSTDLL HfstTransducer &output_project();
 
+    /** \brief Complement the transducer. 
+
+	Equivalent to [?* - A] where A is this transducer with the exception
+	that flag diacritics are treated as ordinary symbols. */
+    HFSTDLL HfstTransducer &negate();
+    
     /** \brief Compose this transducer with \a another. */
     HFSTDLL HfstTransducer &compose(const HfstTransducer &another,
                             bool harmonize=true);

@@ -4515,12 +4515,14 @@ namespace xfst {
         }
 
       HfstTransducer* t = stack_.top();
-      if (t->is_automaton())
+
+      try
 	{
-	  stack_.pop();
+	  t->negate();
 	}
-      else
+      catch (const TransducerIsNotAutomatonException & e)
 	{
+	  (void)e;
 	  error() << "Error: Negation is defined only for automata." << std::endl
 		  << "Use expression [[?:?]* - A] instead where A is the transducer to be negated." << std::endl;
 	  flush(&error());
@@ -4528,18 +4530,7 @@ namespace xfst {
 	  return *this;
 	}
       
-      HfstTransducer * result = new HfstTransducer
-        (hfst::internal_identity, hfst::internal_identity, format_);
-      //HfstTransducer unk2unk
-      //  (hfst::internal_unknown, hfst::internal_unknown, format_);
-      //result->disjunct(unk2unk);
-      result->repeat_star();
-      result->minimize(); // should be safe to minimize
-      result->subtract(*t);
-      delete t;
-      
-      MAYBE_MINIMIZE(result);
-      stack_.push(result);
+      MAYBE_MINIMIZE(t);
       PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&

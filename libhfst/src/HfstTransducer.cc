@@ -2342,7 +2342,29 @@ HfstTransducer &HfstTransducer::output_project()
     /* Add here your implementation. */
     false ); }
 
+HfstTransducer &HfstTransducer::negate()
+{ is_trie = false; // This could be done so that is_trie is preserved
 
+  if (! this->is_automaton())
+    {
+      HFST_THROW_MESSAGE(TransducerIsNotAutomatonException,
+			 "HfstTransducer::negate()");
+    }
+  
+  HfstTransducer idstar("@_IDENTITY_SYMBOL_@", this->type);
+  // diacritics will not be harmonized in subtract
+  StringSet flags = idstar.insert_missing_diacritics_to_alphabet_from(*this);
+  for (StringSet::const_iterator it = flags.begin(); it != flags.end(); it++)
+    {
+      HfstTransducer tr(*it, this->type);
+      idstar.disjunct(tr);
+    }
+  idstar.repeat_star();
+  idstar.minimize();
+  idstar.subtract(*this, true);
+  (*this)=idstar;
+  return *this;
+}
 
 // -----------------------------------------------------------------------
 //
@@ -4863,7 +4885,7 @@ HfstTransducer &HfstTransducer::subtract
 #endif
     /* Add here your implementation. */
     const_cast<HfstTransducer&>(another), harmonize); }
-
+  
 
 // -----------------------------------------------------------------------
 //

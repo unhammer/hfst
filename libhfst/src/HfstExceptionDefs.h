@@ -306,7 +306,6 @@ HFST_EXCEPTION_CHILD_DECLARATION(ContextTransducersAreNotAutomataException);
 
 
 
-
 /** \brief Transducers are not automata.
 
     This exception is thrown by
@@ -316,6 +315,8 @@ HFST_EXCEPTION_CHILD_DECLARATION(ContextTransducersAreNotAutomataException);
     output symbols in all its transitions.
 */
 HFST_EXCEPTION_CHILD_DECLARATION(TransducersAreNotAutomataException);
+
+HFST_EXCEPTION_CHILD_DECLARATION(TransducerIsNotAutomatonException);
 
 /** \brief The StateId argument is not valid.
 
