@@ -849,7 +849,13 @@ REGEXP7: REGEXP8 { $$ = $1; }
 
 REGEXP8: REGEXP9 { $$ = $1; }
        | COMPLEMENT REGEXP8 {
-       		// TODO: forbid pair complement (ie ~a:b)
+       		// forbid pair complement (ie ~a:b)
+		if (! $2->is_automaton())
+		{
+		  xreerror("Complement operator ~ is defined only for automata\n"
+		           "Use expression [[?:?] - A]] instead where A is the relation to be complemented.");
+		  YYABORT;
+		}
        		HfstTransducer complement = HfstTransducer::identity_pair( hfst::xre::format );
        		complement.repeat_star().optimize();
        		complement.subtract(*$2).prune_alphabet(false);

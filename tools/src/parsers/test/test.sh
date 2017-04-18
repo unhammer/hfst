@@ -102,7 +102,7 @@ do
     ## Test that the result of testfile.xfst (written in att format to standard output)
     ## is the same as testfile.att using att-to-fst conversion.
     for testfile in compose_net concatenate_net union_net ignore_net invert_net minus_net intersect_net \
-    determinize_net epsilon_remove_net invert_net minimize_net negate_net \
+    determinize_net epsilon_remove_net invert_net minimize_net \
     one_plus_net reverse_net upper_side_net zero_plus_net lower_side_net \
     define define_function prolog \
         substitute_symbol_1 substitute_symbol_2 substitute_symbol_3 \
@@ -168,22 +168,22 @@ do
     fi
 
 
-    ## Test that testfile_fail fails.
-    #for testfile in define_fail
-    #do
-#    if ! (ls $testfile.xfst 2> /dev/null); then
-#        echo "skipping missing test for "$testfile"..."
-#        continue
-#    fi
-#    if ! (cat $testfile.xfst | ../hfst-xfst -s -f $format 2> tmp > /dev/null); then
-#        echo "ERROR: in compiling "$testfile".xfst"
-#        exit 1;
-#    fi
-#    if ! (grep "xre parsing failed" tmp > /dev/null); then
-#        echo "ERROR: in "$testfile".xfst"
-#        exit 1;
-#    fi
-#    done
+    ## Failing tests
+    for testfile in negate_fail
+    do
+    if ! (ls $testfile.xfst 2> /dev/null); then
+        echo "skipping missing test for "$testfile"..."
+        continue
+    fi
+    if (cat $testfile.xfst | ../hfst-xfst -s -f $format 2> tmp > /dev/null); then
+        echo "ERROR: "$testfile".xfst should have failed"
+        exit 1;
+    fi
+    if ! (grep "Negation is defined only for automata" tmp > /dev/null); then
+        echo "ERROR: in "$testfile".xfst"
+        exit 1;
+    fi
+    done
 
     ## Test that the result of testfile.xfst (written to standard output)
     ## is the same as testfile.output

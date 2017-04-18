@@ -12,7 +12,7 @@ EXTRA_DIST=test.sh \
 	invert_net.xfst invert_net.att \
 	minus_net.xfst minus_net.att \
 	intersect_net.xfst intersect_net.att \
-	negate_net.xfst negate_net.att \
+	negate_net_fail.xfst \
 	one_plus_net.xfst one_plus_net.att \
 	zero_plus_net.xfst zero_plus_net.att \
 	determinize_net.xfst determinize_net.att \
@@ -51,7 +51,6 @@ EXTRA_DIST=test.sh \
 	quoted_literals.xfst quoted_literals.att \
 	define.xfst define.att \
 	define_function.xfst define_function.att \
-	define_fail.xfst \
 	eliminate_flag.xfst eliminate_flag.output \
 	empty_context.xfst empty_context.output \
 	set_variable.xfst set_variable.output \

@@ -4510,21 +4510,31 @@ namespace xfst {
       if (stack_.size() < 1)
         {
           EMPTY_STACK;
-          //hfst_fprintf(stderr, "Empty stack.\n");
           xfst_lesser_fail();
           return *this;
         }
 
+      HfstTransducer* t = stack_.top();
+      if (t->is_automaton())
+	{
+	  stack_.pop();
+	}
+      else
+	{
+	  error() << "Error: Negation is defined only for automata." << std::endl
+		  << "Use expression [[?:?]* - A] instead where A is the transducer to be negated." << std::endl;
+	  flush(&error());
+	  xfst_lesser_fail();
+	  return *this;
+	}
+      
       HfstTransducer * result = new HfstTransducer
         (hfst::internal_identity, hfst::internal_identity, format_);
-      HfstTransducer unk2unk
-        (hfst::internal_unknown, hfst::internal_unknown, format_);
-      result->disjunct(unk2unk);
+      //HfstTransducer unk2unk
+      //  (hfst::internal_unknown, hfst::internal_unknown, format_);
+      //result->disjunct(unk2unk);
       result->repeat_star();
       result->minimize(); // should be safe to minimize
-
-      HfstTransducer* t = stack_.top();
-      stack_.pop();
       result->subtract(*t);
       delete t;
       
