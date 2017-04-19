@@ -12,6 +12,8 @@ EXTRA_DIST=test.sh \
 	invert_net.xfst invert_net.att \
 	minus_net.xfst minus_net.att \
 	intersect_net.xfst intersect_net.att \
+	negate_net_1.xfst negate_net_1.att \
+	negate_net_2.xfst negate_net_2.att \
 	negate_net_fail.xfst \
 	one_plus_net.xfst one_plus_net.att \
 	zero_plus_net.xfst zero_plus_net.att \

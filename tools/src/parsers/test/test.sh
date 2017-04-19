@@ -103,7 +103,7 @@ do
     ## is the same as testfile.att using att-to-fst conversion.
     for testfile in compose_net concatenate_net union_net ignore_net invert_net minus_net intersect_net \
     determinize_net epsilon_remove_net invert_net minimize_net \
-    one_plus_net reverse_net upper_side_net zero_plus_net lower_side_net \
+    one_plus_net reverse_net upper_side_net zero_plus_net lower_side_net negate_net_1 negate_net_2 \
     define define_function prolog \
         substitute_symbol_1 substitute_symbol_2 substitute_symbol_3 \
         substitute_symbol_4 substitute_symbol_5 \
