@@ -505,6 +505,11 @@ class XfstCompiler
   //! @brief Get the prompt string.
   char* get_prompt() const;
 
+  //! @brief Allow read and write operations only in current directory, do not allow system calls.
+  XfstCompiler& setRestrictedMode(bool value);
+  //! @brief Whether restricted mode is on.
+  bool getRestrictedMode() const;
+  
   //! @brief Whether it has been requested to quit the program.
   //  Needed in interactive mode where user input is read line by line.
   bool quit_requested() const;
@@ -548,6 +553,8 @@ class XfstCompiler
   /* Flush the stream. */
   void flush(std::ostream * oss);
 
+  bool check_filename(const char * filename);
+  
  protected:
   //! @brief Get the prompt that is used when applying up or down
   //! (as specified by \a direction).
@@ -680,7 +687,7 @@ class XfstCompiler
 
   //! @brief Get the precision that is used when printing weights.
   int get_precision();
-
+  
   private:
   /* */
   const XfstCompiler& error(const char* message) const;
@@ -696,7 +703,7 @@ class XfstCompiler
 
   XfstCompiler& print_bool(bool value);
   XfstCompiler& read_prop_line(char* line);
-
+  
   /* A wrapper around stream objects, see flush(std::ostream *) for more information. */
   std::ostream * get_stream(std::ostream * oss);
 
@@ -753,6 +760,7 @@ class XfstCompiler
   // and actually written when flush(std::ostream *) is called.
   std::ostringstream winoss_stderr_;
 #endif
+  bool restricted_mode_;
 }
 ;
 

@@ -84,7 +84,7 @@ using hfst::implementations::HfstBasicTransition;
 #define MAYBE_MINIMIZE(x) x->optimize();
 #define MAYBE_ASSERT(assertion, value) if (!value && ((variables_["assert"] == "ON" || assertion) && (variables_["quit-on-fail"] == "ON"))) { this->fail_flag_ = true; }
 #define MAYBE_QUIT if(variables_["quit-on-fail"] == "ON") { this->fail_flag_ = true; }
-
+#define CHECK_FILENAME(x) if (! this->check_filename(x)) { return *this; }
 #define EMPTY_STACK error() << "Empty stack." << std::endl; flush(&error());
 
 #define WEIGHT_PRECISION "5"
@@ -156,12 +156,13 @@ namespace xfst {
         quit_requested_(false),
         fail_flag_(false),
         output_(&std::cout),
-        error_(&std::cerr)
+        error_(&std::cerr),
 #ifdef WINDOWS
-        , winoss_stderr_(std::ostringstream()),
-        winoss_stdout_(std::ostringstream())
+        winoss_stderr_(std::ostringstream()),
+        winoss_stdout_(std::ostringstream()),
         //        redirected_stream_(NULL)
 #endif
+	restricted_mode_(false)
     {
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(this->verbose_);
@@ -222,12 +223,13 @@ namespace xfst {
         quit_requested_(false),
         fail_flag_(false),
         output_(&std::cout),
-        error_(&std::cerr)
+        error_(&std::cerr),
 #ifdef WINDOWS
-        , winoss_stderr_(std::ostringstream()),
-        winoss_stdout_(std::ostringstream())
+        winoss_stderr_(std::ostringstream()),
+        winoss_stdout_(std::ostringstream()),
         //redirected_stream_(NULL)
 #endif
+	restricted_mode_(false)
     {
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(this->verbose_);
@@ -1623,6 +1625,7 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::load_definitions(const char * infilename)
     {
+      CHECK_FILENAME(infilename);
       return this->load_stack_or_definitions
         (infilename, true /* definitions*/ );
     }
@@ -1855,6 +1858,8 @@ namespace xfst {
   XfstCompiler::convert_to_common_format
   (HfstTransducer * t, const char * filename /*=NULL*/)
   {
+    if (! this->check_filename(filename)) { return; }
+
     if (t->get_type() != format_)
       {
         if (t->get_type() == hfst::HFST_OL_TYPE ||
@@ -1901,6 +1906,7 @@ namespace xfst {
   XfstCompiler::open_hfst_input_stream(const char * infilename)
   {
     assert(infilename != NULL);
+    if (! this->check_filename(infilename)) { return NULL; }
     
     FILE * infile = hfst::hfst_fopen(infilename, "r");
     if (infile == NULL)
@@ -1941,6 +1947,7 @@ namespace xfst {
   XfstCompiler::load_stack_or_definitions
   (const char* infilename, bool load_definitions)
   {
+    CHECK_FILENAME(infilename);
     // Try to open the stream to file infilename
     HfstInputStream * instream = open_hfst_input_stream(infilename);
     IF_NULL_PROMPT_AND_RETURN_THIS(instream);
@@ -1982,6 +1989,7 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::load_stack(const char* infilename)
     {
+      CHECK_FILENAME(infilename);
       return this->load_stack_or_definitions(infilename, false);
     }
 
@@ -2069,6 +2077,13 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::system(const char* command)
     {
+      if (restricted_mode_)
+	{
+          error() << "Restricted mode (--restricted-mode) is in use, system calls are disabled" << std::endl;
+          flush(&error());
+          xfst_lesser_fail();
+          PROMPT_AND_RETURN_THIS;
+	}
       int rv = ::system(command);
       if (rv != 0)
         {
@@ -3908,6 +3923,26 @@ namespace xfst {
       PROMPT_AND_RETURN_THIS;
     }
 
+  bool
+  XfstCompiler::check_filename(const char * filename)
+  {
+    if (restricted_mode_)
+      {
+	std::string fn(filename);
+	if ((fn.find('/') != std::string::npos) || (fn.find('\\') != std::string::npos))
+	  {
+	    error() << "Restricted mode (--restricted-mode) is in use, write and read operations are allowed" << std::endl
+		    << "only in current directory (i.e. filenames cannot contain '/' or '\\')" << std::endl;
+	    flush(&error());
+	    xfst_lesser_fail();
+	    prompt();
+	    return false;
+	  }
+      }
+    prompt();
+    return true;
+  }
+  
   XfstCompiler&
   XfstCompiler::write_stack(const char* filename)
     {
@@ -3919,6 +3954,8 @@ namespace xfst {
         return *this;
       }
 
+    CHECK_FILENAME(filename);
+        
       HfstOutputStream* outstream = (filename != 0)?
         new HfstOutputStream(filename, stack_.top()->get_type()):
         new HfstOutputStream(stack_.top()->get_type());
@@ -4068,6 +4105,7 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::read_spaced_from_file(const char * filename)
     {
+      CHECK_FILENAME(filename);
       return this->read_text_or_spaced(filename, true); // spaces are used
     }
   XfstCompiler&
@@ -4081,6 +4119,7 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::read_text_or_spaced(const char * filename, bool spaces)
   {
+    CHECK_FILENAME(filename);
     FILE * infile = hfst::hfst_fopen(filename, "r");
     if (infile == NULL)
       {
@@ -4119,6 +4158,7 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::read_text_from_file(const char * filename)
     {
+      CHECK_FILENAME(filename);
       return this->read_text_or_spaced(filename, false); // spaces are not used
     }
   XfstCompiler&
@@ -5247,6 +5287,7 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::read_lexc_from_file(const char * filename)
   {
+    CHECK_FILENAME(filename);
     HfstTransducer * t = NULL;
     
     if (variables_["lexc-with-flags"] == "ON")
@@ -5318,6 +5359,7 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::read_att_from_file(const char * filename)
     {
+      CHECK_FILENAME(filename);
       FILE * infile = hfst::hfst_fopen(filename, "r");
       if (infile == NULL)
         {
@@ -5385,6 +5427,8 @@ namespace xfst {
   int
   XfstCompiler::parse(const char* filename)
     {
+      if (! this->check_filename(filename)) { return -1; }
+
       hxfstin = hfst::hfst_fopen(filename, "r");
       if (hxfstin == NULL)
         {
@@ -5425,6 +5469,19 @@ namespace xfst {
     return rv;
   }
 
+  XfstCompiler&
+  XfstCompiler::setRestrictedMode(bool value)
+  {
+    restricted_mode_ = value;
+    return *this;
+  }
+
+  bool
+  XfstCompiler::getRestrictedMode() const
+  {
+    return restricted_mode_;
+  }
+  
   XfstCompiler&
   XfstCompiler::print_properties(std::ostream * oss_)
     {
@@ -5482,7 +5539,7 @@ namespace xfst {
     verbose_prompt_ = verbosity;
     return *this;
   }
-
+  
   // CONSOLE
   const XfstCompiler&
   XfstCompiler::prompt()
@@ -5508,7 +5565,7 @@ namespace xfst {
     sprintf(p, "hfst[" SIZE_T_SPECIFIER "]: ", stack_.size());
     return strdup(p);
   }
-
+  
   XfstCompiler&
   XfstCompiler::print_transducer_info()
     {

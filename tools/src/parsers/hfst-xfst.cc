@@ -50,6 +50,7 @@ static char* startupfilename = NULL;
 static std::vector<char*> execute_commands;
 static bool pipe_input = false;
 static bool pipe_output = false; // this has no effect on non-windows platforms
+static bool restricted_mode = false;
 
 #ifdef HAVE_READLINE
   static bool use_readline = true;
@@ -78,6 +79,8 @@ print_usage()
           "  -p, --pipe-mode[=STREAM] Control input and output streams\n"
           "  -r, --no-readline        Do not use readline library for input\n"
           "  -w, --print-weight       Print weights for each operation\n"
+	  "  -R, --restricted-mode    Allow read and write operations only in current\n"
+	  "                           directory, do not allow system calls\n"
           //          "  -k, --no-console         Do not output directly to console (Windows-specific)\n"
           "\n"
           "Option --execute can be invoked many times.\n"
@@ -121,12 +124,13 @@ parse_options(int argc, char** argv)
             {"pipe-mode", optional_argument, 0, 'p'},
             {"no-readline", no_argument, 0, 'r'},
             {"print-weight", no_argument, 0, 'w'},
+	    {"restricted-mode", no_argument, 0, 'R'},
             //            {"no-console", no_argument, 0, 'k'},
             {0,0,0,0}
           };
         int option_index = 0;
         // add tool-specific options here
-        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "f:F:e:l:p::rwk",
+        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "f:F:e:l:p::rwkR",
                              long_options, &option_index);
         if (-1 == c)
           {
@@ -196,7 +200,10 @@ parse_options(int argc, char** argv)
           case 'w':
             print_weight = true;
             break;
-          case 'k':
+	  case 'R':
+            restricted_mode = true;
+            break;
+	  case 'k':
             pipe_output = true;
             break;
 #include "inc/getopt-cases-error.h"
@@ -383,6 +390,11 @@ int main(int argc, char** argv)
       comp.setPromptVerbosity(true);
     }
 
+  if (restricted_mode)
+    {
+      comp.setRestrictedMode(true);
+    }
+  
   if (!pipe_output)
     comp.setOutputToConsole(true);
 
