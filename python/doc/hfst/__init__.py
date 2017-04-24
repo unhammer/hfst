@@ -749,6 +749,7 @@ class HfstBasicTransducer:
     # @param transition A hfst.HfstBasicTransition that is added to \a state.
     # @param add_symbols_to_alphabet Whether the transition symbols are added to the alphabet of the transducer. (In special cases this is not wanted.)
     # @note Adding transitions during iteration (e.g. with #transitions) will invalidate the iteration. Iteration of states (e.g. with #states) is possible.
+    # @see #remove_transition
     def add_transition(self, state, transition, add_symbols_to_alphabet=True):
         pass
 
@@ -759,6 +760,7 @@ class HfstBasicTransducer:
     # @param output The output symbol of the transition.
     # @param weight The weight of the transition.
     # @note Adding transitions during iteration (e.g. with #transitions) will invalidate the iteration. Iteration of states (e.g. with #states) is possible.
+    # @see #remove_transition
     def add_transition(self, source, target, input, output, weight=0):
         pass
 
@@ -767,6 +769,49 @@ class HfstBasicTransducer:
     # @param transition A transition which is compared with all transitions of state \a state, ignoring the weights. It a transition is equivalent to \a transition, it is removed from the transducer.
     # @param remove_symbols_from_alphabet Remove such symbols from transducer alphabet that no longer occur in its transitions (as a result of transition removal).
     # @note Removing transitions during iteration (e.g. with #transitions) will invalidate the iteration. Iteration of states (e.g. with #states) is possible.
+    # @see #add_transition
+    #
+    # An example of allowing transition input and output symbols to be swapped with weight 0.5 and stay as they are with weight 0.3:
+    #
+    # \verbatim
+    # X = hfst.regex("a:A | b:B c:C")
+    # B = hfst.HfstBasicTransducer(X)
+    # print(B)
+    #
+    # for state in B.states():
+    #     arcs_to_be_removed=[]
+    #     arcs_to_be_added=[]
+    #     for arc in B.transitions(state):
+    #         tostate = arc.get_target_state()
+    #         insym = arc.get_input_symbol()
+    #         outsym = arc.get_output_symbol()
+    #         arcs_to_be_removed.append(arc)
+    #         arcs_to_be_added.append(hfst.HfstBasicTransition(tostate, insym, outsym, 0.3))
+    #         arcs_to_be_added.append(hfst.HfstBasicTransition(tostate, outsym, insym, 0.5))
+    #     for arc in arcs_to_be_removed:
+    #         B.remove_transition(state, arc)
+    #     for arc in arcs_to_be_added:
+    #         B.add_transition(state, arc)
+    #
+    # print(B)
+    # \endverbatim
+    #
+    # Result:
+    #
+    # \verbatim
+    # 0       1       b       B       0
+    # 0       2       a       A       0
+    # 1       2       c       C       0
+    # 2       0
+    #
+    # 0       1       b       B       0.3
+    # 0       1       B       b       0.5
+    # 0       2       a       A       0.3
+    # 0       2       A       a       0.5
+    # 1       2       c       C       0.3
+    # 1       2       C       c       0.5
+    # 2       0
+    # \endverbatim
     def remove_transition(self, s, transition, remove_symbols_from_alphabet=False):
         pass
     
