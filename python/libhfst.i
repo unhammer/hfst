@@ -1113,6 +1113,7 @@ class HfstBasicTransducer {
     bool is_final_state(HfstState s) const;
     float get_final_weight(HfstState s) const throw(StateIsNotFinalException, StateIndexOutOfBoundsException);
     void set_final_weight(HfstState s, const float & weight);
+    void remove_final_weight(HfstState s);
 %rename("_transitions") transitions(HfstState s);
     hfst::implementations::HfstBasicTransitions & transitions(HfstState s);
     bool is_infinitely_ambiguous();

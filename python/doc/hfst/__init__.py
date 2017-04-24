@@ -748,6 +748,7 @@ class HfstBasicTransducer:
     # @param state The number of the state where the transition is added. If it does not exist, it is created.
     # @param transition A hfst.HfstBasicTransition that is added to \a state.
     # @param add_symbols_to_alphabet Whether the transition symbols are added to the alphabet of the transducer. (In special cases this is not wanted.)
+    # @note Adding transitions during iteration (e.g. with #transitions) will invalidate the iteration. Iteration of states (e.g. with #states) is possible.
     def add_transition(self, state, transition, add_symbols_to_alphabet=True):
         pass
 
@@ -757,13 +758,15 @@ class HfstBasicTransducer:
     # @param input The input symbol of the transition.
     # @param output The output symbol of the transition.
     # @param weight The weight of the transition.
+    # @note Adding transitions during iteration (e.g. with #transitions) will invalidate the iteration. Iteration of states (e.g. with #states) is possible.
     def add_transition(self, source, target, input, output, weight=0):
         pass
 
-    ## Remove transition \a transition from state \a s.
+    ## Remove all transitions equivalent to \a transition from state \a s.
     # @param s The state which \a transition belongs to.
-    # @param transition The transition to be removed.
-    # @param remove_symbols_from_alphabet Whether 
+    # @param transition A transition which is compared with all transitions of state \a state, ignoring the weights. It a transition is equivalent to \a transition, it is removed from the transducer.
+    # @param remove_symbols_from_alphabet Remove such symbols from transducer alphabet that no longer occur in its transitions (as a result of transition removal).
+    # @note Removing transitions during iteration (e.g. with #transitions) will invalidate the iteration. Iteration of states (e.g. with #states) is possible.
     def remove_transition(self, s, transition, remove_symbols_from_alphabet=False):
         pass
     
@@ -931,6 +934,10 @@ class HfstBasicTransducer:
     ## Set the final weight of state \a state in this transducer to \a weight.
     # If the state does not exist, it is created.
     def set_final_weight(self, state, weight):
+        pass
+
+    ## Remove final weight from state \a state, i.e. make it a non-final state.
+    def remove_final_weight(self, state):
         pass
     
     ## Sort the arcs of this transducer according to input and output symbols.

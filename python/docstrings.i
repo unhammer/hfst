@@ -426,17 +426,22 @@ final weight is copied to the epsilon transition.
 
 %feature("docstring") hfst::HfstBasicTransducer::remove_transition
 """
-
-Remove transition *transition* from state *s*.
+Remove all transitions equivalent to *transition* from state *s*.
 
 Parameters
 ----------
 * `s` :
     The state which *transition* belongs to.
 * `transition` :
-    The transition to be removed.
+    A transition which is compared with all transitions of state *s*, ignoring
+    the weights. It a transition is equivalent to *transition*, it is removed
+    from the transducer.
 * `remove_symbols_from_alphabet` :
-    (?)
+    Remove such symbols from transducer alphabet that no longer occur in its
+    transitions (as a result of transition removal). Defaults to False.
+
+Note: Removing transitions during iteration (e.g. with 'transitions') will
+invalidate the iteration. Iteration of states (e.g. with 'states') is possible.
 """
 
 %feature("docstring") hfst::HfstBasicTransducer::add_transition
@@ -455,6 +460,9 @@ Parameters
 * `add_symbols_to_alphabet` :
     Whether the transition symbols are added to the alphabet of the transducer.
     (In special cases this is not wanted.)
+
+Note: Adding transitions during iteration (e.g. with 'transitions') will
+invalidate the iteration. Iteration of states (e.g. with 'states') is possible.
 """
 
 %feature("docstring") hfst::HfstBasicTransducer::add_transition
@@ -470,13 +478,16 @@ Parameters
     it is created.
 * `target` :
     The number of the state where the transition leads. If it does not exist, it
-    is created. (?)
+    is created.
 * `input` :
     The input symbol of the transition.
 * `output` :
     The output symbol of the transition.
 * `weight` :
     The weight of the transition.
+
+Note: Adding transitions during iteration (e.g. with 'transitions') will
+invalidate the iteration. Iteration of states (e.g. with 'states') is possible.
 """
 
 %feature("docstring") hfst::HfstBasicTransducer::read_prolog
@@ -583,6 +594,12 @@ Return a string representation of the transducer.
 Set the final weight of state *state* in this transducer to *weight*.
 
 If the state does not exist, it is created.
+"""
+
+%feature("docstring") hfst::HfstBasicTransducer::remove_final_weight
+"""
+
+Remove the final weight of state *state* in this transducer, i.e. make the state non-final.
 """
 
 %feature("docstring") hfst::HfstBasicTransducer::add_symbols_to_alphabet
