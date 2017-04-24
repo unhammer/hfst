@@ -5,6 +5,9 @@ COMPILE_XFST_SCRIPT="true"
 COMPILE_HFST_SCRIPT="true"
 EXIT_IF_NOT_EQUIVALENT="true"
 
+PYTHON=""
+PYTHONPATH=""
+
 HFST_TOOL="../../../tools/src/parsers/hfst-xfst"
 
 if [ "$COMPILE_XFST_SCRIPT" = "true" ]; then
@@ -46,8 +49,22 @@ examples="BetterColaMachine BrazilianPortuguese1 BrazilianPortuguese2 EnglishNum
 "MonishAnalysis MonishGuesserAnalyzer NumbersToNumerals PlusOrMinus FinnishNumerals "\
 "YaleShooting FinnishProsody Palindromes EinsteinsPuzzle"
 
-if ! [ "$1" = "" ]; then
-    examples=$1
+if [ "$1" = "--python" ]; then
+    PYTHON=$2
+    if [ "$3" = "--pythonpath" ]; then
+	PYTHONPATH=$4
+    fi
+else
+    if ! [ "$1" = "" ]; then
+	examples=$1
+    fi
+fi
+
+if [ "$2" = "--python" ]; then
+    PYTHON=$3
+    if [ "$4" = "--pythonpath" ]; then
+	PYTHONPATH=$5
+    fi
 fi
 
 for example in $examples;
@@ -131,6 +148,14 @@ do
                 cat LOG;
                 exit 1;
             fi
+	    if ! [ "$PYTHON" == "" ]; then
+		echo "  compiling with HFST python API using back-end format "$format".."
+		if ! ($PYTHON compile_xfst.py $format xfst-scripts/$example.xfst.script $PYTHONPATH); then
+		    echo "ERROR: compilation with HFST python API failed"
+		    cat LOG;
+		    exit 1;
+		fi
+	    fi
             # and convert from prolog to openfst-tropical and compare the results.
             if ! (cat Result | $tooldir/hfst-txt2fst --prolog -f $common_format > tmp && \
                 mv tmp Result_from_hfst_xfst); then
@@ -271,7 +296,9 @@ do
 done
 
 rm -f tmpdir/NumbersToNumerals
-rmdir tmpdir
+if [ -d "tmpdir" ]; then
+    rmdir tmpdir
+fi
 
 echo ""
 echo "**********"

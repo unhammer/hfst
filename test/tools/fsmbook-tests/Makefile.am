@@ -3,6 +3,7 @@ TESTS=test.sh
 endif
 
 EXTRA_DIST=test.sh \
+compile_xfst.py \
 expected-results/BetterColaMachine.prolog \
 expected-results/EnglishNumerals.prolog \
 expected-results/EsperantoNouns.prolog \

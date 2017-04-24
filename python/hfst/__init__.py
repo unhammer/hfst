@@ -745,7 +745,7 @@ def compile_xfst_file(filename, **kvargs):
        if error == sys.stdout:
           arg2 == "cout"
 
-       retval = hfst_compile_xfst(xfstcomp, data, arg1, arg2)
+       retval = libhfst.hfst_compile_xfst(xfstcomp, data, arg1, arg2)
 
        if isinstance(output, StringIO):
           output.write(unicode(libhfst.get_hfst_xfst_string_one(), 'utf-8'))
