@@ -134,26 +134,27 @@ do
         if [ "$COMPILE_XFST_SCRIPT" == "true" ]; then
         for format in $backend_formats; 
         do
-            if ! [ -x $HFST_TOOL ]; then
-                echo "  warning: skipping compilation with hfst-xfst, assuming configured off"
-                continue;
-            fi
-            if (! $tooldir/hfst-format --list-formats | grep $format > /dev/null); then
-                echo "  skipping compilation with hfst-xfst using back-end format "$format" as it is not available"
-                continue;
-            fi
-            echo "  compiling with hfst-xfst using back-end format "$format".."
-            if ! ($HFST -f $format -F xfst-scripts/$example.xfst.script); then
-                echo "ERROR: compilation with hfst-xfst failed"
-                cat LOG;
-                exit 1;
-            fi
 	    if ! [ "$PYTHON" == "" ]; then
-		echo "  compiling with HFST python API using back-end format "$format".."
+		echo "  compiling xfst with HFST python API using back-end format "$format".."
 		if ! ($PYTHON compile_xfst.py $format xfst-scripts/$example.xfst.script $PYTHONPATH); then
-		    echo "ERROR: compilation with HFST python API failed"
+		    echo "ERROR: compilation of xfst with HFST python API failed"
 		    cat LOG;
 		    exit 1;
+		fi
+	    else
+		if ! [ -x $HFST_TOOL ]; then
+                    echo "  warning: skipping compilation with hfst-xfst, assuming configured off"
+                    continue;
+		fi
+		if (! $tooldir/hfst-format --list-formats | grep $format > /dev/null); then
+                    echo "  skipping compilation with hfst-xfst using back-end format "$format" as it is not available"
+                    continue;
+		fi
+		echo "  compiling with hfst-xfst using back-end format "$format".."
+		if ! ($HFST -f $format -F xfst-scripts/$example.xfst.script); then
+                    echo "ERROR: compilation with hfst-xfst failed"
+                    cat LOG;
+                    exit 1;
 		fi
 	    fi
             # and convert from prolog to openfst-tropical and compare the results.
@@ -190,8 +191,6 @@ do
             continue;
         fi
 
-        echo "  compiling hfst script with back-end format "$format".."
-
         if [ "$example" = "FinnishNumerals" ]; then
             if ! [ -f tmpdir/NumbersToNumerals ]; then
                 echo "FAIL: missing file tmpdir/NumbersToNumerals in test FinnishNumerals,"
@@ -200,10 +199,28 @@ do
             fi
         fi
 
-        if ! ($SH hfst-scripts/$example.hfst.script $format $tooldir); then
-            echo "ERROR: compilation of hfst script failed"
-            exit 1
-        fi
+	if ! [ "$PYTHON" == "" ]; then
+	    if [ -e python-scripts/$example.hfst.py ]; then
+		echo "  compiling script with HFST python API using back-end format "$format".."
+		if ! ($PYTHON python-scripts/$example.hfst.py $format $PYTHONPATH); then
+		    echo "ERROR: compilation of script with HFST python API failed"
+		    cat LOG;
+		    exit 1;
+		fi
+	    else
+		echo "  no python script found for "$example", using hfst script instead"
+		if ! ($SH hfst-scripts/$example.hfst.script $format $tooldir); then
+		    echo "ERROR: compilation of hfst script failed"
+		    exit 1
+		fi
+            fi
+	else
+	    echo "  compiling hfst script with back-end format "$format".."
+            if ! ($SH hfst-scripts/$example.hfst.script $format $tooldir); then
+		echo "ERROR: compilation of hfst script failed"
+		exit 1
+            fi
+	fi
         cat Result | $tooldir/hfst-fst2fst -f $common_format > tmp
         mv tmp Result_from_hfst_script_$format
         
