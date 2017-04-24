@@ -481,6 +481,10 @@
            final_weight_map[s] = weight;
          }
 
+     void HfstBasicTransducer::remove_final_weight(HfstState s) {
+       final_weight_map.erase(s);
+     }
+
          /** @brief Sort the arcs of this transducer according to input and
              output symbols. */
          HfstBasicTransducer & HfstBasicTransducer::sort_arcs(void)

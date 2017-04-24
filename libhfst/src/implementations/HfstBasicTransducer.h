@@ -348,6 +348,9 @@
          If the state does not exist, it is created. */
      HFSTDLL void set_final_weight(HfstState s,
                                    const HfstTropicalTransducerTransitionData::WeightType & weight);
+
+     /** @brief Remove final weight from state \a s, i.e. make it a non-final state. */
+     HFSTDLL void remove_final_weight(HfstState s);
      
      /** @brief Sort the arcs of this transducer according to input and
          output symbols. */
