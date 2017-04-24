@@ -6,21 +6,30 @@ setup for HFST-swig
 
 import os
 from distutils.core import setup, Extension
+from sys import platform
 
 libhfst_src_path = '../libhfst/src/'
 absolute_libhfst_src_path = os.path.abspath(libhfst_src_path)
 
 extra_link_arguments = []
-# If you wish to link to the local HFST library, replace the above with:
-# extra_link_arguments = ["-Wl,-rpath=" + absolute_libhfst_src_path + "/.libs"]
+if platform == "darwin":
+        extra_link_arguments.extend(['-mmacosx-version-min=10.7'])
 
-# When making the debian package, replace extra_link_args
-# with ["-L/usr/lib/", "-Wl,-rpath=/usr/lib/"]
+# If you wish to link to the local HFST library:
+# extra_link_arguments.extend(["-Wl,-rpath=" + absolute_libhfst_src_path + "/.libs"])
+#
+# When making the debian package:
+# extra_link_arguments.extend(["-L/usr/lib/", "-Wl,-rpath=/usr/lib/"])
+
+extra_compile_arguments = ['-std=c++0x']
+if platform == "darwin":
+        extra_compile_arguments.extend('["-stdlib=libc++", "-mmacosx-version-min=10.7"]')
 
 # If you wish to link hfst c++ library statically, use:
 # library_dirs = []
 # libraries = []
 # extra_objects = absolute_libhfst_src_path + "/.libs/libhfst.a"
+
 libhfst_module = Extension('_libhfst',
                            language = "c++",
                            sources = ["libhfst.i"],
@@ -29,7 +38,7 @@ libhfst_module = Extension('_libhfst',
                            include_dirs = [absolute_libhfst_src_path],
                            library_dirs = [absolute_libhfst_src_path + "/.libs"],
                            libraries = ["hfst"],
-                           extra_compile_args = ["-std=c++0x"],
+                           extra_compile_args = extra_compile_arguments,
                            extra_link_args = extra_link_arguments
                            )
 # When making the windows package, replace data_files with
