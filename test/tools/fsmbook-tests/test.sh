@@ -1,3 +1,15 @@
+
+if [ "$1" = "-h" -o "$1" = "--help" ]; then
+    echo ""
+    echo "Usage: "$0" [TESTNAME] [--python PYTHON] [--pythonpath PYTHONPATH]"
+    echo ""
+    echo "  TESTNAME: The name of the test that will be run. If not given, all tests are run."
+    echo "    PYTHON: Python that is used to run the tests instead of hfst-xfst (e.g. 'python3.5')."
+    echo "PYTHONPATH: Path that is prepended to sys.path when running tests with python (with --python)."
+    echo ""
+    exit 0
+fi
+
 # check for programs
 
 COMPILE_FROM_SCRATCH="false"
