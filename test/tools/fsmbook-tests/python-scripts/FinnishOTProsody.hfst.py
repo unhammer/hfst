@@ -1,12 +1,16 @@
 exec(compile(open('CompileOptions.py', 'rb').read(), 'CompileOptions.py', 'exec'))
 
-defs = {}
+comp = hfst.XreCompiler(hfst.get_default_fst_type())
 
-def regex(expr):
-    return hfst.regex(expr, definitions=defs)
+def regex(name, expression):
+    tr = comp.compile(expression)
+    if name == None:
+        return tr
+    else:
+        comp.define_transducer(name, tr)
 
 # Data
-defs['FinnWords'] = regex("{kalastelet} | {kalasteleminen} | {ilmoittautuminen} | \
+regex('FinnWords', "{kalastelet} | {kalasteleminen} | {ilmoittautuminen} | \
                  {järjestelmättömyydestänsä} | {kalastelemme} | \
                  {ilmoittautumisesta} | {järjestelmällisyydelläni} | \
                  {järjestelmällistämätöntä} | {voimisteluttelemasta} | \
@@ -19,33 +23,33 @@ defs['FinnWords'] = regex("{kalastelet} | {kalasteleminen} | {ilmoittautuminen} 
 
 # Basic definitions
 
-defs['HighV'] = regex('[u | y | i]')                          # High vowel
-defs['MidV'] = regex('[e | o | ö]')                          # Mid vowel
-defs['LowV'] = regex('[a | ä]')                             # Low vowel
-defs['USV'] = regex('[HighV | MidV | LowV]')                  # Unstressed Vowel
+regex('HighV', '[u | y | i]')                          # High vowel
+regex('MidV', '[e | o | ö]')                          # Mid vowel
+regex('LowV', '[a | ä]')                             # Low vowel
+regex('USV', '[HighV | MidV | LowV]')                  # Unstressed Vowel
 
-defs['C'] = regex("[b | c | d | f | g | h | j | k | l | m | n | p | q | r | s | t | v | w | x | z]")  # Consonant
+regex('C', "[b | c | d | f | g | h | j | k | l | m | n | p | q | r | s | t | v | w | x | z]")  # Consonant
 
-defs['MSV'] = regex('[á | é | í | ó | ú | ý | ä´ | ö´ ]')
-defs['SSV'] = regex('[à | è | ì | ò | ù | y` | ä` | ö`]')
-defs['SV'] = regex('[MSV | SSV]')                              # Stressed vowel
-defs['V'] = regex('[USV | SV] ')                               # Vowel
+regex('MSV', '[á | é | í | ó | ú | ý | ä´ | ö´ ]')
+regex('SSV', '[à | è | ì | ò | ù | y` | ä` | ö`]')
+regex('SV', '[MSV | SSV]')                              # Stressed vowel
+regex('V', '[USV | SV] ')                               # Vowel
 
-defs['P'] = regex('[V | C]')                                   # Phone
-defs['B'] = regex('[[\P+] | .#. ]')                             # Boundary
+regex('P', '[V | C]')                                   # Phone
+regex('B', '[[\P+] | .#. ]')                             # Boundary
 
-defs['E'] = regex('.#. | "."')                                 # Edge
-defs['SB'] = regex('[~$"." "." ~$"."]')                        # At most one syllable boundary
+regex('E', '.#. | "."')                                 # Edge
+regex('SB', '[~$"." "." ~$"."]')                        # At most one syllable boundary
 
-defs['Light'] = regex('[C* V]')                                # Light syllable
-defs['Heavy'] = regex('[Light P+]')                            # Heavy syllable
+regex('Light', '[C* V]')                                # Light syllable
+regex('Heavy', '[Light P+]')                            # Heavy syllable
 
-defs['S'] = regex('[Heavy | Light]')                           # Syllable
-defs['SS'] = regex('[S & $SV]')                                # Stressed syllable
+regex('S', '[Heavy | Light]')                           # Syllable
+regex('SS', '[S & $SV]')                                # Stressed syllable
 
-defs['US'] = regex('[S & ~$SV]')                               # Unstressed syllable
-defs['MSS'] = regex('[S & $MSV] ')                             # Syllable with main stress
-defs['BF'] = regex('[S "." S]')                                # Binary foot
+regex('US', '[S & ~$SV]')                               # Unstressed syllable
+regex('MSS', '[S & $MSV] ')                             # Syllable with main stress
+regex('BF', '[S "." S]')                                # Binary foot
 
 
 # Gen
@@ -57,20 +61,20 @@ defs['BF'] = regex('[S "." S]')                                # Binary foot
 # that historically come from long ee, oo, and öö, respectively.
 # All other adjacent vowels must be separated by a syllable boundary.
 
-defs['MarkNonDiphthongs'] = regex(' [. .] -> "." || [HighV | MidV] _ LowV , i _ [MidV - e] , u _ [MidV - o] , y _ [MidV - ö] ;')
+regex('MarkNonDiphthongs', ' [. .] -> "." || [HighV | MidV] _ LowV , i _ [MidV - e] , u _ [MidV - o] , y _ [MidV - ö] ;')
 
 # The general syllabification rule has exceptions. In particular, loan
 # words such as ate.isti 'atheist' must be partially syllabified in the
 # lexicon.
 
 
-defs['Syllabify'] = regex('C* V+ C* @-> ... "." || _ C V')
+regex('Syllabify', 'C* V+ C* @-> ... "." || _ C V')
 
 
 # Optionally adds primary or secondary stress to the first vowel
 # of each syllable.
 
-defs['Stress'] = regex('a (->) á|à , e (->) é|è , i (->) í|ì , o (->) ó|ò , u (->) ú|ù , y (->) ý|y` , ä (->) ä´|ä` , ö (->) ö´|ö` || E C* _ ')
+regex('Stress', 'a (->) á|à , e (->) é|è , i (->) í|ì , o (->) ó|ò , u (->) ú|ù , y (->) ý|y` , ä (->) ä´|ä` , ö (->) ö´|ö` || E C* _ ')
               
 
 # Scan the word, optionally dividing it to any combination of
@@ -78,13 +82,13 @@ defs['Stress'] = regex('a (->) á|à , e (->) é|è , i (->) í|ì , o (->) ó|�
 # one stressed syllable.
 
 
-defs['Scan'] = regex('[[S ("." S ("." S)) & $SS] (->) "(" ... ")" || E _ E]')
+regex('Scan', '[[S ("." S ("." S)) & $SS] (->) "(" ... ")" || E _ E]')
 
 # In keeping with the idea of "richness of the base", the Gen
 # function produces a great number of output candidates for
 # even short words. Long words have millions of possible outputs.
 
-defs['Gen'] = regex('[MarkNonDiphthongs .o. Syllabify .o. Stress .o. Scan]')
+regex('Gen', '[MarkNonDiphthongs .o. Syllabify .o. Stress .o. Scan]')
 
 # OT constraints
 
@@ -98,7 +102,7 @@ defs['Gen'] = regex('[MarkNonDiphthongs .o. Syllabify .o. Stress .o. Scan]')
 
 # Every instance of * in an output candidate is a violation.
 
-defs['Viol'] = regex('${*}')
+regex('Viol', '${*}')
 
 
 
@@ -106,22 +110,22 @@ defs['Viol'] = regex('${*}')
 # candidates that violate the constraint provided that at least
 # one output candidate survives.
 
-defs['Viol0'] = regex('~Viol')         # No violations
-defs['Viol1'] = regex('~[Viol^2]')     # At most one violation
-defs['Viol2'] = regex('~[Viol^3]')     # At most two violations
-defs['Viol3'] = regex('~[Viol^4]')     # etc.
-defs['Viol4'] = regex('~[Viol^5]')
-defs['Viol5'] = regex('~[Viol^6]')
-defs['Viol6'] = regex('~[Viol^7]')
-defs['Viol7'] = regex('~[Viol^8]')
-defs['Viol8'] = regex('~[Viol^9]')
-defs['Viol9'] = regex('~[Viol^10]')
-defs['Viol10'] = regex('~[Viol^11]')
-defs['Viol11'] = regex('~[Viol^12]')
-defs['Viol12'] = regex('~[Viol^13]')
-defs['Viol13'] = regex('~[Viol^14]')
-defs['Viol14'] = regex('~[Viol^15]')
-defs['Viol15'] = regex('~[Viol^16]')
+regex('Viol0', '~Viol')         # No violations
+regex('Viol1', '~[Viol^2]')     # At most one violation
+regex('Viol2', '~[Viol^3]')     # At most two violations
+regex('Viol3', '~[Viol^4]')     # etc.
+regex('Viol4', '~[Viol^5]')
+regex('Viol5', '~[Viol^6]')
+regex('Viol6', '~[Viol^7]')
+regex('Viol7', '~[Viol^8]')
+regex('Viol8', '~[Viol^9]')
+regex('Viol9', '~[Viol^10]')
+regex('Viol10', '~[Viol^11]')
+regex('Viol11', '~[Viol^12]')
+regex('Viol12', '~[Viol^13]')
+regex('Viol13', '~[Viol^14]')
+regex('Viol14', '~[Viol^15]')
+regex('Viol15', '~[Viol^16]')
 
 
 
@@ -129,7 +133,7 @@ defs['Viol15'] = regex('~[Viol^16]')
 # This eliminates the violation marks after the candidate set has
 # been pruned by a constraint.
 
-defs['Pardon'] = regex('{*} -> 0')
+regex('Pardon', '{*} -> 0')
 
 
 
@@ -148,50 +152,50 @@ defs['Pardon'] = regex('{*} -> 0')
 # Main Stress: The primary stress in Finnish is on the first
 #              syllable. This is an inviolable constraint.
 
-defs['MainStress'] = regex('[B MSS ~$MSS]')
+regex('MainStress', '[B MSS ~$MSS]')
 
 
 # Clash: No stress on adjacent syllables.
 # define Clash SS -> ... {*} || SS B _ ;
-defs['Clash'] = regex('SS -> ... {*} || SS B _ ')
+regex('Clash', 'SS -> ... {*} || SS B _ ')
 
 
 
 # Align-Left: The stressed syllable is initial in the foot.
 
-defs['AlignLeft'] = regex('SV -> ... {*} || .#. ~[?* "(" C*] _ ')
+regex('AlignLeft', 'SV -> ... {*} || .#. ~[?* "(" C*] _ ')
 
 
 # Foot-Bin: Feet are minimally bimoraic and maximally bisyllabic.
 # define FootBin ["(" Light ")" | "(" S ["." S]^>1] -> ... {*} ;
-defs['FootBin'] = regex('["(" Light ")" | "(" S ["." S]^>1] -> ... {*} ')
+regex('FootBin', '["(" Light ")" | "(" S ["." S]^>1] -> ... {*} ')
 
 
 # Lapse: Every unstressed syllable must be adjacent to a stressed
 # syllable.
 # define Lapse US -> ... {*} || [B US B] _ [B US B];
-defs['Lapse'] = regex('US -> ... {*} || [B US B] _ [B US B]')
+regex('Lapse', 'US -> ... {*} || [B US B] _ [B US B]')
 
 
 # Non-Final: The final syllable is not stressed.
 
-defs['NonFinal'] = regex('SS -> ... {*} || _ ~$S .#.')
+regex('NonFinal', 'SS -> ... {*} || _ ~$S .#.')
 
 
 # Stress-To-Weight: Stressed syllables are heavy.
 
-defs['StressToWeight'] = regex('[SS & Light] -> ... {*} || _ ")"| E')
+regex('StressToWeight', '[SS & Light] -> ... {*} || _ ")"| E')
 
 
 # License-&#963;: Syllables are parsed into feet.
 
-defs['Parse'] = regex('S -> ... {*} || E _ E')
+regex('Parse', 'S -> ... {*} || E _ E')
 
 
 # All-Ft-Left: Every foot starts at the beginning of a
 #              prosodic word.
 
-defs['AllFeetFirst'] = regex('[ "(" -> ... {*} || .#. SB _ .o. "(" -> ... {*}^2 || .#. SB^2 _ .o. "(" -> ... {*}^3 || .#. SB^3 _ .o. "(" -> ... {*}^4 || .#. SB^4 _ .o. "(" -> ... {*}^5 || .#. SB^5 _ .o. "(" -> ... {*}^6 || .#. SB^6 _ .o. "(" -> ... {*}^7 || .#. SB^7 _ .o. "(" -> ... {*}^8 || .#. SB^8 _ ]')
+regex('AllFeetFirst', '[ "(" -> ... {*} || .#. SB _ .o. "(" -> ... {*}^2 || .#. SB^2 _ .o. "(" -> ... {*}^3 || .#. SB^3 _ .o. "(" -> ... {*}^4 || .#. SB^4 _ .o. "(" -> ... {*}^5 || .#. SB^5 _ .o. "(" -> ... {*}^6 || .#. SB^6 _ .o. "(" -> ... {*}^7 || .#. SB^7 _ .o. "(" -> ... {*}^8 || .#. SB^8 _ ]')
 #echo '"(" -> ... {*} || .#. SB _ ' | $2/hfst-regexp2fst -f $1 > a0
 #echo '"(" -> ... {*}^2 || .#. SB^2 _ '  | $2/hfst-regexp2fst -f $1 > a1
 #echo '"(" -> ... {*}^3 || .#. SB^3 _ '  | $2/hfst-regexp2fst -f $1 > a2
@@ -209,7 +213,7 @@ defs['AllFeetFirst'] = regex('[ "(" -> ... {*} || .#. SB _ .o. "(" -> ... {*}^2 
 # violated many times. The limits have been chosen to produce
 # a unique winner in all the 25 test cases in FinnWords.
 
-Result = regex('[FinnWords .o. Gen .o. MainStress .o. Clash .O. Viol0 .o. Pardon .o. AlignLeft .O. Viol0 .o. FootBin .O. Viol0 .o. Pardon .o. Lapse .O. Viol3 .O. Viol2 .O. Viol1 .O. Viol0 .o. Pardon .o. NonFinal .O. Viol0 .o. Pardon .o. StressToWeight .O. Viol3 .O. Viol2 .O. Viol1 .O. Viol0 .o. Pardon .o. Parse .O. Viol3 .O. Viol2 .O. Viol1 .O. Viol0 .o. Pardon .o. AllFeetFirst .O. Viol15 .O. Viol14 .O. Viol13 Viol12 .O. Viol11 .O. Viol10 .O. Viol9 .O. Viol8 .O. Viol7 .O. Viol6  .O. Viol5  .O. Viol4  .O. Viol3 .O. Viol2 .O. Viol1 .O. Viol0 .o. Pardon ]')
+Result = regex(None, '[FinnWords .o. Gen .o. MainStress .o. Clash .O. Viol0 .o. Pardon .o. AlignLeft .O. Viol0 .o. FootBin .O. Viol0 .o. Pardon .o. Lapse .O. Viol3 .O. Viol2 .O. Viol1 .O. Viol0 .o. Pardon .o. NonFinal .O. Viol0 .o. Pardon .o. StressToWeight .O. Viol3 .O. Viol2 .O. Viol1 .O. Viol0 .o. Pardon .o. Parse .O. Viol3 .O. Viol2 .O. Viol1 .O. Viol0 .o. Pardon .o. AllFeetFirst .O. Viol15 .O. Viol14 .O. Viol13 Viol12 .O. Viol11 .O. Viol10 .O. Viol9 .O. Viol8 .O. Viol7 .O. Viol6  .O. Viol5  .O. Viol4  .O. Viol3 .O. Viol2 .O. Viol1 .O. Viol0 .o. Pardon ]')
 Result.minimize()
 Result.write_to_file('Result')
 
