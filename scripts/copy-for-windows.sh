@@ -225,7 +225,7 @@ do
         $1/libhfst/src/parsers/$file.hh
 done
 
-for file in xfst-lexer htwolcpre1-lexer htwolcpre2-lexer htwolcpre3-lexer;
+for file in xfst-lexer htwolcpre1-lexer htwolcpre2-lexer htwolcpre3-lexer sfst-scanner;
 do
     sed -i 's/#include <unistd.h>/#include <io.h>/' $1/libhfst/src/parsers/$file.cpp
     sed -i 's/hxfstwrap( )/hxfstwrap(void)/' $1/libhfst/src/parsers/$file.cpp
@@ -352,7 +352,7 @@ do
 done
 
 # twolc
-cp tools/src/hfst-twolc/src/htwolc-main.cc $1/tools/src/hfst-twolc/src/hfst-twolc.cpp 
+cp tools/src/hfst-twolc/src/hfst-twolc.cc $1/tools/src/hfst-twolc/src/hfst-twolc.cpp 
 
 # compare, strings2fst and txt2fst are needed for testing hfst-xfst
 for file in \

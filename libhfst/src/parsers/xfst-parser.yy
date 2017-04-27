@@ -56,7 +56,7 @@ int hxfstlex(void);
     void* nothing;
 }
 
-%token <text> APROPOS DESCRIBE ECHO SYSTEM QUIT HFST
+%token <text> APROPOS DESCRIBE ECHO_ SYSTEM QUIT HFST
 %token <name> NAMETOKEN NAMECHAR GLOB PROTOTYPE
               DEFINE_NAME DEFINE_FUNCTION
 %token <list> RANGE
@@ -312,7 +312,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->eliminate_flags(); CHECK;
        }
        // system
-       | ECHO {
+       | ECHO_ {
             hfst::xfst::xfst_->echo($1);
             free($1); CHECK;
        }

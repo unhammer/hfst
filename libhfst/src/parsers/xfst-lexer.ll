@@ -243,12 +243,12 @@ LWSP [\t ]*
 
 "echo"{WSP}+.* {
     hxfstlval.text = hfst::xfst::strstrip(hxfsttext + strlen("echo "));
-    return ECHO;
+    return ECHO_;
 }
 
 ^{LWSP}"echo"{WSP}* {
     hxfstlval.text = strdup("");
-    return ECHO;
+    return ECHO_;
 }
 
 ^{LWSP}("edit properties"|"edit") {
