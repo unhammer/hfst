@@ -52,7 +52,7 @@ do
 done
 
 # give pythonpath as argument, from __future__ statement must come first
-for file in test_hfst.py test_examples.py calculate_functionality.py;
+for file in test_hfst.py test_examples.py;
 do
     if ( $PYTHON $file $PYTHONPATH 2> /dev/null > /dev/null ); then
         echo $file" passed"
