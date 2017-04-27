@@ -327,7 +327,7 @@ def regex(re, **kvargs):
             vtype = str(type(v))
             if "HfstTransducer" in vtype:
                 comp.define_transducer(k,v)
-                print('defining transducer')
+                # print('defining transducer')
             else:
                 pass
 
@@ -1227,6 +1227,19 @@ def intersect(transducers):
         retval = HfstTransducer(tr)
       else:
         retval.intersect(tr)
+    retval.minimize()
+    return retval
+
+def compose(transducers):
+    """
+    Return a composition of *transducers*.
+    """
+    retval = None
+    for tr in transducers:
+        if retval == None:
+            retval = HfstTransducer(tr)
+        else:
+            retval.compose(tr)
     retval.minimize()
     return retval
 
