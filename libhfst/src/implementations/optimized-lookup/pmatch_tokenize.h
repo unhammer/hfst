@@ -34,7 +34,7 @@ struct TokenizeSettings {
         bool print_all = false;
         double time_cutoff = 0.0;
         bool verbose = true;
-} DefaultTokenizeSettings;
+};
 
 void print_nonmatching_sequence(std::string const & str, std::ostream & outstream, const TokenizeSettings& s);
 
