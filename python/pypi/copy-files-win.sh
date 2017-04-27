@@ -2,7 +2,7 @@
 
 if [ "$1" = "--help" -o "$1" = "-h" ]; then
     echo ""
-    echo "(todo: help message)"
+    echo "(For windows:) copy files needed for pypi distribution."
     echo ""
     exit 0
 fi
