@@ -1243,6 +1243,21 @@ def compose(transducers):
     retval.minimize()
     return retval
 
+def cross_product(transducers):
+    """
+    Return a cross product of *transducers*.
+    """
+    retval = None
+    for tr in transducers:
+        if retval == None:
+            retval = HfstTransducer(tr)
+        else:
+            retval.cross_product(tr)
+    retval.minimize()
+    return retval
+
+
+
 class ImplementationType:
     """
     Back-end implementation.

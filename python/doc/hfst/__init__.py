@@ -593,6 +593,31 @@ class PrologReader:
     def __next__(self):
         pass
 
+## Return a concatenation of *transducers*.
+# @param transducers An iterable object of transducers.
+def concatenate(transducers):
+    pass
+
+## Return a union of *transducers*.
+# @param transducers An iterable object of transducers.
+def disjunct(transducers):
+    pass
+
+## Return an intersection of *transducers*.
+# @param transducers An iterable object of transducers.
+def intersect(transducers):
+    pass
+
+## Return a composition of *transducers*.
+# @param transducers An iterable object of transducers.
+def compose(transducers):
+    pass
+
+## Return a cross product of *transducers*.
+# @param transducers An iterable object of transducers.
+def cross_product(transducers):
+    pass
+
 ## A simple transducer class with tropical weights.
 #
 #    An example of creating an HfstBasicTransducer [foo:bar baz:baz]
