@@ -79,6 +79,7 @@ if WANT_HFSTOL
 HFST_OL_SRCS=\
 optimized-lookup/transducer.cc optimized-lookup/convert.cc \
 	optimized-lookup/ospell.cc optimized-lookup/pmatch.cc \
+	optimized-lookup/pmatch_tokenize.cc \
 	optimized-lookup/find_epsilon_loops.cc
 endif
 
@@ -124,6 +125,7 @@ hfstolinclude_HEADERS = \
 		optimized-lookup/transducer.h \
 		optimized-lookup/convert.h \
 		optimized-lookup/pmatch.h
+		optimized-lookup/pmatch_tokenize.h
 endif
 
 if WANT_FOMA
