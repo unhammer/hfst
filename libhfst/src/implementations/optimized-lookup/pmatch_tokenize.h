@@ -30,7 +30,7 @@ struct TokenizeSettings {
         OutputFormat output_format = tokenize;
         int max_weight_classes = std::numeric_limits<int>::max();
         bool dedupe = false;
-        bool print_weights = true;
+        bool print_weights = false;
         bool print_all = false;
         double time_cutoff = 0.0;
         bool verbose = true;
