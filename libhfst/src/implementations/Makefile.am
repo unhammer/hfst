@@ -124,7 +124,7 @@ hfstolincludedir = $(implincludedir)/optimized-lookup
 hfstolinclude_HEADERS = \
 		optimized-lookup/transducer.h \
 		optimized-lookup/convert.h \
-		optimized-lookup/pmatch.h
+		optimized-lookup/pmatch.h \
 		optimized-lookup/pmatch_tokenize.h
 endif
 
