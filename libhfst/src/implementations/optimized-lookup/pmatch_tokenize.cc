@@ -9,7 +9,7 @@
 
 #include "pmatch_tokenize.h"
 
-namespace hfst_ol_tokenise {
+namespace hfst_ol_tokenize {
 
 using std::string;
 using std::vector;

@@ -14,7 +14,7 @@
 
 #include "pmatch.h"
 
-namespace hfst_ol_tokenise {
+namespace hfst_ol_tokenize {
 
 enum OutputFormat {
     tokenize,
