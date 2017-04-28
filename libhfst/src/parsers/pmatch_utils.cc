@@ -1223,7 +1223,11 @@ void read_vec(std::string filename)
             // there can be one more from pos to the newline if there isn't a
             // separator at the end
             if (line.back() != separator) {
-                components.push_back(strtof(line.substr(pos + 1).c_str(), NULL));
+#if defined _MSC_VER && 1200 <= _MSC_VER
+	      components.push_back((float)strtod(line.substr(pos + 1).c_str(), NULL));
+#else
+	      components.push_back(strtof(line.substr(pos + 1).c_str(), NULL));
+#endif
             }
             if (word_vectors.size() != 0 && word_vectors[0].vector.size() != components.size()) {
                 std::cerr << "pmatch warning: vector file " << filename <<
