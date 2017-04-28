@@ -60,7 +60,7 @@ using hfst::HfstTransducer;
 using hfst_ol::Location;
 using hfst_ol::LocationVector;
 using hfst_ol::LocationVectorVector;
-using namespace hfst_ol_tokenise;
+using namespace hfst_ol_tokenize;
 
 static bool superblanks = false; // Input is apertium-style superblanks (overrides blankline_separated)
 static bool blankline_separated = true; // Input is separated by blank lines (as opposed to single newlines)
