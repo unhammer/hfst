@@ -812,7 +812,6 @@ cat <<EOF
     *                 name: $enable_name
     *                 optimized-lookup: $enable_optimized_lookup
     *                 pmatch: $enable_pmatch
-    *                 tokenize: $enable_tokenize
     *                 proc: $enable_proc
     *                 project: $enable_project
     *                 prune-alphabet: $enable_prune_alphabet
@@ -830,6 +829,7 @@ cat <<EOF
     *                 summarize: $enable_summarize (summarise)
     *                 tail: $enable_tail
     *                 test: $enable_test
+    *                 tokenize: $enable_tokenize (tokenise)
     *                 twolc: $enable_twolc
     *                 twolc-script: $enable_twolc_script
     *                 tagger: $enable_tagger

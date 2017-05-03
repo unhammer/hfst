@@ -161,7 +161,7 @@ struct StatePlaceholder {
         if (input_present(0)) { // if there are epsilons
             offset = hfst::size_t_to_uint(get_transition_placeholders(0).size());
         }
-        for(std::set<SymbolNumber>::iterator flag_it = flag_symbols.begin();
+        for(std::set<SymbolNumber>::const_iterator flag_it = flag_symbols.begin();
             flag_it != flag_symbols.end(); ++flag_it) {
             if (input_present(*flag_it)) {
                 if (symbol == *flag_it) {

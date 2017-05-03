@@ -27,9 +27,12 @@ and 3.4) and msvc 14.0 (with python 3.5 and 3.6).
 """
 
 from setuptools import setup, Extension
-
 from sys import platform
-if platform == "darwin":
+
+# use standard c++11
+CPP_STD_11=True
+
+if platform == "darwin" and CPP_STD_11:
     import os
     os.environ["_PYTHON_HOST_PLATFORM"] = 'macosx-10.7-x86_64'
 
@@ -51,7 +54,7 @@ if platform == "win32" and sys.version_info[0] == 3 and (sys.version_info[1] == 
 ext_extra_link_args = []
 if platform == "linux" or platform == "linux2" or platform == "darwin":
     ext_extra_link_args = ['-lreadline']
-if platform == "darwin":
+if platform == "darwin" and CPP_STD_11:
     ext_extra_link_args.extend(['-mmacosx-version-min=10.7'])
 
 # HFST headers needed when compiling the actual c++ extension
@@ -77,11 +80,19 @@ if platform == "win32":
     for macro in ["HFSTEXPORT", "OPENFSTEXPORT", "WINDOWS", "WIN32", "_CRT_SECURE_NO_WARNINGS"]:
         ext_define_macros.append((macro, None))
 
+# c++ compiler used for python2 on windows (VC 2008), does not support standard c++11
+if (not CPP_STD_11) or (platform == "win32" and sys.version_info[0] == 2):
+    ext_define_macros.append(('NO_CPLUSPLUS_11', None))
+    ext_define_macros.append(('USE_TR1_UNORDERED_MAP', None))
+    ext_define_macros.append(('USE_TR1_UNORDERED_SET', None))
+
 # use c++0x standard, if possible
 ext_extra_compile_args = []
 if platform == "linux" or platform == "linux2" or platform == "darwin":
-    ext_extra_compile_args = ["-std=c++0x", "-Wno-sign-compare", "-Wno-strict-prototypes"]
-if platform == "darwin":
+    ext_extra_compile_args = ["-Wno-sign-compare", "-Wno-strict-prototypes"]
+    if CPP_STD_11:
+        ext_extra_compile_args.extend(["-std=c++0x"])
+if platform == "darwin" and CPP_STD_11:
     ext_extra_compile_args.extend(["-stdlib=libc++", "-mmacosx-version-min=10.7"])
 # define error handling mechanism on windows
 if platform == "win32":
