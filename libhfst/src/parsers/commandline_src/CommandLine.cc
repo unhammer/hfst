@@ -3,6 +3,7 @@
 #include "CommandLine.h"
 #include <cstring>
 #include <fstream>
+#include <cstdlib>
 
 #ifndef _MSC_VER
 #  include <getopt.h>

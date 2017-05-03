@@ -50,6 +50,7 @@ namespace fst
 }
 #endif
 
+#include <stdint.h>
 #ifdef _MSC_VER
 typedef __int64 int64;
 #else

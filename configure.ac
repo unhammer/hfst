@@ -157,6 +157,16 @@ AC_ARG_WITH([readline],
             [with_readline=$withval],
             [with_readline=no])
 AM_CONDITIONAL([WANT_READLINE], [test x$with_readline != xno])
+# make c++11 features optional; this will disable some functions and make compilation slower
+AC_ARG_WITH([c++11],
+            [AS_HELP_STRING([--with-c++11],
+                            [enable c++11 features @<:@default=yes@:>@])],
+            [with_cplusplus_11=$withval],
+            [with_cplusplus_11=yes])
+AS_IF([test "x$with_cplusplus_11" == "xno"], [AC_DEFINE([NO_CPLUSPLUS_11], [1],
+                                              [Define not to have c++11 support])])
+AS_IF([test "x$with_cplusplus_11" == "xno"], [AC_DEFINE([USE_TR1_UNORDERED_MAP], [1], [Define no c++11 support for openfst back-end])])
+AS_IF([test "x$with_cplusplus_11" == "xno"], [AC_DEFINE([USE_TR1_UNORDERED_SET], [1], [Define no c++11 support for openfst back-end])])
 # make it possible to disable loading entries from shared object (openfst back-end feature),
 # since this adds a dependecy on dl library
 AC_ARG_ENABLE([load_so_entries],
@@ -663,11 +673,13 @@ AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h locale.h langinfo.h]
 
 AC_LANG_PUSH([C++])
 
-# Always use c++11 (flag 'c++0x' is understood also by older compilers)
+# Always use c++11 (flag 'c++0x' is understood also by older compilers) unless --with-c++11=no or --without-c++11 is requested
 # Checks for highest supported C++ standard
 # But, clang++ does not accept invalid OpenFST code, so limit to C++11 for now
+AS_IF([test "x$with_cplusplus_11" != "xno"],[
 AX_CHECK_COMPILE_FLAG([-std=c++11], [CXXFLAGS="$CXXFLAGS -std=c++11"], [
  AS_IF([echo "$CXXFLAGS" | grep '\-std' | grep -E '((gnu\+\+)|(c\+\+))((11)|(0x)|(14)|(1y)|(17)|(1z))' > /dev/null 2> /dev/null], [], [CXXFLAGS="$CXXFLAGS -std=c++0x"])
+])
 ])
 
 AC_CHECK_HEADERS([unordered_map], [], [],
@@ -681,10 +693,12 @@ AC_CHECK_HEADERS([unordered_set], [], [],
 #endif
 ])
 
+AS_IF([test "x$with_cplusplus_11" != "xno"],[
 AS_IF([test "x$ac_cv_header_unordered_map" = "xno"],
             [AC_MSG_ERROR(["<unordered_map> not found, it is needed in c++ standard 11 (or higher)"])])
 AS_IF([test "x$ac_cv_header_unordered_set" = "xno"],
             [AC_MSG_ERROR(["<unordered_set> not found, it is needed in c++ standard 11 (or higher)"])])
+])
 
 AC_CHECK_HEADERS([ext/slist])
 
@@ -836,6 +850,8 @@ AS_IF([test "x$with_unicode_handler" = "xhfst"],
       [AC_MSG_WARN([HFST only supports basic unicode handling with limited case mapping tables etc.; for better support consider using glib or ICU --with-unicode-handler])])
 AS_IF([test "x$with_readline" == "xno"],
       [AC_MSG_WARN([HFST tools will be compiled without readline; editing user input on command line is not supported; for better support consider using --with-readline])])
+AS_IF([test "x$with_cplusplus_11" == "xno"],
+      [AC_MSG_WARN([HFST tools will be compiled without C++11 support; some features will be disabled; for better support consider using --with-c++11])])
 dnl warn about missing "important" tools
 AS_IF([test "x$enable_lexc" == "xno"],
       [AC_MSG_WARN([hfst-lexc is not enabled; enable with --enable-lexc])])

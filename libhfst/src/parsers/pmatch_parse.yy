@@ -672,7 +672,7 @@ READ_FROM: READ_BIN {
     free($1);
     std::string regex;
     std::string tmp;
-    std::ifstream regexfile(filepath);
+    std::ifstream regexfile(filepath.c_str());
     if (regexfile.is_open()) {
         while (getline(regexfile, tmp)) {
             regex.append(tmp);
