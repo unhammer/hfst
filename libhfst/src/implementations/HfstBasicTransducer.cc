@@ -2662,7 +2662,11 @@
                for (StringSet::iterator sym_it = substitutions_performed_for_symbols.begin();
                     sym_it != substitutions_performed_for_symbols.end(); sym_it++)
                  {
+#ifdef NO_CPLUSPLUS_11
+                   this->harmonize(substitution_map[*sym_it]);
+#else					 
                    this->harmonize(substitution_map.at(*sym_it));
+#endif			   
                  }
              }
 

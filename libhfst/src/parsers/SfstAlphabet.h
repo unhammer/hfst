@@ -6,7 +6,11 @@
 #endif
 
 #ifdef NO_CPLUSPLUS_11
+#ifdef _MSC_VER
+#include <unordered_map>
+#else
 #include <tr1/unordered_map>
+#endif
 #else
 #include <unordered_map>
 #endif

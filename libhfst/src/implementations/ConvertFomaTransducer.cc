@@ -106,7 +106,7 @@ namespace hfst { namespace implementations
   {
     const HfstBasicTransducer::HfstAlphabet & alpha
       = hfst_fsm->get_alphabet();
-    for (HfstBasicTransducer::HfstAlphabet::iterator it
+    for (HfstBasicTransducer::HfstAlphabet::const_iterator it
            = alpha.begin();
          it != alpha.end(); it++)
       {

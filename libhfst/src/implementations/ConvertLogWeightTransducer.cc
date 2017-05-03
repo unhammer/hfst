@@ -286,7 +286,7 @@ namespace hfst { namespace implementations
       }
     
     // Add also symbols that do not occur in transitions
-    for (HfstBasicTransducer::HfstAlphabet::iterator it
+    for (HfstBasicTransducer::HfstAlphabet::const_iterator it
            = net->alphabet.begin();
          it != net->alphabet.end(); it++) {
         st.AddSymbol(*it);

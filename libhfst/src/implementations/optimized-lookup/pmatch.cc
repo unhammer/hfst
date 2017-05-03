@@ -732,7 +732,11 @@ void PmatchAlphabet::add_rtn(PmatchTransducer * rtn, std::string const & name)
 
 bool PmatchAlphabet::has_rtn(std::string const & name) const
 {
+#ifdef NO_CPLUSPLUS_11
+    return rtn_names[name] < rtns.size() && rtns[rtn_names[name]] != NULL;
+#else	
     return rtn_names.at(name) < rtns.size() && rtns[rtn_names.at(name)] != NULL;
+#endif
 }
 
 bool PmatchAlphabet::has_rtn(SymbolNumber symbol) const
