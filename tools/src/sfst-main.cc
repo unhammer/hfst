@@ -25,7 +25,7 @@ using std::cerr;
 using namespace hfst;
 
 int switch_=0;
-hfst::ImplementationType output_format = hfst::ImplementationType::ERROR_TYPE;
+hfst::ImplementationType output_format = ERROR_TYPE;
 
 int Compact=0;
 int LowMem=0;

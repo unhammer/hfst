@@ -1140,7 +1140,7 @@ HfstTransducer * read_text(std::string filename, ImplementationType type,
 {
     std::ifstream infile;
     std::string line;
-    infile.open(filename);
+    infile.open(filename.c_str());
     HfstTokenizer tok;
     HfstTransducer * retval = new HfstTransducer(type);
     if(!infile.good()) {
@@ -1192,7 +1192,7 @@ void read_vec(std::string filename)
     std::string line;
     size_t linenumber = 0;
     char separator = '\t';
-    infile.open(filename);
+    infile.open(filename.c_str());
     if(!infile.good()) {
         std::cerr << "pmatch: could not open vector file " << filename <<
             " for reading\n";
@@ -1222,7 +1222,11 @@ void read_vec(std::string filename)
             }
             // there can be one more from pos to the newline if there isn't a
             // separator at the end
+#if defined(NO_CPLUSPLUS_11)
+            if (*(line.rbegin()) != separator) {
+#else
             if (line.back() != separator) {
+#endif
 #if defined _MSC_VER && 1200 <= _MSC_VER
 	      components.push_back((float)strtod(line.substr(pos + 1).c_str(), NULL));
 #else

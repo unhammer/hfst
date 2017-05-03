@@ -11,6 +11,7 @@
 #include <limits.h>
 #include <float.h>
 #include <stdexcept>
+#include <cstdio>
 
 namespace hfst
 {
