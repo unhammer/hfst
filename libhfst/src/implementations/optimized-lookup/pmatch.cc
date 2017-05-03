@@ -733,7 +733,12 @@ void PmatchAlphabet::add_rtn(PmatchTransducer * rtn, std::string const & name)
 bool PmatchAlphabet::has_rtn(std::string const & name) const
 {
 #ifdef NO_CPLUSPLUS_11
-    return rtn_names[name] < rtns.size() && rtns[rtn_names[name]] != NULL;
+    hfst_ol::RtnNameMap::const_iterator it = rtn_names.find(name);
+	if (it != rtn_names.end())
+	{
+		return it->second < rtns.size() && rtns[it->second] != NULL;
+	}
+	HFST_THROW(HfstFatalException);
 #else	
     return rtn_names.at(name) < rtns.size() && rtns[rtn_names.at(name)] != NULL;
 #endif
