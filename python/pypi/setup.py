@@ -82,9 +82,14 @@ if platform == "win32":
 
 # c++ compiler used for python2 on windows (VC 2008), does not support standard c++11
 if (not CPP_STD_11) or (platform == "win32" and sys.version_info[0] == 2):
+	# disable c++11 features
     ext_define_macros.append(('NO_CPLUSPLUS_11', None))
-    ext_define_macros.append(('USE_TR1_UNORDERED_MAP', None))
-    ext_define_macros.append(('USE_TR1_UNORDERED_SET', None))
+	# unordered containers are in namespace std::tr1
+    ext_define_macros.append(('USE_TR1_UNORDERED_MAP_AND_SET', None))
+	# on windows, the header files are not located in directory tr1
+	# although the namespace is std::tr1
+    if not platform == "win32":
+        ext_define_macros.append(('INCLUDE_TR1_UNORDERED_MAP_AND_SET', None))
 
 # use c++0x standard, if possible
 ext_extra_compile_args = []
