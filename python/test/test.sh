@@ -9,7 +9,7 @@ if [ "$1" = "--help" -o "$1" = "-h" ]; then
     echo "Usage: test.sh [--python PYTHON] [--pythonpath PATH]"
     echo ""
     echo "PYTHON: the python to be used for testing, defaults to 'python3'"
-    echo "PATH:   insert PATH to sys.path before running each test"
+    echo "PATH:   full path to insert to sys.path before running each test"
     echo ""
     exit 0
 fi
@@ -34,25 +34,8 @@ for file in test_dir_hfst.py test_dir_hfst_exceptions.py test_dir_hfst_sfst_rule
     test_tokenizer.py test_exceptions.py test_xre.py \
     test_read_att_transducer.py test_prolog.py \
     test_att_reader.py test_prolog_reader.py \
-    test_pmatch.py test_xerox_rules.py;
-do
-    if ! [ "$PYTHONPATH" = "" ]; then
-        echo 'import sys' > tmp
-        echo 'sys.path.insert(0, "'$PYTHONPATH'")' >> tmp
-        cat $file >> tmp
-    else
-        cat $file > tmp
-    fi
-    if ( $PYTHON tmp 2> /dev/null > /dev/null ); then
-        echo $file" passed"
-    else
-        echo $file" failed"
-        exit 1
-    fi
-done
-
-# give pythonpath as argument, from __future__ statement must come first
-for file in test_hfst.py test_examples.py;
+    test_pmatch.py test_xerox_rules.py \
+    test_hfst.py test_examples.py;
 do
     if ( $PYTHON $file $PYTHONPATH 2> /dev/null > /dev/null ); then
         echo $file" passed"
@@ -62,25 +45,9 @@ do
     fi
 done
 
-if ! [ "$PYTHONPATH" = "" ]; then
-    echo 'import sys' > tmp1
-    echo 'sys.path.insert(0, "'$PYTHONPATH'")' >> tmp1
-    cat test_streams_1.py >> tmp1
-    echo 'import sys' > tmp2
-    echo 'sys.path.insert(0, "'$PYTHONPATH'")' >> tmp2
-    cat test_streams_2.py >> tmp2
-    echo 'import sys' > tmp3
-    echo 'sys.path.insert(0, "'$PYTHONPATH'")' >> tmp3
-    cat test_streams_3.py >> tmp3
-else
-    cat test_streams_1.py > tmp1
-    cat test_streams_2.py > tmp2
-    cat test_streams_3.py > tmp3
-fi
-
 for format in sfst openfst foma;
 do
-    if ( $PYTHON tmp1 $format | $PYTHON tmp2 $format | $PYTHON tmp3 $format ); then
+    if ( $PYTHON test_streams_1.py $format $PYTHONPATH | $PYTHON test_streams_2.py $format $PYTHONPATH | $PYTHON test_streams_3.py $format $PYTHONPATH ); then
         echo "test_streams[1|2|3].py with "$format" format passed"
     elif [ "$?" = "77" ]; then
         echo "test_streams[1|2|3].py with "$format" format skipped"
@@ -94,7 +61,3 @@ rm foo
 rm foo_att_prolog
 rm testfile3.att
 rm testfile_.att
-rm tmp
-rm tmp1
-rm tmp2
-rm tmp3
