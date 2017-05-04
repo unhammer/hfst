@@ -60,13 +60,9 @@ namespace hfst
       };
       
       typedef std::set<char*, ltstr> RVarSet;
-#ifdef NO_CPLUSPLUS_11
-      typedef std::tr1::unordered_map<char*,HfstTransducer*> VarMap;
-      typedef std::tr1::unordered_map<char*,Range*> SVarMap;
-#else
-      typedef std::unordered_map<char*,HfstTransducer*> VarMap;
-      typedef std::unordered_map<char*,Range*> SVarMap;
-#endif
+      // using std::(tr1::)unordered_map directive comes from SfstAlphabet.h
+      typedef unordered_map<char*,HfstTransducer*> VarMap;
+      typedef unordered_map<char*,Range*> SVarMap;
       
     private:
       VarMap VM;

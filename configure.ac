@@ -165,8 +165,8 @@ AC_ARG_WITH([c++11],
             [with_cplusplus_11=yes])
 AS_IF([test "x$with_cplusplus_11" == "xno"], [AC_DEFINE([NO_CPLUSPLUS_11], [1],
                                               [Define not to have c++11 support])])
-AS_IF([test "x$with_cplusplus_11" == "xno"], [AC_DEFINE([USE_TR1_UNORDERED_MAP], [1], [Define no c++11 support for openfst back-end])])
-AS_IF([test "x$with_cplusplus_11" == "xno"], [AC_DEFINE([USE_TR1_UNORDERED_SET], [1], [Define no c++11 support for openfst back-end])])
+AS_IF([test "x$with_cplusplus_11" == "xno"], [AC_DEFINE([INCLUDE_TR1_UNORDERED_MAP_AND_SET], [1], [Define unordered container header])])
+AS_IF([test "x$with_cplusplus_11" == "xno"], [AC_DEFINE([USE_TR1_UNORDERED_MAP_AND_SET], [1], [Define unordered container namespace])])
 # make it possible to disable loading entries from shared object (openfst back-end feature),
 # since this adds a dependecy on dl library
 AC_ARG_ENABLE([load_so_entries],
