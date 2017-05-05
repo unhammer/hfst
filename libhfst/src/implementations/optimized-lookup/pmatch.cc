@@ -738,7 +738,7 @@ bool PmatchAlphabet::has_rtn(std::string const & name) const
 	{
 		return it->second < rtns.size() && rtns[it->second] != NULL;
 	}
-	HFST_THROW(HfstFatalException);
+	HFST_THROW_MESSAGE(HfstFatalException, "PmatchAlphabet::has_rtn");
 #else	
     return rtn_names.at(name) < rtns.size() && rtns[rtn_names.at(name)] != NULL;
 #endif

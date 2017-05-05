@@ -33,7 +33,7 @@ void sfsterror(char *text)
 {
   cerr << "\n" << sfst_compiler->filename << ":" << sfstlineno << ": " << text << " at: ";
   cerr << sfsttext << "\naborted.\n";
-  throw HfstException();
+  HFST_THROW(HfstException);
 }
 
 void warn(char *text)
@@ -147,7 +147,7 @@ RE:         RE ARROW CONTEXTS2      { $$ = sfst_compiler->restriction($1,$2,$3,0
           | RE '|' RE        { $1->disjunct(*$3); delete $3; $$ = $1; }
           | '(' RE ')'       { $$ = $2; }
           | STRING           { $$ = sfst_compiler->read_words(sfst_compiler->foldername.c_str(), $1, sfst_compiler->compiler_type); }
-          | STRING2          { try { $$ = sfst_compiler->read_transducer(sfst_compiler->foldername.c_str(), $1, sfst_compiler->compiler_type); } catch (HfstException e) { printf("\nAn error happened when reading file \"%s\"\n", $1); throw HfstException(); } }
+          | STRING2          { try { $$ = sfst_compiler->read_transducer(sfst_compiler->foldername.c_str(), $1, sfst_compiler->compiler_type); } catch (HfstException e) { printf("\nAn error happened when reading file \"%s\"\n", $1);   HFST_THROW(HfstException); } }
           ;
 
 RANGES:     RANGE RANGES     { $$ = sfst_compiler->add_range($1,$2); }

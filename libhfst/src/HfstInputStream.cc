@@ -113,7 +113,7 @@ namespace hfst
         assert(false);
         break;
       }
-    HFST_THROW(HfstFatalException); // make compiler happy
+    HFST_THROW_MESSAGE(HfstFatalException, "stream_get(char &) failed"); // make compiler happy
   }
 
   short &HfstInputStream::stream_get(short &i)
@@ -160,7 +160,7 @@ namespace hfst
         assert(false);
         break;
       }
-    HFST_THROW(HfstFatalException); // make compiler happy
+    HFST_THROW_MESSAGE(HfstFatalException, "stream_get(short &) failed"); // make compiler happy
   }
 
   unsigned short &HfstInputStream::stream_get(unsigned short &i)
@@ -211,7 +211,7 @@ namespace hfst
         assert(false);
         break;
       }
-    HFST_THROW(HfstFatalException); // make compiler happy
+    HFST_THROW_MESSAGE(HfstFatalException, "stream_get() failed"); // make compiler happy
   }
 
   void HfstInputStream::stream_unget(char c)

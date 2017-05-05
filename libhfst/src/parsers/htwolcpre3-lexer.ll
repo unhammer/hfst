@@ -67,7 +67,7 @@ __HFST_TWOLC_Sets { return SETS_DECLARATION; }
 __HFST_TWOLC_Rules { return RULES_DECLARATION; }
 __HFST_TWOLC_DIE {
   // If this symbol is seen, exit quietly.
-  throw HfstException();
+  HFST_THROW(HfstException);
 }
 [ \t\n] { /* space: ignore */ }
 

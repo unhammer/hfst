@@ -545,15 +545,15 @@ void htwolcpre3error(const char * text)
 {
   (void)text;
   htwolcpre3_input_reader.error(text);
-  throw HfstException();
+  HFST_THROW(HfstException);
 }
 
 // Print error messge and exit 1.
 void htwolcpre3_semantic_error(const char * text)
 {
   htwolcpre3_input_reader.error(text);
-  //std::cerr << std::endl << "Error: " << text << std::endl;
-  throw HfstException();
+  std::cerr << std::endl << "Error: " << text << std::endl;
+  HFST_THROW(HfstException);
 }
 
 unsigned int get_number(const std::string &s)
