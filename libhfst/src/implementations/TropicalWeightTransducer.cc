@@ -19,6 +19,10 @@
 #include "back-ends/openfst/src/include/fst/fstlib.h"
 #endif // _MSC_VER
 
+#if defined(USE_FOMA_EPSILON_REMOVAL) && defined(HAVE_FOMA)
+#include "FomaTransducer.h"
+#endif
+
 #ifdef PROFILE_OPENFST
 #include <ctime>
 #endif
@@ -166,7 +170,25 @@ namespace hfst {
 
       CHECK_EPSILON_CYCLES(t, "minimize");
 
+#if defined(USE_FOMA_EPSILON_REMOVAL) && defined(HAVE_FOMA)
+      if (!has_weights(t))
+      	{
+	  hfst::implementations::HfstBasicTransducer * basic1
+	    = hfst::implementations::ConversionFunctions::tropical_ofst_to_hfst_basic_transducer(t);
+	  struct fsm * fst1 = hfst::implementations::ConversionFunctions::hfst_basic_transducer_to_foma(basic1);
+	  struct fsm * fst2 = hfst::implementations::FomaTransducer::remove_epsilons(fst1);
+	  hfst::implementations::HfstBasicTransducer * basic2
+	    = hfst::implementations::ConversionFunctions::foma_to_hfst_basic_transducer(fst2);
+	  delete t;
+	  t = hfst::implementations::ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(basic2);
+	}
+      else
+	{
+	  RmEpsilon<StdArc>(t);
+	}
+#else
       RmEpsilon<StdArc>(t);
+#endif
 
       float w = get_smallest_weight(t);
       if (w < 0)
@@ -184,9 +206,9 @@ namespace hfst {
       Decode(det, encode_mapper);
 
       if (w < 0)
-        {
-          add_to_weights(det, w);
-        }
+	{
+	  add_to_weights(det, w);
+	}
 
       return det;
     }
