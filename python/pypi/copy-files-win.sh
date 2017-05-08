@@ -2,7 +2,11 @@
 
 if [ "$1" = "--help" -o "$1" = "-h" ]; then
     echo ""
-    echo "(For windows:) copy files needed for pypi distribution."
+    echo "Copy files needed for pypi distribution on Windows."
+    echo ""
+    echo "NOTE: flex/bison-generated cc and hh files are copied as such to"
+    echo "avoid dependency on swig. Make sure you have a fresh version of them"
+    echo "(run 'compile-cc-files-win.sh' in '../../libhfst/src/parsers', if needed)."
     echo ""
     exit 0
 fi

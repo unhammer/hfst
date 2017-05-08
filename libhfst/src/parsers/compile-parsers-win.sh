@@ -5,7 +5,7 @@ if [ "$1" = "--help" -o "$1" = "-h" ]; then
   echo "PROGDIR: Absolute path to directory where programs win_flex.exe"
   echo "         and win_bison.exe are located (can be fetched from"
   echo "         https://sourceforge.net/projects/winflexbison/)"
-  echo "EXT:     Extension used in generated C++ files (default: cpp)."
+  echo "EXT:     Extension used for generated C++ files (default: cc)."
   exit 0
 fi
 
@@ -24,7 +24,7 @@ if ! [ -e "$1/win_bison.exe" ]; then
   exit 1
 fi
 
-EXT=cpp
+EXT=cc
 if [ "$2" = "--extension" ]; then
   EXT=$3
 fi
