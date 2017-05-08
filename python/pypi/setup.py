@@ -27,10 +27,24 @@ and 3.4) and msvc 14.0 (with python 3.5 and 3.6).
 """
 
 from setuptools import setup, Extension
-from sys import platform
+from sys import argv, platform
+
+# If hfst-specific option is found in sys.argv, remove it and return True.
+# Else, return False.
+def hfst_specific_option(option):
+    if option in argv:
+        index = argv.index(option)
+        argv.pop(index)
+        return True
+    else:
+        return False
 
 # use standard c++11
 CPP_STD_11=True
+if hfst_specific_option('--with-c++11'):
+    CPP_STD_11=True
+if hfst_specific_option('--without-c++11'):
+    CPP_STD_11=False
 
 if platform == "darwin" and CPP_STD_11:
     import os
