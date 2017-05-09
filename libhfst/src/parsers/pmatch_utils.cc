@@ -1049,6 +1049,8 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
                 HfstTransducer * tmp = defs_it->second->evaluate();
                 tmp->minimize();
                 dummy.harmonize(*tmp);
+                // This is what it will be called in the archive
+                tmp->set_name(defs_it->first);
                 retval[defs_it->first] = tmp;
             }
         }
@@ -1069,10 +1071,12 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
             std::cerr << definitions.begin()->first << " as root\n";
             hfst::HfstTransducer * tmp = definitions.begin()->second->evaluate();
             tmp->minimize();
+            tmp->set_name("TOP");
             retval.insert(std::pair<std::string, hfst::HfstTransducer*>("TOP", tmp));
         } else {
             hfst::HfstTransducer * tmp = definitions["TOP"]->evaluate();
             tmp->minimize();
+            tmp->set_name("TOP");
             retval.insert(std::pair<std::string, hfst::HfstTransducer*>("TOP", tmp));
         }
     }
