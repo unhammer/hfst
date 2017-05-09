@@ -732,7 +732,8 @@ void PmatchAlphabet::add_rtn(PmatchTransducer * rtn, std::string const & name)
 
 bool PmatchAlphabet::has_rtn(std::string const & name) const
 {
-    return rtn_names.at(name) < rtns.size() && rtns[rtn_names.at(name)] != NULL;
+    return rtn_names.count(name) != 0 &&
+        rtn_names.at(name) < rtns.size() && rtns[rtn_names.at(name)] != NULL;
 }
 
 bool PmatchAlphabet::has_rtn(SymbolNumber symbol) const
@@ -1522,6 +1523,13 @@ void PmatchTransducer::rtn_call(unsigned int & input_tape_pos,
     local_stack.top().context_placeholder = 0;
     local_stack.top().default_symbol_trap = false;
     local_stack.top().running_weight = 0.0;
+    if (locations != NULL) {
+        delete locations;
+        locations = NULL;
+    }
+    if (container->locate_mode) {
+        locations = new WeightedDoubleTapeVector();
+    }
     get_analyses(input_tape_pos, tape_pos, 0);
     tape_pos = rtn_stack.top().candidate_tape_pos;
     input_tape_pos = rtn_stack.top().candidate_input_pos;
