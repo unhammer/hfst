@@ -68,6 +68,7 @@ static string subreading_separator = "#";
 static string wtag = "W"; // TODO: cg-conv has an argument --wtag, allow changing here as well?
 static double time_cutoff = 0.0;
 static int token_number = 1;
+static float beam =-1.0;
 static int max_weight_classes = std::numeric_limits<int>::max();
 static bool dedupe = false;
 std::string tokenizer_filename;
@@ -102,6 +103,7 @@ print_usage()
             "  -m, --tokenize-multichar Tokenize multicharacter symbols\n"
             "                           (by default only one utf-8 character is tokenized at a time\n"
             "                           regardless of what is present in the alphabet)\n"
+            "  -b, --beam=B                     Output only analyses whose weight is within B from\n"
             "  -tS, --time-cutoff=S     Limit search after having used S seconds per input\n"
             "  -lN, --weight-classes=N  Output no more than N best weight classes\n"
             "                           (where analyses with equal weight constitute a class\n"
@@ -756,13 +758,24 @@ void print_location_vector(hfst_ol::PmatchContainer & container,
     } else if (output_format == giellacg && locations.size() != 0) {
         print_location_vector_giellacg(container, locations, outstream);
     } else if (output_format == xerox) {
+        float best_weight = std::numeric_limits<float>::max();
+        if (beam >= 0.0) {
+            for (LocationVector::const_iterator loc_it = locations.begin();
+                 loc_it != locations.end(); ++loc_it) {
+                if (best_weight > loc_it->weight) {
+                    best_weight = loc_it->weight;
+                }
+            }
+        }
         for (LocationVector::const_iterator loc_it = locations.begin();
              loc_it != locations.end(); ++loc_it) {
-            outstream << loc_it->input << "\t" << loc_it->output;
-            if (print_weights) {
-                outstream << "\t" << loc_it->weight;
+            if (beam < 0.0 || loc_it->weight <= best_weight + beam) {
+                outstream << loc_it->input << "\t" << loc_it->output;
+                if (print_weights) {
+                    outstream << "\t" << loc_it->weight;
+                }
+                outstream << std::endl;
             }
-            outstream << std::endl;
         }
         outstream << std::endl;
     } else if (output_format == conllu) {
@@ -1020,6 +1033,7 @@ int parse_options(int argc, char** argv)
                 {"print-all", no_argument, 0, 'a'},
                 {"print-weights", no_argument, 0, 'w'},
                 {"tokenize-multichar", no_argument, 0, 'm'},
+                {"beam", required_argument, 0, 'b'},
                 {"time-cutoff", required_argument, 0, 't'},
                 {"weight-classes", required_argument, 0, 'l'},
                 {"unique", required_argument, 0, 'u'},
@@ -1035,7 +1049,7 @@ int parse_options(int argc, char** argv)
                 {0,0,0,0}
             };
         int option_index = 0;
-        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nkawmut:l:zixcSgCf",
+        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nkawmub:t:l:zixcSgCf",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -1073,6 +1087,14 @@ int parse_options(int argc, char** argv)
         case 'u':
             dedupe = true;
             break;
+        case 'b':
+          beam = atof(optarg);
+          if (beam < 0)
+            {
+              std::cerr << "Invalid argument for --beam\n";
+              return EXIT_FAILURE;
+            }
+          break;
         case 'l':
             max_weight_classes = atoi(optarg);
             if (max_weight_classes < 1)
