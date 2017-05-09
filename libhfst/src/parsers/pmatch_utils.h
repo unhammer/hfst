@@ -611,6 +611,9 @@ struct PmatchTransducerContainer: public PmatchObject{
         }
         HfstTransducer * retval = new HfstTransducer(*t);
         retval->set_final_weights(hfst::double_to_float(weight), true);
+        if (name != "") {
+            retval->set_name(name);
+        }
         return retval;
     }
 };
