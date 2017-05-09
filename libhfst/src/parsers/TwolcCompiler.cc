@@ -68,7 +68,7 @@ namespace hfst {
     hfst::twolcpre1::set_error_stream(this->error_stream);
     if (hfst::twolcpre1::parse() != 0)
       {
-        throw HfstException();
+	HFST_THROW(HfstException);
       }
 
     std::istringstream iss1(oss1.str());
@@ -78,7 +78,7 @@ namespace hfst {
 
     if (hfst::twolcpre2::parse() != 0)
       {
-        throw HfstException();
+        HFST_THROW(HfstException);
       }
     hfst::twolcpre2::complete_alphabet();
     std::ostringstream oss2;
@@ -101,7 +101,7 @@ namespace hfst {
     hfst::twolcpre3::set_grammar(&twolc_grammar);
     if (hfst::twolcpre3::parse() != 0)
       {
-        throw HfstException();
+        HFST_THROW(HfstException);
       }
   }
    

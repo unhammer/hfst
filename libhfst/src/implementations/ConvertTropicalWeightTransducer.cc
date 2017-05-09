@@ -245,7 +245,7 @@ namespace hfst { namespace implementations
     st.AddSymbol(internal_identity, 2);
     
     // Copy the alphabet
-    for (HfstBasicTransducer::HfstAlphabet::iterator it
+    for (HfstBasicTransducer::HfstAlphabet::const_iterator it
            = net->alphabet.begin();
          it != net->alphabet.end(); it++) {
       assert(! it->empty());

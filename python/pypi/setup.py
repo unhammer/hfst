@@ -5,12 +5,15 @@ Setup for creating PIP packages for HFST Python bindings.
 
 Before running setup, recursively copy directories 'libhfst/src'
 and 'back-ends' from HFST c++ source code under the directory where
-setup is run. Make sure that the following c++ and header files 
-from 'libhfst/src/parsers' have been generated from flex/yacc
-files before copying:
+setup is run (on linux and os x with copy-files.sh and on windows with
+copy-files-win.sh). Make sure that the following c++ and header files 
+from 'libhfst/src/parsers' have been generated from flex/yacc files
+before copying (on linux and os x by running 'make' and on windows
+with 'compile-parsers-win.sh' located in 'libhfst/src/parsers'):
 
-  lexc-parser.cc pmatch_parse.cc xfst-parser.cc xre_parse.cc
-  lexc-parser.hh pmatch_parse.hh xfst-parser.hh xre_parse.hh
+  lexc-lexer.cc pmatch_lex.cc xfst-lexer.cc xre_lex.cc sfst-scanner.cc
+  lexc-parser.cc pmatch_parse.cc xfst-parser.cc xre_parse.cc sfst-compiler.cc
+  lexc-parser.hh pmatch_parse.hh xfst-parser.hh xre_parse.hh sfst-compiler.hh
 
 Compiling the extensions requires python, swig and a c++ compiler, 
 all located on a directory listed on system PATH. On linux and mac 
@@ -18,15 +21,32 @@ osx, readline and getline must be available and the c++ compiler
 must support flag 'std=c++11'.
 
 The setup script has been tested on linux with gcc 4.6.3, swig 3.0.12 and
-python 3.4 and on windows with msvc 10.0 and swig 3.0.5 (with python 3.3.
-and 3.4) and with msvc 14.0 (with python 3.5 and 3.6).
+python 3.4 and on windows with swig 3.0.5 and msvc 10.0 (with python 3.3.
+and 3.4) and msvc 14.0 (with python 3.5 and 3.6).
 
 """
 
 from setuptools import setup, Extension
+from sys import argv, platform
 
-from sys import platform
-if platform == "darwin":
+# If hfst-specific option is found in sys.argv, remove it and return True.
+# Else, return False.
+def hfst_specific_option(option):
+    if option in argv:
+        index = argv.index(option)
+        argv.pop(index)
+        return True
+    else:
+        return False
+
+# use standard c++11
+CPP_STD_11=True
+if hfst_specific_option('--with-c++11'):
+    CPP_STD_11=True
+if hfst_specific_option('--without-c++11'):
+    CPP_STD_11=False
+
+if platform == "darwin" and CPP_STD_11:
     import os
     os.environ["_PYTHON_HOST_PLATFORM"] = 'macosx-10.7-x86_64'
 
@@ -48,7 +68,7 @@ if platform == "win32" and sys.version_info[0] == 3 and (sys.version_info[1] == 
 ext_extra_link_args = []
 if platform == "linux" or platform == "linux2" or platform == "darwin":
     ext_extra_link_args = ['-lreadline']
-if platform == "darwin":
+if platform == "darwin" and CPP_STD_11:
     ext_extra_link_args.extend(['-mmacosx-version-min=10.7'])
 
 # HFST headers needed when compiling the actual c++ extension
@@ -60,8 +80,12 @@ else:
     ext_include_dirs.append("back-ends/openfst/src/include")
 
 # this replaces ./configure
-ext_define_macros = [ ('HAVE_FOMA', None), ('HAVE_OPENFST', None),
-                      ('HAVE_OPENFST_LOG', None) ]
+ext_define_macros = [ ('HAVE_OPENFST', None), ('HAVE_OPENFST_LOG', None) ]
+
+# at the moment, foma back-end is disabled on os x as
+# clang doesn't accept "-std=c++11" or "-std=c++0x" flag when compiling C
+if platform == "linux" or platform == "linux2" or platform == "win32":
+    ext_define_macros.append(('HAVE_FOMA', None))
 if platform == "linux" or platform == "linux2" or platform == "darwin":
     ext_define_macros.append(('HAVE_READLINE', None))
     ext_define_macros.append(('HAVE_GETLINE', None))
@@ -70,11 +94,24 @@ if platform == "win32":
     for macro in ["HFSTEXPORT", "OPENFSTEXPORT", "WINDOWS", "WIN32", "_CRT_SECURE_NO_WARNINGS"]:
         ext_define_macros.append((macro, None))
 
+# c++ compiler used for python2 on windows (VC 2008), does not support standard c++11
+if (not CPP_STD_11) or (platform == "win32" and sys.version_info[0] == 2):
+	# disable c++11 features
+    ext_define_macros.append(('NO_CPLUSPLUS_11', None))
+	# unordered containers are in namespace std::tr1
+    ext_define_macros.append(('USE_TR1_UNORDERED_MAP_AND_SET', None))
+	# on windows, the header files are not located in directory tr1
+	# although the namespace is std::tr1
+    if not platform == "win32":
+        ext_define_macros.append(('INCLUDE_TR1_UNORDERED_MAP_AND_SET', None))
+
 # use c++0x standard, if possible
 ext_extra_compile_args = []
 if platform == "linux" or platform == "linux2" or platform == "darwin":
-    ext_extra_compile_args = ["-std=c++0x", "-Wno-sign-compare", "-Wno-strict-prototypes"]
-if platform == "darwin":
+    ext_extra_compile_args = ["-Wno-sign-compare", "-Wno-strict-prototypes"]
+    if CPP_STD_11:
+        ext_extra_compile_args.extend(["-std=c++0x"])
+if platform == "darwin" and CPP_STD_11:
     ext_extra_compile_args.extend(["-stdlib=libc++", "-mmacosx-version-min=10.7"])
 # define error handling mechanism on windows
 if platform == "win32":
@@ -193,6 +230,7 @@ openfst_source_files =  [ "back-ends/" + openfstdir + "/src/lib/compat" + cpp,
 
 libhfst_source_files = libhfst_source_files + openfst_source_files
 
+# At the moment, foma back-end is disabled on os x. See the following comment.
 if platform == "linux" or platform == "linux2" or platform == "win32":
     libhfst_source_files = libhfst_source_files + foma_source_files
 
@@ -201,9 +239,9 @@ if platform == "linux" or platform == "linux2" or platform == "win32":
 # it seems that subprocess doesn't work, so you must compile them manually before running setup.py:
 # for file in back-ends/foma/*.c; do clang -fPIC -std=c99 -arch i386 -arch x86_64 -mmacosx-version-min=10.7 -DHAVE_FOMA -c $file ; done
 foma_object_files = []
-if platform == "darwin":
-    for file in foma_source_files:
-        foma_object_files.append(file.replace('back-ends/foma/','').replace('.c','.o'))
+#if platform == "darwin":
+#    for file in foma_source_files:
+#        foma_object_files.append(file.replace('back-ends/foma/','').replace('.c','.o'))
 
 # The HFST c++ extension
 libhfst_module = Extension('_libhfst',
@@ -220,7 +258,7 @@ libhfst_module = Extension('_libhfst',
                            )
 
 setup(name = 'hfst',
-      version = '3.12.2.0_beta',
+      version = '3.12.2.2_beta',
       author = 'HFST team',
       author_email = 'hfst-bugs@helsinki.fi',
       url = 'http://hfst.github.io/',

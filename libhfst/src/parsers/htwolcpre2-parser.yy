@@ -242,7 +242,7 @@ void htwolcpre2error(const char * text)
   //std::cerr << text << std::endl;
   htwolcpre2_input_reader.error(text);
   (void)text;
-  throw HfstException();
+  HFST_THROW(HfstException);
 }
 
 void htwolcpre2_semantic_error(const char * text)

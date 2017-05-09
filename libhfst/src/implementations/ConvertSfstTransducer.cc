@@ -164,7 +164,7 @@ namespace hfst { namespace implementations
     t->alphabet.add_symbol(internal_identity.c_str(), 2);
     
     // Copy the alphabet
-    for (HfstBasicTransducer::HfstAlphabet::iterator it
+    for (HfstBasicTransducer::HfstAlphabet::const_iterator it
            = net->alphabet.begin();
          it != net->alphabet.end(); it++) {
       if (not is_epsilon(*it) && not is_unknown(*it) && not is_identity(*it))

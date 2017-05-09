@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # The examples given in doxygen documentation
 from __future__ import print_function
 import sys

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+import sys
+if len(sys.argv) > 1:
+    sys.path.insert(0, sys.argv[1])
 import hfst
-from sys import version
 
 for type in [hfst.ImplementationType.SFST_TYPE, hfst.ImplementationType.TROPICAL_OPENFST_TYPE, hfst.ImplementationType.FOMA_TYPE]:
     if hfst.HfstTransducer.is_implementation_type_available(type):
@@ -60,7 +62,7 @@ for type in [hfst.ImplementationType.SFST_TYPE, hfst.ImplementationType.TROPICAL
         assert tok.tokenize_space_separated('foobar') == \
             (('foobar', 'foobar'),)
 
-        if int(version[0]) > 2:
+        if int(sys.version[0]) > 2:
             try:
                 hfst.HfstTokenizer.check_utf8_correctness('föö')
             except hfst.exceptions.IncorrectUtf8CodingException as e:

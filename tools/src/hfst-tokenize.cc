@@ -977,6 +977,9 @@ inline void maybe_erase_newline(string& input_text)
 int process_input(hfst_ol::PmatchContainer & container,
                   std::ostream & outstream)
 {
+    if(output_format == cg || output_format == giellacg) {
+        outstream << std::fixed << std::setprecision(0);
+    }
     if(output_format == giellacg || superblanks) {
         if(superblanks) {
             return process_input_0delim<true>(container, outstream);

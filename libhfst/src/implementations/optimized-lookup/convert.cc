@@ -608,7 +608,7 @@ TransitionTableIndex ConvertFstState::append_transitions(
     ++place;
   }
   
-  for(ConvertTransitionSet::iterator it=transitions.begin();
+  for(ConvertTransitionSet::const_iterator it=transitions.begin();
       it!=transitions.end(); ++it)
   {
     transition_table.append((*it)->to_transition<T>());

@@ -97,7 +97,7 @@ __HFST_TWOLC_KILL_SYMBOL {
   // Signifies a syntax error in the first compilation phase.
   // Just die quietly, since syntax error msgs have been issued by
   // the first compilation phase.
-  throw HfstException();
+  HFST_THROW(HfstException);
 }
 [ ] { /* space: ignore */ }
 __HFST_TWOLC_RULE_NAME=\"[^\"]+\" {
@@ -289,7 +289,7 @@ __HFST_TWOLC__ {
 __HFST_TWOLC_DIE {
   // If this symbol is seen, pass it on and exit quietly.
   //std::cout << "__HFST_TWOLC_DIE";
-  throw HfstException();
+  HFST_THROW(HfstException);
 }
 __HFST_TWOLC_SET_NAME=[^ ]+ {
   htwolcpre2_non_alphabet_symbol_queue.push_back(htwolcpre2text);

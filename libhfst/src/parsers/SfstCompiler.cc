@@ -105,7 +105,7 @@ namespace hfst
     fprintf(stderr,
         "ERROR: The wildcard symbol '.'"
         " requires the definition of an alphabet");
-    throw HfstException();
+    HFST_THROW(HfstException);
       }
       
       // one of the ranges was '.'
@@ -168,12 +168,12 @@ namespace hfst
 
   void SfstCompiler::error( const char *message ) {
     std::cerr << "\nError: " << message << "\naborted.\n";
-    throw HfstException();
+    HFST_THROW(HfstException);
   }
 
   void SfstCompiler::error2( const char *message, char *input ) {
     std::cerr << "\nError: " << message << ": " << input << "\naborted.\n";
-    throw HfstException();
+    HFST_THROW(HfstException);
   }
   
   Character SfstCompiler::symbol_code( char *symbol )
@@ -279,7 +279,7 @@ namespace hfst
     VarMap::iterator it=VM.find(name);
     if (it == VM.end()) {
       printf("undefined variable %s\n", name);
-      throw HfstException();
+      HFST_THROW(HfstException);
     }
     free(name);
     return new HfstTransducer(*(it->second));
@@ -360,7 +360,7 @@ namespace hfst
       if (l->get_type() != r->get_type()) {
     fprintf(stderr, "ERROR: in sfst-compiler.yy:"
         " context transducers do not have the same type.\n");
-    throw HfstException();
+    HFST_THROW(HfstException);
       }
     }
 
@@ -389,7 +389,7 @@ namespace hfst
     nc->right->get_type() != c->right->get_type() ) {
       fprintf(stderr, "ERROR: in sfst-compiler.yy:"
           " context transducers do not have the same type.\n");
-      throw HfstException();
+      HFST_THROW(HfstException);
     }
     nc->next = c;
     return nc;
@@ -560,7 +560,7 @@ namespace hfst
     if (!Alphabet_Defined) {
       fprintf(stderr, "\nERROR:"
           " Two level rules require the definition of an alphabet!\n");
-      throw HfstException();
+      HFST_THROW(HfstException);
     }
 
     if (lc == NULL)
@@ -585,7 +585,7 @@ namespace hfst
       if (!Alphabet_Defined) {
     fprintf(stderr, "ERROR: The wildcard symbol '.'"
         " requires the definition of an alphabet");
-    throw HfstException();
+    HFST_THROW(HfstException);
       }
       
       // one of the ranges was '.'
@@ -793,10 +793,10 @@ namespace hfst
     break;
       default:
     fprintf(stderr, "ERROR: invalid replace type requested\n");
-    throw HfstException();
+    HFST_THROW(HfstException);
       }
     fprintf(stderr, "ERROR: in function SfstCompiler::replace\n");
-    throw HfstException();
+    HFST_THROW(HfstException);
   }
 
   HfstTransducer * SfstCompiler::make_mapping( Ranges *list1, Ranges *list2, ImplementationType type ) {

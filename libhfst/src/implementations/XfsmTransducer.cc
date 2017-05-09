@@ -56,7 +56,7 @@ namespace hfst { namespace implementations {
           { HFST_THROW(StreamNotReadableException); }
         list_size = NV_len(net_list);
         if (list_size <= 0)
-          { HFST_THROW(HfstFatalException); }
+          { HFST_THROW_MESSAGE(HfstFatalException, "XfstInputStream::XfsmInputStream(const std::string &)"); }
         list_pos = 0;
       }
     }
@@ -339,7 +339,7 @@ namespace hfst { namespace implementations {
         }
       if (minimize_net(t) == 1)
         {
-          HFST_THROW(HfstFatalException);
+          HFST_THROW_MESSAGE(HfstFatalException, "XfsmTransducer::minimize");
         }
       return t;
     }
@@ -514,14 +514,14 @@ namespace hfst { namespace implementations {
 
     void XfsmTransducer::write_in_att_format(NETptr t, const char * filename)
     {
-      HFST_THROW(HfstFatalException);
+      HFST_THROW_MESSAGE(HfstFatalException, "XfsmTransducer::write_in_att_format");
     }
 
     void XfsmTransducer::write_in_prolog_format(NETptr t, const char * filename)
     {
       char * f = strdup(filename);
       if (write_prolog(t, f) != 0)
-        HFST_THROW(HfstFatalException);
+        HFST_THROW_MESSAGE(HfstFatalException, "XfsmTransducer::write_in_prolog_format");
       free(f);
     }
 
@@ -530,7 +530,7 @@ namespace hfst { namespace implementations {
       char * f = strdup(filename);
       NETptr retval = read_prolog(f);
       if (retval == NULL)
-        HFST_THROW(HfstFatalException);
+        HFST_THROW_MESSAGE(HfstFatalException, "XfsmTransducer::prolog_file_to_xfsm_transducer");
       free(f);
       return retval;
     }
