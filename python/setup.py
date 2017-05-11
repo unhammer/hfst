@@ -30,7 +30,7 @@ if local_hfst:
 
 extra_compile_arguments = ['-std=c++0x']
 if platform == "darwin":
-        extra_compile_arguments.extend('["-stdlib=libc++", "-mmacosx-version-min=10.7"]')
+        extra_compile_arguments.extend(["-stdlib=libc++", "-mmacosx-version-min=10.7"])
 
 # If you wish to link hfst c++ library statically, use:
 # library_dirs = []
