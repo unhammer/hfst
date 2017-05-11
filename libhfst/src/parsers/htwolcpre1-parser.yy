@@ -117,6 +117,29 @@ namespace hfst {
 
   // Queue for rule-matchers.
   HandyDeque<Matcher> matcher_queue;
+
+namespace hfst {
+namespace twolcpre1 {
+void reset_parser()
+{
+  output = NULL;
+  htwolcpre1_line_number = 1;
+  htwolcpre1_input_reader.reset();
+  variable_value_map = VariableValueMap();
+  rule_variables = RuleVariables();
+  //rule_symbol_vector.reset();
+  htwolcpre1_symbol_queue = HandyDeque<std::string>();
+  sets = HandySet<std::string>();
+  definitions = HandySet<std::string>();
+  set_symbols = HandyMap<std::string,std::vector<std::string> >();
+  set_name = std::string();
+  latest_set.clear();
+  htwolcpre1_inside_parenthesis = false;
+  variable_vector.clear();
+  matcher_queue = HandyDeque<Matcher>();
+}
+}
+}
 %}
 
 

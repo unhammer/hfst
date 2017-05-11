@@ -22,6 +22,8 @@ namespace hfst {
     int parse();
     void set_input(std::istream & istr);
     void set_output(std::ostream & ostr);
+    void reset_lexer();
+    void reset_parser();
   }
 }
 
@@ -32,6 +34,8 @@ namespace hfst {
     void complete_alphabet(void);
     const HandyDeque<std::string> & get_total_alphabet_symbol_queue();
     const HandyDeque<std::string> & get_non_alphabet_symbol_queue();
+    void reset_lexer();
+    void reset_parser();
   }
 }
 
@@ -43,6 +47,7 @@ namespace hfst {
     TwolCGrammar * get_grammar();
     void set_silent(bool val);
     void set_verbose(bool val);
+    void reset_parser();
   }
 }
 
@@ -51,6 +56,10 @@ namespace hfst {
 
     int compile_twolc_file(const std::string & inputfile, const std::string & outputfile)
     {
+      // Reset previous values
+      hfst::twolcpre1::reset_lexer();
+      hfst::twolcpre1::reset_parser();
+
       // (1) Preprocessing
       std::ifstream istr(inputfile.c_str());
       hfst::twolcpre1::set_input(istr);
@@ -93,6 +102,9 @@ namespace hfst {
       std::ostringstream oss2;
       oss2 << hfst::twolcpre2::get_total_alphabet_symbol_queue() << " ";
       oss2 << hfst::twolcpre2::get_non_alphabet_symbol_queue();
+
+      // Reset previous values
+      hfst::twolcpre3::reset_parser();
 
       // (3) Compilation
       try

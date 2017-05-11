@@ -58,6 +58,15 @@ result = 1; \
   // Tells whether the Alphabet section ended. It ends when the first
   // __HFST_TWOLC_; is seen.
   bool alphabet_ended = false;
+
+namespace hfst {
+namespace twolcpre2 {
+void reset_lexer()
+{
+  alphabet_ended = false;
+}
+}}
+
 %}
 
 %%

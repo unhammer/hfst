@@ -77,6 +77,7 @@ namespace hfst {
   InputReader htwolcpre3_input_reader(htwolcpre3_line_number);
 
 namespace hfst { namespace twolcpre3 {
+
   void set_input(std::istream & istr)
   {
     htwolcpre3_input_reader.set_input(istr);
@@ -117,6 +118,15 @@ namespace hfst {
   {
     return grammar;
   }
+
+  void reset_parser()
+  {
+    htwolcpre3_line_number = 1;
+    htwolcpre3_input_reader.reset();
+    alphabet = Alphabet();
+    definition_map = HandyMap<std::string,OtherSymbolTransducer>();
+  }
+
 }}
 
   unsigned int get_number(const std::string &);
