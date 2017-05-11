@@ -80,6 +80,10 @@ namespace hfst {
 	  return -1;
 	}
 
+      // Reset previous values
+      hfst::twolcpre2::reset_lexer();
+      hfst::twolcpre2::reset_parser();
+
       // (2) Preprocessing
       std::istringstream iss1(oss1.str());
       hfst::twolcpre2::set_input(iss1);
