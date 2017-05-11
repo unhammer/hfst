@@ -54,7 +54,7 @@ import hfst.sfst_rules
 import hfst.xerox_rules
 from libhfst import is_diacritic, compile_pmatch_expression, HfstTransducer, HfstOutputStream, HfstInputStream, \
 HfstTokenizer, HfstBasicTransducer, HfstBasicTransition, XreCompiler, LexcCompiler, \
-XfstCompiler, set_default_fst_type, get_default_fst_type, fst_type_to_string, PmatchContainer
+XfstCompiler, set_default_fst_type, get_default_fst_type, fst_type_to_string, PmatchContainer, compile_twolc_file
 import libhfst
 
 from sys import version

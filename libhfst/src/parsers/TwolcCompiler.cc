@@ -16,15 +16,12 @@
 #include "grammar_defs.h"
 #include "rule_src/TwolCGrammar.h"
 #include "rule_src/OtherSymbolTransducer.h"
-#include "TwolcCompiler.h"
 
 namespace hfst {
   namespace twolcpre1 {
     int parse();
     void set_input(std::istream & istr);
     void set_output(std::ostream & ostr);
-    void set_warning_stream(std::ostream & ostr);
-    void set_error_stream(std::ostream & ostr);
   }
 }
 
@@ -35,8 +32,6 @@ namespace hfst {
     void complete_alphabet(void);
     const HandyDeque<std::string> & get_total_alphabet_symbol_queue();
     const HandyDeque<std::string> & get_non_alphabet_symbol_queue();
-    void set_warning_stream(std::ostream & ostr);
-    void set_error_stream(std::ostream & ostr);
   }
 }
 
@@ -48,69 +43,96 @@ namespace hfst {
     TwolCGrammar * get_grammar();
     void set_silent(bool val);
     void set_verbose(bool val);
-    void message(const std::string &m);
-    void set_warning_stream(std::ostream & ostr);
-    void set_error_stream(std::ostream & ostr);
   }
 }
 
 namespace hfst {
+  namespace twolc {
 
-  TwolcCompiler::TwolcCompiler(const CommandLine & cl, std::ostream & warn, std::ostream & error):
-    command_line(cl), warning_stream(warn), error_stream(error) {};
+    int compile_twolc_file(const std::string & inputfile, const std::string & outputfile)
+    {
+      // (1) Preprocessing
+      std::ifstream istr(inputfile.c_str());
+      hfst::twolcpre1::set_input(istr);
+      std::ostringstream oss1;
+      hfst::twolcpre1::set_output(oss1);
 
-  void TwolcCompiler::compile()
-  {
-    hfst::twolcpre1::set_input(command_line.set_input_file());
-    std::ostringstream oss1;
-    hfst::twolcpre1::set_output(oss1);
-    hfst::twolcpre1::set_warning_stream(this->warning_stream);
-    hfst::twolcpre1::set_error_stream(this->error_stream);
-    if (hfst::twolcpre1::parse() != 0)
-      {
-	HFST_THROW(HfstException);
-      }
+      try
+	{
+	  int retval = hfst::twolcpre1::parse();
+	  if (retval != 0)
+	    {
+	      return retval;
+	    }
+	}
+      catch(const HfstException & e)
+	{
+	  std::cerr << e.what() << std::endl;
+	  return -1;
+	}
 
-    std::istringstream iss1(oss1.str());
-    hfst::twolcpre2::set_input(iss1);
-    hfst::twolcpre2::set_warning_stream(this->warning_stream);
-    hfst::twolcpre2::set_error_stream(this->error_stream);
+      // (2) Preprocessing
+      std::istringstream iss1(oss1.str());
+      hfst::twolcpre2::set_input(iss1);
+      try
+	{
+	  int retval = hfst::twolcpre2::parse();
+	  if (retval != 0)
+	    {
+	      return retval;
+	    }
+	}
+      catch(const HfstException & e)
+	{
+	  std::cerr << e.what() << std::endl;
+	  return -1;
+	}
 
-    if (hfst::twolcpre2::parse() != 0)
-      {
-        HFST_THROW(HfstException);
-      }
-    hfst::twolcpre2::complete_alphabet();
-    std::ostringstream oss2;
-    oss2 << hfst::twolcpre2::get_total_alphabet_symbol_queue() << " ";
-    oss2 << hfst::twolcpre2::get_non_alphabet_symbol_queue();
+      hfst::twolcpre2::complete_alphabet();
 
-    std::istringstream iss2(oss2.str());
-    hfst::twolcpre3::set_input(iss2);
-    hfst::twolcpre3::set_warning_stream(this->warning_stream);
-    hfst::twolcpre3::set_error_stream(this->error_stream);
-      
-    OtherSymbolTransducer::set_transducer_type(command_line.format);
-    hfst::twolcpre3::set_silent(command_line.be_quiet);
-    hfst::twolcpre3::set_verbose(command_line.be_verbose);
+      std::ostringstream oss2;
+      oss2 << hfst::twolcpre2::get_total_alphabet_symbol_queue() << " ";
+      oss2 << hfst::twolcpre2::get_non_alphabet_symbol_queue();
 
-    TwolCGrammar twolc_grammar(command_line.be_quiet,
-                               command_line.be_verbose,
-                               command_line.resolve_left_conflicts,
-                               command_line.resolve_right_conflicts);
-    hfst::twolcpre3::set_grammar(&twolc_grammar);
-    if (hfst::twolcpre3::parse() != 0)
-      {
-        HFST_THROW(HfstException);
-      }
-  }
-   
-  void TwolcCompiler::store(HfstOutputStream & ostr)
-  {   
-    //hfst::twolcpre3::message("Compiling and storing rules.");
-    hfst::twolcpre3::get_grammar()->compile_and_store(ostr);
-  }
+      // (3) Compilation
+      try
+	{
+	  std::istringstream iss2(oss2.str());
+	  hfst::twolcpre3::set_input(iss2);
 
-}
+	  OtherSymbolTransducer::set_transducer_type(hfst::ImplementationType::TROPICAL_OPENFST_TYPE);
+	  hfst::twolcpre3::set_silent(false);
+	  hfst::twolcpre3::set_verbose(false);
 
+	  TwolCGrammar twolc_grammar(false /*silent*/,
+				     false /*verbose*/,
+				     true /*resolve_left_conflicts*/,
+				     true /*resolve_right_conflicts*/);
+	  hfst::twolcpre3::set_grammar(&twolc_grammar);
+	  int exit_code = hfst::twolcpre3::parse();
+	  if (exit_code != 0)
+	    { return exit_code; }
 
+	  HfstOutputStream out
+	    (outputfile,hfst::ImplementationType::TROPICAL_OPENFST_TYPE);
+	  hfst::twolcpre3::get_grammar()->compile_and_store(out);
+
+	  return exit_code;
+	}
+      catch (const HfstException e)
+	{
+	  std::cerr << "This is an hfst interface bug:" << std::endl
+		    << e() << std::endl;
+	  return -1;
+	}
+      catch (const char * s)
+	{
+	  std::cerr << "This is an a bug probably from sfst:" << std::endl
+		    << s << std::endl;
+	  return -1;
+	}
+
+    }
+
+  } // namespace twolc
+} // namespace hfst

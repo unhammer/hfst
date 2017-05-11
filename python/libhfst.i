@@ -46,6 +46,7 @@
 #include "implementations/HfstBasicTransition.h"
 #include "implementations/HfstBasicTransducer.h"
 #include "implementations/optimized-lookup/pmatch.h"
+#include "parsers/TwolcCompiler.h"
 namespace hfst { typedef std::vector<hfst::xeroxRules::Rule> HfstRuleVector; }
 
 // Most of C++ extension code is located in separate files.
@@ -1591,6 +1592,12 @@ namespace hfst_rules {
 
 
 } // namespace hfst
+
+namespace hfst {
+  namespace twolc {
+    int compile_twolc_file(const std::string & inputfile, const std::string & outputfile);
+  }
+}
 
 // *** PmatchContainer *** //
 
