@@ -42,7 +42,7 @@ for file in test_dir_hfst.py test_dir_hfst_exceptions.py test_dir_hfst_sfst_rule
     test_read_att_transducer.py test_prolog.py \
     test_att_reader.py test_prolog_reader.py \
     test_pmatch.py test_xerox_rules.py \
-    test_hfst.py test_examples.py;
+    test_hfst.py test_examples.py test_twolc.py;
 do
     if [ "$VERBOSE" = "true" ]; then
 	$PYTHON $file $PYTHONPATH
