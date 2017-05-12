@@ -54,7 +54,7 @@ import hfst.sfst_rules
 import hfst.xerox_rules
 from libhfst import is_diacritic, compile_pmatch_expression, HfstTransducer, HfstOutputStream, HfstInputStream, \
 HfstTokenizer, HfstBasicTransducer, HfstBasicTransition, XreCompiler, LexcCompiler, \
-XfstCompiler, set_default_fst_type, get_default_fst_type, fst_type_to_string, PmatchContainer, compile_twolc_file
+XfstCompiler, set_default_fst_type, get_default_fst_type, fst_type_to_string, PmatchContainer
 import libhfst
 
 from sys import version
@@ -755,6 +755,57 @@ def compile_xfst_file(filename, **kvargs):
     if verbosity > 1:
       print('Parsed file with return value %i (0 indicating succesful parsing).' % retval)
     return retval
+
+def compile_twolc_file(inputfilename, outputfilename, **kvargs):
+    """
+    Compile twolc file *inputfilename* and store the result to file *outputfilename*.
+
+    Parameters
+    ----------
+    * `inputfilename` :
+        The name of the twolc input file.
+    * `outputfilename` :
+        The name of the transducer output file.
+    * `kvargs` :
+        Arguments recognized are: silent, verbose, resolve_right_conflicts, resolve_left_conflicts, type.
+    * `silent` :
+        Whether compilation is performed in silent mode, defaults to False.
+    * `verbose` :
+        Whether compilation is performed in verbose mode, defaults to False.
+    * `resolve_right_conflicts` :
+        Whether right arrow conflicts are resolved, defaults to True.
+    * `resolve_left_conflicts` :
+        Whether left arrow conflicts are resolved, defaults to False.
+    * `type` :
+        Implementation type of the compiler, defaults to hfst.get_default_fst_type().
+
+    Returns
+    -------
+    On success zero, else an integer other than zero.
+    """
+    silent=False
+    verbose=False
+    resolve_right_conflicts=True
+    resolve_left_conflicts=False
+    implementation_type=get_default_fst_type()
+
+    for k,v in kvargs.items():
+        if k == 'type':
+            implementation_type = v
+        elif k == 'silent':
+            silent=v
+        elif k == 'verbose':
+            verbose=v
+        elif k == 'resolve_right_conflicts':
+            resolve_right_conflicts=v
+        elif k == 'resolve_left_conflicts':
+            resolve_left_conflicts=v
+        else:
+            print('Warning: ignoring unknown argument %s.' % (k))
+
+    return libhfst.compile_twolc_file(inputfilename, outputfilename, silent, verbose,
+                                      resolve_right_conflicts, resolve_left_conflicts,
+                                      implementation_type)
 
 def compile_pmatch_file(filename):
     """

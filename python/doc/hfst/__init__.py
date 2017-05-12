@@ -372,6 +372,19 @@ def compile_xfst_file(filename, **kwargs):
 def compile_pmatch_file(filename):
     pass
 
+## Compile twolc file \a inputfilename and store the result to file \a outputfilename.
+# @param inputfilename The name of the twolc input file.
+# @param outputfilename The name of the transducer output file.
+# @param kvargs Arguments recognized are: silent, verbose, resolve_right_conflicts, resolve_left_conflicts, type.
+# @param silent Whether compilation is performed in silent mode, defaults to False.
+# @param verbose Whether compilation is performed in verbose mode, defaults to False.
+# @param resolve_right_conflicts Whether right arrow conflicts are resolved, defaults to True.
+# @param resolve_left_conflicts Whether left arrow conflicts are resolved, defaults to False.
+# @param type` Implementation type of the compiler, defaults to hfst.get_default_fst_type().
+# @return On success zero, else an integer other than zero.
+def compile_twolc_file(inputfilename, outputfilename, **kwargs):
+    pass
+
 ## Compile a pmatch expression into a tuple of transducers.
 # @param expr A string defining how pmatch is done.
 # @see hfst.compile_pmatch_file
