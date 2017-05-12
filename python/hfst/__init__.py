@@ -803,9 +803,9 @@ def compile_twolc_file(inputfilename, outputfilename, **kvargs):
         else:
             print('Warning: ignoring unknown argument %s.' % (k))
 
-    return libhfst.compile_twolc_file(inputfilename, outputfilename, silent, verbose,
-                                      resolve_right_conflicts, resolve_left_conflicts,
-                                      implementation_type)
+    return libhfst.TwolcCompiler.compile(inputfilename, outputfilename, silent, verbose,
+                                         resolve_right_conflicts, resolve_left_conflicts,
+                                         implementation_type)
 
 def compile_pmatch_file(filename):
     """

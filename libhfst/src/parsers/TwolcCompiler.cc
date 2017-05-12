@@ -16,6 +16,7 @@
 #include "grammar_defs.h"
 #include "rule_src/TwolCGrammar.h"
 #include "rule_src/OtherSymbolTransducer.h"
+#include "TwolcCompiler.h"
 
 namespace hfst {
   namespace twolcpre1 {
@@ -54,9 +55,10 @@ namespace hfst {
 namespace hfst {
   namespace twolc {
 
-    int compile_twolc_file(const std::string & inputfile, const std::string & outputfile,
-			   bool silent, bool verbose, bool resolve_left_conflicts,
-			   bool resolve_right_conflicts, hfst::ImplementationType type)
+    int TwolcCompiler::compile
+    (const std::string & inputfile, const std::string & outputfile,
+     bool silent, bool verbose, bool resolve_left_conflicts,
+     bool resolve_right_conflicts, hfst::ImplementationType type)
     {
       // Reset previous values
       hfst::twolcpre1::reset_lexer();
@@ -118,21 +120,21 @@ namespace hfst {
 	  std::istringstream iss2(oss2.str());
 	  hfst::twolcpre3::set_input(iss2);
 
-	  OtherSymbolTransducer::set_transducer_type(hfst::ImplementationType::TROPICAL_OPENFST_TYPE);
-	  hfst::twolcpre3::set_silent(false);
-	  hfst::twolcpre3::set_verbose(false);
+	  OtherSymbolTransducer::set_transducer_type(type);
+	  hfst::twolcpre3::set_silent(silent);
+	  hfst::twolcpre3::set_verbose(verbose);
 
-	  TwolCGrammar twolc_grammar(false /*silent*/,
-				     false /*verbose*/,
-				     true /*resolve_left_conflicts*/,
-				     true /*resolve_right_conflicts*/);
+	  TwolCGrammar twolc_grammar(silent,
+				     verbose,
+				     resolve_left_conflicts,
+				     resolve_right_conflicts);
 	  hfst::twolcpre3::set_grammar(&twolc_grammar);
 	  int exit_code = hfst::twolcpre3::parse();
 	  if (exit_code != 0)
 	    { return exit_code; }
 
 	  HfstOutputStream out
-	    (outputfile,hfst::ImplementationType::TROPICAL_OPENFST_TYPE);
+	    (outputfile,type);
 	  hfst::twolcpre3::get_grammar()->compile_and_store(out);
 
 	  return exit_code;

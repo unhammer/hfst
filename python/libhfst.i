@@ -1595,9 +1595,13 @@ namespace hfst_rules {
 
 namespace hfst {
   namespace twolc {
-    int compile_twolc_file(const std::string & inputfile, const std::string & outputfile,
-                           bool silent, bool verbose, bool resolve_left_conflicts,
-                           bool resolve_right_conflicts, hfst::ImplementationType type);
+    class TwolcCompiler
+    {
+    public:
+      static int compile(const std::string & inputfile, const std::string & outputfile,
+			 bool silent, bool verbose, bool resolve_left_conflicts,
+			 bool resolve_right_conflicts, hfst::ImplementationType type);
+    };
   }
 }
 
