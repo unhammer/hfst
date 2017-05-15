@@ -1,17 +1,18 @@
 
 PYTHON="python3"
 PYTHONPATH=""
-VERBOSE="false"
+VERBOSITY=""
 
 if [ "$1" = "--help" -o "$1" = "-h" ]; then
     echo ""
     echo "Run all tests in this folder."
     echo ""
-    echo "Usage: test.sh [--python PYTHON] [--pythonpath PATH] [--verbose]"
+    echo "Usage: test.sh [--python PYTHON] [--pythonpath PATH] [--verbose] [--silent]"
     echo ""
     echo "PYTHON:    the python to be used for testing, defaults to 'python3'"
     echo "PATH:      full path to insert to sys.path before running each test"
     echo "--verbose: show output of tests"
+    echo "--silent:  do not print output"
     echo ""
     exit 0
 fi
@@ -31,7 +32,9 @@ do
     elif [ "$arg" = "--pythonpath" ]; then
 	pythonpath="true"
     elif [ "$arg" = "--verbose" ]; then
-	VERBOSE="true"
+	VERBOSITY="verbose"
+    elif [ "$arg" = "--silent" ]; then
+	VERBOSITY="silent"
     else
 	echo "warning: skipping unknown argument '"$arg"'";
     fi
@@ -44,15 +47,19 @@ for file in test_dir_hfst.py test_dir_hfst_exceptions.py test_dir_hfst_sfst_rule
     test_pmatch.py test_xerox_rules.py \
     test_hfst.py test_examples.py test_twolc.py;
 do
-    if [ "$VERBOSE" = "true" ]; then
+    if [ "$VERBOSITY" = "verbose" ]; then
 	$PYTHON $file $PYTHONPATH
     else
 	$PYTHON $file $PYTHONPATH 2> /dev/null > /dev/null
     fi
     if [ "$?" = "0" ]; then
-        echo $file" passed"
+	if ! [ "$VERBOSITY" = "silent" ]; then
+            echo $file" passed"
+	fi
     else
-        echo $file" failed"
+	if ! [ "$VERBOSITY" = "silent" ]; then
+            echo $file" failed"
+	fi
         exit 1
     fi
 done
@@ -60,11 +67,17 @@ done
 for format in sfst openfst foma;
 do
     if ( $PYTHON test_streams_1.py $format $PYTHONPATH | $PYTHON test_streams_2.py $format $PYTHONPATH | $PYTHON test_streams_3.py $format $PYTHONPATH ); then
-        echo "test_streams[1|2|3].py with "$format" format passed"
+	if ! [ "$VERBOSITY" = "silent" ]; then
+            echo "test_streams[1|2|3].py with "$format" format passed"
+	fi
     elif [ "$?" = "77" ]; then
-        echo "test_streams[1|2|3].py with "$format" format skipped"
+	if ! [ "$VERBOSITY" = "silent" ]; then
+            echo "test_streams[1|2|3].py with "$format" format skipped"
+	fi
     else
-        echo "test_streams[1|2|3].py with "$format" format failed"
+	if ! [ "$VERBOSITY" = "silent" ]; then
+            echo "test_streams[1|2|3].py with "$format" format failed"
+	fi
         exit 1
     fi
 done
