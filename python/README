@@ -23,13 +23,11 @@ to build the Python extension eg. like so:
     python3 setup.py build_ext --inplace
 
 If you have only built HFST library but not installed it (or have an earlier
-version of HFST library installed) and want to build the bindings, you either
-have to add full path to ../libhfst/src/.libs to LD_LIBRARY_PATH or hard-code
-the library path by modifying setup.py:
+version of HFST library installed) and want to build the bindings, running
 
-  extra_link_arguments = []
-  # If you wish to link to the local HFST library, replace the above with:
-  # extra_link_arguments = ["-Wl,-rpath=" + absolute_libhfst_src_path + "/.libs"]
+    python3 setup.py build_ext --inplace --local-hfst
+
+will link to the HFST library located in ../libhfst/src.
 
 
 =================

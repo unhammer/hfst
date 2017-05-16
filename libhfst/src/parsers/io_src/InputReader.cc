@@ -25,6 +25,16 @@ InputReader::InputReader(size_t &counter):
   error_stream(NULL)
 {}
 
+void InputReader::reset()
+{
+  input_stream = NULL;
+  // counter is a reference, so it must be reset separately
+  buffer_size = 500000;
+  buffer_index = 0;
+  warning_stream = NULL;
+  error_stream = NULL;
+}
+
 void InputReader::set_input(std::istream &file)
 {
   input_stream = &file;

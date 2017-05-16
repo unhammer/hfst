@@ -583,13 +583,24 @@ void print_location_vector(hfst_ol::PmatchContainer & container,
     } else if (s.output_format == giellacg && locations.size() != 0) {
         print_location_vector_giellacg(container, locations, outstream, s);
     } else if (s.output_format == xerox) {
+        float best_weight = std::numeric_limits<float>::max();
+        if (s.beam >= 0.0) {
+            for (LocationVector::const_iterator loc_it = locations.begin();
+                 loc_it != locations.end(); ++loc_it) {
+                if (best_weight > loc_it->weight) {
+                    best_weight = loc_it->weight;
+                }
+            }
+        }
         for (LocationVector::const_iterator loc_it = locations.begin();
              loc_it != locations.end(); ++loc_it) {
-            outstream << loc_it->input << "\t" << loc_it->output;
-            if (s.print_weights) {
-                outstream << "\t" << loc_it->weight;
+            if (s.beam < 0.0 || loc_it->weight <= best_weight + s.beam) {
+                outstream << loc_it->input << "\t" << loc_it->output;
+                if (s.print_weights) {
+                    outstream << "\t" << loc_it->weight;
+                }
+                outstream << std::endl;
             }
-            outstream << std::endl;
         }
         outstream << std::endl;
     } else if (s.output_format == conllu) {

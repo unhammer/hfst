@@ -94,7 +94,7 @@ namespace hfst
       {
         HfstTokenizer TOK;
         TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-        hfst::ImplementationType type = hfst::ImplementationType::TROPICAL_OPENFST_TYPE;
+        hfst::ImplementationType type = TROPICAL_OPENFST_TYPE;
         HfstTransducerPair contextPair(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type),
                                        HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type));
         HfstTransducerPairVector epsilonContext;

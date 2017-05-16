@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+import sys
+if len(sys.argv) > 1:
+    sys.path.insert(0, sys.argv[1])
 import hfst.exceptions
 
 # HfstException and its subclasses

@@ -5,7 +5,18 @@
 #  include <config.h>
 #endif
 
+#ifdef INCLUDE_TR1_UNORDERED_MAP_AND_SET
+#include <tr1/unordered_map>
+#else
 #include <unordered_map>
+#endif
+
+#ifdef USE_TR1_UNORDERED_MAP_AND_SET
+using std::tr1::unordered_map;
+#else
+using std::unordered_map;
+#endif
+
 #include <set>
 #include <vector>
 #include <string.h>
@@ -23,7 +34,7 @@ namespace hfst {
     public:
       typedef std::pair<unsigned int,unsigned int> NumberPair;
       // used to map the codes back to the symbols
-      typedef std::unordered_map<unsigned int, char*> CharMap;
+      typedef unordered_map<unsigned int, char*> CharMap;
 
     private:
       // string comparison operators needed ???
@@ -34,7 +45,8 @@ namespace hfst {
       };
       
       // used to map the symbols to their codes
-      typedef std::unordered_map<const char*, unsigned int> SymbolMap;
+      typedef unordered_map<const char*, unsigned int> SymbolMap;
+
       // set of symbol pairs
       typedef std::set<NumberPair> NumberPairSet;
       

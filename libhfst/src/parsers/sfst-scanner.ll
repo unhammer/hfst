@@ -97,7 +97,7 @@ FN	[A-Za-z0-9._/\-*+]
 		     name[strlen(name)-1] = 0;
                      if ( Include_Stack_Ptr >= MAX_INCLUDE_DEPTH ) {
 		       fprintf( stderr, "Includes nested too deeply" );
-                       throw HfstException();
+                       HFST_THROW(HfstException);
 		     }
 		     if (sfst_compiler->Verbose) fputc('\n', stderr);
 		     file = fopen( name, "rt" );

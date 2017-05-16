@@ -161,6 +161,8 @@ int main(int argc, char * argv[])
       HfstOutputStream out
         (command_line.output_file_name,command_line.format);
       hfst::twolcpre3::get_grammar()->compile_and_store(out);
+      out.flush();
+      out.close();
     }
       exit(0);
     }

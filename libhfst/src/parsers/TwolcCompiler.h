@@ -10,25 +10,17 @@
 //   You should have received a copy of the GNU General Public License
 //   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-//#include "commandline_src/CommandLine.h"
-//#include "HfstTwolcDefs.h"
-//#include "io_src/InputReader.h"
-//#include "grammar_defs.h"
-//#include "rule_src/TwolCGrammar.h"
-//#include "rule_src/OtherSymbolTransducer.h"
-
 namespace hfst {
+  namespace twolc {
 
-  class TwolcCompiler
-  {
-  private:
-    CommandLine command_line;
-    std::ostream & warning_stream;
-    std::ostream & error_stream;
-  public:
-    TwolcCompiler(const CommandLine & cl, std::ostream & warn, std::ostream & error);
-    void compile();
-    void store(hfst::HfstOutputStream & ostr);
-  };
+    class TwolcCompiler
+    {
+    public:
+      static int compile
+	(const std::string & inputfile, const std::string & outputfile,
+	 bool silent, bool verbose, bool resolve_left_conflicts,
+	 bool resolve_right_conflicts, hfst::ImplementationType type);
+    };
 
-}
+  } // namespace twolc
+} // namespace hfst

@@ -65,6 +65,17 @@ result = 1; \
 
   void reduce_queue(bool variable_symbol=false);
 
+namespace hfst {
+namespace twolcpre1 {
+void reset_lexer()
+{
+  regexp_start = false;
+  htwolcpre1_rules_start = false;
+  where_seen = false;
+}
+}
+}
+
 %}
 
 RESERVED_SYMBOL	   [*+/\\=\"$?|&^\-\{\}\[\]\(\):;_!%\r\t\n~ ]

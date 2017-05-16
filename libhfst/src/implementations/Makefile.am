@@ -25,7 +25,7 @@ IMPLEMENTATION_SRCS=ConvertTransducerFormat.cc \
                     compose_intersect/ComposeIntersectFst.cc \
                     compose_intersect/ComposeIntersectUtilities.cc
 
-AM_CXXFLAGS=-Wno-deprecated -g -std=c++0x
+AM_CXXFLAGS=-Wno-deprecated -g
 
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/back-ends/foma \
 		-I${top_srcdir}/back-ends

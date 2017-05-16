@@ -44,6 +44,7 @@
   InputReader htwolcpre2_input_reader(htwolcpre2_line_number);
 
 namespace hfst { namespace twolcpre2 {
+
   void set_input(std::istream & istr)
   {
     htwolcpre2_input_reader.set_input(istr);
@@ -242,7 +243,7 @@ void htwolcpre2error(const char * text)
   //std::cerr << text << std::endl;
   htwolcpre2_input_reader.error(text);
   (void)text;
-  throw HfstException();
+  HFST_THROW(HfstException);
 }
 
 void htwolcpre2_semantic_error(const char * text)
@@ -272,6 +273,19 @@ const HandyDeque<std::string> & get_non_alphabet_symbol_queue()
   return htwolcpre2_non_alphabet_symbol_queue;
 }
 }}
+
+namespace hfst { namespace twolcpre2 {
+
+  void reset_parser()
+  {
+    htwolcpre2_line_number = 1;
+    htwolcpre2_input_reader.reset();
+    htwolcpre2_non_alphabet_symbol_queue = HandyDeque<std::string>();
+    htwolcpre2_alphabet_symbol_queue = HandyDeque<std::string>();
+    total_alphabet_symbol_queue = HandyDeque<std::string>();
+  }
+}
+}
 
 void insert_alphabet_pairs(const HandyDeque<std::string> &symbol_queue,
 			   HandySet<SymbolPair> &symbol_pair_set)

@@ -12,9 +12,9 @@ morphological complexity.
 Requirements
 ############
 
-The bindings have been tested with python3. Wheels are offered only for python
-version 3.4 and higher for Windows and Mac OS X. For Linux users, we recommend
-using the `Debian packages
+The bindings have been tested with python 3. Wheels are offered for python
+versions 3.4, 3.5 and 3.6 for Windows and Mac OS X. The OS X support is experimental.
+For Linux users, we recommend using the `Debian packages
 <https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstPython#Option_1_Installing_the_debian_p>`_.
 
 We currently offer only 64-bit wheels for Windows. They also require a 64-bit
@@ -22,13 +22,16 @@ python to work correctly. Wheels for Mac are compiled as universal binaries
 that work on both 32- and 64-bit environments. OS X must be 10.7 or higher.
 
 Compiling from source requires at least swig (tested with versions 2.0.4 and
-3.0.5), a C++ compiler (tested with gcc 4.6.3, clang x.y.z and Visual C++ 10.0
+3.0.5), a C++ compiler (tested with gcc 4.6.3, clang and Visual C++ 10.0
 for python 3.4 and 14.0 for python >= 3.5), and python3 with setuptools
 (tested with version 28.8.0). All these must be located on directories listed
 on system PATH. On Linux and Mac OS X, readline and getline libraries must be
-available and the C++ compiler must support flag 'std=c++0x'. A known issue
-on OS X is that compiling C code fails as flag 'std=c++0x' must be set
-globally in setup.py but is not accepted when the source is pure C.
+available and the C++ compiler must support flag 'std=c++11'.
+
+A known issue on OS X is that compiling C code fails as flag 'std=c++11' must
+be set globally in setup.py but is not accepted when the source is pure C.
+To circumvent this, code written in C (the foma back-end) is disabled on Mac
+if bindings are created from source.
 
 Installation
 ############
@@ -85,6 +88,9 @@ the corresponding wheel for the given environment. Report this via our
 `issue tracker <https://github.com/hfst/hfst/issues/>`_ so a fresh wheel
 will be created.
 
+It is a known issue that pip does not always accept the wheels for OS X
+but starts to compile the bindings from scratch. We are working on this issue.
+
 *Error message "command ... failed with error code ...":*
 
 Try rerunning pip in verbose mode with
@@ -97,7 +103,7 @@ installing as super user with ``sudo pip3 install [--upgrade] hfst``.
 On Windows, reopen Command Prompt/Python command line/IDLE by right-clicking
 and choose "Run as administrator", then run pip again.
 
-*Using flag -std=c++0x causes an error in the C++/C compiler:*
+*Using flag -std=c++11 causes an error in the C++/C compiler:*
 
 This is a known issue on OS X when compiling from source. The flag must be
 set globally in setup.py but is not accepted when the source is pure C, as

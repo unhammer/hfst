@@ -4,52 +4,99 @@
 Setup for creating PIP packages for HFST Python bindings.
 
 Before running setup, recursively copy directories 'libhfst/src'
-and 'back-ends' from HFST c++ source code under the directory where
-setup is run. Make sure that the following c++ and header files 
-from 'libhfst/src/parsers' have been generated from flex/yacc
-files before copying:
+and 'back-ends' from HFST C++ source code under the directory where
+setup is run (on linux and OS X with copy-files.sh and on windows with
+copy-files-win.sh). Make sure that the following C++ files 
+from 'libhfst/src/parsers' have been generated from flex/yacc files
+before copying (on linux and OS X by running 'make' and on windows
+with 'compile-parsers-win.sh' located in 'libhfst/src/parsers'):
 
-  lexc-parser.cc pmatch_parse.cc xfst-parser.cc xre_parse.cc
-  lexc-parser.hh pmatch_parse.hh xfst-parser.hh xre_parse.hh
+  lexc-lexer.cc pmatch_lex.cc xfst-lexer.cc xre_lex.cc sfst-scanner.cc
+  lexc-parser.cc pmatch_parse.cc xfst-parser.cc xre_parse.cc sfst-compiler.cc
+  lexc-parser.hh pmatch_parse.hh xfst-parser.hh xre_parse.hh sfst-compiler.hh
 
-Compiling the extensions requires python, swig and a c++ compiler, 
-all located on a directory listed on system PATH. On linux and mac 
-osx, readline and getline must be available and the c++ compiler
-must support flag 'std=c++11'.
+Compiling the extensions requires python, swig and a C++ compiler,
+all located on a directory listed on system PATH. On linux and OS X,
+readline and getline must be available.
 
 The setup script has been tested on linux with gcc 4.6.3, swig 3.0.12 and
-python 3.4 and on windows with msvc 10.0 and swig 3.0.5 (with python 3.3.
-and 3.4) and with msvc 14.0 (with python 3.5 and 3.6).
+python 3.4 and on windows with swig 3.0.5 and msvc 10.0 (with python 3.3.
+and 3.4) and msvc 14.0 (with python 3.5 and 3.6).
 
 """
 
 from setuptools import setup, Extension
+from sys import argv, platform
 
-from sys import platform
-if platform == "darwin":
-    import os
-    os.environ["_PYTHON_HOST_PLATFORM"] = 'macosx-10.7-x86_64'
+
+# ----- README -----
 
 def readme():
     with open('README.rst') as f:
         return f.read()
 
+
+# ----- SETUP OPTION HANDLING -----
+
+# If hfst-specific option is found in sys.argv, remove it and return True. Else, return False.
+def hfst_specific_option(option):
+    if option in argv:
+        index = argv.index(option)
+        argv.pop(index)
+        return True
+    else:
+        return False
+
+
+# ----- C++ STANDARD  -----
+
+# Use C++ standard C++11 unless compiling for Python 2.7 for Windows (requires msvc 2008 which does not support C++11)
+# or for OS X (C++11 requires libc++ instead of libstdc++ and minimum version requirement 10.7 instead of 10.6 as well
+# as setting option -std=c++0x which clang refuses to accept when compiling C code of foma backend; the latter is a
+# potential issue also for other environments).
+CPP_STD_11=True
+if (platform == "darwin") or (platform == "win32" and sys.version_info[0] == 2):
+    CPP_STD_11=False
+# Override default behaviour, if requested.
+if hfst_specific_option('--with-c++11'):
+    CPP_STD_11=True
+if hfst_specific_option('--without-c++11'):
+    CPP_STD_11=False
+
+# Experimental...
+if platform == "darwin" and CPP_STD_11:
+    import os
+    os.environ["_PYTHON_HOST_PLATFORM"] = 'macosx-10.7-x86_64'
+
+
+# ----- SWIG CONFIGURATION -----
+
 # HFST C++ headers needed by swig when creating the python/c++ interface
 swig_include_dir = "libhfst/src/"
-
+# Generate wrapper for C++
 ext_swig_opts = ["-c++", "-I" + swig_include_dir, "-Wall"]
-import sys
+from sys import version_info
 # for python3.3 and python3.4 on windows, add SDK include directory
-if platform == "win32" and sys.version_info[0] == 3 and (sys.version_info[1] == 3 or sys.version_info[1] == 4):
+if platform == "win32" and version_info[0] == 3 and (version_info[1] == 3 or version_info[1] == 4):
     ext_swig_opts.extend(["-IC:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v7.0A\\Include"])
 
-# readline is needed for hfst.start_xfst(), on windows the shell where HFST
-# python bindings are run from has its own readline which will do
-ext_extra_link_args = []
+
+# ----- LINKER ARGUMENTS -----
+
+# Readline is needed for hfst.start_xfst(). On windows the shell where HFST
+# python bindings are run from has its own readline which will do.
+include_readline_and_getline=False
 if platform == "linux" or platform == "linux2" or platform == "darwin":
+    include_readline_and_getline=True
+ext_extra_link_args = []
+if include_readline_and_getline:
     ext_extra_link_args = ['-lreadline']
-if platform == "darwin":
+# Experimental...
+if platform == "darwin" and CPP_STD_11:
     ext_extra_link_args.extend(['-mmacosx-version-min=10.7'])
+
+
+# ----- INCLUDE DIRECTORIES -----
 
 # HFST headers needed when compiling the actual c++ extension
 ext_include_dirs = [".", "libhfst/src/", "back-ends/foma", "back-ends",
@@ -59,29 +106,60 @@ if platform == "win32":
 else:
     ext_include_dirs.append("back-ends/openfst/src/include")
 
-# this replaces ./configure
-ext_define_macros = [ ('HAVE_FOMA', None), ('HAVE_OPENFST', None),
-                      ('HAVE_OPENFST_LOG', None) ]
-if platform == "linux" or platform == "linux2" or platform == "darwin":
+
+# ----- CONFIGURATION -----
+
+# Include foma implementation for OS X only when c++11 is disabled.
+include_foma_backend=False
+if platform == "linux" or platform == "linux2" or platform == "win32" or (platform == "darwin" and not CPP_STD_11):
+    include_foma_backend=True
+ext_define_macros = []
+if include_foma_backend:
+    ext_define_macros.append(('HAVE_FOMA', None))
+
+# Openfst backend is always enabled
+ext_define_macros.append(('HAVE_OPENFST', None))
+ext_define_macros.append(('HAVE_OPENFST_LOG', None))
+
+if include_readline_and_getline:
     ext_define_macros.append(('HAVE_READLINE', None))
     ext_define_macros.append(('HAVE_GETLINE', None))
+
+# msvc-specific macros.
 if platform == "win32":
     # MSC_VER_ should already be defined
     for macro in ["HFSTEXPORT", "OPENFSTEXPORT", "WINDOWS", "WIN32", "_CRT_SECURE_NO_WARNINGS"]:
         ext_define_macros.append((macro, None))
 
-# use c++0x standard, if possible
+# If C++11 is not supported, what features will be disabled and where unordered map and set are found.
+if (not CPP_STD_11):
+    # Disable c++11 features.
+    ext_define_macros.append(('NO_CPLUSPLUS_11', None))
+    # Unordered containers are in namespace std::tr1.
+    ext_define_macros.append(('USE_TR1_UNORDERED_MAP_AND_SET', None))
+    # On windows, the header files are not located in directory tr1
+    # although the namespace is std::tr1.
+    if not platform == "win32":
+        ext_define_macros.append(('INCLUDE_TR1_UNORDERED_MAP_AND_SET', None))
+
+
+# ----- COMPILATION OPTIONS -----
+
 ext_extra_compile_args = []
 if platform == "linux" or platform == "linux2" or platform == "darwin":
-    ext_extra_compile_args = ["-std=c++0x", "-Wno-sign-compare", "-Wno-strict-prototypes"]
-if platform == "darwin":
+    ext_extra_compile_args = ["-Wno-sign-compare", "-Wno-strict-prototypes"]
+    # C++11 standard does not need to be specifically requested for msvc compilers.
+    if CPP_STD_11:
+        ext_extra_compile_args.extend(["-std=c++0x"])
+# Experimental...
+if platform == "darwin" and CPP_STD_11:
     ext_extra_compile_args.extend(["-stdlib=libc++", "-mmacosx-version-min=10.7"])
 # define error handling mechanism on windows
 if platform == "win32":
     ext_extra_compile_args = ["/EHsc"]
 
-ext_library_dirs = []
-ext_libraries = []
+
+# ----- C++ SOURCE FILES -----
 
 # on windows, c++ source files have 'cpp' extension
 cpp = ".cc"
@@ -157,7 +235,33 @@ libhfst_source_files = ["libhfst/src/parsers/XfstCompiler" + cpp,
                         "libhfst/src/parsers/SfstCompiler" + cpp,
                         "libhfst/src/parsers/SfstAlphabet" + cpp,
                         "libhfst/src/parsers/SfstBasic" + cpp,
-                        "libhfst/src/parsers/SfstUtf8" + cpp ]
+                        "libhfst/src/parsers/SfstUtf8" + cpp,
+                        "libhfst/src/parsers/htwolcpre1-lexer" + cpp,
+                        "libhfst/src/parsers/htwolcpre2-lexer" + cpp,
+                        "libhfst/src/parsers/htwolcpre3-lexer" + cpp,
+                        "libhfst/src/parsers/htwolcpre1-parser" + cpp,
+                        "libhfst/src/parsers/htwolcpre2-parser" + cpp,
+                        "libhfst/src/parsers/htwolcpre3-parser" + cpp,
+                        "libhfst/src/parsers/TwolcCompiler" + cpp,
+                        "libhfst/src/parsers/io_src/InputReader" + cpp,
+                        "libhfst/src/parsers/string_src/string_manipulation" + cpp,
+                        "libhfst/src/parsers/variable_src/RuleSymbolVector" + cpp,
+                        "libhfst/src/parsers/variable_src/RuleVariables" + cpp,
+                        "libhfst/src/parsers/variable_src/RuleVariablesConstIterator" + cpp,
+                        "libhfst/src/parsers/variable_src/VariableValues" + cpp,
+                        "libhfst/src/parsers/rule_src/ConflictResolvingLeftArrowRule" + cpp,
+                        "libhfst/src/parsers/rule_src/ConflictResolvingRightArrowRule" + cpp,
+                        "libhfst/src/parsers/rule_src/LeftArrowRule" + cpp,
+                        "libhfst/src/parsers/rule_src/LeftArrowRuleContainer" + cpp,
+                        "libhfst/src/parsers/rule_src/LeftRestrictionArrowRule" + cpp,
+                        "libhfst/src/parsers/rule_src/OtherSymbolTransducer" + cpp,
+                        "libhfst/src/parsers/rule_src/RightArrowRule" + cpp,
+                        "libhfst/src/parsers/rule_src/RightArrowRuleContainer" + cpp,
+                        "libhfst/src/parsers/rule_src/Rule" + cpp,
+                        "libhfst/src/parsers/rule_src/RuleContainer" + cpp,
+                        "libhfst/src/parsers/rule_src/TwolCGrammar" + cpp,
+                        "libhfst/src/parsers/commandline_src/CommandLine" + cpp,
+                        "libhfst/src/parsers/alphabet_src/Alphabet" + cpp ]
 
 foma_source_files = [ "back-ends/foma/int_stack.c",
                       "back-ends/foma/define.c",
@@ -193,34 +297,34 @@ openfst_source_files =  [ "back-ends/" + openfstdir + "/src/lib/compat" + cpp,
 
 libhfst_source_files = libhfst_source_files + openfst_source_files
 
-if platform == "linux" or platform == "linux2" or platform == "win32":
+if include_foma_backend:
     libhfst_source_files = libhfst_source_files + foma_source_files
 
-# clang doesn't accept "-std=c++11" flag when compiling C,
-# so foma back-end must be compiled separately
-# it seems that subprocess doesn't work, so you must compile them manually before running setup.py:
-# for file in back-ends/foma/*.c; do clang -fPIC -std=c99 -arch i386 -arch x86_64 -mmacosx-version-min=10.7 -DHAVE_FOMA -c $file ; done
-foma_object_files = []
-if platform == "darwin":
-    for file in foma_source_files:
-        foma_object_files.append(file.replace('back-ends/foma/','').replace('.c','.o'))
 
-# The HFST c++ extension
+# (Is this needed?)
+# foma_object_files = []
+# (compile foma backend separately)
+# for file in back-ends/foma/*.c; do clang -fPIC -std=c99 -arch i386 -arch x86_64 -mmacosx-version-min=10.7 -DHAVE_FOMA -c $file ; done
+# if platform == "darwin":
+#     for file in foma_source_files:
+#         foma_object_files.append(file.replace('back-ends/foma/','').replace('.c','.o'))
+# in Extension: extra_objects = foma_object_files
+
+
+# ----- The HFST C++ EXTENSION -----
+
 libhfst_module = Extension('_libhfst',
                            language = "c++",
                            sources = ["libhfst.i"] + libhfst_source_files,
                            swig_opts = ext_swig_opts,
                            include_dirs = ext_include_dirs,
-                           library_dirs = ext_library_dirs,
-                           libraries = ext_libraries,
                            define_macros = ext_define_macros,
                            extra_link_args = ext_extra_link_args,
-                           extra_compile_args = ext_extra_compile_args,
-                           extra_objects = foma_object_files
+                           extra_compile_args = ext_extra_compile_args
                            )
 
 setup(name = 'hfst',
-      version = '3.12.2.0_beta',
+      version = '3.12.2.2_beta',
       author = 'HFST team',
       author_email = 'hfst-bugs@helsinki.fi',
       url = 'http://hfst.github.io/',

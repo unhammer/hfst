@@ -327,7 +327,7 @@ def regex(re, **kvargs):
             vtype = str(type(v))
             if "HfstTransducer" in vtype:
                 comp.define_transducer(k,v)
-                print('defining transducer')
+                # print('defining transducer')
             else:
                 pass
 
@@ -755,6 +755,57 @@ def compile_xfst_file(filename, **kvargs):
     if verbosity > 1:
       print('Parsed file with return value %i (0 indicating succesful parsing).' % retval)
     return retval
+
+def compile_twolc_file(inputfilename, outputfilename, **kvargs):
+    """
+    Compile twolc file *inputfilename* and store the result to file *outputfilename*.
+
+    Parameters
+    ----------
+    * `inputfilename` :
+        The name of the twolc input file.
+    * `outputfilename` :
+        The name of the transducer output file.
+    * `kvargs` :
+        Arguments recognized are: silent, verbose, resolve_right_conflicts, resolve_left_conflicts, type.
+    * `silent` :
+        Whether compilation is performed in silent mode, defaults to False.
+    * `verbose` :
+        Whether compilation is performed in verbose mode, defaults to False.
+    * `resolve_right_conflicts` :
+        Whether right arrow conflicts are resolved, defaults to True.
+    * `resolve_left_conflicts` :
+        Whether left arrow conflicts are resolved, defaults to False.
+    * `type` :
+        Implementation type of the compiler, defaults to hfst.get_default_fst_type().
+
+    Returns
+    -------
+    On success zero, else an integer other than zero.
+    """
+    silent=False
+    verbose=False
+    resolve_right_conflicts=True
+    resolve_left_conflicts=False
+    implementation_type=get_default_fst_type()
+
+    for k,v in kvargs.items():
+        if k == 'type':
+            implementation_type = v
+        elif k == 'silent':
+            silent=v
+        elif k == 'verbose':
+            verbose=v
+        elif k == 'resolve_right_conflicts':
+            resolve_right_conflicts=v
+        elif k == 'resolve_left_conflicts':
+            resolve_left_conflicts=v
+        else:
+            print('Warning: ignoring unknown argument %s.' % (k))
+
+    return libhfst.TwolcCompiler.compile(inputfilename, outputfilename, silent, verbose,
+                                         resolve_right_conflicts, resolve_left_conflicts,
+                                         implementation_type)
 
 def compile_pmatch_file(filename):
     """
@@ -1229,6 +1280,34 @@ def intersect(transducers):
         retval.intersect(tr)
     retval.minimize()
     return retval
+
+def compose(transducers):
+    """
+    Return a composition of *transducers*.
+    """
+    retval = None
+    for tr in transducers:
+        if retval == None:
+            retval = HfstTransducer(tr)
+        else:
+            retval.compose(tr)
+    retval.minimize()
+    return retval
+
+def cross_product(transducers):
+    """
+    Return a cross product of *transducers*.
+    """
+    retval = None
+    for tr in transducers:
+        if retval == None:
+            retval = HfstTransducer(tr)
+        else:
+            retval.cross_product(tr)
+    retval.minimize()
+    return retval
+
+
 
 class ImplementationType:
     """

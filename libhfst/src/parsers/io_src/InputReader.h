@@ -61,6 +61,8 @@ public:
   //! maintained by Bison.
   InputReader(size_t &counter);
 
+  void reset();
+
   //! @brief Set the input stream from which the twolc-grmmar is read.
   void set_input(std::istream &file);
 

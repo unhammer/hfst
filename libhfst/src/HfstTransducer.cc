@@ -4543,11 +4543,10 @@ HfstTransducer &HfstTransducer::priority_union (const HfstTransducer &another)
     HfstTransducer t1upper(t1);
     t1upper.input_project().optimize();
     
-    HfstTransducer complement = HfstTransducer::identity_pair( this->type );
-    complement.repeat_star().optimize();
-    complement.subtract(t1upper).prune_alphabet(false);
+    HfstTransducer complement(t1upper);
+    complement.negate().prune_alphabet(false);
 
-    complement.compose(t2).optimize();
+    complement.compose(t2, true).optimize();
 
     HfstTransducer retval(t1);
     retval.disjunct(complement).optimize();

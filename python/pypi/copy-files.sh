@@ -1,5 +1,19 @@
 #!/bin/sh
 
+## Copy files needed for a pypi distribution for linux or os x.
+## copy-files-win.sh is the equivalent script for windows environment.
+
+if [ "$1" = "--help" -o "$1" = "-h" ]; then
+    echo ""
+    echo "Copy files needed for a pypi distribution on linux and OS X."
+    echo ""
+    echo "NOTE: flex/bison-generated cc and hh files are copied as such to"
+    echo "avoid dependency on swig. Make sure you have a fresh version of them"
+    echo "(run 'make' in top directory, if needed)."
+    echo ""
+    exit 0
+fi
+
 if ! [ -d "back-ends" ]; then mkdir back-ends; fi
 if ! [ -d "libhfst" ]; then mkdir libhfst; fi
 if ! [ -d "hfst" ]; then mkdir hfst; fi

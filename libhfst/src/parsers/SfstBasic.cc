@@ -21,7 +21,7 @@
     char* pStringCopy = (char*)malloc(strlen(pString) + 1);
     if (pStringCopy == NULL) {
       fprintf(stderr, "\nError: out of memory (malloc failed)\naborted.\n");
-      throw HfstException();
+      HFST_THROW(HfstException);
     }
     strcpy(pStringCopy, pString);
     return pStringCopy;

@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
-import hfst
 import sys
+if len(sys.argv) > 2:
+    sys.path.insert(0, sys.argv[2])
+import hfst
+if len(sys.argv) < 1:
+    raise RuntimeError('Transducer format must be given as first argument')
 
 if sys.argv[1] == 'sfst':
     if not hfst.HfstTransducer.is_implementation_type_available(hfst.ImplementationType.SFST_TYPE):

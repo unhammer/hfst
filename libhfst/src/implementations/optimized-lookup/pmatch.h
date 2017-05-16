@@ -310,7 +310,7 @@ namespace hfst_ol {
             }
         }
 
-        bool get_weight(TransitionTableIndex i)
+        Weight get_weight(TransitionTableIndex i)
         {
             if (indexes_transition_table(i)) {
                 return transition_table[i - TRANSITION_TARGET_TABLE_START].get_weight();

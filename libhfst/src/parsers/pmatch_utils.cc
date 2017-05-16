@@ -1049,6 +1049,8 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
                 HfstTransducer * tmp = defs_it->second->evaluate();
                 tmp->minimize();
                 dummy.harmonize(*tmp);
+                // This is what it will be called in the archive
+                tmp->set_name(defs_it->first);
                 retval[defs_it->first] = tmp;
             }
         }
@@ -1069,10 +1071,12 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
             std::cerr << definitions.begin()->first << " as root\n";
             hfst::HfstTransducer * tmp = definitions.begin()->second->evaluate();
             tmp->minimize();
+            tmp->set_name("TOP");
             retval.insert(std::pair<std::string, hfst::HfstTransducer*>("TOP", tmp));
         } else {
             hfst::HfstTransducer * tmp = definitions["TOP"]->evaluate();
             tmp->minimize();
+            tmp->set_name("TOP");
             retval.insert(std::pair<std::string, hfst::HfstTransducer*>("TOP", tmp));
         }
     }
@@ -1140,7 +1144,7 @@ HfstTransducer * read_text(std::string filename, ImplementationType type,
 {
     std::ifstream infile;
     std::string line;
-    infile.open(filename);
+    infile.open(filename.c_str());
     HfstTokenizer tok;
     HfstTransducer * retval = new HfstTransducer(type);
     if(!infile.good()) {
@@ -1192,7 +1196,7 @@ void read_vec(std::string filename)
     std::string line;
     size_t linenumber = 0;
     char separator = '\t';
-    infile.open(filename);
+    infile.open(filename.c_str());
     if(!infile.good()) {
         std::cerr << "pmatch: could not open vector file " << filename <<
             " for reading\n";
@@ -1222,8 +1226,16 @@ void read_vec(std::string filename)
             }
             // there can be one more from pos to the newline if there isn't a
             // separator at the end
+#if defined(NO_CPLUSPLUS_11)
+            if (*(line.rbegin()) != separator) {
+#else
             if (line.back() != separator) {
-                components.push_back(strtof(line.substr(pos + 1).c_str(), NULL));
+#endif
+#if defined _MSC_VER && 1200 <= _MSC_VER
+	      components.push_back((float)strtod(line.substr(pos + 1).c_str(), NULL));
+#else
+	      components.push_back(strtof(line.substr(pos + 1).c_str(), NULL));
+#endif
             }
             if (word_vectors.size() != 0 && word_vectors[0].vector.size() != components.size()) {
                 std::cerr << "pmatch warning: vector file " << filename <<

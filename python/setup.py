@@ -6,6 +6,15 @@ setup for HFST-swig
 
 import os
 from distutils.core import setup, Extension
+
+# handle hfst-specific commands
+import sys
+local_hfst=False
+if '--local-hfst' in sys.argv:
+        index = sys.argv.index('--local-hfst')
+        sys.argv.pop(index)
+        local_hfst=True
+
 from sys import platform
 
 libhfst_src_path = '../libhfst/src/'
@@ -16,14 +25,12 @@ if platform == "darwin":
         extra_link_arguments.extend(['-mmacosx-version-min=10.7'])
 
 # If you wish to link to the local HFST library:
-# extra_link_arguments.extend(["-Wl,-rpath=" + absolute_libhfst_src_path + "/.libs"])
-#
-# When making the debian package:
-# extra_link_arguments.extend(["-L/usr/lib/", "-Wl,-rpath=/usr/lib/"])
+if local_hfst:
+        extra_link_arguments.extend(["-Wl,-rpath=" + absolute_libhfst_src_path + "/.libs"])
 
 extra_compile_arguments = ['-std=c++0x']
 if platform == "darwin":
-        extra_compile_arguments.extend('["-stdlib=libc++", "-mmacosx-version-min=10.7"]')
+        extra_compile_arguments.extend(["-stdlib=libc++", "-mmacosx-version-min=10.7"])
 
 # If you wish to link hfst c++ library statically, use:
 # library_dirs = []
@@ -41,9 +48,7 @@ libhfst_module = Extension('_libhfst',
                            extra_compile_args = extra_compile_arguments,
                            extra_link_args = extra_link_arguments
                            )
-# When making the windows package, replace data_files with
-# ["libhfst-NN.dll", "libgcc_s_seh-1.dll"] or
-# ["libhfst-NN.dll", "libgcc_s_dw2-1.dll"] or
+
 setup(name = 'libhfst_swig',
       version = '3.12.2_beta',
       author = 'HFST team',

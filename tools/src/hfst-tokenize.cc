@@ -86,6 +86,7 @@ print_usage()
             "  -m, --tokenize-multichar Tokenize multicharacter symbols\n"
             "                           (by default only one utf-8 character is tokenized at a time\n"
             "                           regardless of what is present in the alphabet)\n"
+            "  -b, --beam=B             Output only analyses whose weight is within B from\n"
             "  -tS, --time-cutoff=S     Limit search after having used S seconds per input\n"
             "  -lN, --weight-classes=N  Output no more than N best weight classes\n"
             "                           (where analyses with equal weight constitute a class\n"
@@ -282,6 +283,9 @@ inline void maybe_erase_newline(string& input_text)
 int process_input(hfst_ol::PmatchContainer & container,
                   std::ostream & outstream)
 {
+    if(settings.output_format == cg || settings.output_format == giellacg) {
+        outstream << std::fixed << std::setprecision(10);
+    }
     if(settings.output_format == giellacg || superblanks) {
         if(superblanks) {
             return process_input_0delim<true>(container, outstream);
@@ -338,6 +342,7 @@ int parse_options(int argc, char** argv)
                 {"print-all", no_argument, 0, 'a'},
                 {"print-weights", no_argument, 0, 'w'},
                 {"tokenize-multichar", no_argument, 0, 'm'},
+                {"beam", required_argument, 0, 'b'},
                 {"time-cutoff", required_argument, 0, 't'},
                 {"weight-classes", required_argument, 0, 'l'},
                 {"unique", required_argument, 0, 'u'},
@@ -353,7 +358,7 @@ int parse_options(int argc, char** argv)
                 {0,0,0,0}
             };
         int option_index = 0;
-        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nkawmut:l:zixcSgCf",
+        int c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nkawmub:t:l:zixcSgCf",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -391,6 +396,14 @@ int parse_options(int argc, char** argv)
         case 'u':
             settings.dedupe = true;
             break;
+        case 'b':
+          settings.beam = atof(optarg);
+          if (settings.beam < 0)
+          {
+              std::cerr << "Invalid argument for --beam\n";
+              return EXIT_FAILURE;
+          }
+          break;
         case 'l':
             settings.max_weight_classes = atoi(optarg);
             if (settings.max_weight_classes < 1)
