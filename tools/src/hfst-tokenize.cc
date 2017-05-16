@@ -546,7 +546,13 @@ void print_location_vector_giellacg(hfst_ol::PmatchContainer & container,
                                     LocationVector const & locations,
                                     std::ostream & outstream)
 {
-    outstream << "\"<" << locations.at(0).input << ">\"" << std::endl;
+    size_t i_input = 0;
+    for (; i_input < locations.size(); ++i_input) {
+        if(locations.at(i_input).input.length() > 0) {
+            break;
+        }
+    }
+    outstream << "\"<" << locations.at(i_input).input << ">\"" << std::endl;
     if(locations.size() == 1 && locations.at(0).output.empty()) {
         // Treat empty analyses as unknown-but-tokenised:
         outstream << "\t\"" << locations.at(0).input << "\" ?" << std::endl;
